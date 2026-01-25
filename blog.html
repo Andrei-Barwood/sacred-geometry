@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Spiritual blog - Reflections, interviews, reviews, and devotional content">
+  <meta name="keywords" content="spiritual blog, reflections, interviews, reviews, meditation">
+  <title>Spiritual Blog - Kirtan Teg Singh</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Ensure Alpine expressions never crash even if app.js (module) loads after Alpine initializes.
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('app', Alpine.store('app') || {
+        __placeholder: true,
+        mobileMenuOpen: false,
+        darkMode: false,
+        currentView: 'list',
+        selectedFilter: 'All',
+        filteredPosts: [],
+        selectedPost: null,
+        comments: {},
+        commentLoading: {},
+        init() {}
+      });
+    });
+    window.commentForm = window.commentForm || function () {
+      return {
+        name: '',
+        text: '',
+        charCount: 0,
+        maxChars: 500,
+        submitting: false,
+        init() {},
+        get canSubmit() { return false; },
+        get isWarning() { return false; },
+        async handleSubmit() {}
+      };
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.x/dist/cdn.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body class="no-js" x-data="{ }" x-init="Alpine.store('app')?.init?.()">
+  <div id="js-required-overlay" aria-live="polite">
+    <div class="js-required-inner">
+      <h1>Please enable JavaScript</h1>
+      <p>This site requires JavaScript to work. Enable it in your browser settings and reload the page.</p>
+      <p class="js-required-gurmukhi">ਆਜ਼ਾਦੀ ਦੂਜਿਆਂ ਦੀ ਚੀਜ਼ ਵਿੱਚ ਝਾਤੀ ਮਾਰਨ ਨਹੀਂ। ਇਹ ਲਈ ਨਹੀਂ ਜਾ ਸਕਦੀ, ਸਿਰਫ਼ ਦਿੱਤੀ ਜਾ ਸਕਦੀ ਹੈ।</p>
+    </div>
+  </div>
+  <script>document.body.classList.remove('no-js');</script>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <!-- Header -->
+  <header x-data="{ scrolled: false }" x-effect="scrolled = window.scrollY > 50" :class="{ 'scrolled': scrolled }">
+    <div class="header-content">
+      <a href="index.html" class="logo">Kirtan Teg Singh</a>
+      
+      <nav class="desktop-nav">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="blog.html" class="active">Blog</a></li>
+          <li><a href="discography.html">Discography</a></li>
+          <li><a href="biography.html">Biography</a></li>
+          <li><a href="tarot.html">Cloud</a></li>
+          <li>
+            <button 
+              @click="Alpine.store('app').toggleDarkMode()" 
+              class="dark-mode-toggle"
+              aria-label="Toggle dark mode"
+            >
+              <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Hamburger Menu -->
+      <button 
+        class="hamburger" 
+        @click="Alpine.store('app').toggleMobileMenu()"
+        :class="{ 'active': Alpine.store('app').mobileMenuOpen }"
+        aria-label="Navigation menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div 
+      class="mobile-menu" 
+      x-show="Alpine.store('app').mobileMenuOpen"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0 translate-x-full"
+      x-transition:enter-end="opacity-100 translate-x-0"
+      x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="opacity-100 translate-x-0"
+      x-transition:leave-end="opacity-0 translate-x-full"
+    >
+      <ul>
+        <li><a href="index.html" @click="Alpine.store('app').toggleMobileMenu()">Home</a></li>
+        <li><a href="blog.html" @click="Alpine.store('app').toggleMobileMenu()">Blog</a></li>
+        <li><a href="discography.html" @click="Alpine.store('app').toggleMobileMenu()">Discography</a></li>
+        <li><a href="biography.html" @click="Alpine.store('app').toggleMobileMenu()">Biography</a></li>
+        <li><a href="tarot.html" @click="Alpine.store('app').toggleMobileMenu()">Cloud</a></li>
+        <li>
+          <button 
+            @click="Alpine.store('app').toggleDarkMode()" 
+            class="dark-mode-toggle"
+            aria-label="Toggle dark mode"
+          >
+            <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <div 
+      x-show="Alpine.store('app').currentView === 'list'"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+    >
+      <section class="container" style="padding: 4rem 2rem;">
+        <h1 style="text-align: center; margin-bottom: 3rem;">Spiritual Blog</h1>
+        
+        <!-- Filters -->
+        <div class="blog-filters">
+          <button 
+            class="filter-btn" 
+            :class="{ 'active': Alpine.store('app').selectedFilter === 'All' }"
+            @click="Alpine.store('app').filterPosts('All')"
+          >
+            All
+          </button>
+          <button 
+            class="filter-btn" 
+            :class="{ 'active': Alpine.store('app').selectedFilter === 'Interview' }"
+            @click="Alpine.store('app').filterPosts('Interview')"
+          >
+            Interviews
+          </button>
+          <button 
+            class="filter-btn" 
+            :class="{ 'active': Alpine.store('app').selectedFilter === 'Review' }"
+            @click="Alpine.store('app').filterPosts('Review')"
+          >
+            Reviews
+          </button>
+          <button 
+            class="filter-btn" 
+            :class="{ 'active': Alpine.store('app').selectedFilter === 'Reflection' }"
+            @click="Alpine.store('app').filterPosts('Reflection')"
+          >
+            Reflections
+          </button>
+          <button 
+            class="filter-btn" 
+            :class="{ 'active': Alpine.store('app').selectedFilter === 'Casual' }"
+            @click="Alpine.store('app').filterPosts('Casual')"
+          >
+            Casual
+          </button>
+        </div>
+
+        <!-- Posts Grid -->
+        <div class="grid">
+          <template x-for="post in Alpine.store('app').filteredPosts" :key="post.id">
+            <div 
+              class="card" 
+              @click="Alpine.store('app').viewPost(post.id); window.location.href='?post=' + post.id;"
+              style="cursor: pointer;"
+            >
+              <img :src="post.coverImage" :alt="post.title" class="card-img" loading="lazy">
+              <div class="card-meta" style="margin-bottom: 0.5rem;">
+                <span x-text="post.type"></span>
+                <span x-text="new Date(post.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })"></span>
+              </div>
+              <h3 class="card-title" x-text="post.title"></h3>
+              <p class="card-excerpt" x-text="post.excerpt"></p>
+              <div class="card-meta">
+                <span x-text="post.readTime + ' min read'"></span>
+                <span>Read more →</span>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <div x-show="Alpine.store('app').filteredPosts.length === 0" class="empty-state">
+          <p>No entries to show in this category.</p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Post Detail View -->
+    <div 
+      x-show="Alpine.store('app').currentView === 'detail' && Alpine.store('app').selectedPost"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0"
+      x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="opacity-100"
+      x-transition:leave-end="opacity-0"
+    >
+      <section class="blog-detail">
+        <button 
+          @click="Alpine.store('app').backToList()" 
+          style="margin-bottom: 2rem; padding: 0.75rem 1.5rem; background: var(--surface); border: 2px solid var(--border); border-radius: 8px; cursor: pointer;"
+        >
+          ← Back to blog
+        </button>
+
+        <div class="blog-header" x-show="Alpine.store('app').selectedPost">
+          <div class="card-meta" style="margin-bottom: 1rem;">
+            <span x-text="Alpine.store('app').selectedPost?.type"></span>
+            <span x-text="new Date(Alpine.store('app').selectedPost?.date || '').toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })"></span>
+          </div>
+          <h1 x-text="Alpine.store('app').selectedPost?.title"></h1>
+          <img 
+            :src="Alpine.store('app').selectedPost?.coverImage" 
+            :alt="Alpine.store('app').selectedPost?.title" 
+            class="blog-cover"
+            loading="lazy"
+          >
+        </div>
+
+        <article 
+          class="blog-content" 
+          x-html="Alpine.store('app').selectedPost?.content"
+          x-show="Alpine.store('app').selectedPost"
+        >
+        </article>
+
+        <!-- Comments Section -->
+        <div class="comments-section" x-show="Alpine.store('app').selectedPost">
+          <h2 style="margin-bottom: 2rem;">Comments</h2>
+          
+          <!-- Comment Form -->
+          <!-- Comment Form -->
+<div 
+class="comment-form"
+x-data="{
+  postId: null,
+  name: '',
+  text: '',
+  charCount: 0,
+  maxChars: 500,
+  submitting: false,
+  init() {
+    this.$watch('text', (value) => {
+      this.charCount = value.length;
+    });
+  },
+  get canSubmit() {
+    const hasText = this.text.trim().length > 0;
+    const withinLimit = this.text.length <= this.maxChars;
+    const hasPostId = this.postId;
+    
+    return hasText && withinLimit && !this.submitting && hasPostId;
+  },
+  get isWarning() {
+    return this.charCount >= 450;
+  },
+  async handleSubmit() {
+    if (!this.canSubmit) return;
+    
+    this.submitting = true;
+    const result = await Alpine.store('app').submitComment(this.postId.toString(), {
+      name: this.name.trim(),
+      text: this.text.trim()
+    });
+    
+    if (result.success) {
+      this.name = '';
+      this.text = '';
+      this.charCount = 0;
+      // Optional: show success message
+       alert('Comment sent successfully!');
+    } else {
+      alert('Error sending comment: ' + (result.error || 'Please try again.'));
+    }
+    
+    this.submitting = false;
+  }
+}"
+x-effect="postId = Alpine.store('app').selectedPost?.id;"
+>
+<textarea
+  class="comment-textarea"
+  :class="{ 'warning': isWarning }"
+  x-model="text"
+  placeholder="Write your comment..."
+  maxlength="500"
+  rows="4"
+></textarea>
+<div class="char-counter" :class="{ 'warning': isWarning }">
+  <span x-text="charCount"></span> / 500
+</div>
+
+<div class="comment-input-group">
+  <input
+    type="text"
+    class="comment-input"
+    x-model="name"
+    placeholder="Name (optional, will be 'Anonymous' if left blank)"
+  >
+  <button
+    class="comment-submit"
+    :disabled="!canSubmit"
+    @click="handleSubmit()"
+  >
+    <span x-show="!submitting">Send</span>
+    <span x-show="submitting">Sending...</span>
+  </button>
+</div>
+</div>
+
+          <!-- Comments List -->
+          <div 
+            x-show="Alpine.store('app').commentLoading[Alpine.store('app').selectedPost?.id]"
+            class="loading"
+          >
+            Loading comments...
+          </div>
+
+          <div 
+            x-show="!Alpine.store('app').commentLoading[Alpine.store('app').selectedPost?.id] && (!Alpine.store('app').comments[Alpine.store('app').selectedPost?.id] || Alpine.store('app').comments[Alpine.store('app').selectedPost?.id].length === 0)"
+            class="empty-state"
+          >
+            <p>No comments yet. Be the first to share your reflection.</p>
+          </div>
+
+          <template x-for="comment in (Alpine.store('app').comments[Alpine.store('app').selectedPost?.id] || [])" :key="comment.id">
+            <div class="comment">
+              <div 
+                class="comment-avatar"
+                :style="'background-color: ' + getAvatarColor(comment.name)"
+              >
+                <span x-text="getInitials(comment.name)"></span>
+              </div>
+              <div class="comment-body">
+                <div class="comment-author" x-text="comment.name"></div>
+                <div class="comment-text" x-text="comment.text"></div>
+                <div class="comment-date" x-text="formatRelativeTime(comment.timestamp || comment.createdAt)"></div>
+              </div>
+            </div>
+          </template>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>Kirtan Teg Singh and The Gurdwara Ensemble 2026 Ⓒ</p>
+    <p><a href="https://www.youtube.com/@kirtantegsingh" target="_blank" title="YouTube">YouTube</a></p>
+  </footer>
+</body>
+</html>
+

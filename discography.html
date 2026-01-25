@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Discography - Devotional and spiritual music">
+  <meta name="keywords" content="devotional music, spiritual music, discography, albums">
+  <title>Discography - Kirtan Teg Singh</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script>
+    // Ensure Alpine expressions never crash even if app.js (module) loads after Alpine initializes.
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('app', Alpine.store('app') || {
+        __placeholder: true,
+        mobileMenuOpen: false,
+        darkMode: false,
+        currentView: 'list',
+        selectedFilter: 'All',
+        filteredPosts: [],
+        selectedPost: null,
+        comments: {},
+        commentLoading: {},
+        init() {}
+      });
+    });
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.x/dist/cdn.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</head>
+<body class="no-js" x-data="{ }" x-init="Alpine.store('app')?.init?.()">
+  <div id="js-required-overlay" aria-live="polite">
+    <div class="js-required-inner">
+      <h1>Please enable JavaScript</h1>
+      <p>This site requires JavaScript to work. Enable it in your browser settings and reload the page.</p>
+      <p class="js-required-gurmukhi">ਆਜ਼ਾਦੀ ਦੂਜਿਆਂ ਦੀ ਚੀਜ਼ ਵਿੱਚ ਝਾਤੀ ਮਾਰਨ ਨਹੀਂ। ਇਹ ਲਈ ਨਹੀਂ ਜਾ ਸਕਦੀ, ਸਿਰਫ਼ ਦਿੱਤੀ ਜਾ ਸਕਦੀ ਹੈ।</p>
+    </div>
+  </div>
+  <script>document.body.classList.remove('no-js');</script>
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  
+  <!-- Header -->
+  <header x-data="{ scrolled: false }" x-effect="scrolled = window.scrollY > 50" :class="{ 'scrolled': scrolled }">
+    <div class="header-content">
+      <a href="index.html" class="logo">Kirtan Teg Singh</a>
+      
+      <nav class="desktop-nav">
+        <ul>
+          <li><a href="index.html">Home</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="discography.html" class="active">Discography</a></li>
+          <li><a href="biography.html">Biography</a></li>
+          <li><a href="tarot.html">Cloud</a></li>
+          <li>
+            <button 
+              @click="Alpine.store('app').toggleDarkMode()" 
+              class="dark-mode-toggle"
+              aria-label="Toggle dark mode"
+            >
+              <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Hamburger Menu -->
+      <button 
+        class="hamburger" 
+        @click="Alpine.store('app').toggleMobileMenu()"
+        :class="{ 'active': Alpine.store('app').mobileMenuOpen }"
+        aria-label="Navigation menu"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div 
+      class="mobile-menu" 
+      x-show="Alpine.store('app').mobileMenuOpen"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0 translate-x-full"
+      x-transition:enter-end="opacity-100 translate-x-0"
+      x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="opacity-100 translate-x-0"
+      x-transition:leave-end="opacity-0 translate-x-full"
+    >
+      <ul>
+        <li><a href="index.html" @click="Alpine.store('app').toggleMobileMenu()">Home</a></li>
+        <li><a href="blog.html" @click="Alpine.store('app').toggleMobileMenu()">Blog</a></li>
+        <li><a href="discography.html" @click="Alpine.store('app').toggleMobileMenu()">Discography</a></li>
+        <li><a href="biography.html" @click="Alpine.store('app').toggleMobileMenu()">Biography</a></li>
+        <li><a href="tarot.html" @click="Alpine.store('app').toggleMobileMenu()">Cloud</a></li>
+        <li>
+          <button 
+            @click="Alpine.store('app').toggleDarkMode()" 
+            class="dark-mode-toggle"
+            aria-label="Toggle dark mode"
+          >
+            <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content">
+    <section class="container" style="padding: 4rem 2rem;">
+      <h1 style="text-align: center; margin-bottom: 3rem;">Discography</h1>
+      
+      <div class="discography-grid">
+        <div class="album-card">
+          <img src="assets/03.jpg" alt="Light of the Vertex - EP" class="album-img" loading="lazy">
+          <div class="album-info">
+            <h3 class="album-title">Light of the Vertex - EP</h3>
+            <div class="album-year">2026</div>
+            <p style="margin-bottom: 1rem; color: var(--text-medium);">
+              Punjabi · 2 songs, 28 minutes · ℗ 2026 Kirtan Teg Singh.
+            </p>
+            
+            <div class="album-actions">
+              <a 
+                href="https://music.youtube.com/playlist?list=OLAK5uy_moiBbX17tXos3S2cjcPV1GAmJfcMKtVaQ&si=Aphu4XNI7_Vy-bXl" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="album-btn"
+                aria-label="Listen on YouTube Music"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M10 16.5v-9l6 4.5M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                </svg>
+                YouTube Music
+              </a>
+              <a 
+                href="https://music.apple.com/cl/album/light-of-the-vertex-ep/1867704529" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                class="album-btn"
+                aria-label="Listen on Apple Music"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/>
+                </svg>
+                Apple Music
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>Kirtan Teg Singh and The Gurdwara Ensemble 2026 Ⓒ</p>
+    <p><a href="https://www.youtube.com/@kirtantegsingh" target="_blank" title="YouTube">YouTube</a></p>
+  </footer>
+</body>
+</html>
+
