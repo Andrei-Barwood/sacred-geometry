@@ -451,6 +451,15 @@ main {
   line-height: 1.8;
 }
 
+.post-video-wrap {
+  margin: 1rem 0;
+}
+
+.post-video-wrap iframe {
+  max-width: 100%;
+  border-radius: 4px;
+}
+
 /* Interview Format */
 .interview-question {
   font-weight: 600;

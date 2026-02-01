@@ -442,6 +442,9 @@ export const blogEntries = [
     readTime: 18,
     content: `
       <p><em>By Kirtan Teg Singh</em></p>
+      <div class="post-video-wrap">
+        <iframe width="280" height="158" src="https://www.youtube.com/embed/WalR5GNvZIY?si=7frzsPbc4nuhW6vc" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      </div>
       <p>In an era of genomic sequencing and functional MRI scans, a quiet revolution is unfolding within integrative medicine: the recognition that systems of healing developed millennia before the stethoscope hold profound relevance for contemporary wellness. Among these ancient frameworks, Ayurveda—India's 5,000-year-old science of life—offers not superstition, but sophisticated observation of human physiology through the lens of elemental balance, circadian rhythm, and subtle energy flow. Today, we examine a simple yet profound preparation known in yogic circles as "Jal Chandra Ras" or Water Moon Elixir—a cucumber, lemon, and black pepper infusion—and explore how its traditional applications find unexpected resonance in modern biomedical understanding.</p>
 
       <h3>Beyond the 500-Year Myth: Ayurveda's Temporal Depth</h3>
