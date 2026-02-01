@@ -310,7 +310,7 @@ function registerAppStore() {
     },
     
     get isWarning() {
-      return this.charCount >= 450;
+      return this.charCount >= 1900;
     },
     
     async handleSubmit() {

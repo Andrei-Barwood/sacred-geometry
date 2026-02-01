@@ -29,7 +29,7 @@
         name: '',
         text: '',
         charCount: 0,
-        maxChars: 500,
+        maxChars: 2000,
         submitting: false,
         init() {},
         get canSubmit() { return false; },
@@ -253,7 +253,7 @@ x-data="{
   name: '',
   text: '',
   charCount: 0,
-  maxChars: 500,
+  maxChars: 2000,
   submitting: false,
   init() {
     this.$watch('text', (value) => {
@@ -268,7 +268,7 @@ x-data="{
     return hasText && withinLimit && !this.submitting && hasPostId;
   },
   get isWarning() {
-    return this.charCount >= 450;
+    return this.charCount >= 1900;
   },
   async handleSubmit() {
     if (!this.canSubmit) return;
