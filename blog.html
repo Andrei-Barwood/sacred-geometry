@@ -299,11 +299,11 @@ x-effect="postId = Alpine.store('app').selectedPost?.id;"
   :class="{ 'warning': isWarning }"
   x-model="text"
   placeholder="Write your comment..."
-  maxlength="500"
+  maxlength="2000"
   rows="4"
 ></textarea>
 <div class="char-counter" :class="{ 'warning': isWarning }">
-  <span x-text="charCount"></span> / 500
+  <span x-text="charCount"></span> / 2000
 </div>
 
 <div class="comment-input-group">

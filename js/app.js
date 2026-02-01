@@ -291,7 +291,7 @@ function registerAppStore() {
     name: '',
     text: '',
     charCount: 0,
-    maxChars: 500,
+    maxChars: 2000,
     submitting: false,
     
     init() {
