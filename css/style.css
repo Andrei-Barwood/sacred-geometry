@@ -451,6 +451,18 @@ main {
   line-height: 1.8;
 }
 
+.blog-content .math-block {
+  text-align: center;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.blog-content .MathJax,
+.blog-content mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
 .post-video-wrap {
   margin: 1rem 0;
 }

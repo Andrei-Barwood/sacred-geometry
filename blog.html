@@ -9,6 +9,26 @@
   <link rel="icon" href="favicon.jpeg" type="image/jpeg">
   <link rel="stylesheet" href="css/style.css">
   <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    document.getElementById('MathJax-script').addEventListener('load', function() {
+      if (window.MathJax && window.MathJax.typesetPromise && window.Alpine && Alpine.store('app').currentView === 'detail' && Alpine.store('app').selectedPost) {
+        setTimeout(function() { window.MathJax.typesetPromise(); }, 250);
+      }
+    });
+  </script>
+  <script>
     // Ensure Alpine expressions never crash even if app.js (module) loads after Alpine initializes.
     document.addEventListener('alpine:init', () => {
       Alpine.store('app', Alpine.store('app') || {
@@ -211,7 +231,7 @@
       x-transition:leave-start="opacity-100"
       x-transition:leave-end="opacity-0"
     >
-      <section class="blog-detail">
+      <section class="blog-detail" x-effect="Alpine.store('app').currentView === 'detail' && Alpine.store('app').selectedPost && window.MathJax && window.MathJax.typesetPromise && setTimeout(function() { window.MathJax.typesetPromise(); }, 200)">
         <button 
           @click="Alpine.store('app').backToList()" 
           style="margin-bottom: 2rem; padding: 0.75rem 1.5rem; background: var(--surface); border: 2px solid var(--border); border-radius: 8px; cursor: pointer;"

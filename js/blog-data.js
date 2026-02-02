@@ -2,7 +2,7 @@
 // 9+ entries: Interview, Review, Reflection, Casual/Tarot
 
 /** Only entries whose IDs are listed here are shown in the blog and Latest Reflections. Set to null to show all. */
-const VISIBLE_ENTRY_IDS = [9, 10, 11];
+const VISIBLE_ENTRY_IDS = [9, 10, 11, 12];
 
 function getVisibleEntries() {
   if (!VISIBLE_ENTRY_IDS) return [...blogEntries];
@@ -480,6 +480,58 @@ export const blogEntries = [
       <h3>Conclusion: The Future is Integrative</h3>
       <p>The Water Moon Elixir exemplifies what integrative medicine must become: not cherry-picking "exotic" ingredients, but understanding <em>why</em> traditional systems paired specific elements. Ayurveda's 5,000-year observation revealed that cooling agents require catalytic fire (pepper) to avoid <em>ama</em> (toxic stagnation)—a principle now validated by pharmacokinetics. Western medicine excels at acute intervention; Ayurveda at constitutional maintenance. Neither holds monopoly on truth.</p>
       <p>As we advance technologically, we must also advance temporally—honoring knowledge systems refined across centuries of human observation. The cucumber in your glass carries not just silica and water, but the distilled wisdom of physicians who understood that true healing occurs when biochemistry, rhythm, and consciousness align. That is not mysticism. It is medicine matured by time—a resource no laboratory can manufacture, but every practitioner can learn to honor.</p>
+    `
+  },
+  {
+    id: 12,
+    type: 'Reflection',
+    title: 'The Unfading Dodecahedron: From Sexual Energy to Spiritual Luminosity',
+    date: '2026-02-02',
+    excerpt: 'A spiritual reflection on the Theorem of the Mind\'s Projection—transforming vital energy into coherence to restore the human body, framed by sacred geometry and futurist dynamism.',
+    coverImage: 'assets/07.jpg',
+    readTime: 14,
+    content: `
+      <p>Two ideas from early twentieth-century futurism—<strong>dynamism</strong>, the exaltation of velocity and the spiral as the trajectory of the future, and the <strong>body-machine</strong>, the human as an engine whose output is not mere motion but luminosity—establish the tone of what follows. Here, sacred geometry is not nostalgia for the past; it is the invariant structure through which raw vital energy is transformed into spiritual coherence and the body is restored.</p>
+
+      <p>In many contemplative and yogic traditions, the same force that animates desire and procreation—sexual or creative energy—can be <em>sublimated</em>: redirected along the vertical axis of awareness so that it no longer dissipates downward and outward, but ascends. That ascent is not the evaporation of the self; it is its refinement. The body does not disappear; it becomes the stable vessel through which the mind projects, layer by layer, into higher states of coherence. This vision finds a precise geometric analogue in the <strong>Theorem of the Mind's Projection</strong>, also known in marginal notation as <em>The Unfading Dodecahedron</em>.</p>
+
+      <h3>The Theorem: Mind as Dodecahedron</h3>
+
+      <p>Let the Mind be modeled as a regular dodecahedron \\( D \\), the solid of quintessence, embedded in a three-dimensional field of awareness with a privileged vertical axis \\( z \\). Let projection be defined not as displacement of substance, but as transformation of relational orientation between light and shadow.</p>
+
+      <p><strong>Statement.</strong> For any conscious projection of \\( D \\) along the vertical axis of awareness, the following invariants hold:</p>
+
+      <p><strong>Volume Integrity (Ojas Conservation).</strong> The dodecahedral core preserves its total volume and topological identity under all rotations and ascensions. The Mind does not evaporate; it refines. What ascends is not mass but coherence. In the language of the body: the vital essence—<em>ojas</em>—is conserved. Sexual or creative energy, when sublimated rather than spent, does not vanish; it is converted into a subtler form that sustains the nervous system, the immune response, and the clarity of awareness. The body is not depleted by ascent; it is restored by it.</p>
+
+      <p><strong>Spiral Ascent of Vertices.</strong> Each vertex \\( v_i \\) of \\( D \\) traces a logarithmic spiral</p>
+      <p class="math-block">\\[ r(\\theta) = r_0 \\cdot \\varphi^{\\theta/(2\\pi)} \\]</p>
+      <p>where \\( \\varphi \\) is the golden ratio. With each full rotation, the dodecahedron projects a discrete layer of presence—a day-layer—at a higher \\( z \\)-coordinate. Dynamism enters here: the spiral is the trajectory of the future. The mind does not advance in a straight line; it advances in a curve that scales with \\( \\varphi \\), the same ratio that governs growth in nature and the proportions of the dodecahedron itself. The transformation of sexual energy into spiritual energy follows this spiral: each cycle of practice releases a layer of shadow and projects a layer of light.</p>
+
+      <p><strong>Shadow-Orthogonal Detachment.</strong> For every projected day-layer, there exists a complementary shadow-layer composed of pentagonal silhouettes. These detach downward along \\( -z \\) with velocity proportional to \\( \\varphi^n \\), where \\( n \\) is the number of completed rotations. Shadow is not destroyed; it loses attachment. In the body, this corresponds to the release of tamas—inertia, fixation, and the heaviness that binds vitality to the lower centres. That release is not violence; it is geometric necessity. As coherence ascends, what no longer serves the ascent falls away.</p>
+
+      <p><strong>Guna Dynamics at Intersections.</strong></p>
+      <ul>
+        <li><em>Tamas</em> manifests as deep blue shadow-pentagons, descending intact until dissolution.</li>
+        <li><em>Rajas</em> appears at spiral intersections as crimson energy points—moments where kinetic tension converts shadow into motion.</li>
+        <li><em>Sattva</em> governs the core: a golden-white luminosity increasing monotonically with ascent, independent of shadow quantity released.</li>
+      </ul>
+      <p>The body-machine does not suppress rajas or tamas; it puts them in geometric relation. Rajas becomes the engine of ascent; tamas becomes the ballast that detaches. Sattva is the output: the light that restores the human form.</p>
+
+      <p><strong>Circadian Geometry of Awareness.</strong> Along the projection axis, the lower third is dominated by shadow release (night), the middle third by rotational transition (dawn), and the upper third by luminous emergence (day). This ordering is geometric, not temporal. One can be in "day" at midnight and in "night" at noon, depending on where consciousness rests on \\( z \\). The restoration of the body follows this geometry: practices that release shadow, that navigate the transition, and that stabilise luminosity each have their place.</p>
+
+      <h3>Conclusion of the Theorem</h3>
+
+      <p>Therefore, after every night-layer necessarily emerges a day-layer of new light. The Mind, modeled as a persistent dodecahedron, advances by projection alone: keeping its essence whole while leaving old shadows behind as a mathematically inevitable consequence of ascent.</p>
+
+      <div class="reflection-quote">
+        "The Mind does not evaporate; it refines. What ascends is not mass but coherence."
+      </div>
+
+      <h3>Spiritual Reflection: Energy, Body, and the Unfading Form</h3>
+
+      <p>The theorem is not a metaphor in the weak sense—it is a structural description. When we speak of transforming sexual energy into spiritual energy to restore the human body, we are not speaking of a vague "raising of vibrations." We are speaking of a process that obeys invariants: conservation of essence (ojas), spiral trajectory (\\( \\varphi \\)), and the detachment of shadow along \\( -z \\). The body is the field in which this geometry is lived. Depletion occurs when energy is expelled without sublimation; restoration occurs when the same energy is channelled along the vertical axis so that volume is preserved and shadow is released in an ordered way.</p>
+
+      <p>Futurism's body-machine finds its sacred counterpart here: the human is an engine whose fuel is raw vitality and whose output, when the geometry is honoured, is luminosity. The dodecahedron does not fade because its volume is invariant; the body, when it becomes the vessel of this projection, does not simply "get better"—it participates in a form that persists across layers of night and day. The unfading dodecahedron is the mind's promise: after every night-layer, a day-layer of new light. The restoration of the body is the visible sign that the projection has begun.</p>
     `
   }
 ];
