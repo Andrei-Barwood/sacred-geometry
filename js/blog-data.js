@@ -2,7 +2,7 @@
 // 9+ entries: Interview, Review, Reflection, Casual/Tarot
 
 /** Only entries whose IDs are listed here are shown in the blog and Latest Reflections. Set to null to show all. */
-const VISIBLE_ENTRY_IDS = [9, 10, 11, 12];
+const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13];
 
 function getVisibleEntries() {
   if (!VISIBLE_ENTRY_IDS) return [...blogEntries];
@@ -532,6 +532,71 @@ export const blogEntries = [
       <p>The theorem is not a metaphor in the weak sense—it is a structural description. When we speak of transforming sexual energy into spiritual energy to restore the human body, we are not speaking of a vague "raising of vibrations." We are speaking of a process that obeys invariants: conservation of essence (ojas), spiral trajectory (\\( \\varphi \\)), and the detachment of shadow along \\( -z \\). The body is the field in which this geometry is lived. Depletion occurs when energy is expelled without sublimation; restoration occurs when the same energy is channelled along the vertical axis so that volume is preserved and shadow is released in an ordered way.</p>
 
       <p>Futurism's body-machine finds its sacred counterpart here: the human is an engine whose fuel is raw vitality and whose output, when the geometry is honoured, is luminosity. The dodecahedron does not fade because its volume is invariant; the body, when it becomes the vessel of this projection, does not simply "get better"—it participates in a form that persists across layers of night and day. The unfading dodecahedron is the mind's promise: after every night-layer, a day-layer of new light. The restoration of the body is the visible sign that the projection has begun.</p>
+    `
+  },
+  {
+    id: 13,
+    type: 'Reflection',
+    title: 'Amrit Vela: The Circadian Antidote to the Americanized Mind',
+    date: '2026-02-14',
+    excerpt: 'In an age defined by 24/7 connectivity and chronic sleep debt, modern medicine is rediscovering what ancient wisdom never forgot: the pre-dawn hours are sacred—and deeply biological.',
+    coverImage: 'assets/12.jpg',
+    readTime: 11,
+    content: `
+      <p>In an age defined by 24/7 connectivity, ultraprocessed dopamine hits, and chronic sleep debt, modern medicine is beginning to rediscover what ancient wisdom never forgot: the pre-dawn hours are not just quiet—they are sacred. Not in a mystical sense alone, but in a deeply biological one. This is Amrit Vela—the nectarous time between approximately 3:00 and 6:00 a.m.—and it may be the single most underutilized therapeutic window for human restoration in the 21st century.</p>
+
+      <h3>The Geometry of Stillness: Why 3–6 a.m. Is Your Body's Reset Button</h3>
+
+      <p>From the perspective of circadian biology, Amrit Vela aligns with the nadir of core body temperature, the tail end of melatonin secretion, and the gentle rise of cortisol—nature's own "boot sequence" for consciousness. In Ayurveda, this window corresponds to the final phase of Vata dosha (2–6 a.m.), governing movement, clarity, and subtle energy flow. It is the only time of day when the nervous system is simultaneously calm and alert—ideal for neuroplastic rewiring.</p>
+
+      <p>The Sri Guru Granth Sahib Ji states: <em>"ਜਿਨ ਕੌ ਨਦਰਿ ਕਰੇਇ ਤਿਨ ਕਾ ਸਭੁ ਕਿਛੁ ਹੋਇ ॥"</em> ("All is accomplished for those upon whom Grace falls.") Reframed through a geometric lens of minimalism: when your internal rhythm syncs with cosmic timing, everything else—productivity, creativity, emotional balance—falls into place without force. No hustle required. Just alignment.</p>
+
+      <h3>The Americanized Excuse Matrix—and Why It Fails</h3>
+
+      <p>We live in a culture that glorifies burnout. We drink caramel-colored soda for energy, inhale microwaved meals labeled "chicken," and scroll until our retinas ache—all while claiming we "don't have time" to wake before sunrise. But let's be clinically honest: the issue isn't time. It's misaligned priorities masked as pragmatism.</p>
+
+      <p>Common excuses include:</p>
+      <ul>
+        <li>"I'm not a morning person." → Actually, you're a chronically sleep-deprived person.</li>
+        <li>"I work nights." → Then shift your Amrit Vela to your biological dawn (post-sleep).</li>
+        <li>"It's too hard to wake up." → So is reversing metabolic syndrome—but we accept insulin shots before we accept silence.</li>
+      </ul>
+
+      <p>Ayurveda calls this <em>Tamas</em>—the quality of inertia, dullness, and sensory overload. Coca-Cola, Marlboro, KFC, and infinite Netflix scrolling are all Tamas in liquid, smoke, grease, and light form. They numb the system so thoroughly that the subtle call of Amrit Vela becomes inaudible.</p>
+
+      <h3>Minimalist Spirituality in a Maximalist World</h3>
+
+      <p>Amrit Vela isn't about dogma. It's about protocol. Think of it as your daily firmware update for the human operating system. You don't need incense or Sanskrit chants (though they help). You need stillness, breath, and intention.</p>
+
+      <p>Consider these real-world adaptations:</p>
+      <ul>
+        <li><strong>In Santiago, Chile</strong>: A university engineering student rises at 4:00 a.m., drinks warm water with lemon (per Ayurvedic <em>Ushapan</em>), recites Nitnem, then composes breakcore rhythms in Renoise—using the silence to hear the gaps between beats.</li>
+        <li><strong>In Austin, Texas</strong>: A software developer disables Wi-Fi, sits facing east (as Vastu recommends), and journals for 20 minutes before checking email. His anxiety meds were halved within three months.</li>
+        <li><strong>In Toronto</strong>: A Punjabi grandmother teaches her TikTok-influencer granddaughter to chant <em>Waheguru</em> while stretching—blending ancestral rhythm with Gen-Z attention spans.</li>
+      </ul>
+
+      <p>This is minimalism not as aesthetic, but as <em>essentialism</em>: stripping away noise to reveal the signal that was always there.</p>
+
+      <h3>The Neuro-Ayurvedic Advantage</h3>
+
+      <p>Modern neuroscience confirms what Ayurveda has known for millennia: consistent pre-dawn practice regulates the hypothalamic-pituitary-adrenal (HPA) axis, lowers inflammatory markers like IL-6, and enhances default mode network coherence—the brain's "self-referential" circuitry linked to empathy, introspection, and moral reasoning.</p>
+
+      <p>When you sit in Amrit Vela:</p>
+      <ul>
+        <li><strong>Vata</strong> is balanced → mental clarity improves.</li>
+        <li><strong>Pitta</strong> hasn't surged yet → no reactivity, only receptivity.</li>
+        <li><strong>Kapha</strong> is still dormant → no lethargy, only lightness.</li>
+      </ul>
+
+      <p>This is why Sikh Gurus called it <em>Amrit</em>—nectar. Not because it's magical, but because it's biochemically regenerative. In a world selling synthetic stimulants, Amrit Vela offers endogenous awakening.</p>
+
+      <p>So here's the prescription—not from a monk, but from a clinician who's watched patients trade McDonald's for meditation and transform their biomarkers:</p>
+
+      <p><strong>Wake before the world does. Sit in silence. Breathe. Listen.</strong></p>
+
+      <p>You won't find this in a pill. But you will find it in the space between 3 and 6 a.m.—if you're willing to show up. Grace doesn't fall on those who scroll. It falls on those who rise.</p>
+
+      <p>And when you do, you'll realize: the guide you've been seeking wasn't outside you. It was waiting in the dark, just before dawn.</p>
     `
   }
 ];
