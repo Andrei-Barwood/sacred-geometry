@@ -2,7 +2,7 @@
 // 9+ entries: Interview, Review, Reflection, Casual/Tarot
 
 /** Only entries whose IDs are listed here are shown in the blog and Latest Reflections. Set to null to show all. */
-const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13, 14];
+const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13, 14, 15];
 
 function getVisibleEntries() {
   if (!VISIBLE_ENTRY_IDS) return [...blogEntries];
@@ -812,6 +812,58 @@ export const blogEntries = [
       <p>The Theorem of Concentric Viveka and the Luminous Triangle provides the map: stand in witness, read through distance, filter through light-discernment-compassion, label patterns not souls, protect boundaries without violence, and recalibrate daily through Shabad. Kundalini kriya provides energetic competence, Shabad provides moral authority, Ayurveda provides physiological grounding, and sattvic nourishment provides continuity.</p>
       <p>When these four are integrated, protection no longer depends on intimidation, control, or social approval. It rests in a deeper law: the one who lives in inner light cannot be easily deceived, and the one who lives in Shabad cannot be easily broken.</p>
       <p>For those navigating difficult seasons, this is the promise: you can remain open-hearted without becoming unguarded, truthful without becoming harsh, and compassionate without surrendering discernment. That is the real shield. That is the quiet victory.</p>
+    `
+  },
+  {
+    id: 15,
+    type: 'Reflection',
+    title: 'Nitnem Banis',
+    date: '2026-03-08',
+    excerpt: 'First album: studio recordings for devotional practice and Nitnem. Punjabi kirtan inspired by the Sri Guru Granth Sahib.',
+    coverImage: 'assets/09.jpg',
+    readTime: 5,
+    content: `
+      <h2>Nitnem Banis</h2>
+      <p><strong>Artist:</strong> Kirtan Teg Singh</p>
+      <p><strong>Album:</strong> Nitnem Banis</p>
+      <p><strong>Genre:</strong> Devotional Music / Kirtan / Kundalini Yoga / Mantras</p>
+      <p><strong>Language:</strong> Punjabi</p>
+
+      <h3>About This Album</h3>
+      <p>This is my first album, a collection of studio recordings created between 2023 and 2025 with the purpose of accompanying devotional practice and Nitnem. The compositions are inspired by the Sri Guru Granth Sahib (SGGS), Gur Shabad, and paraphrases of its teachings.</p>
+      <p>The music seeks to create a bridge between tradition and modernity: classical Indian instruments (tabla, sitar, tanpura, santur) are fused with electronic synthesizers and, at times, transverse flute solos, creating a hybrid environment that invites introspection and spiritual elevation. All recordings are mastered at 24 bits / 192 kHz and tuned to 432 Hz, a frequency that promotes relaxation and inner connection.</p>
+
+      <h3>Tracklist</h3>
+      <ul>
+        <li>Japji Sahib</li>
+        <li>Jaap Sahib</li>
+        <li>Anand Sahib</li>
+        <li>Kirtan Sohila</li>
+      </ul>
+
+      <h3>Credits</h3>
+      <p>Kirtan Teg Singh: musical composition, vocals, synthesizers, production</p>
+      <p>Ensamble Gurdwara: traditional instruments (tabla, sitar, tanpura, santur)</p>
+      <p>Recorded and mixed by: Kirtan Teg Singh</p>
+      <p>Mastered by: Kirtan Teg Singh</p>
+
+      <h3>Spiritual Purpose</h3>
+      <p>These chants are dedicated to the purification of the mind, the dissolution of the ego, and the overcoming of Maya (illusion). They are a tool for the practice of kirtan within Kundalini Yoga, and for anyone seeking inner peace through sacred sound.</p>
+
+      <h3>License</h3>
+      <p>This work is licensed under a Creative Commons Attribution-NonCommercial 4.0 International License (CC BY-NC 4.0). You are free to share, copy, and redistribute the material in any medium or format, as well as remix or transform it, provided that:</p>
+      <ul>
+        <li>Appropriate credit is given to the artist (Kirtan Teg Singh).</li>
+        <li>It is not used for commercial purposes.</li>
+        <li>Any changes made are indicated.</li>
+      </ul>
+      <p>For more details: <a href="https://creativecommons.org/licenses/by-nc/4.0/" target="_blank" rel="noopener noreferrer">https://creativecommons.org/licenses/by-nc/4.0/</a></p>
+
+      <h3>Links</h3>
+      <p>YouTube: <a href="https://youtube.com/@kirtantegsingh" target=_blank>@kirtantegsingh</a> </p>
+
+      <h3>Acknowledgments</h3>
+      <p>To my teacher, the musicians of Ensamble Gurdwara, and all the listeners who sustain this path of devotion. May the Naad (divine sound) guide us.</p>
     `
   }
 ];
