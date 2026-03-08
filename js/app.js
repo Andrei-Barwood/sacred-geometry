@@ -4,6 +4,7 @@
 import { getLatestEntries, getEntriesByType, getEntryById } from './blog-data.js';
 import { addComment, subscribeToComments, getAvatarColor, getInitials, formatRelativeTime } from './firebase.js';
 import { cloudPhrases } from './cloud-phrases.js';
+import { hasCoverAnimation, mountCoverAnimation as mountP5CoverAnimation, unmountCoverAnimation as unmountP5CoverAnimation } from './cover-animations.js';
 
 function registerAppStore() {
   // If Alpine isn't ready yet, bail (we'll be called again on alpine:init)
@@ -72,6 +73,19 @@ function registerAppStore() {
       } else {
         document.documentElement.removeAttribute('data-theme');
       }
+    },
+
+    hasAnimatedCover(post) {
+      return hasCoverAnimation(post);
+    },
+
+    mountCoverAnimation(el, post) {
+      if (!this.hasAnimatedCover(post)) return;
+      mountP5CoverAnimation(el, post.coverAnimation);
+    },
+
+    unmountCoverAnimation(el) {
+      unmountP5CoverAnimation(el);
     },
     
     filterPosts(type) {
@@ -437,4 +451,3 @@ window.getAvatarColor = getAvatarColor;
 window.getInitials = getInitials;
 window.formatRelativeTime = formatRelativeTime;
 window.getEntryById = getEntryById;
-

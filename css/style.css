@@ -380,6 +380,22 @@ main {
   margin-bottom: 1rem;
 }
 
+.animated-cover {
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 28% 24%, #325394 0%, #243871 42%, #101C2F 100%);
+}
+
+.animated-cover canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
+}
+
+.animated-cover--fallback {
+  background: radial-gradient(circle at 70% 82%, #57C4DD 0%, #3F5085 45%, #101C2F 100%);
+}
+
 .card-title {
   margin-bottom: 0.5rem;
   color: var(--text-dark);
@@ -1032,4 +1048,3 @@ footer {
     padding: 2.5rem;
   }
 }
-

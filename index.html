@@ -124,7 +124,17 @@
       <div class="grid">
         <template x-for="entry in $store.app.latestEntries" :key="entry.id">
           <div class="card" @click="Alpine.store('app').viewPost(entry.id); window.location.href='blog.html?post=' + entry.id;">
-            <img :src="entry.coverImage" :alt="entry.title" class="card-img" loading="lazy">
+            <template x-if="!Alpine.store('app').hasAnimatedCover(entry)">
+              <img :src="entry.coverImage" :alt="entry.title" class="card-img" loading="lazy">
+            </template>
+            <template x-if="Alpine.store('app').hasAnimatedCover(entry)">
+              <div
+                class="card-img animated-cover animated-cover--card"
+                role="img"
+                :aria-label="entry.title"
+                x-init="Alpine.store('app').mountCoverAnimation($el, entry)"
+              ></div>
+            </template>
             <div class="card-meta" style="margin-bottom: 0.5rem;">
               <span x-text="entry.type"></span>
               <span x-text="new Date(entry.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })"></span>
@@ -177,4 +187,3 @@
   </footer>
 </body>
 </html>
-

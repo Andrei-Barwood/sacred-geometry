@@ -200,7 +200,17 @@
               @click="Alpine.store('app').viewPost(post.id); window.location.href='?post=' + post.id;"
               style="cursor: pointer;"
             >
-              <img :src="post.coverImage" :alt="post.title" class="card-img" loading="lazy">
+              <template x-if="!Alpine.store('app').hasAnimatedCover(post)">
+                <img :src="post.coverImage" :alt="post.title" class="card-img" loading="lazy">
+              </template>
+              <template x-if="Alpine.store('app').hasAnimatedCover(post)">
+                <div
+                  class="card-img animated-cover animated-cover--card"
+                  role="img"
+                  :aria-label="post.title"
+                  x-init="Alpine.store('app').mountCoverAnimation($el, post)"
+                ></div>
+              </template>
               <div class="card-meta" style="margin-bottom: 0.5rem;">
                 <span x-text="post.type"></span>
                 <span x-text="new Date(post.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })"></span>
@@ -245,12 +255,22 @@
             <span x-text="new Date(Alpine.store('app').selectedPost?.date || '').toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })"></span>
           </div>
           <h1 x-text="Alpine.store('app').selectedPost?.title"></h1>
-          <img 
-            :src="Alpine.store('app').selectedPost?.coverImage" 
-            :alt="Alpine.store('app').selectedPost?.title" 
-            class="blog-cover"
-            loading="lazy"
-          >
+          <template x-if="!Alpine.store('app').hasAnimatedCover(Alpine.store('app').selectedPost)">
+            <img 
+              :src="Alpine.store('app').selectedPost?.coverImage" 
+              :alt="Alpine.store('app').selectedPost?.title" 
+              class="blog-cover"
+              loading="lazy"
+            >
+          </template>
+          <template x-if="Alpine.store('app').hasAnimatedCover(Alpine.store('app').selectedPost)">
+            <div
+              class="blog-cover animated-cover animated-cover--detail"
+              role="img"
+              :aria-label="Alpine.store('app').selectedPost?.title"
+              x-init="Alpine.store('app').mountCoverAnimation($el, Alpine.store('app').selectedPost)"
+            ></div>
+          </template>
         </div>
 
         <article 
@@ -386,4 +406,3 @@ x-effect="postId = Alpine.store('app').selectedPost?.id;"
   </footer>
 </body>
 </html>
-

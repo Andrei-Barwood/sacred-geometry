@@ -2,7 +2,7 @@
 // 9+ entries: Interview, Review, Reflection, Casual/Tarot
 
 /** Only entries whose IDs are listed here are shown in the blog and Latest Reflections. Set to null to show all. */
-const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13];
+const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13, 14];
 
 function getVisibleEntries() {
   if (!VISIBLE_ENTRY_IDS) return [...blogEntries];
@@ -598,6 +598,221 @@ export const blogEntries = [
 
       <p>And when you do, you'll realize: the guide you've been seeking wasn't outside you. It was waiting in the dark, just before dawn.</p>
     `
+  },
+  {
+    id: 14,
+    type: 'Reflection',
+    title: 'The Inner Eagle of Discernment: A Geometric Path to Spiritual Protection Through Kundalini, Shabad, and Ayurveda',
+    date: '2026-03-08',
+    excerpt: 'A complete spiritual framework for non-violent discernment: identifying misalignment from distance, labeling with Viveka, and protecting the psyche through inner light.',
+    coverImage: 'assets/placeholder.svg',
+    coverAnimation: 'concentric-viveka',
+    readTime: 16,
+    content: `
+      <h2>The Inner Eagle of Discernment</h2>
+      <h3>A Geometric Path to Spiritual Protection Through Kundalini, Shabad, and Ayurveda</h3>
+
+      <h3>Introduction: Reclaiming Eagle Vision as a Sacred Faculty</h3>
+      <p>In a well-known desert guardian legend, there is a striking image remembered by many cultures: the protector does not wait for danger to arrive at skin level. He sees from above, from distance, and marks what is harmful before it comes close. In modern language, this has been compared to an eagle-like intelligence that scans the horizon and identifies threats in advance. Spiritual life can reclaim this metaphor without violence, without conquest, and without hatred.</p>
+      <p>For a sincere practitioner, the real question is not: How do I defeat enemies? The real question is: How do I detect falsehood before it enters my nervous system? How do I identify distortion before it infects my thought-stream? How do I remain compassionate and still hold an unbreakable boundary? For those navigating grief, betrayal, burnout, psychic overload, or spiritual confusion, this is not abstract mysticism. This is psychological first aid and energetic survival.</p>
+      <p>Many people today suffer because they confuse intensity with truth. If a message is loud, urgent, dramatic, and emotionally activating, they assume it must be important. This is precisely how confusion penetrates the mind-field. What appears near in emotion may be far from truth. What appears far in social approval may be very close to destiny. Therefore, one needs a method to see accurately across distance.</p>
+      <p>The core principle of this teaching is simple: inner light protects better than external armor. The one anchored in Shabad does not become naive; the one anchored in Shabad becomes precise. The one anchored in Naam does not become passive; they become correctly responsive. They do not collapse into fear; they become a lighthouse for those crossing storms.</p>
+      <p>To make this practical, this post introduces a complete framework called a metaphysical geometric theorem, then operationalizes it through Kundalini Yoga kriyas, SGGS-based Japa, Ayurvedic regulation, and a sattvic recipe for nervous-system stability. Geometry gives structure. Kriya gives energy. Shabad gives moral calibration. Food gives biochemical continuity. Together they create a shield that is soft in heart and firm in boundary.</p>
+
+      <h3>The Metaphysical Geometric Theorem</h3>
+      <h3>The Theorem of Concentric Viveka and the Luminous Triangle</h3>
+      <p>This theorem is not conventional mathematics. It is spiritual geometry for ethical perception. It explains how distance, labeling, and protection function inside consciousness in a coherent way.</p>
+
+      <h3>Core Geometric Objects</h3>
+      <ul>
+        <li><strong>Point A (Ajna Point):</strong> the witness center in the brow field, where observation becomes stable.</li>
+        <li><strong>Point P (Phenomenon Point):</strong> any person, message, thought, environment, memory, desire, fear, or influence being perceived.</li>
+        <li><strong>Ray AP (Ray of Attention):</strong> directional awareness from witness to object.</li>
+        <li><strong>Concentric Circles around A:</strong> C1 immediate field (body sensations and emotions), C2 relational field (family and social dynamics), C3 collective field (media, public narratives, ideological weather).</li>
+        <li><strong>Triangle JVD (Luminous Triangle):</strong> J for Jot (inner light), V for Viveka (discernment), D for Daya (compassion).</li>
+      </ul>
+      <p>Every ray AP must pass through Triangle JVD before action. This is the moral-optical law of spiritual perception.</p>
+
+      <h3>Axioms of the Theorem</h3>
+      <ul>
+        <li><strong>Axiom 1 - Field Axiom:</strong> Every experience appears as Point P in awareness. Nothing bypasses consciousness; it bypasses only conscious filtering.</li>
+        <li><strong>Axiom 2 - Distance Axiom:</strong> Greater inner steadiness yields clearer reading of distant points (C3). Greater reactivity distorts even near points (C1).</li>
+        <li><strong>Axiom 3 - Triangular Filter Axiom:</strong> A perception is valid only if Ray AP crosses all three vertices: light, discernment, and compassion. Missing one vertex creates unsafe perception.</li>
+        <li><strong>Axiom 4 - Labeling Axiom:</strong> After JVD filtering, Point P receives one living label: Dharmic, Adharmic Pattern, or Unclear.</li>
+        <li><strong>Axiom 5 - Protection Circle Axiom:</strong> Circle CS (Circle of Spiritual Integrity) surrounds Point A. Only properly labeled impressions may cross into intimate psyche.</li>
+        <li><strong>Axiom 6 - Non-Essentialization Axiom:</strong> Labels apply to patterns and behaviors, not to eternal essence. This prevents hatred and preserves justice.</li>
+        <li><strong>Axiom 7 - Recalibration Axiom:</strong> Labels must be reviewed daily through Shabad. Frozen judgment is prohibited.</li>
+      </ul>
+
+      <h3>Operational Meaning</h3>
+      <p>Without this theorem, people usually become either gullible or cynical. Gullibility allows harm. Cynicism blocks grace. Concentric Viveka offers a third way: compassionate precision. If a disturbing influence is sensed from C3, do not panic. Place it at Point P. Stabilize at A through breath. Pass AP through JVD. Then label and respond.</p>
+      <ul>
+        <li><strong>Dharmic:</strong> move closer with clarity and gratitude.</li>
+        <li><strong>Adharmic Pattern:</strong> reduce access, set boundaries, keep non-violence.</li>
+        <li><strong>Unclear:</strong> delay reaction, deepen Simran, reassess later.</li>
+      </ul>
+      <p>Protection here is not aggression. One becomes difficult to manipulate while remaining compassionate. This is not paranoia. It is disciplined spiritual optics.</p>
+
+      <h3>Kundalini Yoga Kriyas for Activating the Theorem</h3>
+      <p>In this framework, kriya is how geometry enters biology. These practices stabilize Point A, refine Ray AP, purify Triangle JVD, and fortify Circle CS.</p>
+
+      <h3>Daily Sequence (42 minutes)</h3>
+      <ul>
+        <li>7 minutes Ego Eradicator</li>
+        <li>9 minutes Alternate Nostril Breath with Shambhavi Mudra</li>
+        <li>12 minutes Kirtan Kriya (Sa Ta Na Ma)</li>
+        <li>7 minutes Trataka to Ajna</li>
+        <li>5 minutes Sat Kriya</li>
+        <li>2 minutes silent integration</li>
+      </ul>
+      <p>Beginners can start at half durations and gradually build.</p>
+
+      <h3>1) Ego Eradicator</h3>
+      <p>Sit with a tall spine. Raise arms to sixty degrees, thumbs pointing upward, fingers curled. Perform Breath of Fire through the nose for three to seven minutes. Inhale deeply, hold gently, apply a light root lock, exhale, and relax.</p>
+      <p><strong>Geometric function:</strong> clears turbulence in C1 and C2 so Ray AP is less jagged. Fear frequently imitates intuition. This kriya helps separate the two and reduces false tagging.</p>
+
+      <h3>2) Alternate Nostril Breath with Shambhavi</h3>
+      <p>Inhale through left nostril, exhale through right; inhale through right, exhale through left. Continue smoothly for nine minutes while keeping a relaxed inner gaze at the brow center.</p>
+      <p><strong>Geometric function:</strong> balances dual polarity and aligns Ray AP. Shambhavi strengthens Point A so perception is less vulnerable to emotional narratives.</p>
+
+      <h3>3) Kirtan Kriya (Sa Ta Na Ma)</h3>
+      <p>Chant aloud, whisper, and silently in classic sequence while rotating thumb-to-finger mudra. Synchronize mantra, breath, and touch.</p>
+      <p><strong>Geometric function:</strong> stabilizes Triangle JVD and improves ethical labeling. The mind shifts from reactive categorization to discernment-based classification.</p>
+
+      <h3>4) Trataka to Ajna</h3>
+      <p>Gaze at candle flame tip one to three minutes, close eyes, hold inner after-image at brow center. Repeat cycles for seven minutes total.</p>
+      <p><strong>Geometric function:</strong> trains distance discipline and teaches perception without fusion. C3 can be read without collapsing into C1 reactivity.</p>
+
+      <h3>5) Sat Kriya</h3>
+      <p>In Vajrasana, interlace fingers overhead with index fingers extended. Chant Sat on navel pull and Nam on release for three to five minutes, then rest deeply.</p>
+      <p><strong>Geometric function:</strong> seals Circle CS and reinforces central axis. Kindness remains intact while energetic boundaries become firm.</p>
+
+      <h3>Practice Notes</h3>
+      <ul>
+        <li>Commit to forty days for structural change.</li>
+        <li>Adapt under guidance if there is hypertension, pregnancy, or active psychiatric instability.</li>
+        <li>Never use this training to inflate ego superiority. Without humility, triangle D (compassion) collapses and theorem accuracy fails.</li>
+      </ul>
+
+      <h3>Shabad and Japa for Truth Labeling</h3>
+      <p>In this theorem, labeling becomes trustworthy only when tuned to revealed sound-current, not personal mood. A central line from SGGS supports this calibration:</p>
+      <p><em>ਮਨ ਤੂੰ ਜੋਤਿ ਸਰੂਪੁ ਹੈ ਆਪਣਾ ਮੂਲੁ ਪਛਾਣੁ ॥</em><br><em>ਮਨ ਹਰਿ ਜੀ ਤੇਰੈ ਨਾਲਿ ਹੈ ਗੁਰਮਤੀ ਰੰਗੁ ਮਾਣੁ ॥</em></p>
+      <p><strong>Transliteration:</strong> Man tu jot saroop hai, apna mool pachhan. Man Har Jee terai naal hai, gurmati rang maan.</p>
+      <p><strong>Meaning:</strong> O mind, you are the form of divine light; recognize your origin. O mind, the Divine is with you; through Guru-guided wisdom, delight in that color.</p>
+      <p>These lines prevent fear-based identity and restore source memory. If the mind is light in origin, then labels must be issued as light, not as revenge.</p>
+
+      <h3>Japa Protocol (21 minutes)</h3>
+      <ul>
+        <li>Sit at dawn with upright spine.</li>
+        <li>Inhale mentally: Man tu jot saroop hai.</li>
+        <li>Exhale mentally: Apna mool pachhan.</li>
+        <li>Repeat with second line on next breath cycle.</li>
+        <li>After each cycle, place one current Point P in awareness and pass it through JVD.</li>
+        <li>Assign living label: Dharmic, Adharmic Pattern, or Unclear.</li>
+        <li>Seal with soft Sat Nam and continue.</li>
+      </ul>
+
+      <h3>How This Creates Spiritual Protection</h3>
+      <p>When a pattern is tagged as Adharmic, the practitioner does not dehumanize the person. Instead, access is reduced. Timing is adjusted. Proximity is recalibrated. Speech becomes truthful but non-cruel. This is the practical meaning of non-violent protection in Sikh consciousness: a soft heart with steel boundaries.</p>
+
+      <h3>Ayurvedic Analysis of Discernment at Distance</h3>
+      <p>The theorem requires physiological support. Ayurveda explains why discernment is sharp on some days and distorted on others.</p>
+
+      <h3>Dosha Roles</h3>
+      <ul>
+        <li><strong>Vata and Ray AP:</strong> governs subtle detection and movement of attention. Balanced Vata enables refined sensing. Disturbed Vata creates anxiety, impulsive tagging, and false alarms.</li>
+        <li><strong>Pitta and Vertex V:</strong> governs discrimination and classification. Balanced Pitta sees patterns accurately. Excess Pitta produces harsh judgment and moral aggression.</li>
+        <li><strong>Kapha and Circle CS:</strong> governs containment, resilience, and emotional immunity. Balanced Kapha gives stable boundaries. Low Kapha leads to porousness; high stagnant Kapha leads to denial.</li>
+      </ul>
+
+      <h3>Guna Interpretation</h3>
+      <ul>
+        <li><strong>Sattva:</strong> clear, luminous discernment.</li>
+        <li><strong>Rajas:</strong> speed and urgency, useful for action but dangerous in excess.</li>
+        <li><strong>Tamas:</strong> grounding and rest in healthy form, confusion and numbness when excessive.</li>
+      </ul>
+      <p>Most mislabeling occurs when Rajas overdrives or Tamas obscures. The theorem seeks Sattvic predominance through disciplined daily practice.</p>
+
+      <h3>Ojas, Tejas, and Prana in the Theorem</h3>
+      <ul>
+        <li><strong>Ojas:</strong> fortifies Circle CS and emotional immunity.</li>
+        <li><strong>Tejas:</strong> lights up Triangle JVD and sharpens moral clarity.</li>
+        <li><strong>Prana:</strong> energizes Ray AP and prevents dull perception.</li>
+      </ul>
+      <p>If Ojas is low, everything penetrates. If Tejas is low, everything looks vague. If Prana is low, everything feels heavy and confused. Thus diet, breath, and prayer are not optional accessories. They are theorem infrastructure.</p>
+
+      <h3>Mental Health Benefits and Protective Qualities</h3>
+      <ul>
+        <li>Lower emotional reactivity and panic interpretation.</li>
+        <li>Improved boundary setting without guilt.</li>
+        <li>Better ability to delay impulsive responses.</li>
+        <li>Reduced contamination from chaotic collective narratives.</li>
+        <li>More accurate intuition with less paranoia.</li>
+        <li>Greater emotional steadiness when helping people in distress.</li>
+      </ul>
+      <p>Spiritual immunity does not mean isolation. It means non-fragmentation under pressure.</p>
+
+      <h3>Potentiating Sattvic Recipe: Ajna Ojas Nectar</h3>
+      <p>This preparation is designed to support nervous-system resilience, cognitive steadiness, and sattvic mood for theorem practice.</p>
+
+      <h3>Ingredients (1 serving)</h3>
+      <ul>
+        <li>2 cups organic milk or unsweetened almond milk</li>
+        <li>10 soaked almonds, peeled</li>
+        <li>2 soaked walnut halves</li>
+        <li>1 teaspoon ghee</li>
+        <li>3 to 4 saffron strands</li>
+        <li>1 soft date, chopped</li>
+        <li>1/4 teaspoon cardamom powder</li>
+        <li>1 pinch turmeric</li>
+        <li>1 tiny pinch black pepper</li>
+        <li>1/4 teaspoon brahmi powder (optional)</li>
+        <li>1 teaspoon lightly crushed pumpkin seeds</li>
+        <li>3 edible rose petals (optional)</li>
+      </ul>
+
+      <h3>Preparation</h3>
+      <ol>
+        <li>Soak almonds and walnuts overnight. Peel almonds in the morning.</li>
+        <li>Blend nuts with a little warm milk into a smooth paste.</li>
+        <li>Warm remaining milk on low heat.</li>
+        <li>Add ghee, saffron, date, cardamom, turmeric, pepper, and nut paste.</li>
+        <li>Simmer gently for six to eight minutes, stirring clockwise.</li>
+        <li>Turn off heat. Add brahmi and pumpkin seeds when slightly cooler.</li>
+        <li>Pour and finish with rose petals.</li>
+      </ol>
+
+      <h3>Intention Protocol Before Drinking</h3>
+      <p>Hold the cup at heart center and internally affirm:</p>
+      <ul>
+        <li>May Point A remain steady.</li>
+        <li>May every ray pass through light, discernment, and compassion.</li>
+        <li>May my boundaries protect without hatred.</li>
+      </ul>
+      <p>Then repeat softly eleven times: Man tu jot saroop hai, apna mool pachhan.</p>
+
+      <h3>Ayurvedic Rationale</h3>
+      <ul>
+        <li>Almond and walnut nourish nervous tissue and support Ojas.</li>
+        <li>Saffron and cardamom uplift Sattva and refine Tejas.</li>
+        <li>Ghee stabilizes Vata and improves subtle nutrient delivery.</li>
+        <li>Brahmi supports cognitive steadiness and medhya function.</li>
+        <li>Turmeric and pepper aid assimilation and reduce inflammatory dullness.</li>
+      </ul>
+
+      <h3>Timing</h3>
+      <ul>
+        <li>Best after morning sadhana or early evening meditation.</li>
+        <li>Avoid directly after heavy meals.</li>
+        <li>Use consistency over excess quantity.</li>
+      </ul>
+
+      <h3>Conclusion: The Impenetrable Shield of Inner Peace</h3>
+      <p>The spiritual equivalent of eagle tagging is not surveillance. It is sanctified discernment. It is the ability to perceive from distance, label with truth, and protect through light rather than force. Geometry, yoga, sound, and sattvic food are not separate domains. They are one architecture of protection.</p>
+      <p>The Theorem of Concentric Viveka and the Luminous Triangle provides the map: stand in witness, read through distance, filter through light-discernment-compassion, label patterns not souls, protect boundaries without violence, and recalibrate daily through Shabad. Kundalini kriya provides energetic competence, Shabad provides moral authority, Ayurveda provides physiological grounding, and sattvic nourishment provides continuity.</p>
+      <p>When these four are integrated, protection no longer depends on intimidation, control, or social approval. It rests in a deeper law: the one who lives in inner light cannot be easily deceived, and the one who lives in Shabad cannot be easily broken.</p>
+      <p>For those navigating difficult seasons, this is the promise: you can remain open-hearted without becoming unguarded, truthful without becoming harsh, and compassionate without surrendering discernment. That is the real shield. That is the quiet victory.</p>
+    `
   }
 ];
 
@@ -619,4 +834,3 @@ export function getEntriesByType(type) {
 export function getEntryById(id) {
   return getVisibleEntries().find(entry => entry.id === parseInt(id));
 }
-
