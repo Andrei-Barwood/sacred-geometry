@@ -1,8 +1,8 @@
 // Blog Data - Dynamic Spiritual Content
-// 9+ entries: Interview, Review, Reflection, Casual/Tarot
+// 9+ entries: Nutrition, Review, Reflection, Casual/Tarot
 
 /** Only entries whose IDs are listed here are shown in the blog and Latest Reflections. Set to null to show all. */
-const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13, 14, 15];
+const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13, 14, 15, 16];
 
 function getVisibleEntries() {
   if (!VISIBLE_ENTRY_IDS) return [...blogEntries];
@@ -864,6 +864,227 @@ export const blogEntries = [
 
       <h3>Acknowledgments</h3>
       <p>To my teacher, the musicians of Ensamble Gurdwara, and all the listeners who sustain this path of devotion. May the Naad (divine sound) guide us.</p>
+    `
+  },
+  {
+    id: 16,
+    type: 'Nutrition',
+    title: 'Spring Rejuvenation: Fasting, the Rejuvenating Diet, and the Geometry of Gentle Change',
+    date: '2026-03-28',
+    excerpt: 'A long-form nutrition reflection on spring fasting, Ayurvedic and Western medical wisdom, Kundalini rebuilding after weight loss, and a new plane geometry theorem for modern spiritual life.',
+    coverImage: 'assets/13.jpg',
+    readTime: 28,
+    content: `
+      <p>Spring does not enter the body like a command. It arrives like a rumor of green light. First the tongue wants less heaviness. Then sleep starts asking for cleaner evenings. Then the mind, which has been chewing on too much noise, begins to crave a softer rhythm. In that sense, fasting is not only about food. It is about making room. It is about letting the body stop shouting so the deeper music can be heard again.</p>
+
+      <p>In the spirit of the SGGS Ji, we can say it this way: the seasons of life keep turning under a wisdom larger than our moods, and the heart suffers less when it learns to move with that rhythm instead of wrestling it. The Guru keeps pointing us back to a luminous fact: you are not only the appetite of this moment, not only the fear of change, not only the body in transition. You are light learning how to live gently inside form.</p>
+
+      <div class="reflection-quote">
+        Change is not the enemy of the soul. Change is the wind that asks the soul whether it remembers its root.
+      </div>
+
+      <h3>Preparing the Ground for a Fast</h3>
+      <iframe width="560" height="315" src="https://www.youtube.com/embed/WeN94GszZs0?si=0XvGf-iR76KTXOvZ" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+      <p>A wise fast begins before the first skipped meal. The old teaching is still beautiful and still practical: do not jump from stimulation to austerity in one dramatic leap. Prepare. Lighten. Listen. If your regular rhythm is built on processed food, sugar spikes, heavy late dinners, caffeine, and emotional snacking, a sudden fast may feel less like purification and more like physiological revolt.</p>
+
+      <p>The gentlest preparation is progressive. Remove ultra-processed foods first. Let the plate become brighter: fruit in the morning, cooked vegetables at lunch, a lighter evening meal, enough water, fewer packaged snacks, fewer fried foods, fewer sugars that make the nervous system swing. Then experiment with simplicity. Skip one snack. Then maybe one meal on another day. Then try a single light day with broths, fruit, vegetables, and rest. A body that has rehearsed lightness usually meets a short fast with far more grace than a body that has been living in excess.</p>
+
+      <p>From a Western medical perspective, this gradual approach makes sense because appetite hormones, blood sugar regulation, digestion, and hydration do not love sudden chaos. From an Ayurvedic perspective, the same gradualism protects <em>agni</em>, the digestive fire. A small, steady flame transforms food; a flame shocked by extremes either flares wildly or weakens into smoke. Preparation, moderation, and supervision remain the golden words.</p>
+
+      <ul>
+        <li>If it is your first fast, stay modest. A one-day or very short fast is different from a multi-day fast.</li>
+        <li>If you feel faint, confused, short of breath, or unable to function, that is not spiritual heroism. That is a sign to stop and reassess.</li>
+        <li>If any fast lasts beyond a very brief period, medical guidance becomes much more important.</li>
+      </ul>
+
+      <h3>Why Spring So Often Feels Like the Right Door</h3>
+      <p>Any season can host a reset, but spring carries an emotional and biological poetry that makes lightening easier. Nature is already in transition. Cold loosens its grip. Days widen. Color returns. Ayurveda traditionally sees spring as a season when accumulated heaviness can begin to melt, especially after a dense winter. A lighter, cleaner, more seasonal way of eating can help that transition feel supported rather than stuck.</p>
+
+      <p>Western common sense lands in a similar place by a different route. Warmer weather often makes fresh produce more available and more appealing. Hydration becomes easier to remember. Walking increases. Sunlight shifts mood, circadian rhythm, and motivation. We do not need to turn these patterns into ideology to honor them. The body is seasonal. So is the psyche.</p>
+
+      <div class="reflection-quote">
+        The Guru's wisdom keeps circling the same mystery: all forms turn, all weather moves, but the one who remembers the inner Name learns how to bend without breaking.
+      </div>
+
+      <h3>The Mind Also Fasts</h3>
+      <p>Many first-time fasters are surprised by this: the hardest part is often not hunger. It is mood. It is memory. It is agitation. It is anger that was waiting for silence. When food becomes simpler, the mind sometimes loses one of its favorite sedatives. Old irritation rises. Negativity grows louder. Restlessness tries to negotiate. This does not automatically mean something is wrong. Sometimes it means the usual distractions are no longer covering the deeper weather.</p>
+
+      <p>There is also a plain physiological layer here. Less food, fewer stimulants, lower sugar swings, and interrupted habit loops can affect mood and energy very quickly. So if a cleansing phase brings emotional intensity, meet it with support rather than spiritual fantasy. Sleep more. Reduce social drama. Journal. Go outside. Sit in sunlight. Keep conversations kind. A fast is not the ideal week to pick fights, overtrain, or romanticize depletion.</p>
+
+      <p>Again the SGGS Ji offers a brilliant paraphrasable medicine: breath by breath, remembrance unties the knot within. In modern language, that means we do not have to obey every emotional wave produced by transition. We can witness it, steady it, and keep moving in truth.</p>
+
+      <h3>When the Body Learns Better Fuel, It Speaks More Clearly</h3>
+      <p>One of the more honest observations in traditional cleansing literature is this: once the body has had a season of cleaner fuel, it may stop tolerating old excess in the same way. Heavy, greasy, ultra-processed, or aggressively sugary foods can feel much louder afterward. Bloating may come faster. Sleep may worsen more noticeably. Mood may swing harder. This is not the body becoming fragile. It is the body becoming articulate.</p>
+
+      <p>So re-entry matters. After any cleansing phase, do not break the spell by crashing straight into overload. Return gently: steamed vegetables, soups, fresh fruit, and well-chewed meals. If dairy is reintroduced later and tolerated, do it in a modest way. Think cultured yogurt, kefir, or lighter preparations before richer ones. Let the body vote. A wiser diet is not a purity contest. It is a relationship.</p>
+
+      <h3>The Rejuvenating Diet</h3>
+      <p>The classic rejuvenating approach described in your source text is simple and bold: for 30 days, live on fruits, seeds, and vegetables, both cooked and raw, and let the body remember lightness. The original promise is vivid: at first you may feel weak, but gradually strength, clarity, and a kind of inner brightness can return. In warm weather, with produce in season, the plan becomes even more harmonious.</p>
+
+      <p>There is real beauty in this approach when it is understood correctly. It is not a punishment diet. It is a simplification ritual. It asks the overstimulated eater to come back to color, water, fiber, minerals, and elemental taste. It lowers culinary drama and invites the senses to become more honest. The sweetness of a peach tastes different when your mouth is no longer numbed by packaged sugar. The earthiness of a steamed carrot tastes different when your nervous system is no longer racing.</p>
+
+      <h3>How Ayurveda Can Support This Approach</h3>
+      <p>Ayurveda does not usually begin with ideology. It begins with pattern recognition: What is too heavy? What is too dry? What is too sharp? What is too cold? What is your constitution, your season, your age, your digestion, your strength, your depletion level? Within that framework, a temporary diet based on fresh produce and seeds can make sense, especially in a warm season and especially when someone is carrying signs of heaviness, dull appetite, sluggishness, post-winter stagnation, or the sense that food has become more burden than nourishment.</p>
+
+      <p>In Ayurvedic terms, a bright plant-forward month may help reduce excess heaviness and clear a feeling of internal congestion. Fresh seasonal foods are often valued because they carry more living prana, and simple meals can lessen the burden on digestion. Warm weather also matters. A light diet that feels expansive in spring or summer may feel depleting in a cold, windy season. Ayurveda is deeply seasonal that way.</p>
+
+      <p>At the same time, Ayurveda would never say that one cleansing format fits every body. A person with clear signs of <em>Vata</em> aggravation, for example, may become more anxious, cold, dry, constipated, insomniac, underweight, or scattered on a plan that is too raw, too sparse, or too low in calories. In that case the same rejuvenating intention may still be valid, but the expression changes: more cooked vegetables, stewed fruit, soups, warming spices, soaked seeds, gentler pacing, and more supervision. Ayurveda validates the spirit of simplification while insisting on personalization.</p>
+
+      <p>That nuance matters. The wise Ayurvedic reading is not, "Everyone should eat the same cleansing menu for 30 days." It is, "A temporary season of lighter, fresher, less processed food can be profoundly useful when matched to constitution, climate, digestive strength, and actual life circumstances."</p>
+
+      <h3>How Western Medicine Can Support Parts of This Approach</h3>
+      <p>Western nutrition science does not use the language of <em>agni</em>, <em>ojas</em>, or <em>ama</em>, but it does clearly support several of the principles underneath this style of eating. Diets centered on plants and lower in heavily processed foods are associated with better cardiometabolic health when they are well planned. Fruits and vegetables increase fiber, potassium, vitamin C, folate, water, and a wide spectrum of phytonutrients. Seeds and nuts contribute healthy fats, minerals, and satiety. A simpler diet can also reduce excess saturated fat and help many people become more aware of emotional eating, overeating, and food-driven inflammation.</p>
+
+      <p>In very practical terms, a produce-rich month may support bowel regularity, lower sodium intake if packaged foods fall away, improve hydration, and give the microbiome a kinder landscape. For some people, this feels like relief almost immediately: less heaviness after meals, clearer skin, steadier mornings, less compulsive snacking, and a brighter relationship with hunger cues.</p>
+
+      <p>But Western medicine also asks an important and necessary question: is the plan nutritionally complete for this particular person? That is where we need honesty. A strict 30-day diet of only fruit, vegetables, and seeds may become too low in protein, vitamin B12, iron, zinc, calcium, iodine, omega-3 fats, total calories, or overall recovery support, especially in people who exercise intensely, are already losing weight, are under chronic stress, or have medical conditions. So Western medicine can validate the direction while challenging the extremity.</p>
+
+      <div class="reflection-quote">
+        Lightness is holy only when it still carries life. If a method steals your steadiness, it is no longer cleansing; it is draining.
+      </div>
+
+      <h3>A Safer, More Detailed Way to Understand the Rejuvenating Diet</h3>
+      <p>If we expand the original text responsibly, the diet becomes less like a dare and more like a practice of elegant discipline. Imagine 30 days in which your base is fruit, seeds, and vegetables, but your execution is intelligent: more cooked than raw if digestion is fragile, more hydration than performance, more chewing than rushing, more seasonal variety than monotony, more observation than ego. The first several days may indeed feel unusual. Cravings may speak loudly. Energy may wobble. If the body has been living on stimulation, the quieter menu can feel almost too honest.</p>
+
+      <p>Then, if the approach truly suits you, a different phase begins. Taste sharpens. The body asks for less nonsense. Energy becomes cleaner, not necessarily louder but steadier. Mood can brighten because digestion is less burdened. The face sometimes changes before the mind admits it: clearer eyes, less puffiness, a lighter expression. This is the poetic promise people love in cleansing traditions. But it should never be romanticized beyond the facts of the body.</p>
+
+      <p>Here is a modern, more grounded way to carry the same spirit:</p>
+      <ul>
+        <li>Make vegetables the center of lunch and dinner, with most of them cooked if you bloat easily.</li>
+        <li>Use fruit as a real food, not an endless grazing pattern. Pair it with rest, hydration, and awareness.</li>
+        <li>Include seeds in reasonable amounts, ideally soaked or ground when helpful for digestion.</li>
+        <li>If you are physically active, watch closely for protein and calorie insufficiency. A clinician may advise adding legumes, tofu, yogurt, or other supports earlier rather than waiting 30 days.</li>
+        <li>Track not only weight, but sleep, bowel movements, mood, menstrual regularity, recovery from exercise, and concentration.</li>
+      </ul>
+
+      <h3>Clear and Explicit Warnings</h3>
+      <p>This matters enough to say without poetry: this kind of diet is not automatically safe for everyone, and a strong spiritual mood does not cancel physiology.</p>
+
+      <ul>
+        <li>Do not do a restrictive cleansing diet without professional guidance if you are pregnant, breastfeeding, under 18, underweight, frail, or over 65 with reduced appetite or muscle loss.</li>
+        <li>Do not do it alone if you have diabetes, frequent hypoglycemia, kidney disease, liver disease, an active gastrointestinal disorder, a history of eating disorders, active cancer treatment, chronic anemia, or recent major illness.</li>
+        <li>Do not combine a restrictive diet with hard training, aggressive calorie burning, or a desire to force rapid weight loss. That can impair hormones, mood, recovery, and muscle preservation.</li>
+        <li>Stop and seek medical help if you develop fainting, chest pain, confusion, severe weakness, persistent vomiting, black stools, rapid heartbeat, severe dizziness, signs of dehydration, or continued unintentional weight loss.</li>
+      </ul>
+
+      <h3>When to Consult an Ayurvedic Professional</h3>
+      <p>Consult a qualified Ayurvedic practitioner before or during this diet if any of the following sound like you:</p>
+      <ul>
+        <li>You already run cold, dry, anxious, constipated, and overstimulated, or you lose weight too easily.</li>
+        <li>Raw foods consistently leave you bloated, crampy, foggy, or exhausted.</li>
+        <li>You have obvious signs of depletion: poor sleep, dry skin, hair loss, low libido, irregular periods, dizziness, or the feeling that exercise drains you for days.</li>
+        <li>You are unsure whether you need a more Kapha-lightening approach or a more Vata-protective, cooked, grounding variation.</li>
+        <li>You want to incorporate herbs, spices, or ghee and need them matched to your constitution instead of copied from general advice.</li>
+      </ul>
+
+      <h3>When to Consult a Western Medical Professional</h3>
+      <p>Consult a physician and, ideally, a registered dietitian if any of the following apply:</p>
+      <ul>
+        <li>You have diabetes, thyroid disease, low blood pressure, kidney disease, inflammatory bowel disease, ulcers, GERD, malabsorption, or chronic fatigue.</li>
+        <li>You are taking insulin, sulfonylureas, blood pressure medication, diuretics, anticoagulants, lithium, or other medicines affected by diet or hydration shifts.</li>
+        <li>You have already lost more weight than intended, you are doing a lot of physical training, or you are worried about muscle loss.</li>
+        <li>You have known iron deficiency, B12 deficiency, vitamin D deficiency, osteoporosis risk, or a history of anemia.</li>
+        <li>You want baseline labs or professional monitoring because you are making a significant nutrition change. In many cases that is smart, not excessive.</li>
+      </ul>
+
+      <p>A concrete modern example: if you are already losing weight from exercise and you begin a fruit-and-vegetable-heavy cleanse, it can push you from “lighter” into “under-recovered” very quickly. That is the kind of threshold where professional guidance stops being optional and starts being loving.</p>
+
+      <h3>A Kundalini Yoga Kriya for Weight-Loss Imbalance and Physical Rebuilding</h3>
+      <p>If someone has lost weight, is exercising, and wants a Kundalini Yoga practice that supports balance without turning recovery into another depletion ritual, the kriya I would pair with this process is <strong>Disease Resistance and Heart Helper</strong>. It is traditionally taught as a low-activity set that supports calmness, elimination, nervous system resilience, endurance through the third chakra, and circulation through the upper body and heart.</p>
+
+      <p>Why is it such a strong complement here? Because the problem after weight loss is not always “How do I burn more?” Often the real question is “How do I become stable enough to hold the change?” This kriya helps rebuild coherence rather than chase intensity. It works the navel and heart relationship, which matters both physically and symbolically. The navel center relates to vitality, digestion, and grounded fire. The heart center relates to emotional steadiness, trust, and the ability to change without collapsing into fear.</p>
+
+      <p><strong>Suggested use:</strong> practice gently three times a week or in short daily doses. Start with beginner timing, not advanced timing. If your body is already light, shaky, or undernourished, shorter and steadier is better than dramatic effort.</p>
+
+      <p><strong>Shabad to weave around the kriya:</strong> <em>Saas Saas Simro Gobind</em>. Breath by breath, remember the Divine. This line is perfect for a body learning to trust rhythm again. Use it reverently, softly, and without turning it into decorative wellness wallpaper. Let it be remembrance, not performance.</p>
+
+      <ul>
+        <li>Skip or modify the practice if you are dizzy, feverish, acutely ill, recently post-operative, or dealing with a hernia, uncontrolled hypertension, or other conditions that make breathwork or abdominal effort risky.</li>
+        <li>If you are pregnant, recovering from trauma, or new to Kundalini practices, work with a qualified teacher and a healthcare professional.</li>
+        <li>If any breath pattern or movement spikes anxiety, shorten it, simplify it, or stop. Regulation is the goal.</li>
+      </ul>
+
+      <h3>A Kundalini Meditation for the Mind During Body Change</h3>
+      <p>To keep weight change from hitting the mind like a sudden storm, I would pair the kriya with <strong>Meditation for Change</strong>, practiced gently and consistently. This is one of the most psychologically relevant pairings for your request because it addresses the friction between transformation and ego. The body changes. The habits change. The mirror changes. The appetite changes. But sometimes the self-image does not update fast enough. That gap creates doubt, and doubt can become misery.</p>
+
+      <p>This meditation is beautiful because it does not ask the mind to become fake-positive. It asks the mind to surrender its panic and meet reality with a cleaner inner posture. That is exactly what many people need during dietary change: not more control, but more inner spaciousness.</p>
+
+      <p><strong>Shabad for the meditation:</strong> <em>Man Tu Jot Saroop Hai, Apna Mool Pachhan</em>. O mind, you are the form of light; recognize your origin. If weight changes quickly, the psyche can start making the body into a verdict. This shabad interrupts that illusion. It reminds the practitioner that the body may be changing, but dignity and essence do not depend on fluctuations in size, appetite, or external validation.</p>
+
+      <p>This is where the SGGS Ji becomes medicine in the most intimate sense. The Guru's teaching does not ask us to worship the body or reject the body. It asks us to live inside it without forgetting the deeper light. That is the healing balance modern culture often misses.</p>
+
+      <ul>
+        <li>Practice 3 to 11 minutes at first if your nervous system is sensitive.</li>
+        <li>If you have a history of panic, dissociation, trauma, or obsessive thinking, keep your eyes soft, your breath natural, and your sessions brief until you know how the practice affects you.</li>
+        <li>If meditation intensifies distress rather than settling it, pause and consult a mental health professional as well as your teacher. More intensity is not always more healing.</li>
+      </ul>
+
+      <h3>A 30-Day Rhythm of Rejuvenation</h3>
+      <p>For people who want to understand this diet as a lived month rather than a slogan, it helps to think in phases.</p>
+
+      <p><strong>Days 1-7:</strong> The break-up with excess. Cravings are loud. Simplicity feels almost insulting. The body is asking where the old stimulation went. Keep meals warm, colorful, and calm. Do not overexercise.</p>
+
+      <p><strong>Days 8-14:</strong> The tongue begins to reset. Emotional weather may still rise. This is a good window for journaling, short walks, early sleep, and very gentle Kundalini work. If dizziness or weakness worsens instead of easing, reassess the plan.</p>
+
+      <p><strong>Days 15-21:</strong> Many people feel a cleaner kind of energy here if the diet is truly fitting them. Appetite becomes less chaotic. Taste becomes more subtle. The body often becomes more communicative, not less.</p>
+
+      <p><strong>Days 22-30:</strong> Discernment begins. What actually nourishes you? What was just stimulation? What foods make you feel clear, grounded, creative, steady, and emotionally kind? That knowledge is worth more than the drama of any cleanse.</p>
+
+      <p>After day 30, if dairy is to be added back and it is medically appropriate for you, do it with maturity. Start small. Notice digestion, skin, mood, sinuses, and energy. Let food re-enter like a guest, not like a riot.</p>
+
+      <h3>Travel with no Return ticket</h3>
+      <p>I want to end the philosophical core of this essay with an invented result I will call <strong>The Theorem of the Returning Witness Chord</strong>.</p>
+
+      <p><strong>Statement.</strong> Let \\( \\triangle ABC \\) be an acute triangle and let \\( P \\) be any interior point. Drop perpendiculars from \\( P \\) to the three sides, creating the pedal triangle \\( DEF \\). Draw the tangents to the circumcircle of \\( \\triangle DEF \\) at \\( D, E, F \\), and let their pairwise intersections be \\( X, Y, Z \\). Then the lines \\( AX, BY, CZ \\) concur at a single point \\( W(P) \\), the Returning Witness. If \\( P \\) moves along the Steiner inellipse of \\( \\triangle ABC \\), the locus of \\( W(P) \\) is a cubic passing through the incenter, circumcenter, and symmedian point of \\( \\triangle ABC \\).</p>
+
+      <p>This theorem is deliberately invented, but spiritually it says something real. The big triangle is human life: body, mind, and world. The interior point \\( P \\) is attention. The pedal triangle is where inner life actually touches reality. The tangents are boundaries created by contact. When those boundaries are drawn honestly, they do not isolate us; they send us back toward a deeper witness. That witness is \\( W(P) \\): the point where scattered life re-converges.</p>
+
+      <p>The most important part is the cubic locus. Modern spirituality keeps wanting a straight line: one method, one biohack, one awakening arc, one perfectly curated identity. But the path of a real witness is not linear. It bends. It loops. It returns. It crosses itself. It contains beauty and correction at once. That is why the locus is a cubic and not a line. Twenty-first-century spirituality is full of obstacles: algorithmic distraction, branding disguised as enlightenment, nervous systems fried by speed, spiritual bypass, information without digestion, aesthetics without ethics. But it also has real advantages: unprecedented access to sacred texts, dialogue across traditions, trauma-informed embodiment, better nutritional science, broader community, and the ability to test inner claims against lived health.</p>
+
+      <p>So the spiritual reading of the theorem is this: wherever attention touches life, boundaries appear; wherever boundaries are conscious, witness can re-emerge; and wherever witness returns, the geometry of the self becomes less performative and more true. That is the hidden mercy of our era. We are overstimulated, yes. But we are also capable of a more integrated spirituality than many previous generations could easily build.</p>
+
+      <div class="reflection-quote">
+        The obstacle of our century is fragmentation. The advantage of our century is that fragments can finally learn to speak to one another.
+      </div>
+
+      <h3>Banana and Nutmeg Ice Cream</h3>
+      <p>This recipe carries the lush, old-world charm of tonic food, but it needs a strong modern safety revision. Traditional language around nutmeg can be extravagant, yet current poison guidance is very clear: large amounts of nutmeg can be toxic and may cause nausea, vomiting, agitation, hallucinations, prolonged drowsiness, and even coma. So here is the loving truth: do <strong>not</strong> use a whole medium nutmeg in one household batch the way some old recipes suggest. Crushing or macerating nutmeg in a mortar reduces its volume, but not its real dose. The issue is not how much space it takes up after grinding; the issue is how much nutmeg is actually being used. Use a tiny culinary amount only.</p>
+
+      <p><strong>Modern safer version for one small batch:</strong></p>
+      <ul>
+        <li>1 cup milk, or a fortified plant milk if preferred</li>
+        <li>1/16 to 1/8 teaspoon freshly grated nutmeg, or just a few very light passes on the grater</li>
+        <li>1 to 3 tablespoons honey, to taste</li>
+        <li>3 medium bananas</li>
+        <li>1 fresh apple, peeled and cored</li>
+      </ul>
+
+      <h3>Preparation</h3>
+      <ol>
+        <li>Grate or crush only a very small amount of nutmeg. If using a mortar, work with a small shaving or fragment, not the whole nutmeg.</li>
+        <li>Blend the milk, nutmeg, honey, bananas, and apple until completely smooth.</li>
+        <li>For a warm tonic drink, heat gently on low and do not boil.</li>
+        <li>For ice cream, chill the mixture, then freeze in an ice-cream maker, or use the tray method: freeze until nearly solid, blend again, freeze once more, and repeat for a creamier texture.</li>
+      </ol>
+
+      <h3>Benefits and Beauties of the Recipe</h3>
+      <ul>
+        <li>Banana offers carbohydrates and potassium, which can be comforting when the body feels overtrained or underfed.</li>
+        <li>Milk, if tolerated, contributes protein, calcium, and softness; a fortified plant milk can offer a similar gentleness with different nutritional tradeoffs.</li>
+        <li>Apple brings pectin and brightness, helping the recipe feel less dense and more alive.</li>
+        <li>A tiny amount of nutmeg adds warmth and fragrance, and in traditional systems it is often used in very small culinary quantities to support digestion and comfort.</li>
+        <li>Honey can make the preparation feel restorative, but use less if blood sugar is a concern, and never give honey to infants under one year old.</li>
+      </ul>
+
+      <h3>Important Nutmeg Warnings</h3>
+      <ul>
+        <li>Large amounts of nutmeg are toxic. More is not better.</li>
+        <li>Keep whole nutmeg and ground nutmeg away from children.</li>
+        <li>Avoid using nutmeg medicinally in large doses, and never make this recipe with an entire nutmeg even if it is later ground or macerated.</li>
+        <li>If someone consumes too much nutmeg and develops unusual drowsiness, agitation, vomiting, confusion, or hallucination-like symptoms, seek poison or emergency guidance right away.</li>
+      </ul>
+
+      <p>And maybe that is the whole lesson of this post. Rejuvenation is not extremism. It is intelligent tenderness. The body does not need to be bullied into light. It needs to be listened into balance. The Guru's current keeps whispering the same thing through every season of change: remember your source, move with wisdom, and let each new form of life be held by something deeper than fear.</p>
     `
   }
 ];

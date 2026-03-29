@@ -160,7 +160,7 @@ Each entry is a JavaScript object with these properties:
 ```javascript
 {
   id: 9,                    // Unique sequential number (next available)
-  type: 'Reflection',       // Type: 'Interview', 'Review', 'Reflection', or 'Casual'
+  type: 'Reflection',       // Type: 'Nutrition', 'Review', 'Reflection', or 'Casual'
   title: 'Post Title',      // Engaging title
   date: '2026-01-20',       // Date in YYYY-MM-DD format
   excerpt: 'Short description...', // Short summary (appears in lists)
@@ -198,12 +198,12 @@ Each entry is a JavaScript object with these properties:
 }
 ```
 
-**Example: New Interview**
+**Example: New Nutrition Entry**
 
 ```javascript
 {
   id: 10,
-  type: 'Interview',
+  type: 'Nutrition',
   title: 'Dialogue: The Power of Morning Meditation',
   date: '2026-01-18',
   excerpt: 'An intimate conversation about how morning practice transforms the whole day.',
