@@ -4,7 +4,13 @@
 import { getLatestEntries, getEntriesByType, getEntryById } from './blog-data.js';
 import { addComment, subscribeToComments, getAvatarColor, getInitials, formatRelativeTime } from './firebase.js';
 import { cloudPhrases } from './cloud-phrases.js';
-import { hasCoverAnimation, mountCoverAnimation as mountP5CoverAnimation, unmountCoverAnimation as unmountP5CoverAnimation } from './cover-animations.js';
+import {
+  hasCoverAnimation,
+  mountCoverAnimation as mountP5CoverAnimation,
+  unmountCoverAnimation as unmountP5CoverAnimation,
+  mountInlineAnimation as mountP5InlineAnimation,
+  unmountInlineAnimation as unmountP5InlineAnimation
+} from './cover-animations.js';
 
 function registerAppStore() {
   // If Alpine isn't ready yet, bail (we'll be called again on alpine:init)
@@ -38,6 +44,9 @@ function registerAppStore() {
     
     // Latest entries for home page
     latestEntries: [],
+
+    // Inline p5.js post animations
+    inlineAnimationHosts: new Set(),
     
     // Methods
     init() {
@@ -87,6 +96,58 @@ function registerAppStore() {
     unmountCoverAnimation(el) {
       unmountP5CoverAnimation(el);
     },
+
+    cleanupInlineAnimations() {
+      if (!(this.inlineAnimationHosts instanceof Set)) {
+        this.inlineAnimationHosts = new Set();
+      }
+
+      this.inlineAnimationHosts.forEach((host) => {
+        unmountP5InlineAnimation(host);
+      });
+      this.inlineAnimationHosts.clear();
+    },
+
+    hydratePostContent(rootEl) {
+      if (!rootEl) return;
+      if (this.currentView !== 'detail' || !this.selectedPost) {
+        this.cleanupInlineAnimations();
+        return;
+      }
+
+      if (!(this.inlineAnimationHosts instanceof Set)) {
+        this.inlineAnimationHosts = new Set();
+      }
+
+      const mountFrames = () => {
+        if (!rootEl.isConnected || this.currentView !== 'detail' || !this.selectedPost) return;
+
+        const frames = Array.from(rootEl.querySelectorAll('[data-inline-animation]'));
+        const liveHosts = new Set(frames);
+
+        Array.from(this.inlineAnimationHosts).forEach((host) => {
+          if (!liveHosts.has(host)) {
+            unmountP5InlineAnimation(host);
+            this.inlineAnimationHosts.delete(host);
+          }
+        });
+
+        frames.forEach((frame) => {
+          const animationName = frame.dataset.inlineAnimation;
+          if (!animationName) return;
+
+          this.inlineAnimationHosts.add(frame);
+          mountP5InlineAnimation(frame, animationName);
+        });
+      };
+
+      if (window.Alpine && typeof window.Alpine.nextTick === 'function') {
+        window.Alpine.nextTick(() => requestAnimationFrame(mountFrames));
+        return;
+      }
+
+      setTimeout(mountFrames, 0);
+    },
     
     filterPosts(type) {
       this.selectedFilter = type;
@@ -96,6 +157,7 @@ function registerAppStore() {
     viewPost(postId) {
       const post = getEntryById(postId);
       if (post) {
+        this.cleanupInlineAnimations();
         this.selectedPost = post;
         this.currentView = 'detail';
         
@@ -111,6 +173,7 @@ function registerAppStore() {
     },
     
     backToList() {
+      this.cleanupInlineAnimations();
       this.currentView = 'list';
       this.selectedPost = null;
       window.history.pushState({}, '', 'blog.html');
@@ -415,6 +478,9 @@ window.addEventListener('DOMContentLoaded', () => {
 // Cleanup interval on page unload
 window.addEventListener('beforeunload', () => {
   const app = window.Alpine?.store?.('app');
+  if (app) {
+    app.cleanupInlineAnimations?.();
+  }
   if (app && app.cloudPhraseCheckInterval) {
     clearInterval(app.cloudPhraseCheckInterval);
   }

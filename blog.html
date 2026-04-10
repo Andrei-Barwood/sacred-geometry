@@ -276,6 +276,7 @@
         <article 
           class="blog-content" 
           x-html="Alpine.store('app').selectedPost?.content"
+          x-effect="Alpine.store('app').selectedPost && Alpine.store('app').currentView === 'detail' && Alpine.store('app').hydratePostContent($el)"
           x-show="Alpine.store('app').selectedPost"
         >
         </article>
