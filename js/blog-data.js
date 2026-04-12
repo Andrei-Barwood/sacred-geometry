@@ -989,35 +989,66 @@ export const blogEntries = [
 
       <p>Un ejemplo moderno y concreto: si ya estás perdiendo peso por el ejercicio y comienzas una limpieza muy centrada en frutas y verduras, puedes pasar de sentirte “más liviano” a quedar “insuficientemente recuperado” muy rápido. Ese es el tipo de umbral en el que la guía profesional deja de ser opcional y empieza a ser una forma de amor.</p>
 
-      <h3>Una kriya de Kundalini Yoga para el desequilibrio tras la pérdida de peso y la reconstrucción física</h3>
-      <p>Si alguien ha perdido peso, está haciendo ejercicio y quiere una práctica de Kundalini Yoga que apoye el equilibrio sin convertir la recuperación en otro ritual de agotamiento, la kriya que yo uniría a este proceso es <strong>Disease Resistance and Heart Helper</strong> (Resistencia a la enfermedad y apoyo al corazón). Tradicionalmente se enseña como una serie de baja actividad que apoya la calma, la eliminación, la resiliencia del sistema nervioso, la resistencia a través del tercer chakra y la circulación en la parte alta del cuerpo y el corazón.</p>
+      <h3>Una kriya de Kundalini Yoga para atravesar este umbral con devoción</h3>
+      <p>Si quisiera unir este ensayo a una práctica realmente congruente con su propósito espiritual, elegiría <strong>Nabhi Kriya for Prana-Apana</strong>. No solo porque trabaja digestión, punto umbilical, abdomen, respiración y corazón, sino porque puede volverse una manera de ofrecerle el cambio al Guru en vez de vivirlo como una pelea privada con el cuerpo. Cuando alguien aligera la dieta, pierde peso o intenta reconstruir fuerza, la tentación moderna es volverse más calculador. Esta kriya propone otra cosa: reunir el fuego del ombligo con la humildad del pecho para que la transición no sea solo física, sino también reverente.</p>
 
-      <p>¿Por qué es un complemento tan fuerte aquí? Porque el problema después de perder peso no siempre es “¿cómo quemo más?”. Muchas veces la verdadera pregunta es: “¿cómo me vuelvo lo bastante estable para sostener el cambio?”. Esta kriya ayuda a reconstruir coherencia en vez de perseguir intensidad. Trabaja la relación entre el ombligo y el corazón, algo importante tanto física como simbólicamente. El centro del ombligo se relaciona con vitalidad, digestión y fuego enraizado. El centro del corazón se relaciona con estabilidad emocional, confianza y la capacidad de cambiar sin colapsar en miedo.</p>
+      <p>La secuencia misma tiene una belleza devocional. Primero ordena el eje. Luego moviliza lo que está estancado. Después exige presencia real. Y finalmente abre el centro del corazón y la sensibilidad de las manos, como si el cuerpo recordara que no fue hecho solamente para resistir, sino también para recibir. En el lenguaje del SGGS Ji: no busca volvernos impresionantes, sino honestos ante la Luz.</p>
 
-      <p><strong>Uso sugerido:</strong> practícala con suavidad tres veces por semana o en dosis breves diarias. Empieza con tiempos de principiante, no avanzados. Si tu cuerpo ya está liviano, tembloroso o insuficientemente nutrido, menos tiempo y más estabilidad es mejor que un esfuerzo dramático.</p>
+      <p><strong>Paso a paso sugerido para practicantes intermedios-altos o avanzados:</strong></p>
+      <ol>
+        <li><strong>Variación del estiramiento del nervio de la vida:</strong> siéntate con una pierna extendida y la otra plegada sobre el muslo contrario. Toma el dedo gordo del pie, eleva el pecho, lleva el mentón hacia adentro y realiza Respiración de Fuego durante 1 a 2 minutos por lado.</li>
+        <li><strong>Talones hacia los glúteos:</strong> recuéstate, lleva las rodillas al pecho y alterna el golpeteo de los talones hacia los glúteos durante 1 a 3 minutos, manteniendo la respiración coordinada con el movimiento.</li>
+        <li><strong>Empuje alternado de piernas:</strong> todavía boca arriba, una rodilla entra mientras la otra se extiende, con piernas activas y respiración potente, durante 1 a 3 minutos.</li>
+        <li><strong>Plancha frontal con Respiración de Fuego:</strong> en una línea larga desde cabeza a pies, sostén 1 a 3 minutos. Termina con una breve retención al inhalar, exhala, vuelve a inhalar, exhala por completo y descansa.</li>
+        <li><strong>Stretch pose con cierre final:</strong> eleva talones, cabeza y hombros, mira los pies, sostén el patrón de respiración indicado por la serie y cierra la última exhalación con un suave <em>mula bandha</em>.</li>
+        <li><strong>Heart Center Stretch:</strong> vuelve a sentarte. Abre los brazos como si fueras a recibir algo grande, tensa los dedos y respira profundo. Luego lleva los puños al centro del pecho con una exhalación fuerte 2 o 3 veces. Después mantén los brazos abiertos 1 minuto, acerca las palmas enfrentadas frente al pecho 1 a 2 minutos sintiendo el campo entre ambas, junta las palmas al centro y medita en el entrecejo 1 minuto.</li>
+        <li><strong>Inclinación y cierre:</strong> inclínate hacia delante con frente y palmas al suelo 1 a 2 minutos. Luego vuelve a sentarte para una breve meditación silenciosa y termina con relajación profunda.</li>
+      </ol>
 
-      <p><strong>Shabad para entretejer con la kriya:</strong> <em>Saas Saas Simro Gobind</em>. Respiración a respiración, recuerda lo Divino. Esta línea es perfecta para un cuerpo que está aprendiendo a confiar de nuevo en el ritmo. Úsala con reverencia, suavidad y sin convertirla en decoración de bienestar. Deja que sea recuerdo, no actuación.</p>
+      <p>Lo que vuelve esta kriya particularmente valiosa aquí es que ordena <em>prana</em> y <em>apana</em> sin separar el ombligo del corazón. Ayuda a que la ligereza no se vuelva dispersión y a que el cuerpo no interprete el cambio como pérdida de eje. Hecha con la actitud correcta, puede sentirse menos como “entrenamiento” y más como una limpieza del canal por el que el recuerdo de Dios vuelve a circular con menos ruido.</p>
 
+      <p><strong>Shabad sugerido para entretejer con la kriya:</strong> <em>Saas Saas Simro Gobind</em>. Respiración a respiración, recuerda lo Divino. Esta línea le da a la serie el tono correcto. Hace que el trabajo del ombligo no se vuelva voluntad seca, y que la apertura del corazón no se vuelva sentimentalismo. La respiración entonces deja de ser un mecanismo y vuelve a ser recuerdo.</p>
+
+      <p><strong>Recomendaciones específicas para este contexto:</strong></p>
       <ul>
-        <li>Omite o modifica la práctica si estás mareado, con fiebre, agudamente enfermo, recién operado o si tienes una hernia, hipertensión no controlada u otra condición que vuelva riesgoso el trabajo respiratorio o el esfuerzo abdominal.</li>
-        <li>Si estás embarazada, recuperándote de trauma o recién empezando con prácticas de Kundalini, trabaja con un profesor calificado y con un profesional de salud.</li>
-        <li>Si algún patrón respiratorio o movimiento dispara ansiedad, acórtalo, simplifícalo o detente. La meta es la regulación.</li>
+        <li>Hazla mejor en días de alimentación simple pero suficiente, o en la fase de reentrada y reconstrucción. Idealmente, después de una breve oración o antes de sentarte a leer o recitar algo del Guru. No es la kriya que yo elegiría en medio de un ayuno prolongado, de mareos o de un déficit calórico evidente.</li>
+        <li>Si vienes de perder peso, usa el tiempo mínimo de cada ejercicio durante las primeras semanas. En este tipo de transición, la precisión vale más que la proeza.</li>
+        <li>Si la Respiración de Fuego acelera demasiado tu sistema, cambia a una respiración nasal firme pero pareja y conserva la lógica de la serie sin volverla una batalla.</li>
       </ul>
 
-      <h3>Una meditación de Kundalini para la mente durante el cambio corporal</h3>
-      <p>Para evitar que el cambio de peso golpee a la mente como una tormenta repentina, yo uniría la kriya con <strong>Meditation for Change</strong> (Meditación para el cambio), practicada con suavidad y constancia. Esta es una de las combinaciones psicológicamente más relevantes para tu petición porque aborda la fricción entre transformación y ego. El cuerpo cambia. Los hábitos cambian. El espejo cambia. El apetito cambia. Pero a veces la autoimagen no se actualiza con suficiente rapidez. Esa brecha crea duda, y la duda puede volverse miseria.</p>
-
-      <p>Esta meditación es hermosa porque no le pide a la mente que se vuelva falsamente positiva. Le pide que rinda su pánico y se encuentre con la realidad desde una postura interior más limpia. Eso es exactamente lo que mucha gente necesita durante un cambio alimentario: no más control, sino más amplitud interna.</p>
-
-      <p><strong>Shabad para la meditación:</strong> <em>Man Tu Jot Saroop Hai, Apna Mool Pachhan</em>. Oh mente, eres la forma de la luz; reconoce tu origen. Si el peso cambia rápido, la psique puede empezar a convertir el cuerpo en un veredicto. Este shabad interrumpe esa ilusión. Le recuerda a quien practica que el cuerpo puede estar cambiando, pero la dignidad y la esencia no dependen de fluctuaciones de tamaño, apetito o validación externa.</p>
-
-      <p>Aquí es donde el SGGS Ji se vuelve medicina en el sentido más íntimo. La enseñanza del Guru no nos pide adorar el cuerpo ni rechazarlo. Nos pide vivir dentro de él sin olvidar la luz más profunda. Ese es el equilibrio sanador que la cultura moderna tantas veces pierde.</p>
-
+      <p><strong>Precauciones pertinentes:</strong></p>
       <ul>
-        <li>Practica entre 3 y 11 minutos al comienzo si tu sistema nervioso es sensible.</li>
-        <li>Si tienes antecedentes de pánico, disociación, trauma o pensamiento obsesivo, mantén la mirada suave, la respiración natural y las sesiones breves hasta saber cómo te afecta la práctica.</li>
-        <li>Si la meditación intensifica el malestar en vez de calmarlo, pausa y consulta tanto a un profesional de salud mental como a tu maestro. Más intensidad no siempre significa más sanación.</li>
+        <li>Reduce o evita la serie completa si hay hernia abdominal o inguinal, diástasis marcada, cirugía reciente, lesión del suelo pélvico, lumbalgia aguda o sensibilidad cervical que no tolere plancha, balanceos o <em>stretch pose</em>.</li>
+        <li>Si hay hipotensión, tendencia a desmayos, vértigo, recuperación insuficiente del ejercicio o señales claras de infraalimentación, es más sensato esperar o trabajar solo la parte sentada del centro del corazón.</li>
+        <li>Con hipertensión no controlada, palpitaciones, embarazo o posparto temprano, yo no haría retenciones, <em>mula bandha</em> sostenido ni Respiración de Fuego intensa sin supervisión experta.</li>
       </ul>
+
+      <h3>La meditación más adecuada para entregar el cambio al Guru</h3>
+      <p>De la página de meditaciones, la que mejor conversa con este momento es <strong>Meditation for Transformation</strong>. Me parece más exacta que una meditación genérica para relajarse porque entra justo donde este ensayo se vuelve más delicado: la distancia entre el cuerpo que está cambiando y la autoimagen que todavía no sabe leer ese cambio. Cuando esa brecha se abre, la mente dramatiza, proyecta y empieza a fabricar un pequeño ídolo de sí misma, ya sea por orgullo o por vergüenza. Esta meditación trabaja precisamente sobre esa distorsión y la vuelve ofrenda.</p>
+
+      <p><strong>Paso a paso:</strong></p>
+      <ol>
+        <li>Siéntate con la columna recta y el pecho estable.</li>
+        <li>Lleva ambas manos en puño a la altura del diafragma. Haz que se toquen los nudillos medios de los dedos medios; extiende los índices hacia delante hasta que sus yemas se encuentren formando un pequeño vértice; estira los pulgares hacia arriba y atrás hasta que también se contacten.</li>
+        <li>Inhala profundo hacia el diafragma.</li>
+        <li>En esa respiración, canta <em>WAA-HAY GUROO</em> en tres golpes rítmicos. Para una práctica seria, construye gradualmente: comienza con 16 o 24 repeticiones por respiración y solo después avanza hacia 40 sin forzar.</li>
+        <li>Cuando el aire se termine, detente. No aprietes la garganta ni “robes” respiración para cumplir una cifra.</li>
+        <li>Empieza con 11 a 15 minutos; para un practicante avanzado, 31 minutos ya es una sesión plena y contundente.</li>
+      </ol>
+
+      <p>Lo refinado de esta meditación es que no intenta anestesiar la transición. La atraviesa. Ordena el diafragma, compromete el centro de voluntad y le pide a la mente que deje de fabricar una lectura neurótica del cambio. En términos devocionales: ayuda a que el cuerpo cambie sin que el ego convierta ese cambio en juicio, pánico o vanidad. Le recuerda al practicante que la transformación verdadera no consiste en gustarse más, sino en transparentarse mejor ante la Presencia.</p>
+
+      <p><strong>Línea del SGGS Ji para sellar la práctica:</strong> <em>Man Tu Jot Saroop Hai, Apna Mool Pachhan</em>. Oh mente, eres la forma misma de la Luz; reconoce tu origen. Después de esta meditación, esa línea cae con mucha verdad. Reordena la relación con el espejo y devuelve dignidad espiritual a un proceso que, de otro modo, la cultura moderna convierte en ansiedad estética.</p>
+
+      <p><strong>Recomendaciones y precauciones específicas:</strong></p>
+      <ul>
+        <li>Practícala fuera de la franja de hambre más áspera. Si el cuerpo está demasiado vacío, la intensidad simbólica puede confundirse con simple irritabilidad fisiológica.</li>
+        <li>Si aparece presión excesiva en pecho, garganta o diafragma, baja el conteo por respiración y prioriza el ritmo limpio de <em>WAA-HAY GUROO</em> sobre la ambición numérica.</li>
+        <li>Si tienes asma inestable, ansiedad respiratoria, pánico ligado a escasez de aire o una relación compulsiva con el control, mantén sesiones breves y no conviertas las 40 repeticiones en una prueba de valor.</li>
+        <li>Si la práctica te deja más tenso, más grandioso o más desconectado del cuerpo, no está cumpliendo su función. Aquí debería aparecer más sobriedad, más percepción justa y más humildad interior.</li>
+      </ul>
+
+      <p>El eco con el SGGS Ji es sencillo y profundo a la vez: la forma cambia, pero la luz no nace del espejo. Una dieta más clara, una kriya hecha como ofrenda y una meditación que entregue la proyección al Guru pueden volver la primavera menos teatral, más humilde y mucho más verdadera.</p>
 
       <h3>Un ritmo de 30 días para rejuvenecer</h3>
       <p>Para quienes quieren entender esta dieta como un mes vivido y no como un eslogan, ayuda pensarla por fases.</p>
