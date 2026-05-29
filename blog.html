@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Spiritual blog - reflections, nutrition, reviews, and devotional content">
-  <meta name="keywords" content="spiritual blog, reflections, nutrition, reviews, meditation">
-  <title>Spiritual Blog - Kirtan Teg Singh</title>
+  <meta name="description" content="Blog espiritual - reflexiones, nutrición, reseñas y contenido devocional">
+  <meta name="keywords" content="blog espiritual, reflexiones, nutrición, reseñas, meditación">
+  <title>Blog Espiritual - Kirtan Teg Singh</title>
   <link rel="icon" href="favicon.jpeg" type="image/jpeg">
   <link rel="stylesheet" href="css/style.css">
   <script>
@@ -64,13 +64,13 @@
 <body class="no-js" x-data="{ }" x-init="Alpine.store('app')?.init?.()">
   <div id="js-required-overlay" aria-live="polite">
     <div class="js-required-inner">
-      <h1>Please enable JavaScript</h1>
-      <p>This site requires JavaScript to work. Enable it in your browser settings and reload the page.</p>
+      <h1>Por favor, habilite JavaScript</h1>
+      <p>Este sitio requiere JavaScript para funcionar. Habilítelo en la configuración de su navegador y recargue la página.</p>
       <p class="js-required-gurmukhi">ਆਜ਼ਾਦੀ ਦੂਜਿਆਂ ਦੀ ਚੀਜ਼ ਵਿੱਚ ਝਾਤੀ ਮਾਰਨ ਨਹੀਂ। ਇਹ ਲਈ ਨਹੀਂ ਜਾ ਸਕਦੀ, ਸਿਰਫ਼ ਦਿੱਤੀ ਜਾ ਸਕਦੀ ਹੈ।</p>
     </div>
   </div>
   <script>document.body.classList.remove('no-js');</script>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
   
   <!-- Header -->
   <header x-data="{ scrolled: false }" x-effect="scrolled = window.scrollY > 50" :class="{ 'scrolled': scrolled }">
@@ -79,16 +79,16 @@
       
       <nav class="desktop-nav">
         <ul>
-          <li><a href="index.html">Home</a></li>
+          <li><a href="index.html">Inicio</a></li>
           <li><a href="blog.html" class="active">Blog</a></li>
-          <li><a href="discography.html">Discography</a></li>
-          <li><a href="biography.html">Biography</a></li>
-          <li><a href="tarot.html">Cloud</a></li>
+          <li><a href="discography.html">Discografía</a></li>
+          <li><a href="biography.html">Biografía</a></li>
+          <li><a href="tarot.html">Nube</a></li>
           <li>
             <button 
               @click="Alpine.store('app').toggleDarkMode()" 
               class="dark-mode-toggle"
-              aria-label="Toggle dark mode"
+              aria-label="Alternar modo oscuro"
             >
               <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
             </button>
@@ -101,7 +101,7 @@
         class="hamburger" 
         @click="Alpine.store('app').toggleMobileMenu()"
         :class="{ 'active': Alpine.store('app').mobileMenuOpen }"
-        aria-label="Navigation menu"
+        aria-label="Menú de navegación"
       >
         <span></span>
         <span></span>
@@ -121,16 +121,16 @@
       x-transition:leave-end="opacity-0 translate-x-full"
     >
       <ul>
-        <li><a href="index.html" @click="Alpine.store('app').toggleMobileMenu()">Home</a></li>
+        <li><a href="index.html" @click="Alpine.store('app').toggleMobileMenu()">Inicio</a></li>
         <li><a href="blog.html" @click="Alpine.store('app').toggleMobileMenu()">Blog</a></li>
-        <li><a href="discography.html" @click="Alpine.store('app').toggleMobileMenu()">Discography</a></li>
-        <li><a href="biography.html" @click="Alpine.store('app').toggleMobileMenu()">Biography</a></li>
-        <li><a href="tarot.html" @click="Alpine.store('app').toggleMobileMenu()">Cloud</a></li>
+        <li><a href="discography.html" @click="Alpine.store('app').toggleMobileMenu()">Discografía</a></li>
+        <li><a href="biography.html" @click="Alpine.store('app').toggleMobileMenu()">Biografía</a></li>
+        <li><a href="tarot.html" @click="Alpine.store('app').toggleMobileMenu()">Nube</a></li>
         <li>
           <button 
             @click="Alpine.store('app').toggleDarkMode()" 
             class="dark-mode-toggle"
-            aria-label="Toggle dark mode"
+            aria-label="Alternar modo oscuro"
           >
             <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
           </button>
@@ -151,7 +151,7 @@
       x-transition:leave-end="opacity-0"
     >
       <section class="container" style="padding: 4rem 2rem;">
-        <h1 style="text-align: center; margin-bottom: 3rem;">Spiritual Blog</h1>
+        <h1 style="text-align: center; margin-bottom: 3rem;">Blog Espiritual</h1>
         
         <!-- Filters -->
         <div class="blog-filters">
@@ -218,15 +218,15 @@
               <h3 class="card-title" x-text="post.title"></h3>
               <p class="card-excerpt" x-text="post.excerpt"></p>
               <div class="card-meta">
-                <span x-text="post.readTime + ' min read'"></span>
-                <span>Read more →</span>
+                <span x-text="post.readTime + ' min de lectura'"></span>
+                <span>Leer más →</span>
               </div>
             </div>
           </template>
         </div>
 
         <div x-show="Alpine.store('app').filteredPosts.length === 0" class="empty-state">
-          <p>No entries to show in this category.</p>
+          <p>No hay entradas para mostrar en esta categoría.</p>
         </div>
       </section>
     </div>
@@ -246,7 +246,7 @@
           @click="Alpine.store('app').backToList()" 
           style="margin-bottom: 2rem; padding: 0.75rem 1.5rem; background: var(--surface); border: 2px solid var(--border); border-radius: 8px; cursor: pointer;"
         >
-          ← Back to blog
+          ← Volver al blog
         </button>
 
         <div class="blog-header" x-show="Alpine.store('app').selectedPost">
@@ -325,9 +325,9 @@ x-data="{
       this.text = '';
       this.charCount = 0;
       // Optional: show success message
-       alert('Comment sent successfully!');
+       alert('¡Comentario enviado con éxito!');
     } else {
-      alert('Error sending comment: ' + (result.error || 'Please try again.'));
+      alert('Error al enviar comentario: ' + (result.error || 'Por favor, inténtalo de nuevo.'));
     }
     
     this.submitting = false;
@@ -339,7 +339,7 @@ x-effect="postId = Alpine.store('app').selectedPost?.id;"
   class="comment-textarea"
   :class="{ 'warning': isWarning }"
   x-model="text"
-  placeholder="Write your comment..."
+  placeholder="Escribe tu comentario..."
   maxlength="2000"
   rows="4"
 ></textarea>
@@ -352,15 +352,15 @@ x-effect="postId = Alpine.store('app').selectedPost?.id;"
     type="text"
     class="comment-input"
     x-model="name"
-    placeholder="Name (optional, will be 'Anonymous' if left blank)"
+    placeholder="Nombre (opcional, será 'Anónimo' si se deja en blanco)"
   >
   <button
     class="comment-submit"
     :disabled="!canSubmit"
     @click="handleSubmit()"
   >
-    <span x-show="!submitting">Send</span>
-    <span x-show="submitting">Sending...</span>
+    <span x-show="!submitting">Enviar</span>
+    <span x-show="submitting">Enviando...</span>
   </button>
 </div>
 </div>
@@ -370,14 +370,14 @@ x-effect="postId = Alpine.store('app').selectedPost?.id;"
             x-show="Alpine.store('app').commentLoading[Alpine.store('app').selectedPost?.id]"
             class="loading"
           >
-            Loading comments...
+            Cargando comentarios...
           </div>
 
           <div 
             x-show="!Alpine.store('app').commentLoading[Alpine.store('app').selectedPost?.id] && (!Alpine.store('app').comments[Alpine.store('app').selectedPost?.id] || Alpine.store('app').comments[Alpine.store('app').selectedPost?.id].length === 0)"
             class="empty-state"
           >
-            <p>No comments yet. Be the first to share your reflection.</p>
+            <p>Aún no hay comentarios. Sé el primero en compartir tu reflexión.</p>
           </div>
 
           <template x-for="comment in (Alpine.store('app').comments[Alpine.store('app').selectedPost?.id] || [])" :key="comment.id">

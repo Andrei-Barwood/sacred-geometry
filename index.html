@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Minimalist spiritual portal - Reflections, meditations, and devotional content">
-  <meta name="keywords" content="spirituality, meditation, devotion, reflection, minimalist spirituality">
+  <meta name="description" content="Portal espiritual minimalista - Reflexiones, meditaciones y contenido devocional">
+  <meta name="keywords" content="espiritualidad, meditación, devoción, reflexión, espiritualidad minimalista">
   <title>Kirtan Teg Singh</title>
   <link rel="icon" href="favicon.jpeg" type="image/jpeg">
   <link rel="stylesheet" href="css/style.css">
@@ -31,13 +31,13 @@
 <body class="no-js" x-data="{ }" x-init="Alpine.store('app')?.init?.()">
   <div id="js-required-overlay" aria-live="polite">
     <div class="js-required-inner">
-      <h1>Please enable JavaScript</h1>
-      <p>This site requires JavaScript to work. Enable it in your browser settings and reload the page.</p>
+      <h1>Por favor, habilite JavaScript</h1>
+      <p>Este sitio requiere JavaScript para funcionar. Habilítelo en la configuración de su navegador y recargue la página.</p>
       <p class="js-required-gurmukhi">ਆਜ਼ਾਦੀ ਦੂਜਿਆਂ ਦੀ ਚੀਜ਼ ਵਿੱਚ ਝਾਤੀ ਮਾਰਨ ਨਹੀਂ। ਇਹ ਲਈ ਨਹੀਂ ਜਾ ਸਕਦੀ, ਸਿਰਫ਼ ਦਿੱਤੀ ਜਾ ਸਕਦੀ ਹੈ।</p>
     </div>
   </div>
   <script>document.body.classList.remove('no-js');</script>
-  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
   
   <!-- Header -->
   <header x-data="{ scrolled: false }" x-effect="scrolled = window.scrollY > 50" :class="{ 'scrolled': scrolled }">
@@ -46,16 +46,16 @@
       
       <nav class="desktop-nav">
         <ul>
-          <li><a href="index.html" class="active">Home</a></li>
+          <li><a href="index.html" class="active">Inicio</a></li>
           <li><a href="blog.html">Blog</a></li>
-          <li><a href="discography.html">Discography</a></li>
-          <li><a href="biography.html">Biography</a></li>
-          <li><a href="tarot.html">Cloud</a></li>
+          <li><a href="discography.html">Discografía</a></li>
+          <li><a href="biography.html">Biografía</a></li>
+          <li><a href="tarot.html">Nube</a></li>
           <li>
             <button 
               @click="Alpine.store('app').toggleDarkMode()" 
               class="dark-mode-toggle"
-              aria-label="Toggle dark mode"
+              aria-label="Alternar modo oscuro"
             >
               <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
             </button>
@@ -68,7 +68,7 @@
         class="hamburger" 
         @click="Alpine.store('app').toggleMobileMenu()"
         :class="{ 'active': Alpine.store('app').mobileMenuOpen }"
-        aria-label="Navigation menu"
+        aria-label="Menú de navegación"
       >
         <span></span>
         <span></span>
@@ -88,16 +88,16 @@
       x-transition:leave-end="opacity-0 translate-x-full"
     >
       <ul>
-        <li><a href="index.html" @click="Alpine.store('app').toggleMobileMenu()">Home</a></li>
+        <li><a href="index.html" @click="Alpine.store('app').toggleMobileMenu()">Inicio</a></li>
         <li><a href="blog.html" @click="Alpine.store('app').toggleMobileMenu()">Blog</a></li>
-        <li><a href="discography.html" @click="Alpine.store('app').toggleMobileMenu()">Discography</a></li>
-        <li><a href="biography.html" @click="Alpine.store('app').toggleMobileMenu()">Biography</a></li>
-        <li><a href="tarot.html" @click="Alpine.store('app').toggleMobileMenu()">Cloud</a></li>
+        <li><a href="discography.html" @click="Alpine.store('app').toggleMobileMenu()">Discografía</a></li>
+        <li><a href="biography.html" @click="Alpine.store('app').toggleMobileMenu()">Biografía</a></li>
+        <li><a href="tarot.html" @click="Alpine.store('app').toggleMobileMenu()">Nube</a></li>
         <li>
           <button 
             @click="Alpine.store('app').toggleDarkMode()" 
             class="dark-mode-toggle"
-            aria-label="Toggle dark mode"
+            aria-label="Alternar modo oscuro"
           >
             <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
           </button>
@@ -113,14 +113,14 @@
       <div>
         <h1>Sat Nam</h1>
         <div class="hero-quote">
-          "Union with the Lord's Name is the true purpose of human life. In the silence of meditation, the soul finds its home."
+          "La unión con el Nombre del Señor es el verdadero propósito de la vida humana. En el silencio de la meditación, el alma encuentra su hogar."
         </div>
       </div>
     </section>
 
-    <!-- Latest Reflections -->
+    <!-- Últimas Reflexiones -->
     <section class="container" style="padding: 4rem 2rem; background: var(--surface); margin: 2rem auto; border-radius: 12px;">
-      <h2 style="text-align: center; margin-bottom: 3rem;">Latest Reflections</h2>
+      <h2 style="text-align: center; margin-bottom: 3rem;">Últimas Reflexiones</h2>
       <div class="grid">
         <template x-for="entry in $store.app.latestEntries" :key="entry.id">
           <div class="card" @click="Alpine.store('app').viewPost(entry.id); window.location.href='blog.html?post=' + entry.id;">
@@ -142,8 +142,8 @@
             <h3 class="card-title" x-text="entry.title"></h3>
             <p class="card-excerpt" x-text="entry.excerpt"></p>
             <div class="card-meta">
-              <span x-text="entry.readTime + ' min read'"></span>
-              <span>Read more →</span>
+              <span x-text="entry.readTime + ' min de lectura'"></span>
+              <span>Leer más →</span>
             </div>
           </div>
         </template>
@@ -154,26 +154,26 @@
     <section class="container" style="padding: 4rem 2rem;">
       <div class="grid grid-3">
         <a href="blog.html" class="card">
-          <h3 class="card-title">Spiritual Blog</h3>
-          <p class="card-excerpt">Explore deep reflections, nourishing nutrition essays, spiritual content reviews, and meditations on the inner path.</p>
+          <h3 class="card-title">Blog Espiritual</h3>
+          <p class="card-excerpt">Explora profundas reflexiones, ensayos sobre nutrición, reseñas de contenido espiritual y meditaciones en el camino interior.</p>
           <div class="card-meta">
-            <span>Latest reflections →</span>
+            <span>Últimas reflexiones →</span>
           </div>
         </a>
 
         <a href="discography.html" class="card">
           <h3 class="card-title">Discography</h3>
-          <p class="card-excerpt">Devotional music that nourishes the soul. Discover inspiring albums that accompany the spiritual journey.</p>
+          <p class="card-excerpt">Música devocional que nutre el alma. Descubre álbumes inspiradores que acompañan el viaje espiritual.</p>
           <div class="card-meta">
-            <span>Explore music →</span>
+            <span>Explorar música →</span>
           </div>
         </a>
 
         <a href="biography.html" class="card">
           <h3 class="card-title">Biography</h3>
-          <p class="card-excerpt">Discover the spiritual journey, meaningful milestones, and teachings that shaped this inner path.</p>
+          <p class="card-excerpt">Descubre el viaje espiritual, hitos significativos y las enseñanzas que formaron este camino interior.</p>
           <div class="card-meta">
-            <span>My story →</span>
+            <span>Mi historia →</span>
           </div>
         </a>
       </div>

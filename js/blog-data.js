@@ -13,53 +13,53 @@ export const blogEntries = [
   // ENTRY TYPE: INTERVIEW (2)
   {
     id: 1,
-    type: 'Interview',
-    title: 'Dialogue with Wisdom: A Conversation on the Inner Journey',
+    type: 'Entrevista',
+    title: 'Diálogo con la Sabiduría: Una Conversación sobre el Viaje Interior',
     date: '2026-01-15',
-    excerpt: 'A deep interview about the spiritual path and the search for meaning in modern life.',
+    excerpt: 'Una profunda entrevista sobre el camino espiritual y la búsqueda de sentido en la vida moderna.',
     coverImage: 'assets/placeholder.svg',
     readTime: 8,
     content: `
-      <div class="interview-question">What is the fundamental purpose of the spiritual journey?</div>
-      <div class="interview-answer">The fundamental purpose is union with the Divine. As the Sri Guru Granth Sahib teaches, true purpose is found in remembering the Divine Name. This is not about escaping the world, but about finding harmony between the material and the spiritual.</div>
+      <div class="interview-question">¿Cuál es el propósito fundamental del viaje espiritual?</div>
+      <div class="interview-answer">El propósito fundamental es la unión con lo Divino. Como enseña el Sri Guru Granth Sahib, el verdadero propósito se encuentra en recordar el Nombre Divino. No se trata de escapar del mundo, sino de encontrar la armonía entre lo material y lo espiritual.</div>
       
-      <div class="interview-question">How can we sustain spiritual practice in daily life?</div>
-      <div class="interview-answer">Practice does not require isolation. Every action can become an offering when performed with awareness. The Guru teaches that meditation can be present in every moment, in every breath, in every act of service.</div>
+      <div class="interview-question">¿Cómo podemos sostener la práctica espiritual en la vida diaria?</div>
+      <div class="interview-answer">La práctica no requiere aislamiento. Cada acción puede convertirse en una ofrenda cuando se realiza con conciencia. El Guru enseña que la meditación puede estar presente en cada momento, en cada respiración, en cada acto de servicio.</div>
       
-      <div class="interview-question">What role does community play in spiritual growth?</div>
-      <div class="interview-answer">Sangat, the spiritual community, is essential. We do not walk alone. In the company of elevated souls, we find inspiration and support. "In the company of the saints, one becomes saintly." It is a collective journey toward illumination.</div>
+      <div class="interview-question">¿Qué papel juega la comunidad en el crecimiento espiritual?</div>
+      <div class="interview-answer">El Sangat, la comunidad espiritual, es esencial. No caminamos solos. En compañía de almas elevadas, encontramos inspiración y apoyo. "En la compañía de los santos, uno se vuelve santo." Es un viaje colectivo hacia la iluminación.</div>
       
-      <div class="interview-question">How do we face doubts and moments of darkness?</div>
-      <div class="interview-answer">Doubts are part of the process. The Guru reminds us that even in the deepest darkness, the light of the Divine Name is present. Steady practice, scripture reading, and meditation are our tools for passing through these moments.</div>
+      <div class="interview-question">¿Cómo enfrentamos las dudas y los momentos de oscuridad?</div>
+      <div class="interview-answer">Las dudas son parte del proceso. El Guru nos recuerda que incluso en la oscuridad más profunda, la luz del Nombre Divino está presente. La práctica constante, la lectura de escrituras y la meditación son nuestras herramientas para atravesar estos momentos.</div>
     `
   },
   {
     id: 2,
-    type: 'Interview',
-    title: 'Voices of the Present: Reflections on Faith in the Digital Era',
+    type: 'Entrevista',
+    title: 'Voces del Presente: Reflexiones sobre la Fe en la Era Digital',
     date: '2026-01-10',
-    excerpt: 'Exploring how ancestral teachings find their place in a digitally connected world.',
+    excerpt: 'Explorando cómo las enseñanzas ancestrales encuentran su lugar en un mundo digitalmente conectado.',
     coverImage: 'assets/placeholder.svg',
     readTime: 6,
     content: `
-      <div class="interview-question">How does modern technology affect our spiritual practice?</div>
-      <div class="interview-answer">Technology is neutral; it depends on how we use it. It can be a powerful tool to connect with spiritual communities, access teachings, and maintain a steady practice. Yet it can also distract us if we do not keep discipline.</div>
+      <div class="interview-question">¿Cómo afecta la tecnología moderna a nuestra práctica espiritual?</div>
+      <div class="interview-answer">La tecnología es neutral; depende de cómo la usemos. Puede ser una herramienta poderosa para conectar con comunidades espirituales, acceder a enseñanzas y mantener una práctica constante. Sin embargo, también puede distraernos si no mantenemos la disciplina.</div>
       
-      <div class="interview-question">Is it possible to find moments of silence in such a noisy world?</div>
-      <div class="interview-answer">Absolutely. Silence does not require the absence of external sound, but inner stillness. We can create sacred spaces anywhere: during a commute, in a pause at work, upon waking. The Guru teaches that the Divine Name is always available, regardless of external circumstances.</div>
+      <div class="interview-question">¿Es posible encontrar momentos de silencio en un mundo tan ruidoso?</div>
+      <div class="interview-answer">Absolutamente. El silencio no requiere la ausencia de sonido externo, sino quietud interior. Podemos crear espacios sagrados en cualquier lugar: durante un viaje, en una pausa en el trabajo, al despertar. El Guru enseña que el Nombre Divino siempre está disponible, independientemente de las circunstancias externas.</div>
       
-      <div class="interview-question">What advice would you give to those beginning their spiritual path?</div>
-      <div class="interview-answer">Start with patience and compassion toward yourself. Do not seek instant perfection. As the Guru says, "Little by little, drop by drop, the heart fills with love." Consistency in practice is more valuable than occasional intensity. And remember: each day is a new opportunity.</div>
+      <div class="interview-question">¿Qué consejo le darías a quienes comienzan su camino espiritual?</div>
+      <div class="interview-answer">Comienza con paciencia y compasión hacia ti mismo. No busques la perfección instantánea. Como dice el Guru, "Poco a poco, gota a gota, el corazón se llena de amor". La constancia en la práctica es más valiosa que la intensidad ocasional. Y recuerda: cada día es una nueva oportunidad.</div>
     `
   },
   
   // ENTRY TYPE: REVIEW (2)
   {
     id: 3,
-    type: 'Review',
-    title: 'Review: "The Path of Devotion" - An Album That Transcends',
+    type: 'Reseña',
+    title: 'Reseña: "El Camino de la Devoción" - Un Álbum que Trasciende',
     date: '2026-01-08',
-    excerpt: 'A musical exploration of the depths of Bhakti and divine connection through sound.',
+    excerpt: 'Una exploración musical de las profundidades del Bhakti y la conexión divina a través del sonido.',
     coverImage: 'assets/placeholder.svg',
     readTime: 5,
     content: `
@@ -71,36 +71,36 @@ export const blogEntries = [
         <svg class="star filled" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       </div>
       
-      <p>This album represents an extraordinary synthesis between devotional musical tradition and contemporary expressions. Each track invites deep inner reflection.</p>
+      <p>Este álbum representa una síntesis extraordinaria entre la tradición musical devocional y las expresiones contemporáneas. Cada pista invita a una profunda reflexión interior.</p>
       
       <div class="review-pros-cons">
         <div class="pros">
-          <h4>Strengths</h4>
+          <h4>Fortalezas</h4>
           <ul>
-            <li>Impeccable production that honors tradition</li>
-            <li>Lyrics that connect with the spiritual heart</li>
-            <li>A rich variety of authentic instruments</li>
-            <li>Arrangements that invite meditation</li>
+            <li>Producción impecable que honra la tradición</li>
+            <li>Letras que conectan con el corazón espiritual</li>
+            <li>Una rica variedad de instrumentos auténticos</li>
+            <li>Arreglos que invitan a la meditación</li>
           </ul>
         </div>
         <div class="cons">
-          <h4>Areas to Improve</h4>
+          <h4>Áreas de Mejora</h4>
           <ul>
-            <li>Some tracks could be longer</li>
-            <li>Some verse translations could be deeper</li>
+            <li>Algunas pistas podrían ser más largas</li>
+            <li>Algunas traducciones de versos podrían ser más profundas</li>
           </ul>
         </div>
       </div>
       
-      <p>Overall, "The Path of Devotion" offers a transformative sonic experience that transcends entertainment to become a tool for spiritual growth. Highly recommended for those seeking music that nourishes the soul.</p>
+      <p>En general, "El Camino de la Devoción" ofrece una experiencia sonora transformadora que trasciende el entretenimiento para convertirse en una herramienta de crecimiento espiritual. Altamente recomendado para aquellos que buscan música que nutra el alma.</p>
     `
   },
   {
     id: 4,
-    type: 'Review',
-    title: 'Analysis: "Reflections of the Soul" - Modern Spiritual Literature',
+    type: 'Reseña',
+    title: 'Análisis: "Reflexiones del Alma" - Literatura Espiritual Moderna',
     date: '2026-01-05',
-    excerpt: 'A critical examination of a literary work that bridges ancient wisdom and contemporary consciousness.',
+    excerpt: 'Un examen crítico de una obra literaria que tiende un puente entre la sabiduría antigua y la conciencia contemporánea.',
     coverImage: 'assets/placeholder.svg',
     readTime: 7,
     content: `
@@ -112,88 +112,88 @@ export const blogEntries = [
         <svg class="star" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       </div>
       
-      <p>"Reflections of the Soul" is a collection of essays that addresses spiritual themes from a perspective accessible to modern readers. The author demonstrates deep knowledge of sacred traditions while presenting them in a contemporary voice.</p>
+      <p>"Reflexiones del Alma" es una colección de ensayos que aborda temas espirituales desde una perspectiva accesible para los lectores modernos. El autor demuestra un profundo conocimiento de las tradiciones sagradas mientras las presenta con una voz contemporánea.</p>
       
       <div class="review-pros-cons">
         <div class="pros">
-          <h4>Strengths</h4>
+          <h4>Fortalezas</h4>
           <ul>
-            <li>Clear, accessible language without losing depth</li>
-            <li>Excellent references to the Sri Guru Granth Sahib</li>
-            <li>A structure suited to both short and continuous reading</li>
-            <li>Reflective questions at the end of each chapter</li>
+            <li>Lenguaje claro y accesible sin perder profundidad</li>
+            <li>Excelentes referencias al Sri Guru Granth Sahib</li>
+            <li>Una estructura adecuada tanto para lecturas cortas como continuas</li>
+            <li>Preguntas de reflexión al final de cada capítulo</li>
           </ul>
         </div>
         <div class="cons">
-          <h4>Considerations</h4>
+          <h4>Consideraciones</h4>
           <ul>
-            <li>Some chapters could go deeper</li>
-            <li>Footnotes for additional references are missing</li>
+            <li>Algunos capítulos podrían profundizar más</li>
+            <li>Faltan notas al pie para referencias adicionales</li>
           </ul>
         </div>
       </div>
       
-      <p>This work serves as an excellent introduction for those approaching spiritual teachings for the first time, while also offering new perspectives for more experienced practitioners. The integration of theory and personal practice makes this book a valuable addition to any spiritual library.</p>
+      <p>Esta obra sirve como una excelente introducción para aquellos que se acercan a las enseñanzas espirituales por primera vez, al tiempo que ofrece nuevas perspectivas para los practicantes más experimentados. La integración de la teoría y la práctica personal hace de este libro una valiosa adición a cualquier biblioteca espiritual.</p>
     `
   },
   
   // ENTRY TYPE: REFLECTION (2)
   {
     id: 5,
-    type: 'Reflection',
-    title: 'Silence as Teacher: Learning to Listen',
+    type: 'Reflexión',
+    title: 'El Silencio como Maestro: Aprendiendo a Escuchar',
     date: '2026-01-12',
-    excerpt: 'A meditation on the power of silence and inner listening in our spiritual journey.',
+    excerpt: 'Una meditación sobre el poder del silencio y la escucha interior en nuestro viaje espiritual.',
     coverImage: 'assets/placeholder.svg',
     readTime: 6,
     content: `
-      <p>In a world filled with constant noise, finding silence can feel like an unreachable luxury. Yet silence is not the absence of sound, but the presence of deep attention.</p>
+      <p>En un mundo lleno de ruido constante, encontrar el silencio puede parecer un lujo inalcanzable. Sin embargo, el silencio no es la ausencia de sonido, sino la presencia de una atención profunda.</p>
       
       <div class="reflection-quote">
-        "In the silence of meditation, the soul speaks and the heart listens to the Guru's voice."
+        "En el silencio de la meditación, el alma habla y el corazón escucha la voz del Guru."
       </div>
       
-      <p>The Guru Granth Sahib teaches that true wisdom arises when we quiet external and internal voices. This is not a passive act, but an active state of receptivity where divine intuition can flow freely.</p>
+      <p>El Guru Granth Sahib enseña que la verdadera sabiduría surge cuando silenciamos las voces externas e internas. Este no es un acto pasivo, sino un estado activo de receptividad donde la intuición divina puede fluir libremente.</p>
       
-      <p>In my own practice, I have found that the most transformative moments occur not when I seek answers actively, but when I sit in silence and allow the teachings to sink in naturally. It is like watering a seed: we do not force it to grow, we simply provide the right conditions.</p>
+      <p>En mi propia práctica, he descubierto que los momentos más transformadores ocurren no cuando busco respuestas activamente, sino cuando me siento en silencio y permito que las enseñanzas se asienten de forma natural. Es como regar una semilla: no la forzamos a crecer, simplemente proporcionamos las condiciones adecuadas.</p>
       
       <div class="reflection-quote">
-        "Quiet the mind, and in that silence you will find the One who is closer than your very breath."
+        "Aquieta la mente y en ese silencio encontrarás a Aquel que está más cerca que tu propia respiración."
       </div>
       
-      <p>Silence teaches patience. In modern culture, we value speed and efficiency, but spiritual growth follows its own rhythm. Like the seasons, we cannot hurry inner flowering. We must learn to trust the process and honor each stage of the journey.</p>
+      <p>El silencio enseña paciencia. En la cultura moderna, valoramos la velocidad y la eficiencia, pero el crecimiento espiritual sigue su propio ritmo. Al igual que las estaciones, no podemos apresurar el florecimiento interior. Debemos aprender a confiar en el proceso y honrar cada etapa del viaje.</p>
       
-      <p>Practice for today: devote five minutes to conscious silence. Do not actively meditate; simply sit and listen. Let thoughts arrive and depart without clinging. In that space, find the presence that has always been there, waiting to be recognized.</p>
+      <p>Práctica para hoy: dedica cinco minutos al silencio consciente. No medites activamente; simplemente siéntate y escucha. Deja que los pensamientos lleguen y se vayan sin aferrarte a ellos. En ese espacio, encuentra la presencia que siempre ha estado ahí, esperando ser reconocida.</p>
     `
   },
   {
     id: 6,
-    type: 'Reflection',
-    title: 'Service as an Expression of Divine Love',
+    type: 'Reflexión',
+    title: 'El Servicio como Expresión de Amor Divino',
     date: '2026-01-03',
-    excerpt: 'Reflecting on how Seva (selfless service) becomes a transformative spiritual practice.',
+    excerpt: 'Reflexionando sobre cómo el Seva (servicio desinteresado) se convierte en una práctica espiritual transformadora.',
     coverImage: 'assets/placeholder.svg',
     readTime: 7,
     content: `
-      <p>Selfless service, or Seva, is not simply doing good deeds. It is a profound spiritual practice that transforms both the one who serves and the one who receives.</p>
+      <p>El servicio desinteresado, o Seva, no es simplemente hacer buenas acciones. Es una profunda práctica espiritual que transforma tanto al que sirve como al que recibe.</p>
       
       <div class="reflection-quote">
-        "Selfless service is the most direct path to Self-realization. In the act of giving, we find ourselves."
+        "El servicio desinteresado es el camino más directo hacia la autorrealización. En el acto de dar, nos encontramos a nosotros mismos."
       </div>
       
-      <p>I have observed that when we serve with expectations, when we seek recognition or gratitude, the act loses its transformative power. True Seva occurs when we forget we are serving, when the ego dissolves and only the act itself remains, pure and without labels.</p>
+      <p>He observado que cuando servimos con expectativas, cuando buscamos reconocimiento o gratitud, el acto pierde su poder transformador. El verdadero Seva ocurre cuando olvidamos que estamos sirviendo, cuando el ego se disuelve y solo queda el acto en sí, puro y sin etiquetas.</p>
       
-      <p>The Guru teaches that each being is a manifestation of the Divine. Therefore, when we serve another, we are truly serving that One Presence that dwells in all. This understanding completely changes the nature of service.</p>
+      <p>El Guru enseña que cada ser es una manifestación de lo Divino. Por lo tanto, cuando servimos a otro, estamos sirviendo verdaderamente a esa Única Presencia que mora en todos. Esta comprensión cambia completamente la naturaleza del servicio.</p>
       
       <div class="reflection-quote">
-        "There is no difference between serving God and serving humanity. Both are expressions of the same unconditional love."
+        "No hay diferencia entre servir a Dios y servir a la humanidad. Ambos son expresiones del mismo amor incondicional."
       </div>
       
-      <p>In my experience, service has been one of my greatest teachers. It has taught me humility when I realized how much I have received compared to how little I have given. It has taught me gratitude as I recognize my privileges. And above all, it has taught me love by showing me that serving is simply love in action.</p>
+      <p>En mi experiencia, el servicio ha sido uno de mis grandes maestros. Me ha enseñado humildad al darme cuenta de cuánto he recibido en comparación con lo poco que he dado. Me ha enseñado gratitud al reconocer mis privilegios. Y sobre todo, me ha enseñado el amor al mostrarme que servir es simplemente amor en acción.</p>
       
-      <p>Service does not require grand gestures. It can be listening to someone who needs to be heard, offering a genuine smile, helping without anyone knowing, or simply being present for another human being. In these small acts, we find the greatness of the spirit.</p>
+      <p>El servicio no requiere grandes gestos. Puede ser escuchar a alguien que necesita ser escuchado, ofrecer una sonrisa genuina, ayudar sin que nadie lo sepa o simplemente estar presente para otro ser humano. En estos pequeños actos encontramos la grandeza del espíritu.</p>
       
-      <p>Invitation: this week, seek an opportunity to serve without anyone knowing and without expecting anything in return. Observe how this simple act transforms your perspective and your relationship with the world.</p>
+      <p>Invitación: esta semana, busca una oportunidad para servir sin que nadie lo sepa y sin esperar nada a cambio. Observa cómo este simple acto transforma tu perspectiva y tu relación con el mundo.</p>
     `
   },
   
@@ -201,35 +201,35 @@ export const blogEntries = [
   {
     id: 7,
     type: 'Casual',
-    title: 'The Sun Card: Illumination and Inner Clarity',
+    title: 'La Carta del Sol: Iluminación y Claridad Interior',
     date: '2026-01-01',
-    excerpt: 'Exploring the symbolism of the Sun card in the context of our personal spiritual awakening.',
+    excerpt: 'Explorando el simbolismo de la carta del Sol en el contexto de nuestro despertar espiritual personal.',
     coverImage: 'assets/placeholder.svg',
     readTime: 5,
     content: `
       <div class="tarot-card-layout">
         <img src="assets/placeholder.svg" alt="The Sun card" class="tarot-card-img">
         <div>
-          <p>The Sun card represents one of the highest states of consciousness on the spiritual journey. It is not sudden illumination, but the gradual recognition of the light that has always been present within us.</p>
+          <p>La carta del Sol representa uno de los estados más elevados de conciencia en el viaje espiritual. No es una iluminación repentina, sino el reconocimiento gradual de la luz que siempre ha estado presente dentro de nosotros.</p>
           
-          <p>In the context of spiritual teachings, this card reminds us of the Guru's words: "The divine light dwells in every heart, yet few recognize it." The Sun is not something we need to seek outside; it is our true nature, temporarily obscured by the clouds of ignorance and ego.</p>
+          <p>En el contexto de las enseñanzas espirituales, esta carta nos recuerda las palabras del Guru: "La luz divina mora en cada corazón, sin embargo pocos la reconocen". El Sol no es algo que debamos buscar afuera; es nuestra verdadera naturaleza, oscurecida temporalmente por las nubes de la ignorancia y el ego.</p>
           
-          <p>When this card appears in a reading, it may indicate a period of clarity and deep understanding. It is a moment to trust our intuition, to let our true essence shine without restriction.</p>
+          <p>Cuando esta carta aparece en una lectura, puede indicar un período de claridad y profunda comprensión. Es un momento para confiar en nuestra intuición, para dejar que nuestra verdadera esencia brille sin restricciones.</p>
         </div>
       </div>
       
-      <p>Solar symbolism connects with many spiritual traditions. In many teachings, the sun represents the Atman, the true Self that transcends the limitations of the individual ego. It is pure, eternal, radiant consciousness.</p>
+      <p>El simbolismo solar se conecta con muchas tradiciones espirituales. En muchas enseñanzas, el sol representa el Atman, el verdadero Ser que trasciende las limitaciones del ego individual. Es conciencia pura, eterna y radiante.</p>
       
-      <p>In our daily practice, we can invoke the energy of the Sun through morning meditation, allowing the first rays to remind us of our own luminous nature. It is not a complex ritual, but a simple practice of recognition and gratitude.</p>
+      <p>En nuestra práctica diaria, podemos invocar la energía del Sol a través de la meditación matutina, permitiendo que los primeros rayos nos recuerden nuestra propia naturaleza luminosa. No es un ritual complejo, sino una simple práctica de reconocimiento y gratitud.</p>
     `
   },
   // ENTRY TYPE: REFLECTION (3) — Sacred Geometry, Nitnem, Electromagnetic Kriya
   {
     id: 9,
-    type: 'Reflection',
-    title: 'Geometry of the Heart: Nitnem, the Electromagnetic Field and Heart Center Kriya, and Fifteen Vertices of Transformation',
+    type: 'Reflexión',
+    title: 'Geometría del Corazón: Nitnem, la Kriya del Campo Electromagnético y Centro del Corazón, y Quince Vértices de Transformación',
     date: '2026-01-22',
-    excerpt: 'A reflection on the intersection between the medicinal benefits of Nitnem and the Kundalini Yoga kriya for the electromagnetic field and the heart center, articulated through fifteen geometric-spiritual concepts.',
+    excerpt: 'Una reflexión sobre la intersección entre los beneficios medicinales del Nitnem y la kriya de Kundalini Yoga para el campo electromagnético y el centro del corazón, articulada a través de quince conceptos geométrico-espirituales.',
     coverImage: 'assets/02.jpg',
     readTime: 22,
     content: `
@@ -320,34 +320,34 @@ export const blogEntries = [
   {
     id: 8,
     type: 'Casual',
-    title: 'The Star: Hope and Guidance in Dark Moments',
+    title: 'La Estrella: Esperanza y Guía en Momentos Oscuros',
     date: '2025-12-28',
-    excerpt: 'A casual reflection on how the Star card guides us in times of spiritual uncertainty.',
+    excerpt: 'Una reflexión casual sobre cómo la carta de la Estrella nos guía en tiempos de incertidumbre espiritual.',
     coverImage: 'assets/placeholder.svg',
     readTime: 4,
     content: `
       <div class="tarot-card-layout">
         <img src="assets/placeholder.svg" alt="The Star card" class="tarot-card-img">
         <div>
-          <p>The Star is one of the most comforting cards in spiritual tarot. After the turbulence represented by the Tower, the Star emerges as a beacon of hope in the dark night of the soul.</p>
+          <p>La Estrella es una de las cartas más reconfortantes del tarot espiritual. Después de la turbulencia representada por la Torre, la Estrella emerge como un faro de esperanza en la noche oscura del alma.</p>
           
-          <p>This card speaks of renewed faith, of the ability to find meaning even in the most difficult moments. The Guru reminds us: "In the deepest darkness, the light of a single star is enough to find the path."</p>
+          <p>Esta carta habla de fe renovada, de la capacidad de encontrar significado incluso en los momentos más difíciles. El Guru nos recuerda: "En la oscuridad más profunda, la luz de una sola estrella es suficiente para encontrar el camino."</p>
           
-          <p>The Star also represents spiritual inspiration, that divine spark that moves us forward when everything seems lost. It is the inner voice that whispers that we are greater than our circumstances, that our essence transcends temporary challenges.</p>
+          <p>La Estrella también representa la inspiración espiritual, esa chispa divina que nos impulsa hacia adelante cuando todo parece perdido. Es la voz interior que nos susurra que somos más grandes que nuestras circunstancias, que nuestra esencia trasciende los desafíos temporales.</p>
         </div>
       </div>
       
-      <p>In practical terms, the appearance of this card suggests it is time to connect with our inner source of inspiration. It may be through reading sacred scriptures, meditation, or simply contemplating the beauty of the night sky.</p>
+      <p>En términos prácticos, la aparición de esta carta sugiere que es hora de conectar con nuestra fuente interna de inspiración. Puede ser a través de la lectura de escrituras sagradas, la meditación o simplemente contemplando la belleza del cielo nocturno.</p>
       
-      <p>The Star teaches us that even in the darkest periods of our spiritual life, guidance is available. We only need to learn to look upward, to trust that light always returns, and to remember that stars are most visible when the night is darkest.</p>
+      <p>La Estrella nos enseña que incluso en los períodos más oscuros de nuestra vida espiritual, hay guía disponible. Solo necesitamos aprender a mirar hacia arriba, a confiar en que la luz siempre regresa, y a recordar que las estrellas son más visibles cuando la noche es más oscura.</p>
     `
   },
   {
     id: 10,
-    type: 'Reflection',
-    title: 'Unfolding: The Fracture of Identity on the Path of Self-Knowledge',
+    type: 'Reflexión',
+    title: 'Desdoblamiento: La Fractura de la Identidad en el Camino del Autoconocimiento',
     date: '2026-01-25',
-    excerpt: 'An exploration from Ayurveda and Sikh spirituality on unfolding as a metaphor for the self-knowledge process, directed at Western medicine professionals.',
+    excerpt: 'Una exploración desde el Ayurveda y la espiritualidad sij sobre el desdoblamiento como metáfora del proceso de autoconocimiento, dirigida a profesionales de la medicina occidental.',
     coverImage: 'assets/05.jpg',
     readTime: 20,
     content: `
@@ -435,9 +435,9 @@ export const blogEntries = [
   {
     id: 11,
     type: 'Casual',
-    title: 'The Water Moon Elixir: Where Ayurvedic Wisdom Meets Modern Physiology',
+    title: 'El Elixir de la Luna de Agua: Donde la Sabiduría Ayurvédica Encuentra a la Fisiología Moderna',
     date: '2026-01-31',
-    excerpt: 'A cucumber, lemon, and black pepper infusion—Jal Chandra Ras—and how its traditional applications find unexpected resonance in modern biomedical understanding.',
+    excerpt: 'Una infusión de pepino, limón y pimienta negra (Jal Chandra Ras) y cómo sus aplicaciones tradicionales encuentran una resonancia inesperada en la comprensión biomédica moderna.',
     coverImage: 'assets/06.jpg',
     readTime: 18,
     content: `
@@ -484,8 +484,8 @@ export const blogEntries = [
   },
   {
     id: 12,
-    type: 'Reflection',
-    title: 'The Unfading Dodecahedron: From Sexual Energy to Spiritual Luminosity',
+    type: 'Reflexión',
+    title: 'El Dodecaedro Inmarcesible: De la Energía Sexual a la Luminosidad Espiritual',
     date: '2026-02-02',
     excerpt: 'A spiritual reflection on the Theorem of the Mind\'s Projection—transforming vital energy into coherence to restore the human body, framed by sacred geometry and futurist dynamism.',
     coverImage: 'assets/07.jpg',
@@ -536,8 +536,8 @@ export const blogEntries = [
   },
   {
     id: 13,
-    type: 'Reflection',
-    title: 'Amrit Vela: The Circadian Antidote to the Americanized Mind',
+    type: 'Reflexión',
+    title: 'Amrit Vela: El Antídoto Circadiano para la Mente Americanizada',
     date: '2026-02-14',
     excerpt: 'In an age defined by 24/7 connectivity and chronic sleep debt, modern medicine is rediscovering what ancient wisdom never forgot: the pre-dawn hours are sacred—and deeply biological.',
     coverImage: 'assets/12.jpg',
@@ -601,7 +601,7 @@ export const blogEntries = [
   },
   {
     id: 14,
-    type: 'Reflection',
+    type: 'Reflexión',
     title: 'El águila interior del discernimiento: un camino geométrico hacia la protección espiritual a través de Kundalini, Shabad y Ayurveda',
     date: '2026-03-08',
     excerpt: 'Un marco espiritual completo para el discernimiento no violento: identificar el desajuste a la distancia, etiquetar con Viveka y proteger la psique mediante la luz interior.',
@@ -816,7 +816,7 @@ export const blogEntries = [
   },
   {
     id: 15,
-    type: 'Reflection',
+    type: 'Reflexión',
     title: 'Nitnem Banis',
     date: '2026-03-08',
     excerpt: 'Primer álbum: grabaciones de estudio para la práctica devocional y el nitnem. Kirtan en punjabi inspirado en el Sri Guru Granth Sahib.',
@@ -1120,7 +1120,7 @@ export const blogEntries = [
   },
   {
     id: 17,
-    type: 'Reflection',
+    type: 'Reflexión',
     title: 'El arco sereno del águila: respiración, límite y refugio sagrado',
     date: '2026-04-10',
     excerpt: 'Una reflexión contemplativa sobre un águila como símbolo de refugio, atención firme y protección sagrada a través del SGGS, nitnem, Kundalini Yoga, Ayurveda y un teorema del radio estable.',
