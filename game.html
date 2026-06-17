@@ -8,6 +8,7 @@
   <title>Kirtan Teg Singh</title>
   <link rel="icon" href="favicon.jpeg" type="image/jpeg">
   <link rel="stylesheet" href="css/style.css">
+  <script src="https://js-dos.com/6.22/current/js-dos.js"></script>
   <script>
     // Ensure Alpine expressions never crash even if app.js (module) loads after Alpine initializes.
     document.addEventListener('alpine:init', () => {
@@ -111,74 +112,24 @@
   <!-- Main Content -->
   <main id="main-content">
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero" style="padding-bottom: 2rem;">
       <div>
-        <h1>Sat Nam</h1>
+        <h1>Prince of Persia</h1>
         <div class="hero-quote">
-          "La unión con el Nombre del Señor es el verdadero propósito de la vida humana. En el silencio de la meditación, el alma encuentra su hogar."
+          "El tiempo apremia, el destino del sultán está en tus manos."
         </div>
       </div>
     </section>
 
-    <!-- Últimas Reflexiones -->
-    <section class="container" style="padding: 4rem 2rem; background: var(--surface); margin: 2rem auto; border-radius: 12px;">
-      <h2 style="text-align: center; margin-bottom: 3rem;">Últimas Reflexiones</h2>
-      <div class="grid">
-        <template x-for="entry in $store.app.latestEntries" :key="entry.id">
-          <div class="card" @click="Alpine.store('app').viewPost(entry.id); window.location.href='blog.html?post=' + entry.id;">
-            <template x-if="!Alpine.store('app').hasAnimatedCover(entry)">
-              <img :src="entry.coverImage" :alt="entry.title" class="card-img" loading="lazy">
-            </template>
-            <template x-if="Alpine.store('app').hasAnimatedCover(entry)">
-              <div
-                class="card-img animated-cover animated-cover--card"
-                role="img"
-                :aria-label="entry.title"
-                x-init="Alpine.store('app').mountCoverAnimation($el, entry)"
-              ></div>
-            </template>
-            <div class="card-meta" style="margin-bottom: 0.5rem;">
-              <span x-text="entry.type"></span>
-              <span x-text="new Date(entry.date).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })"></span>
-            </div>
-            <h3 class="card-title" x-text="entry.title"></h3>
-            <p class="card-excerpt" x-text="entry.excerpt"></p>
-            <div class="card-meta">
-              <span x-text="entry.readTime + ' min de lectura'"></span>
-              <span>Leer más →</span>
-            </div>
-          </div>
-        </template>
-      </div>
-    </section>
-
-    <!-- Cards Grid -->
-    <section class="container" style="padding: 4rem 2rem;">
-      <div class="grid grid-3">
-        <a href="blog.html" class="card">
-          <h3 class="card-title">Blog Espiritual</h3>
-          <p class="card-excerpt">Explora profundas reflexiones, ensayos sobre nutrición, reseñas de contenido espiritual y meditaciones en el camino interior.</p>
-          <div class="card-meta">
-            <span>Últimas reflexiones →</span>
-          </div>
-        </a>
-
-        <a href="discography.html" class="card">
-          <h3 class="card-title">Discography</h3>
-          <p class="card-excerpt">Música devocional que nutre el alma. Descubre álbumes inspiradores que acompañan el viaje espiritual.</p>
-          <div class="card-meta">
-            <span>Explorar música →</span>
-          </div>
-        </a>
-
-        <a href="biography.html" class="card">
-          <h3 class="card-title">Biography</h3>
-          <p class="card-excerpt">Descubre el viaje espiritual, hitos significativos y las enseñanzas que formaron este camino interior.</p>
-          <div class="card-meta">
-            <span>Mi historia →</span>
-          </div>
-        </a>
-      </div>
+    <!-- Game Container -->
+    <section class="container" style="padding: 2rem; background: var(--surface); margin: 0 auto 4rem auto; border-radius: 12px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+        <div id="loading" style="margin-bottom: 1rem; color: var(--primary); font-weight: 600;">Cargando JS-DOS...</div>
+        <div style="border: 4px solid var(--border); border-radius: 8px; overflow: hidden; max-width: 100%; box-shadow: 0 10px 30px rgba(0,0,0,0.1); background: #000;">
+            <canvas id="jsdos" width="640" height="400" style="display: block; max-width: 100%; height: auto; image-rendering: pixelated;"></canvas>
+        </div>
+        <p style="margin-top: 1.5rem; color: var(--text-medium); text-align: center; font-size: 0.9rem;">
+            Controles: Flechas de dirección para moverte. Shift para agarrarte o usar la espada.
+        </p>
     </section>
   </main>
 
@@ -187,5 +138,23 @@
     <p>Kirtan Teg Singh and The Gurdwara Ensemble 2026 Ⓒ</p>
     <p><a href="https://www.youtube.com/@kirtantegsingh" target="_blank" title="YouTube">YouTube</a></p>
   </footer>
+
+  <script>
+    const loadingMsg = document.getElementById('loading');
+    Dos(document.getElementById("jsdos"), { 
+        wdosboxUrl: "https://js-dos.com/6.22/current/wdosbox.js" 
+    }).ready((fs, main) => {
+        loadingMsg.innerText = "Extrayendo juego...";
+        fs.extract("assets/prince.zip").then(() => {
+            loadingMsg.style.display = "none";
+            main(["-c", "prince.exe"]).then((ci) => {
+                window.ci = ci; 
+            });
+        }).catch(err => {
+            loadingMsg.innerText = "Error cargando el juego.";
+            console.error(err);
+        });
+    });
+  </script>
 </body>
 </html>
