@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Maeth / Aemaeth - Suite Educativa Interactiva de Análisis de Circuitos Eléctricos">
+  <meta name="keywords" content="boylestad, circuitos, matemáticas, notación científica, ingeniería">
+  <title>Maeth / Aemaeth - Análisis de Circuitos Eléctricos</title>
+  <link rel="icon" href="../favicon.jpeg" type="image/jpeg">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/aemaeth.css">
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('app', Alpine.store('app') || {
+        __placeholder: true,
+        mobileMenuOpen: false,
+        darkMode: false,
+        currentView: 'list',
+        selectedFilter: 'All',
+        filteredPosts: [],
+        selectedPost: null,
+        comments: {},
+        commentLoading: {},
+        init() {}
+      });
+    });
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.x/dist/cdn.min.js"></script>
+  <script type="module" src="../js/app.js"></script>
+  <script type="module" src="../js/aemaeth.js"></script>
+</head>
+<body class="no-js" x-data="{ }" x-init="Alpine.store('app')?.init?.()">
+  <div id="js-required-overlay" aria-live="polite">
+    <div class="js-required-inner">
+      <h1>Por favor, habilite JavaScript</h1>
+      <p>Este sitio requiere JavaScript para funcionar. Habilítelo en la configuración de su navegador y recargue la página.</p>
+    </div>
+  </div>
+  <script>document.body.classList.remove('no-js');</script>
+  
+  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+  
+  <!-- Header -->
+  <header x-data="{ scrolled: false }" x-effect="scrolled = window.scrollY > 50" :class="{ 'scrolled': scrolled }">
+    <div class="header-content">
+      <a href="../index.html" class="logo">Kirtan Teg Singh</a>
+      
+      <nav class="desktop-nav">
+        <ul>
+          <li><a href="../index.html">Inicio</a></li>
+          <li><a href="../blog.html">Blog</a></li>
+          <li><a href="../discography.html">Discografía</a></li>
+          <li><a href="../biography.html">Biografía</a></li>
+          <li><a href="../tarot.html">Nube</a></li>
+          <li><a href="../game.html">Arcade</a></li>
+          <li><a href="aemaeth.html" class="active">Maeth / Aemaeth</a></li>
+          <li>
+            <button 
+              @click="Alpine.store('app').toggleDarkMode()" 
+              class="dark-mode-toggle"
+              aria-label="Alternar modo oscuro"
+            >
+              <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+      
+      <!-- Hamburger Menu -->
+      <button 
+        class="hamburger" 
+        @click="Alpine.store('app').toggleMobileMenu()"
+        :class="{ 'active': Alpine.store('app').mobileMenuOpen }"
+        aria-label="Menú de navegación"
+      >
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+    
+    <!-- Mobile Menu -->
+    <div 
+      class="mobile-menu" 
+      x-show="Alpine.store('app').mobileMenuOpen"
+      x-transition:enter="transition ease-out duration-300"
+      x-transition:enter-start="opacity-0 translate-x-full"
+      x-transition:enter-end="opacity-100 translate-x-0"
+      x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="opacity-100 translate-x-0"
+      x-transition:leave-end="opacity-0 translate-x-full"
+    >
+      <ul>
+        <li><a href="../index.html" @click="Alpine.store('app').toggleMobileMenu()">Inicio</a></li>
+        <li><a href="../blog.html" @click="Alpine.store('app').toggleMobileMenu()">Blog</a></li>
+        <li><a href="../discography.html" @click="Alpine.store('app').toggleMobileMenu()">Discografía</a></li>
+        <li><a href="../biography.html" @click="Alpine.store('app').toggleMobileMenu()">Biografía</a></li>
+        <li><a href="../tarot.html" @click="Alpine.store('app').toggleMobileMenu()">Nube</a></li>
+        <li><a href="../game.html" @click="Alpine.store('app').toggleMobileMenu()">Arcade</a></li>
+        <li><a href="aemaeth.html" @click="Alpine.store('app').toggleMobileMenu()">Maeth / Aemaeth</a></li>
+        <li>
+          <button 
+            @click="Alpine.store('app').toggleDarkMode()" 
+            class="dark-mode-toggle"
+            aria-label="Alternar modo oscuro"
+          >
+            <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main id="main-content" style="padding-top: 100px;">
+    <section class="hero aemaeth-hero" style="padding: 4rem 2rem; text-align: center;">
+      <div>
+        <h1>Maeth / Aemaeth</h1>
+        <div class="hero-quote" style="max-width: 800px; margin: 1rem auto; font-size: 1.2rem; opacity: 0.9;">
+          "El aliento de la verdad animando a la materia."<br>
+          Suite de Resolución y Análisis de Circuitos Eléctricos
+        </div>
+      </div>
+    </section>
+
+    <section class="container aemaeth-container" style="max-width: 900px; margin: 0 auto; padding: 2rem;">
+      <!-- Tabs Navigation -->
+      <div class="aemaeth-tabs">
+        <button class="tab-btn active" data-target="sec-1-6">Sec 1.6</button>
+        <button class="tab-btn" data-target="sec-1-7">Sec 1.7</button>
+        <button class="tab-btn" data-target="sec-1-8">Sec 1.8</button>
+        <button class="tab-btn" data-target="sec-1-10">Sec 1.10</button>
+        <button class="tab-btn" data-target="sec-1-11">Sec 1.11</button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div class="tab-content active" id="sec-1-6">
+        <h2>Sección 1.6: Potencias de Diez</h2>
+        <p>Realiza sumas, restas, multiplicaciones y divisiones usando potencias de 10.</p>
+        
+        <div class="card interactive-card">
+          <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
+          <div class="input-group">
+            <label for="preset-1-6">Selecciona un problema:</label>
+            <select id="preset-1-6" class="book-preset-select" data-section="1-6">
+              <option value="" disabled selected>-- Elige un problema --</option>
+              <option value="p12a">Prob 12.a: Expresar 10.000 como potencia de diez</option>
+              <option value="p12b">Prob 12.b: Expresar 0.0001 como potencia de diez</option>
+              <option value="p13a">Prob 13.a: Expresar 15.000 en potencias de diez</option>
+              <option value="p13d">Prob 13.d: Expresar 0.0000068 en potencias de diez</option>
+              <option value="p14a">Prob 14.a: Suma 4.200 + 6.800.000 en potencias de diez</option>
+              <option value="p14c">Prob 14.c: Resta 0.5x10^-3 - 6x10^-5 en potencias de diez</option>
+              <option value="p15c">Prob 15.c: Multiplicación 10^3 * 10^6</option>
+              <option value="p16a">Prob 16.a: Multiplicación (50.000)(0.0003)</option>
+              <option value="p17a">Prob 17.a: División 100 / 1000</option>
+              <option value="p18a">Prob 18.a: División 2000 / 0.00008</option>
+              <option value="p20a">Prob 20.a: Potencia (2.2x10^3)^3</option>
+              <option value="p22a">Prob 22.a: Op. de Ingeniería (300)^2 * 100 / 10^4</option>
+            </select>
+          </div>
+          <div id="desc-preset-1-6" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+        </div>
+
+        <div class="card interactive-card">
+          <div class="input-group">
+            <label for="num-1-6">Número:</label>
+            <input type="text" id="num-1-6" placeholder="Ej. 10000, 0.0001, 10e3" />
+            <button id="btn-convert-1-6" class="action-btn">Convertir</button>
+          </div>
+          
+          <div class="results-box" id="res-1-6">
+            <div class="result-row"><strong>Notación Científica:</strong> <span id="sci-1-6">-</span></div>
+            <div class="result-row"><strong>Notación de Ingeniería:</strong> <span id="eng-1-6">-</span></div>
+          </div>
+        </div>
+
+        <div class="card interactive-card">
+          <h3>Calculadora de Operaciones (Potencias de Diez)</h3>
+          <div class="operation-group">
+            <input type="text" id="op1-1-6" placeholder="Op 1 (Ej: 300)" />
+            <select id="operator-1-6">
+              <option value="+">+</option>
+              <option value="-">-</option>
+              <option value="*">×</option>
+              <option value="/">÷</option>
+            </select>
+            <input type="text" id="op2-1-6" placeholder="Op 2 (Ej: 100)" />
+            <button id="btn-calc-1-6" class="action-btn">Calcular</button>
+          </div>
+          <div class="results-box" id="calc-res-1-6">
+            <div class="result-row"><strong>Procedimiento:</strong> <div id="proc-1-6" class="procedure-box">-</div></div>
+            <div class="result-row"><strong>Resultado Final (Ingeniería):</strong> <span id="final-1-6">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="sec-1-7">
+        <h2>Sección 1.7: Conversión entre niveles de potencias de diez</h2>
+        <p>Conversiones de prefijos métricos (p. ej., µs a ms, pF a nF, km a mm).</p>
+        
+        <div class="card interactive-card">
+          <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
+          <div class="input-group">
+            <label for="preset-1-7">Selecciona un problema:</label>
+            <select id="preset-1-7" class="book-preset-select" data-section="1-7">
+              <option value="" disabled selected>-- Elige un problema --</option>
+              <option value="p23a">Prob 23.a: Completar 6x10^3 = ___ x 10^6</option>
+              <option value="p23b">Prob 23.b: Completar 4x10^-4 = ___ x 10^-6</option>
+              <option value="p23c1">Prob 23.c.1: Completar 50x10^5 = ___ x 10^3</option>
+              <option value="p23c2">Prob 23.c.2: Completar 50x10^5 = ___ x 10^6</option>
+              <option value="p23d1">Prob 23.d.1: Completar 30x10^-8 = ___ x 10^-3</option>
+              <option value="p23d2">Prob 23.d.2: Completar 30x10^-8 = ___ x 10^-6</option>
+              <option value="p24a">Prob 24.a: Convertir 2000 µs a milisegundos</option>
+              <option value="p24b">Prob 24.b: Convertir 0.04 ms a microsegundos</option>
+              <option value="p24c">Prob 24.c: Convertir 0.06 µf a nanofarads</option>
+              <option value="p24d">Prob 24.d: Convertir 8400 ps a microsegundos</option>
+              <option value="p24e">Prob 24.e: Convertir 0.006 km a milímetros</option>
+              <option value="p24f">Prob 24.f: Convertir 260x10^3 mm a kilómetros</option>
+            </select>
+          </div>
+          <div id="desc-preset-1-7" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+        </div>
+
+        <div class="card interactive-card">
+          <div class="prefix-group">
+            <input type="number" id="val-1-7" placeholder="Valor" />
+            <select id="prefix-from-1-7">
+              <option value="12">Tera (T)</option>
+              <option value="9">Giga (G)</option>
+              <option value="6">Mega (M)</option>
+              <option value="3">Kilo (k)</option>
+              <option value="0" selected>Unidad base</option>
+              <option value="-3">Mili (m)</option>
+              <option value="-6">Micro (µ)</option>
+              <option value="-9">Nano (n)</option>
+              <option value="-12">Pico (p)</option>
+            </select>
+            <span>➜</span>
+            <select id="prefix-to-1-7">
+              <option value="12">Tera (T)</option>
+              <option value="9">Giga (G)</option>
+              <option value="6">Mega (M)</option>
+              <option value="3">Kilo (k)</option>
+              <option value="0">Unidad base</option>
+              <option value="-3">Mili (m)</option>
+              <option value="-6">Micro (µ)</option>
+              <option value="-9">Nano (n)</option>
+              <option value="-12">Pico (p)</option>
+            </select>
+            <button id="btn-convert-1-7" class="action-btn">Convertir</button>
+          </div>
+          <div class="results-box">
+            <div class="result-row"><strong>Resultado:</strong> <span id="res-1-7">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="sec-1-8">
+        <h2>Sección 1.8: Conversión de sistemas de unidades</h2>
+        <p>Resuelve problemas complejos de cinemática y conversión (Problemas 25-40).</p>
+        
+        <div class="card interactive-card">
+          <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
+          <div class="input-group">
+            <label for="preset-1-8">Selecciona un problema:</label>
+            <select id="preset-1-8" class="book-preset-select" data-section="1-8">
+              <option value="" disabled selected>-- Elige un problema --</option>
+              <option value="p25a">Prob 25.a: Convertir 1.5 min a segundos</option>
+              <option value="p25b">Prob 25.b: Convertir 0.04 h a segundos</option>
+              <option value="p25c">Prob 25.c: Convertir 0.05 s a microsegundos</option>
+              <option value="p25d">Prob 25.d: Convertir 0.16 m a milímetros</option>
+              <option value="p26a">Prob 26.a: Convertir 0.1 µF a picofarads</option>
+              <option value="p26b">Prob 26.b: Convertir 0.467 km a metros</option>
+              <option value="p27a">Prob 27.a: Convertir 100 pulgadas a metros</option>
+              <option value="p27b">Prob 27.b: Convertir 4 pies a metros</option>
+              <option value="p29">Prob 29: Calcular velocidad de la luz en millas/hora</option>
+              <option value="p30">Prob 30: Velocidad en mi/h para 50 pies en 20 s</option>
+              <option value="p31">Prob 31: Tiempo para auto a 100 mi/h recorrer 100 yd</option>
+              <option value="p32">Prob 32: Convertir 6 mi/h a metros por segundo</option>
+            </select>
+          </div>
+          <div id="desc-preset-1-8" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+        </div>
+
+        <div class="card interactive-card">
+          <h3>Conversión General de Unidades</h3>
+          <div class="unit-group">
+            <input type="number" id="val-1-8" placeholder="Valor" />
+            <select id="unit-type-1-8">
+              <option value="length">Longitud</option>
+              <option value="time">Tiempo</option>
+              <option value="force">Fuerza / Masa</option>
+            </select>
+            <select id="unit-from-1-8"></select>
+            <span>➜</span>
+            <select id="unit-to-1-8"></select>
+            <button id="btn-convert-1-8" class="action-btn">Convertir</button>
+          </div>
+          <div class="results-box">
+             <div class="result-row"><strong>Resultado:</strong> <span id="res-1-8">-</span></div>
+          </div>
+        </div>
+        
+        <div class="card interactive-card mt-2">
+          <h3>Solucionador Cinemático Avanzado (Velocidad, Tiempo, Distancia)</h3>
+          <p>Ejemplo: Calcule el tiempo para recorrer una distancia a cierta velocidad.</p>
+          <div class="kinematics-group">
+            <div class="k-input"><label>Distancia (d):</label> <input type="text" id="kin-d" placeholder="Ej. 100 yd, 3000 mi" /></div>
+            <div class="k-input"><label>Velocidad (v):</label> <input type="text" id="kin-v" placeholder="Ej. 100 mi/h, 600 cm/s" /></div>
+            <div class="k-input"><label>Tiempo (t):</label> <input type="text" id="kin-t" placeholder="Ej. 20 s, 0.016 h" /></div>
+            <small>Deja exactamente UN campo vacío para calcularlo.</small>
+            <button id="btn-kin-calc" class="action-btn mt-1">Calcular Incógnita</button>
+          </div>
+          <div class="results-box" id="res-kin">
+            <div class="result-row"><strong>Procedimiento y Resultado:</strong> <div id="proc-kin" class="procedure-box">-</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="sec-1-10">
+        <h2>Sección 1.10: Tablas de Conversión</h2>
+        
+        <div class="card interactive-card">
+          <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
+          <div class="input-group">
+            <label for="preset-1-10">Selecciona un problema:</label>
+            <select id="preset-1-10" class="book-preset-select" data-section="1-10">
+              <option value="" disabled selected>-- Elige un problema --</option>
+              <option value="p41a">Prob 41.a: Determinar BTU en 5 J de energía</option>
+              <option value="p41b">Prob 41.b: Determinar Metros cúbicos en 24 oz de líquido</option>
+              <option value="p41c">Prob 41.c: Determinar Segundos en 1.4 días</option>
+              <option value="p41d">Prob 41.d: Determinar Pintas en 1 m³ de líquido</option>
+              <option value="preset5">Ej. 5: BTU en 1000 J de energía</option>
+              <option value="preset6">Ej. 6: Metros cúbicos en 1 galón (128 oz) de líquido</option>
+              <option value="preset7">Ej. 7: Segundos en 1 hora (0.0417 días)</option>
+              <option value="preset8">Ej. 8: Litros a metros cúbicos (1000 litros)</option>
+              <option value="preset9">Ej. 9: Galones a litros (10 galones)</option>
+              <option value="preset10">Ej. 10: Libras a kilogramos (150 libras)</option>
+              <option value="preset11">Ej. 11: Millas a kilómetros (100 millas)</option>
+              <option value="preset12">Ej. 12: Caballos de fuerza (HP) a Watts (5 HP)</option>
+            </select>
+          </div>
+          <div id="desc-preset-1-10" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+        </div>
+
+        <div class="card interactive-card">
+           <div class="unit-group">
+            <input type="number" id="val-1-10" placeholder="Valor" />
+            <select id="conv-preset-1-10">
+              <option value="btu_j">BTU a Joules</option>
+              <option value="j_btu">Joules a BTU</option>
+              <option value="oz_m3">Oz líquido a Metros cúbicos</option>
+              <option value="m3_oz">Metros cúbicos a Oz líquido</option>
+              <option value="days_s">Días a Segundos</option>
+              <option value="s_days">Segundos a Días</option>
+              <option value="pints_m3">Pintas a Metros cúbicos</option>
+              <option value="m3_pints">Metros cúbicos a Pintas</option>
+              <option value="l_m3">Litros a Metros cúbicos</option>
+              <option value="gal_l">Galones a Litros</option>
+              <option value="lb_kg">Libras a Kilogramos</option>
+              <option value="mi_km">Millas a Kilómetros</option>
+              <option value="hp_w">Caballos de fuerza (HP) a Watts</option>
+            </select>
+            <button id="btn-convert-1-10" class="action-btn">Convertir</button>
+          </div>
+          <div class="results-box">
+             <div class="result-row"><strong>Resultado:</strong> <span id="res-1-10">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="sec-1-11">
+        <h2>Sección 1.11: Calculadoras</h2>
+        <p>Operaciones científicas avanzadas y trigonométricas. (Ej: prob 42 a 45)</p>
+
+        <div class="card interactive-card">
+          <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
+          <div class="input-group">
+            <label for="preset-1-11">Selecciona un problema:</label>
+            <select id="preset-1-11" class="book-preset-select" data-section="1-11">
+              <option value="" disabled selected>-- Elige un problema --</option>
+              <option value="p42">Prob 42: Evaluar 6(4 + 8)</option>
+              <option value="p43">Prob 43: Evaluar sqrt(3^2 + 4^2)</option>
+              <option value="p44">Prob 44: Evaluar atan(4/3) (inversa trigonométrica)</option>
+              <option value="p45">Prob 45: Evaluar sqrt(400) / sqrt(6^2 + 10)</option>
+              <option value="preset5">Ej. 5: Impedancia sqrt(12^2 + 5^2)</option>
+              <option value="preset6">Ej. 6: Reactancia capacitiva 1 / (2 * pi * 1000 * 10^-6)</option>
+              <option value="preset7">Ej. 7: Reactancia inductiva 2 * pi * 60 * 0.15</option>
+              <option value="preset8">Ej. 8: Ángulo de fase atan(10 / 5) * (180 / pi)</option>
+              <option value="preset9">Ej. 9: Voltaje RMS 120 / sqrt(2)</option>
+              <option value="preset10">Ej. 10: Voltaje instantáneo 10 * sin(2 * pi * 50 * 0.005)</option>
+              <option value="preset11">Ej. 11: Impedancia RLC sqrt(100^2 + (50 - 20)^2)</option>
+              <option value="preset12">Ej. 12: Ganancia en dB 20 * log10(100 / 10)</option>
+            </select>
+          </div>
+          <div id="desc-preset-1-11" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+        </div>
+        <div class="card interactive-card dictionary-card">
+          <h3>Diccionario de Casos de Uso</h3>
+          <p>Selecciona una categoría para ver expresiones comunes y cargar un ejemplo en la calculadora:</p>
+          <div class="input-group">
+            <label for="dict-category">Categoría:</label>
+            <select id="dict-category" class="book-preset-select">
+              <option value="" disabled selected>-- Selecciona una categoría --</option>
+              <option value="electricidad">Circuitos Eléctricos</option>
+              <option value="matematicas">Matemática Aplicada</option>
+              <option value="finanzas">Finanzas</option>
+              <option value="trigonometria">Trigonometría y Geometría</option>
+            </select>
+          </div>
+          <div id="dict-expressions" class="procedure-box" style="display: none; margin-bottom: 1rem;">
+          </div>
+        </div>
+
+        <div class="card interactive-card">
+          <div class="calc-grid">
+            <div class="calc-item">
+               <label>Expresión (Ej: <code>6*(4+8)</code>, <code>sqrt(3^2 + 4^2)</code>, <code>atan(4/3)</code>)</label>
+               <input type="text" id="expr-1-11" placeholder="Ej. sqrt(400 / (6^2 + 10))" />
+               <button id="btn-calc-1-11" class="action-btn mt-1">Evaluar Expresión</button>
+            </div>
+          </div>
+          <div class="results-box">
+             <div class="result-row"><strong>Resultado:</strong> <span id="res-1-11">-</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Mini-Calculadora / Entrenador Widget (Persistent) -->
+  <div class="mini-calc-widget" id="miniCalcWidget" x-data="{ open: false }">
+    <button class="mini-calc-toggle" @click="open = !open">
+      <span x-text="open ? '✕ Cerrar Entrenador' : '🧮 Entrenador Potencias'"></span>
+    </button>
+    <div class="mini-calc-body" x-show="open" x-transition>
+      <h4>Entrenador de Potencias de Diez</h4>
+      <div class="mini-calc-row">
+         <input type="number" id="mc-val1" placeholder="Val 1" />
+         <span>×10^</span>
+         <input type="number" id="mc-exp1" placeholder="Exp" />
+      </div>
+      <div class="mini-calc-row">
+         <select id="mc-op">
+            <option value="+">+</option>
+            <option value="-">-</option>
+            <option value="*">×</option>
+            <option value="/">÷</option>
+         </select>
+      </div>
+      <div class="mini-calc-row">
+         <input type="number" id="mc-val2" placeholder="Val 2" />
+         <span>×10^</span>
+         <input type="number" id="mc-exp2" placeholder="Exp" />
+      </div>
+      <button id="mc-calc-btn" class="action-btn full-width mt-1" style="width: 100%;">Calcular</button>
+      <div class="mini-calc-res mt-1" id="mc-res" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+        Resultado: <br><strong id="mc-res-val">-</strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>Kirtan Teg Singh and The Gurdwara Ensemble 2026 Ⓒ</p>
+    <p><a href="https://www.youtube.com/@kirtantegsingh" target="_blank" title="YouTube">YouTube</a></p>
+  </footer>
+</body>
+</html>

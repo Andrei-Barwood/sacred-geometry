@@ -1,0 +1,233 @@
+/* Aemaeth Interactive Suite Styles */
+
+.aemaeth-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: transparent;
+}
+
+.aemaeth-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.5rem;
+}
+
+.tab-btn {
+  background: none;
+  border: none;
+  padding: 0.5rem 1rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.tab-btn:hover {
+  background: var(--border);
+  color: var(--text-dark);
+}
+
+.tab-btn.active {
+  background: var(--primary);
+  color: white;
+}
+
+.tab-content {
+  display: none;
+  animation: fadeIn 0.4s ease-in-out;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.interactive-card {
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 2rem;
+  border: 1px solid var(--border);
+}
+
+[data-theme="dark"] .interactive-card {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.interactive-card h3 {
+  margin-bottom: 1.5rem;
+  font-size: 1.4rem;
+  color: var(--primary);
+}
+
+.input-group, .operation-group, .prefix-group, .unit-group, .kinematics-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.kinematics-group {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.k-input {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.k-input label {
+  width: 120px;
+  font-weight: 500;
+}
+
+input[type="text"], input[type="number"], select {
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-light);
+  color: var(--text-dark);
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+input[type="text"]:focus, input[type="number"]:focus, select:focus {
+  border-color: var(--primary);
+}
+
+.action-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.3s, transform 0.1s;
+}
+
+.action-btn:hover {
+  background: var(--secondary);
+}
+
+.action-btn:active {
+  transform: scale(0.98);
+}
+
+.results-box {
+  background: var(--reflection-quote-bg);
+  padding: 1.5rem;
+  border-radius: 8px;
+  border-left: 4px solid var(--secondary);
+}
+
+.result-row {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.result-row:last-child {
+  margin-bottom: 0;
+}
+
+.procedure-box {
+  background: rgba(0,0,0,0.05);
+  padding: 1rem;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+[data-theme="dark"] .procedure-box {
+  background: rgba(255,255,255,0.05);
+}
+
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+
+/* Mini-Calculator Widget */
+.mini-calc-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  width: 320px;
+}
+
+[data-theme="dark"] .mini-calc-widget {
+  box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+}
+
+.mini-calc-toggle {
+  width: 100%;
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.mini-calc-toggle:hover {
+  background: var(--secondary);
+}
+
+.mini-calc-body {
+  padding: 1.5rem;
+}
+
+.mini-calc-body h4 {
+  margin-bottom: 1rem;
+  color: var(--text-dark);
+}
+
+.mini-calc-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.mini-calc-row input {
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.mini-calc-row select {
+  width: 100%;
+  padding: 0.5rem;
+  text-align: center;
+}
+
+.full-width {
+  width: 100%;
+}
