@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,8 @@
   <link rel="icon" href="../favicon.jpeg" type="image/jpeg">
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/aemaeth.css">
+  <link rel="stylesheet" href="https://v8.js-dos.com/latest/js-dos.css">
+  <script src="https://v8.js-dos.com/latest/js-dos.js"></script>
   <script>
     document.addEventListener('alpine:init', () => {
       Alpine.store('app', Alpine.store('app') || {
@@ -21,7 +24,7 @@
         selectedPost: null,
         comments: {},
         commentLoading: {},
-        init() {}
+        init() { }
       });
     });
   </script>
@@ -29,22 +32,24 @@
   <script type="module" src="../js/app.js"></script>
   <script type="module" src="../js/aemaeth.js"></script>
 </head>
+
 <body class="no-js" x-data="{ }" x-init="Alpine.store('app')?.init?.()">
   <div id="js-required-overlay" aria-live="polite">
     <div class="js-required-inner">
       <h1>Por favor, habilite JavaScript</h1>
-      <p>Este sitio requiere JavaScript para funcionar. Habilítelo en la configuración de su navegador y recargue la página.</p>
+      <p>Este sitio requiere JavaScript para funcionar. Habilítelo en la configuración de su navegador y recargue la
+        página.</p>
     </div>
   </div>
   <script>document.body.classList.remove('no-js');</script>
-  
+
   <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
-  
+
   <!-- Header -->
   <header x-data="{ scrolled: false }" x-effect="scrolled = window.scrollY > 50" :class="{ 'scrolled': scrolled }">
     <div class="header-content">
       <a href="../index.html" class="logo">Kirtan Teg Singh</a>
-      
+
       <nav class="desktop-nav">
         <ul>
           <li><a href="../index.html">Inicio</a></li>
@@ -55,41 +60,28 @@
           <li><a href="../game.html">Arcade</a></li>
           <li><a href="aemaeth.html" class="active">Maeth / Aemaeth</a></li>
           <li>
-            <button 
-              @click="Alpine.store('app').toggleDarkMode()" 
-              class="dark-mode-toggle"
-              aria-label="Alternar modo oscuro"
-            >
+            <button @click="Alpine.store('app').toggleDarkMode()" class="dark-mode-toggle"
+              aria-label="Alternar modo oscuro">
               <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
             </button>
           </li>
         </ul>
       </nav>
-      
+
       <!-- Hamburger Menu -->
-      <button 
-        class="hamburger" 
-        @click="Alpine.store('app').toggleMobileMenu()"
-        :class="{ 'active': Alpine.store('app').mobileMenuOpen }"
-        aria-label="Menú de navegación"
-      >
+      <button class="hamburger" @click="Alpine.store('app').toggleMobileMenu()"
+        :class="{ 'active': Alpine.store('app').mobileMenuOpen }" aria-label="Menú de navegación">
         <span></span>
         <span></span>
         <span></span>
       </button>
     </div>
-    
+
     <!-- Mobile Menu -->
-    <div 
-      class="mobile-menu" 
-      x-show="Alpine.store('app').mobileMenuOpen"
-      x-transition:enter="transition ease-out duration-300"
-      x-transition:enter-start="opacity-0 translate-x-full"
-      x-transition:enter-end="opacity-100 translate-x-0"
-      x-transition:leave="transition ease-in duration-300"
-      x-transition:leave-start="opacity-100 translate-x-0"
-      x-transition:leave-end="opacity-0 translate-x-full"
-    >
+    <div class="mobile-menu" x-show="Alpine.store('app').mobileMenuOpen"
+      x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-full"
+      x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-300"
+      x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 translate-x-full">
       <ul>
         <li><a href="../index.html" @click="Alpine.store('app').toggleMobileMenu()">Inicio</a></li>
         <li><a href="../blog.html" @click="Alpine.store('app').toggleMobileMenu()">Blog</a></li>
@@ -99,11 +91,8 @@
         <li><a href="../game.html" @click="Alpine.store('app').toggleMobileMenu()">Arcade</a></li>
         <li><a href="aemaeth.html" @click="Alpine.store('app').toggleMobileMenu()">Maeth / Aemaeth</a></li>
         <li>
-          <button 
-            @click="Alpine.store('app').toggleDarkMode()" 
-            class="dark-mode-toggle"
-            aria-label="Alternar modo oscuro"
-          >
+          <button @click="Alpine.store('app').toggleDarkMode()" class="dark-mode-toggle"
+            aria-label="Alternar modo oscuro">
             <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
           </button>
         </li>
@@ -131,13 +120,14 @@
         <button class="tab-btn" data-target="sec-1-8">Sec 1.8</button>
         <button class="tab-btn" data-target="sec-1-10">Sec 1.10</button>
         <button class="tab-btn" data-target="sec-1-11">Sec 1.11</button>
+        <button class="tab-btn" data-target="sec-tim">TIM (Juego)</button>
       </div>
 
       <!-- Tab Contents -->
       <div class="tab-content active" id="sec-1-6">
         <h2>Sección 1.6: Potencias de Diez</h2>
         <p>Realiza sumas, restas, multiplicaciones y divisiones usando potencias de 10.</p>
-        
+
         <div class="card interactive-card">
           <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
           <div class="input-group">
@@ -158,7 +148,8 @@
               <option value="p22a">Prob 22.a: Op. de Ingeniería (300)^2 * 100 / 10^4</option>
             </select>
           </div>
-          <div id="desc-preset-1-6" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+          <div id="desc-preset-1-6" class="procedure-box"
+            style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
         </div>
 
         <div class="card interactive-card">
@@ -167,7 +158,7 @@
             <input type="text" id="num-1-6" placeholder="Ej. 10000, 0.0001, 10e3" />
             <button id="btn-convert-1-6" class="action-btn">Convertir</button>
           </div>
-          
+
           <div class="results-box" id="res-1-6">
             <div class="result-row"><strong>Notación Científica:</strong> <span id="sci-1-6">-</span></div>
             <div class="result-row"><strong>Notación de Ingeniería:</strong> <span id="eng-1-6">-</span></div>
@@ -188,7 +179,9 @@
             <button id="btn-calc-1-6" class="action-btn">Calcular</button>
           </div>
           <div class="results-box" id="calc-res-1-6">
-            <div class="result-row"><strong>Procedimiento:</strong> <div id="proc-1-6" class="procedure-box">-</div></div>
+            <div class="result-row"><strong>Procedimiento:</strong>
+              <div id="proc-1-6" class="procedure-box">-</div>
+            </div>
             <div class="result-row"><strong>Resultado Final (Ingeniería):</strong> <span id="final-1-6">-</span></div>
           </div>
         </div>
@@ -197,7 +190,7 @@
       <div class="tab-content" id="sec-1-7">
         <h2>Sección 1.7: Conversión entre niveles de potencias de diez</h2>
         <p>Conversiones de prefijos métricos (p. ej., µs a ms, pF a nF, km a mm).</p>
-        
+
         <div class="card interactive-card">
           <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
           <div class="input-group">
@@ -218,7 +211,8 @@
               <option value="p24f">Prob 24.f: Convertir 260x10^3 mm a kilómetros</option>
             </select>
           </div>
-          <div id="desc-preset-1-7" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+          <div id="desc-preset-1-7" class="procedure-box"
+            style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
         </div>
 
         <div class="card interactive-card">
@@ -257,8 +251,8 @@
 
       <div class="tab-content" id="sec-1-8">
         <h2>Sección 1.8: Conversión de sistemas de unidades</h2>
-        <p>Resuelve problemas complejos de cinemática y conversión (Problemas 25-40).</p>
-        
+        <p>Resuelve problemas complejos de cinemática y conversión.</p>
+
         <div class="card interactive-card">
           <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
           <div class="input-group">
@@ -279,7 +273,8 @@
               <option value="p32">Prob 32: Convertir 6 mi/h a metros por segundo</option>
             </select>
           </div>
-          <div id="desc-preset-1-8" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+          <div id="desc-preset-1-8" class="procedure-box"
+            style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
         </div>
 
         <div class="card interactive-card">
@@ -297,29 +292,34 @@
             <button id="btn-convert-1-8" class="action-btn">Convertir</button>
           </div>
           <div class="results-box">
-             <div class="result-row"><strong>Resultado:</strong> <span id="res-1-8">-</span></div>
+            <div class="result-row"><strong>Resultado:</strong> <span id="res-1-8">-</span></div>
           </div>
         </div>
-        
+
         <div class="card interactive-card mt-2">
           <h3>Solucionador Cinemático Avanzado (Velocidad, Tiempo, Distancia)</h3>
           <p>Ejemplo: Calcule el tiempo para recorrer una distancia a cierta velocidad.</p>
           <div class="kinematics-group">
-            <div class="k-input"><label>Distancia (d):</label> <input type="text" id="kin-d" placeholder="Ej. 100 yd, 3000 mi" /></div>
-            <div class="k-input"><label>Velocidad (v):</label> <input type="text" id="kin-v" placeholder="Ej. 100 mi/h, 600 cm/s" /></div>
-            <div class="k-input"><label>Tiempo (t):</label> <input type="text" id="kin-t" placeholder="Ej. 20 s, 0.016 h" /></div>
+            <div class="k-input"><label>Distancia (d):</label> <input type="text" id="kin-d"
+                placeholder="Ej. 100 yd, 3000 mi" /></div>
+            <div class="k-input"><label>Velocidad (v):</label> <input type="text" id="kin-v"
+                placeholder="Ej. 100 mi/h, 600 cm/s" /></div>
+            <div class="k-input"><label>Tiempo (t):</label> <input type="text" id="kin-t"
+                placeholder="Ej. 20 s, 0.016 h" /></div>
             <small>Deja exactamente UN campo vacío para calcularlo.</small>
             <button id="btn-kin-calc" class="action-btn mt-1">Calcular Incógnita</button>
           </div>
           <div class="results-box" id="res-kin">
-            <div class="result-row"><strong>Procedimiento y Resultado:</strong> <div id="proc-kin" class="procedure-box">-</div></div>
+            <div class="result-row"><strong>Procedimiento y Resultado:</strong>
+              <div id="proc-kin" class="procedure-box">-</div>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="tab-content" id="sec-1-10">
         <h2>Sección 1.10: Tablas de Conversión</h2>
-        
+
         <div class="card interactive-card">
           <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
           <div class="input-group">
@@ -340,11 +340,12 @@
               <option value="preset12">Ej. 12: Caballos de fuerza (HP) a Watts (5 HP)</option>
             </select>
           </div>
-          <div id="desc-preset-1-10" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+          <div id="desc-preset-1-10" class="procedure-box"
+            style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
         </div>
 
         <div class="card interactive-card">
-           <div class="unit-group">
+          <div class="unit-group">
             <input type="number" id="val-1-10" placeholder="Valor" />
             <select id="conv-preset-1-10">
               <option value="btu_j">BTU a Joules</option>
@@ -364,14 +365,14 @@
             <button id="btn-convert-1-10" class="action-btn">Convertir</button>
           </div>
           <div class="results-box">
-             <div class="result-row"><strong>Resultado:</strong> <span id="res-1-10">-</span></div>
+            <div class="result-row"><strong>Resultado:</strong> <span id="res-1-10">-</span></div>
           </div>
         </div>
       </div>
 
       <div class="tab-content" id="sec-1-11">
         <h2>Sección 1.11: Calculadoras</h2>
-        <p>Operaciones científicas avanzadas y trigonométricas. (Ej: prob 42 a 45)</p>
+        <p>Operaciones científicas avanzadas y trigonométricas. </p>
 
         <div class="card interactive-card">
           <h3>Ejercicios Preestablecidos (12 Opciones)</h3>
@@ -393,7 +394,8 @@
               <option value="preset12">Ej. 12: Ganancia en dB 20 * log10(100 / 10)</option>
             </select>
           </div>
-          <div id="desc-preset-1-11" class="procedure-box" style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
+          <div id="desc-preset-1-11" class="procedure-box"
+            style="display: none; font-style: italic; margin-bottom: 1rem;"></div>
         </div>
         <div class="card interactive-card dictionary-card">
           <h3>Diccionario de Casos de Uso</h3>
@@ -415,14 +417,217 @@
         <div class="card interactive-card">
           <div class="calc-grid">
             <div class="calc-item">
-               <label>Expresión (Ej: <code>6*(4+8)</code>, <code>sqrt(3^2 + 4^2)</code>, <code>atan(4/3)</code>)</label>
-               <input type="text" id="expr-1-11" placeholder="Ej. sqrt(400 / (6^2 + 10))" />
-               <button id="btn-calc-1-11" class="action-btn mt-1">Evaluar Expresión</button>
+              <label>Expresión (Ej: <code>6*(4+8)</code>, <code>sqrt(3^2 + 4^2)</code>, <code>atan(4/3)</code>)</label>
+              <input type="text" id="expr-1-11" placeholder="Ej. sqrt(400 / (6^2 + 10))" />
+              <button id="btn-calc-1-11" class="action-btn mt-1">Evaluar Expresión</button>
             </div>
           </div>
           <div class="results-box">
-             <div class="result-row"><strong>Resultado:</strong> <span id="res-1-11">-</span></div>
+            <div class="result-row"><strong>Resultado:</strong> <span id="res-1-11">-</span></div>
           </div>
+        </div>
+      </div>
+
+      <div class="tab-content" id="sec-tim">
+        <h2>The Incredible Machine</h2>
+        <p>Laboratorio interactivo de física, mecánica y lógica deductiva.</p>
+
+        <div class="card interactive-card">
+          <h3>Simulador MS-DOS</h3>
+          <p>Presiona el botón para cargar el emulador y el juego, haz click sobre la pantalla, se pondrá negra unos
+            segundos
+            y se iniciará el juego. <strong>ADVERTENCIA: El simulador tiene un
+              temporizador máximo de una hora para evitar que pases dos días jugando por accidente.</strong></p>
+
+          <div style="margin-top: 10px; font-size: 0.9rem; line-height: 1.5; margin-bottom: 15px;">
+            <strong>Cómo usar las contraseñas para continuar tu partida:</strong>
+            <ol style="margin-left: 20px; margin-top: 5px;">
+              <li>En el menú principal del juego, haz clic en el icono del rompecabezas sin una pieza (el que es verde
+                con azul)
+                si te paras y dejas quieto el puntero sobre esa parte sale el texto 'select puzzle' seleccionas
+                cualquier nivel de los rojos
+                y en el campo de contraseña del nivel que quieres instalar presionas 'enter' y la lista se convierte a
+                verde,
+                lo que significa que el nivel está disponible. </li>
+
+            </ol>
+          </div>
+
+          <button id="btn-start-tim" class="action-btn">Iniciar Simulador</button>
+          <button id="btn-stop-tim" class="action-btn"
+            style="display: none; background-color: #EA428B; color: white;">Detener Juego</button>
+
+          <div id="jsdos-container"
+            style="width: 800px; height: 600px; max-width: 100%; margin-top: 1rem; border: 2px solid var(--accent); border-radius: 8px; overflow: hidden; display: none;">
+          </div>
+
+          <details style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.05); border-radius: 4px;">
+            <summary style="font-weight: bold; cursor: pointer;">Ver Contraseñas de Nivel (Level Codes)</summary>
+
+
+            <div
+              style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 15px; font-family: monospace; font-size: 0.85rem;">
+              <ul style="columns: 3; list-style-type: none; padding: 0; margin: 0;">
+                <li><strong>2</strong>: SIERRA</li>
+                <li><strong>3</strong>: DYNAMIX</li>
+                <li><strong>4</strong>: MACHINE</li>
+                <li><strong>5</strong>: DISK</li>
+                <li><strong>6</strong>: SHUTTLE</li>
+                <li><strong>7</strong>: SATURN</li>
+                <li><strong>8</strong>: KING</li>
+                <li><strong>9</strong>: DRAGON</li>
+                <li><strong>10</strong>: ANTS</li>
+                <li><strong>11</strong>: BASEBALL</li>
+                <li><strong>12</strong>: BEAR</li>
+                <li><strong>13</strong>: FISH</li>
+                <li><strong>14</strong>: DALE</li>
+                <li><strong>15</strong>: CHESTERTON</li>
+                <li><strong>16</strong>: SIZE</li>
+                <li><strong>17</strong>: IRELAND</li>
+                <li><strong>18</strong>: WORD</li>
+                <li><strong>19</strong>: BRIEF</li>
+                <li><strong>20</strong>: HOT DOG</li>
+                <li><strong>21</strong>: COUNTDOWN</li>
+                <li><strong>22</strong>: PSALMS</li>
+                <li><strong>23</strong>: TANK</li>
+                <li><strong>24</strong>: NIGHT</li>
+                <li><strong>25</strong>: GAMES</li>
+                <li><strong>26</strong>: WESTERN</li>
+                <li><strong>27</strong>: LOG HOME</li>
+                <li><strong>28</strong>: GRAPHICS</li>
+                <li><strong>29</strong>: KNUTH</li>
+                <li><strong>30</strong>: DONALD</li>
+                <li><strong>31</strong>: COMPACT DISC</li>
+                <li><strong>32</strong>: SHAVER LAKE</li>
+                <li><strong>33</strong>: RHEUMATISM</li>
+                <li><strong>34</strong>: HARPSICORD</li>
+                <li><strong>35</strong>: MARKET</li>
+                <li><strong>36</strong>: DESK</li>
+                <li><strong>37</strong>: MYRTLE</li>
+                <li><strong>38</strong>: QUA TERNION</li>
+                <li><strong>39</strong>: AQUARIUM</li>
+                <li><strong>40</strong>: SHOE</li>
+                <li><strong>41</strong>: FLOWER</li>
+                <li><strong>42</strong>: STONE</li>
+                <li><strong>43</strong>: CLARE</li>
+                <li><strong>44</strong>: KERRY</li>
+                <li><strong>45</strong>: FLANGE</li>
+                <li><strong>46</strong>: SEASON</li>
+                <li><strong>47</strong>: TRIBOLOGY</li>
+                <li><strong>48</strong>: ABRASIVE</li>
+                <li><strong>49</strong>: DEFORMATION</li>
+                <li><strong>50</strong>: ELASTIC</li>
+                <li><strong>51</strong>: ASHESION</li>
+                <li><strong>52</strong>: SPECTRA</li>
+                <li><strong>53</strong>: INDUCTION</li>
+                <li><strong>54</strong>: POLARIZATION</li>
+                <li><strong>55</strong>: OVERJOY</li>
+                <li><strong>56</strong>: DISCURSIVE</li>
+                <li><strong>57</strong>: CROSS</li>
+                <li><strong>58</strong>: CHOCOLATE</li>
+                <li><strong>59</strong>: PLATO</li>
+                <li><strong>60</strong>: WELLSPRING</li>
+                <li><strong>61</strong>: HYDROPLANE</li>
+                <li><strong>62</strong>: PALM</li>
+                <li><strong>63</strong>: SOMBRERO</li>
+                <li><strong>64</strong>: JOIST</li>
+                <li><strong>65</strong>: ASTRONAUT</li>
+                <li><strong>66</strong>: MARIONETTE</li>
+                <li><strong>67</strong>: OSMIUM</li>
+                <li><strong>68</strong>: ASSURANCE</li>
+                <li><strong>69</strong>: CALCULATOR</li>
+                <li><strong>70</strong>: SUPERIOR</li>
+                <li><strong>71</strong>: PHILHARMONIC</li>
+                <li><strong>72</strong>: ANGULAR</li>
+                <li><strong>73</strong>: ZIPPER</li>
+                <li><strong>74</strong>: UMPIRE</li>
+                <li><strong>75</strong>: RECOVER</li>
+                <li><strong>76</strong>: SHADOW</li>
+                <li><strong>77</strong>: IONIZE</li>
+                <li><strong>78</strong>: QUAKE</li>
+                <li><strong>79</strong>: OCTOBER</li>
+                <li><strong>80</strong>: BILATERAL</li>
+                <li><strong>81</strong>: LYRIC</li>
+                <li><strong>82</strong>: NEEDLE</li>
+                <li><strong>83</strong>: THEORY</li>
+                <li><strong>84</strong>: LOBSTER</li>
+                <li><strong>85</strong>: SAMURAI</li>
+                <li><strong>86</strong>: SPLICE</li>
+                <li><strong>87</strong>: GULF</li>
+                <li><strong>88</strong>: RHOMBUS</li>
+                <li><strong>89</strong>: OLIVE</li>
+                <li><strong>90</strong>: POLYNOMIALS</li>
+                <li><strong>91</strong>: PARAMETRIC</li>
+                <li><strong>92</strong>: SOLAR SYSTEM</li>
+                <li><strong>93</strong>: MARBLE</li>
+                <li><strong>94</strong>: HEAVY</li>
+                <li><strong>96</strong>: QUATRAIN</li>
+                <li><strong>97</strong>: TYRANNOSAUR</li>
+                <li><strong>98</strong>: SULFURIS</li>
+                <li><strong>99</strong>: DOPA</li>
+                <li><strong>100</strong>: MINARET</li>
+                <li><strong>101</strong>: DOVETAIL</li>
+                <li><strong>102</strong>: JASMINE</li>
+                <li><strong>103</strong>: WRANGLE</li>
+                <li><strong>104</strong>: KUDOS</li>
+                <li><strong>105</strong>: CULDESAC</li>
+                <li><strong>106</strong>: YODEL</li>
+                <li><strong>107</strong>: XYLOPHONE</li>
+                <li><strong>108</strong>: MONKEY</li>
+                <li><strong>109</strong>: HEIST</li>
+                <li><strong>110</strong>: CAPTURE</li>
+                <li><strong>111</strong>: PURSE</li>
+                <li><strong>112</strong>: HOBBY</li>
+                <li><strong>113</strong>: DEIFY</li>
+                <li><strong>114</strong>: MERGANSER</li>
+                <li><strong>115</strong>: SEAK</li>
+                <li><strong>116</strong>: CONTRAPTION</li>
+                <li><strong>117</strong>: FLAX</li>
+                <li><strong>118</strong>: PRIMORDIAL</li>
+                <li><strong>119</strong>: RAVE</li>
+                <li><strong>120</strong>: HYACINTH</li>
+                <li><strong>121</strong>: SPIDER</li>
+                <li><strong>122</strong>: YAMMER</li>
+                <li><strong>123</strong>: NERVE</li>
+                <li><strong>124</strong>: GRATE</li>
+                <li><strong>125</strong>: EMULSION</li>
+                <li><strong>126</strong>: INPUT</li>
+                <li><strong>127</strong>: PARADISE</li>
+                <li><strong>128</strong>: SAMURAI</li>
+                <li><strong>129</strong>: CHAOS</li>
+                <li><strong>130</strong>: BRAWL</li>
+                <li><strong>131</strong>: ASIDE</li>
+                <li><strong>132</strong>: AXIS</li>
+                <li><strong>133</strong>: OFFBEAT</li>
+                <li><strong>134</strong>: QUIP</li>
+                <li><strong>135</strong>: NEWMAN</li>
+                <li><strong>136</strong>: SLOPE</li>
+                <li><strong>137</strong>: TENON</li>
+                <li><strong>138</strong>: CROSSCUT</li>
+                <li><strong>139</strong>: NORM</li>
+                <li><strong>140</strong>: HOUSE</li>
+                <li><strong>141</strong>: MACARONI</li>
+                <li><strong>142</strong>: TALON</li>
+                <li><strong>143</strong>: BEAK</li>
+                <li><strong>145</strong>: FREQUENT</li>
+                <li><strong>146</strong>: STREAM</li>
+                <li><strong>147</strong>: UMIAK</li>
+                <li><strong>148</strong>: HIATUS</li>
+                <li><strong>149</strong>: CREEK</li>
+                <li><strong>150</strong>: CROQUET</li>
+                <li><strong>151</strong>: ACID</li>
+                <li><strong>152</strong>: BABY</li>
+                <li><strong>153</strong>: SEAN</li>
+                <li><strong>154</strong>: QUALM</li>
+                <li><strong>155</strong>: THIAMINE</li>
+                <li><strong>156</strong>: TURN</li>
+                <li><strong>157</strong>: KANGAROO</li>
+                <li><strong>158</strong>: CONTENT</li>
+                <li><strong>159</strong>: BELLOC</li>
+                <li><strong>160</strong>: PASSWORD</li>
+              </ul>
+            </div>
+          </details>
         </div>
       </div>
     </section>
@@ -436,25 +641,26 @@
     <div class="mini-calc-body" x-show="open" x-transition>
       <h4>Entrenador de Potencias de Diez</h4>
       <div class="mini-calc-row">
-         <input type="number" id="mc-val1" placeholder="Val 1" />
-         <span>×10^</span>
-         <input type="number" id="mc-exp1" placeholder="Exp" />
+        <input type="number" id="mc-val1" placeholder="Val 1" />
+        <span>×10^</span>
+        <input type="number" id="mc-exp1" placeholder="Exp" />
       </div>
       <div class="mini-calc-row">
-         <select id="mc-op">
-            <option value="+">+</option>
-            <option value="-">-</option>
-            <option value="*">×</option>
-            <option value="/">÷</option>
-         </select>
+        <select id="mc-op">
+          <option value="+">+</option>
+          <option value="-">-</option>
+          <option value="*">×</option>
+          <option value="/">÷</option>
+        </select>
       </div>
       <div class="mini-calc-row">
-         <input type="number" id="mc-val2" placeholder="Val 2" />
-         <span>×10^</span>
-         <input type="number" id="mc-exp2" placeholder="Exp" />
+        <input type="number" id="mc-val2" placeholder="Val 2" />
+        <span>×10^</span>
+        <input type="number" id="mc-exp2" placeholder="Exp" />
       </div>
       <button id="mc-calc-btn" class="action-btn full-width mt-1" style="width: 100%;">Calcular</button>
-      <div class="mini-calc-res mt-1" id="mc-res" style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px;">
+      <div class="mini-calc-res mt-1" id="mc-res"
+        style="margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.05); border-radius: 4px;">
         Resultado: <br><strong id="mc-res-val">-</strong>
       </div>
     </div>
@@ -465,5 +671,39 @@
     <p>Kirtan Teg Singh and The Gurdwara Ensemble 2026 Ⓒ</p>
     <p><a href="https://www.youtube.com/@kirtantegsingh" target="_blank" title="YouTube">YouTube</a></p>
   </footer>
+  <script>
+    let dosInstance = null;
+    let playTimer = null;
+
+    document.getElementById('btn-start-tim').addEventListener('click', function () {
+      this.style.display = 'none';
+      document.getElementById('btn-stop-tim').style.display = 'inline-block';
+      const container = document.getElementById('jsdos-container');
+      container.style.display = 'block';
+
+      dosInstance = Dos(container, {
+        url: "../assets/tim.zip",
+        autoStart: true,
+        noCursor: true,
+        imageRendering: "smooth"
+      });
+
+      playTimer = setTimeout(() => {
+        alert("oye, si, tu, tu, tuuu, tu, ya jugaste una hora ve a hacer otra cosa, por ejemplo haz tu sesión de kirtan, bro, jugar es bueno, pero, jugar mucho es muy malo, para ya, detente, S . T . O P . -- P . L . E . A . S . E");
+      }, 3600000);
+    });
+
+    document.getElementById('btn-stop-tim').addEventListener('click', function () {
+      if (dosInstance && dosInstance.stop) {
+        dosInstance.stop();
+      }
+      document.getElementById('jsdos-container').innerHTML = '';
+      document.getElementById('jsdos-container').style.display = 'none';
+      this.style.display = 'none';
+      document.getElementById('btn-start-tim').style.display = 'inline-block';
+      if (playTimer) clearTimeout(playTimer);
+    });
+  </script>
 </body>
+
 </html>
