@@ -2,7 +2,7 @@
 // 9+ entries: Nutrition, Review, Reflection, Casual/Tarot
 
 /** Only entries whose IDs are listed here are shown in the blog and Latest Reflections. Set to null to show all. */
-const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13, 14, 15, 16, 17];
+const VISIBLE_ENTRY_IDS = [9, 10, 11, 12, 13, 14, 15, 16, 17, 18];
 
 function getVisibleEntries() {
   if (!VISIBLE_ENTRY_IDS) return [...blogEntries];
@@ -10,6 +10,204 @@ function getVisibleEntries() {
 }
 
 export const blogEntries = [
+  // ENTRY TYPE: REFLECTION — newest first
+  {
+    id: 18,
+    type: 'Reflexión',
+    title: 'Sehaj y la proporción áurea: la geometría de no forzar el fruto',
+    date: '2026-07-24',
+    excerpt: 'Una reflexión de mitad de año sobre el sehaj, la proporción áurea y un teorema del crecimiento no forzado: Simran, Ayurveda y la paciencia que madura sin estridencia.',
+    coverImage: 'assets/15.jpg',
+    readTime: 15,
+    content: `
+      <p>Hay un momento del año en que el calor ya no es promesa: es presencia. Julio no pide prisa; pide madurez. Las frutas que se forzan se abren sin sabor. Las que esperan su proporción se vuelven dulces sin anuncio. La vida interior no es distinta. Muchas prácticas espirituales se rompen no por falta de devoción, sino por exceso de fuerza aplicada en el punto equivocado.</p>
+
+      <p>Esta reflexión nace en esa estación: la mitad del año, cuando el entusiasmo de enero ya se ha diluido y aún no ha llegado la nostalgia de diciembre. Es el tramo más honesto. Aquí se ve si la práctica era un proyecto del ego o un vínculo real con el Nombre. Aquí se descubre si el camino se sostiene por drama o por sehaj.</p>
+
+      <figure class="post-figure">
+        <img src="assets/15.jpg" alt="Mesa de juego geométrico levitando en un apartamento minimalista frente a un bosque alienígena bajo luz de mañana" loading="lazy">
+        <figcaption>La mesa flota. El bosque espera. Nada se fuerza: solo se alinea. Así empieza el sehaj —como un tablero quieto en la luz de un planeta desconocido.</figcaption>
+      </figure>
+
+      <div class="reflection-quote">
+        El fruto no madura porque gritas al árbol. Madura porque el sol, el agua y el tiempo se mantienen en proporción.
+      </div>
+
+      <h2>Sehaj: la cualidad que no se apresura</h2>
+      <p>En la tradición del Sri Guru Granth Sahib Ji, <em>sehaj</em> no es pasividad. Es el estado en el que la mente deja de pelear con su propio ritmo y se alinea con una inteligencia más grande que su agenda. No es pereza. No es indiferencia. Es naturalidad iluminada: la acción sin violencia interior, el recuerdo sin teatralidad, la devoción sin contorsión.</p>
+
+      <p>El sehaj se parece a una curva bien dibujada. No es una línea recta que impone velocidad. Es una trayectoria que respeta la curvatura del alma. Por eso conviene hablar de proporción. No de más. No de menos. De lo justo, sostenido, repetido.</p>
+
+      <p>Cuando la mente se llena de rajas —urgencia, comparación, rendimiento espiritual—, el sehaj se aleja. Cuando se llena de tamas —adormecimiento, cinismo, abandono—, el sehaj también se aleja. El sehaj es, en cierto modo, el sattva aplicado al tiempo: claridad que no se agita y constancia que no se endurece.</p>
+
+      <h2>La proporción áurea como metáfora de la práctica</h2>
+      <p>La proporción áurea, φ ≈ 1.618, aparece en espirales, hojas, caracolas y en la forma en que la naturaleza crece sin desperdiciar ni forzar. No es magia numérica. Es un recordatorio geométrico: el crecimiento sano guarda una relación entre lo que se expande y lo que se conserva. Si todo se expande, se rompe. Si nada se expande, se estanca.</p>
+
+      <p>Traducido a la vida espiritual, la proporción áurea no pide que cuentes mantras con calculadora. Pide que te preguntes: ¿cuánta intensidad, cuánta quietud? ¿cuánta acción, cuánto silencio? ¿cuánta apertura al mundo, cuánta intimidad con el Naam? La belleza de φ es que no es un extremo. Es una relación.</p>
+
+      <h3>El teorema del crecimiento no forzado</h3>
+      <p>Propongo un teorema contemplativo sencillo, no para demostrar al universo, sino para ordenar la atención:</p>
+
+      <ul>
+        <li><strong>Punto S (Simran):</strong> el centro de recuerdo donde la conciencia vuelve al Nombre.</li>
+        <li><strong>Radio C (Constancia):</strong> la distancia práctica entre un día y el siguiente: minutos reales de nitnem, japa, respiración o servicio.</li>
+        <li><strong>Ángulo F (Fuerza del ego):</strong> la cantidad de presión con la que se exige resultado inmediato.</li>
+        <li><strong>Espiral G (Gracia percibida):</strong> la sensación de madurez, claridad y suavidad que aparece cuando S y C se mantienen y F se reduce.</li>
+      </ul>
+
+      <p><strong>Enunciado:</strong> si el radio C se sostiene con regularidad y el ángulo F se reduce, la espiral G se despliega aunque el ego no reciba espectáculo. Si F crece y C se vuelve irregular, G se fragmenta aunque haya picos de intensidad.</p>
+
+      <p>En lenguaje llano: la constancia suave supera a la intensidad dramática. El sehaj es el ángulo que se abre sin forzar la hoja.</p>
+
+      <figure class="post-figure">
+        <img src="assets/16.jpg" alt="Pieza translúcida violeta con curvas cóncavas y convexas en equilibrio sobre el tablero geométrico" loading="lazy">
+        <figcaption>Cóncavo y convexo se buscan sin violencia. Una sola pieza, a media rotación, enseña la proporción: no hay victoria ruidosa, solo encaje.</figcaption>
+      </figure>
+
+      <div class="reflection-quote">
+        Shabad Guru, surat dhun chela: el sonido es el Maestro; la conciencia es la discípula. La discípula no se gradúa a gritos. Aprende por escucha repetida.
+      </div>
+
+      <h2>Lo que el verano revela del sistema nervioso</h2>
+      <p>Julio, en muchos cuerpos, aumenta pitta: calor, impaciencia, juicio afilado, sueño más liviano, hambre de control. En la mente americanizada y globalmente acelerada, ese calor se disfraza de productividad espiritual: más libros, más kriyas, más “debería”. Pero el sistema nervioso no madura por catálogo. Madura por seguridad repetida.</p>
+
+      <p>Desde una lectura ayurvédica sencilla:</p>
+      <ul>
+        <li><strong>Vata</strong> se agita con irregularidad: horarios rotos, saltos de práctica, demasiada información.</li>
+        <li><strong>Pitta</strong> se inflama con exigencia: perfeccionismo, comparación, irritación sagrada.</li>
+        <li><strong>Kapha</strong> se estanca con abandono: “ya no importa”, inercia, olvido del Naam.</li>
+      </ul>
+
+      <p>El sehaj no borra los doshas. Los educa. En verano, eso suele significar: menos fuego moral inútil, más agua de paciencia, más sombra de silencio, más comida y habla que refresquen sin adormecer.</p>
+
+      <figure class="post-figure">
+        <img src="assets/17.jpg" alt="Tablero circular levitante con piezas violetas junto a ventanales por los que entra la luz de la mañana de un planeta desconocido" loading="lazy">
+        <figcaption>Por la ventana entra la mañana de un mundo que no es el nuestro —y aun así el cuerpo reconoce la calma. El calor de julio se vuelve luz fresca cuando el ritmo se alinea.</figcaption>
+      </figure>
+
+      <h3>Señales de que estás forzando el fruto</h3>
+      <ul>
+        <li>Mides tu valor por el “nivel” de la meditación de hoy.</li>
+        <li>Usas el mantra como látigo y no como refugio.</li>
+        <li>Cambias de técnica cada tres días buscando la euforia correcta.</li>
+        <li>Hablas mucho de espiritualidad y duermes poco.</li>
+        <li>Confundes culpa con devoción y rigidez con pureza.</li>
+      </ul>
+
+      <h3>Señales de sehaj operativo</h3>
+      <ul>
+        <li>Vuelves al nitnem aunque el día haya sido imperfecto.</li>
+        <li>Puedes acortar la práctica sin abandonarla.</li>
+        <li>El límite con otros no necesita teatro.</li>
+        <li>Hay menos dramatización del “progreso” y más honestidad del presente.</li>
+        <li>El cuerpo se siente más habitable, no más castigado.</li>
+      </ul>
+
+      <h2>Simran como espiral, no como carrera</h2>
+      <p>El japa no avanza en línea recta. Gira. Cada vuelta parece similar, pero el radio interior cambia. Eso es lo que la gente a menudo no tolera: la repetición sin novedad aparente. Sin embargo, la novedad del Naam no es entretenimiento. Es profundidad. La misma frase vuelve hasta que la mente deja de usarla como objeto y empieza a ser sostenida por ella.</p>
+
+      <figure class="post-figure">
+        <img src="assets/18.jpg" alt="Espiral geométrica de piezas cóncavas y convexas violetas alineadas sobre una mesa levitante frente al bosque" loading="lazy">
+        <figcaption>La espiral no corre: gira. Cada pieza regresa cerca de donde empezó, un poco más cerca del centro. Así es el Simran: repetición que madura sin anunciar el fruto.</figcaption>
+      </figure>
+
+      <p>Una línea que sostiene esta estación:</p>
+      <p><em>ਮਨ ਤੂੰ ਜੋਤਿ ਸਰੂਪੁ ਹੈ ਆਪਣਾ ਮੂਲੁ ਪਛਾਣੁ ॥</em></p>
+      <p><strong>Transliteración:</strong> Man tu jot saroop hai, apna mool pachhan.</p>
+      <p><strong>Sentido vivo:</strong> Oh mente, eres forma de luz; reconoce tu raíz. No tu rendimiento. Tu raíz.</p>
+
+      <p>Cuando el verano aprieta y la mente se vuelve cortante, esta línea no pide que “seas mejor persona” de un golpe. Pide que dejes de identificarte con la irritación del momento y recuerdes el origen luminoso desde el cual se puede responder sin quemar el vínculo.</p>
+
+      <h3>Protocolo breve de mitad de año (21 minutos)</h3>
+      <ol>
+        <li><strong>2 minutos — Asiento y agua interior.</strong> Siéntate. Bebe un sorbo de agua tibia si lo necesitas. Nota el calor del día sin pelear con él. Columna alta, mandíbula suelta.</li>
+        <li><strong>5 minutos — Respiración larga y profunda.</strong> Inhala y exhala por la nariz con la misma longitud. Si contar te tensa, abandona la cuenta. Solo igualdad suave. Este paso reduce el ángulo F del teorema.</li>
+        <li><strong>9 minutos — Japa del origen.</strong> En cada inhalación mental: <em>Man tu jot saroop hai</em>. En cada exhalación: <em>Apna mool pachhan</em>. Si prefieres algo más breve, usa <em>Waheguru</em> o <em>Sat Nam</em> con la misma suavidad.</li>
+        <li><strong>3 minutos — Un solo propósito del día.</strong> No hagas una lista épica. Elige una acción dharmica pequeña: una conversación honesta, un plato limpio, un límite claro, un acto de seva. El sehaj ama lo concreto.</li>
+        <li><strong>2 minutos — Sello sin evaluación.</strong> No preguntes “¿funcionó?”. Solo nota si el pecho está un poco más amplio y si la mente grita un poco menos. Levántate sin drama.</li>
+      </ol>
+
+      <p>Hazlo de tres a cinco veces por semana. Si un día solo tienes siete minutos, conserva el centro: respiración + un minuto de japa + un propósito. La proporción importa más que la pose.</p>
+
+      <h2>Kundalini sin heroísmo</h2>
+      <p>En esta estación, la kriya útil es la que enfría la prisa sin apagar la presencia. No se trata de acumular técnicas. Se trata de devolver al cuerpo la sensación de que el recuerdo es seguro.</p>
+
+      <h3>Kriya suave de la proporción (16 minutos)</h3>
+      <ol>
+        <li><strong>Flexiones espinales suaves, 3 minutos.</strong> Movimiento pequeño. Inhala abriendo el pecho; exhala redondeando. Sin espectáculo cervical.</li>
+        <li><strong>Rotación de hombros, 2 minutos.</strong> Un minuto en cada dirección. Suelta la mandíbula.</li>
+        <li><strong>Gyan Mudra y respiración 4–6, 5 minutos.</strong> Inhala en 4, exhala en 6 si te es cómodo. La exhalación un poco más larga enseña al sistema a bajar de la vigilancia inútil.</li>
+        <li><strong>Manos al pecho con Shabad, 4 minutos.</strong> <em>Shabad Guru, surat dhun chela</em>, en voz baja o mental. Ritmo de caminata interior, no de marcha militar.</li>
+        <li><strong>Quietud, 2 minutos.</strong> Palmas sobre los muslos. Deja que el cuerpo vote. Si hay paz sobria, es suficiente.</li>
+      </ol>
+
+      <h3>Advertencias</h3>
+      <ul>
+        <li>Si hay mareo, dolor agudo o agitación fuerte, detente y descansa.</li>
+        <li>En calor extremo, practica en la hora más fresca y reduce tiempos a la mitad.</li>
+        <li>No uses la kriya para “pagar” un día “malo”. El sehaj no es contabilidad de culpa.</li>
+        <li>Si estás embarazada, en postoperatorio o con condición cardiovascular, adapta con criterio profesional y sin forzar la respiración.</li>
+      </ul>
+
+      <h2>Comida que no pelea con el verano</h2>
+      <p>La proporción áurea también se come. Un plato de verano que apoya el sehaj no necesita ser exótico. Necesita ser asimilable, fresco y estable.</p>
+
+      <h3>Cuenco de pepino, menta y arroz limón (1 porción)</h3>
+      <ul>
+        <li>1/2 taza de arroz basmati cocido y entibiado</li>
+        <li>1/2 pepino en cubos pequeños</li>
+        <li>1 cucharada de cilantro fresco picado</li>
+        <li>6 a 8 hojas de menta</li>
+        <li>Jugo de 1/2 limón</li>
+        <li>1 cucharadita de ghee o aceite de oliva suave</li>
+        <li>1 pizca de comino tostado</li>
+        <li>Sal al gusto</li>
+        <li>Opcional: 2 cucharadas de yogur natural si lo digieres bien</li>
+      </ul>
+
+      <ol>
+        <li>Mezcla el arroz tibio con el ghee o el aceite y el comino.</li>
+        <li>Incorpora pepino, cilantro y menta.</li>
+        <li>Agrega limón y sal. Prueba. El sabor correcto es limpio, no ácido agresivo.</li>
+        <li>Si usas yogur, incorpóralo al final para enfriar sin apagar el agni.</li>
+      </ol>
+
+      <p>Este cuenco refresca pitta, no satura kapha si la porción es modesta, y da a vata un ancla de arroz y grasa suave. Se come despacio. El sehaj también es masticación.</p>
+
+      <h2>Nitnem como proporción del día</h2>
+      <p>El nitnem no existe para decorar la identidad espiritual. Existe para devolver proporción al tiempo. Japji Sahib abre el día como una ventana. Rehras recoge la tarde y evita que el residual del mundo se instale como verdad. Kirtan Sohila apaga la lámpara sin miedo. Entre esos anillos, el japa personal puede ser breve y fiel.</p>
+
+      <p>En mitad de año, una pregunta útil es: ¿mi nitnem es un altar vivo o un recuerdo de mejores intenciones? Si se ha diluido, no hace falta un reinicio heroico de cuarenta días anunciado en redes. Hace falta un regreso humilde mañana al amanecer —o a tu amrit vela biológica— con menos F y más C.</p>
+
+      <div class="reflection-quote">
+        La constancia sin espectáculo es una forma de belleza. El Naam no necesita que lo anuncies; necesita que lo habites.
+      </div>
+
+      <h2>Geometría moral: no forzar al otro</h2>
+      <p>El mismo teorema se aplica a las relaciones. Forzar el “crecimiento” de otra persona es otra forma de ángulo F. Puedes ofrecer claridad, límite y presencia. No puedes madurar el fruto ajeno a gritos. El sehaj relacional se ve así: dices la verdad sin humillar; te retiras sin odio; permaneces sin tragarte el veneno del otro.</p>
+
+      <p>Eso no es debilidad. Es óptica. Como el águila de reflexiones anteriores, ves a distancia sin volverte frío. Etiquetas patrones, no almas. Proteges el radio de tu integridad sin convertir la espiritualidad en arma.</p>
+
+      <h2>Un inventario de julio (sin drama)</h2>
+      <p>Si quieres un ejercicio de mitad de año, hazlo en una sola página, a mano, sin audiencia:</p>
+      <ol>
+        <li>¿Qué práctica pequeña todavía me sostiene de verdad?</li>
+        <li>¿Dónde estoy usando la espiritualidad para evitar sentir?</li>
+        <li>¿Qué relación necesita un límite más claro y más amable?</li>
+        <li>¿Qué alimento, horario o pantalla está inflamando mi pitta inútilmente?</li>
+        <li>¿Qué forma de seva —aunque sea mínima— devuelve proporción a mi semana?</li>
+      </ol>
+
+      <p>No conviertas las respuestas en un plan de marketing personal. Conviértelas en un ajuste de radio: un poco más de C, un poco menos de F, un poco más de escucha al Shabad.</p>
+
+      <h2>Conclusión: la madurez no se anuncia</h2>
+      <p>La proporción áurea no te pide que te vuelvas un número. Te pide que dejes de tratar el alma como una máquina de resultados. El sehaj no es el premio final de un camino perfecto. Es el modo en que se camina cuando el ego afloja el puño y el Naam ocupa el centro.</p>
+
+      <p>En este 24 de julio, mientras el año está partido en dos, recuerda el teorema del crecimiento no forzado: sostén el punto del Simran, mantén el radio de la constancia, reduce el ángulo de la fuerza y deja que la espiral de la gracia se dibuje a su tiempo. El fruto llegará con sabor. No porque lo exigiste. Porque te quedaste en proporción.</p>
+
+      <p>Y cuando la mente pregunte otra vez “¿ya?”, puedes responderle con la suavidad de quien ha visto árboles de verdad: todavía no, y eso está bien. Sigue el sol. Sigue el agua. Sigue el Nombre. El resto madura.</p>
+    `
+  },
   // ENTRY TYPE: INTERVIEW (2)
   {
     id: 1,
