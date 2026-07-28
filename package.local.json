@@ -5,18 +5,10 @@
   "description": "Static site + Web Push (Cloudflare Pages Functions)",
   "scripts": {
     "build": "exit 0",
+    "bundle:notify": "node scripts/bundle-notify.mjs",
     "generate-vapid": "node scripts/generate-vapid-keys.mjs",
     "setup-push": "node scripts/setup-cloudflare-push.mjs",
     "pages:dev": "npx wrangler@4 pages dev . --kv=SUBSCRIPTIONS --compatibility-flags=nodejs_compat",
     "notify": "bash scripts/send-notification.sh"
-  },
-  "dependencies": {
-    "@block65/webcrypto-web-push": "^1.0.2"
-  },
-  "devDependencies": {
-    "web-push": "^3.6.7"
-  },
-  "engines": {
-    "node": ">=18"
   }
 }
