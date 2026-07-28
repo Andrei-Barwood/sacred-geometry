@@ -3,8 +3,11 @@
 
 name = "sacred-geometry"
 compatibility_date = "2024-11-01"
+# Necesario para @block65/webcrypto-web-push (node:crypto)
 compatibility_flags = ["nodejs_compat"]
+# Sitio estático en la raíz del repo (HTML/CSS/JS). Functions en /functions.
 pages_build_output_dir = "."
+
 
 # Local: npm run pages:dev usa --kv=SUBSCRIPTIONS (KV en memoria).
 # Producción: binding SUBSCRIPTIONS en el dashboard o scripts/setup-cloudflare-push.mjs
