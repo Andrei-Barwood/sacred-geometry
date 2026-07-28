@@ -60,6 +60,15 @@
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.x/dist/cdn.min.js"></script>
   <script type="module" src="js/app.js"></script>
+  <script type="module">
+    import { bindButton } from './js/push-notifications.js';
+    // Enlaza el botón cuando el DOM está listo
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', () => bindButton('#push-enable-btn'));
+    } else {
+      bindButton('#push-enable-btn');
+    }
+  </script>
 </head>
 <body class="no-js" x-data="{ }" x-init="Alpine.store('app')?.init?.()">
   <div id="js-required-overlay" aria-live="polite">
@@ -154,6 +163,16 @@
     >
       <section class="container" style="padding: 4rem 2rem;">
         <h1 style="text-align: center; margin-bottom: 3rem;">Blog Espiritual</h1>
+
+        <!-- Web Push: activar notificaciones de nuevos posts -->
+        <div class="push-notifications" id="push-notifications">
+          <button type="button" class="push-btn" id="push-enable-btn" aria-pressed="false">
+            Activar notificaciones
+          </button>
+          <p class="push-status" data-push-status role="status" aria-live="polite">
+            Recibe un aviso cuando se publique un post nuevo.
+          </p>
+        </div>
         
         <!-- Filters -->
         <div class="blog-filters">

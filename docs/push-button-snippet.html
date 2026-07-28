@@ -1,0 +1,24 @@
+<!--
+  Snippet listo para pegar en cualquier página del sitio.
+  Requiere css/style.css (clases .push-*) y js/push-notifications.js
+  Rutas relativas: ajusta "./" si la página no está en la raíz.
+-->
+
+<div class="push-notifications" id="push-notifications">
+  <button type="button" class="push-btn" id="push-enable-btn" aria-pressed="false">
+    Activar notificaciones
+  </button>
+  <p class="push-status" data-push-status role="status" aria-live="polite">
+    Recibe un aviso cuando se publique un post nuevo.
+  </p>
+</div>
+
+<script type="module">
+  import { bindButton } from './js/push-notifications.js';
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => bindButton('#push-enable-btn'));
+  } else {
+    bindButton('#push-enable-btn');
+  }
+</script>

@@ -1,0 +1,32 @@
+{
+  "name": "sacred-geometry",
+  "version": "1.0.0",
+  "description": "Sitio estático con Web Push (Cloudflare Pages Functions + KV)",
+  "private": true,
+  "scripts": {
+    "generate-vapid": "node scripts/generate-vapid-keys.mjs",
+    "setup-push": "node scripts/setup-cloudflare-push.mjs",
+    "pages:dev": "wrangler pages dev . --kv=SUBSCRIPTIONS",
+    "notify": "bash scripts/send-notification.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Andrei-Barwood/sacred-geometry.git"
+  },
+  "keywords": ["web-push", "cloudflare-pages", "static-site"],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Andrei-Barwood/sacred-geometry/issues"
+  },
+  "homepage": "https://github.com/Andrei-Barwood/sacred-geometry#readme",
+  "dependencies": {
+    "@block65/webcrypto-web-push": "^1.0.2"
+  },
+  "devDependencies": {
+    "web-push": "^3.6.7",
+    "wrangler": "^4.0.0"
+  }
+}
+

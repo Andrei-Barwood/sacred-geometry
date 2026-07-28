@@ -1,0 +1,62 @@
+# ─────────────────────────────────────────────────────────────
+# EJEMPLO — Notificar tras push a main (comentado / renombrar)
+# ─────────────────────────────────────────────────────────────
+#
+# 1. Copia este archivo a:
+#      .github/workflows/notify-on-deploy.yml
+# 2. Añade secrets en GitHub (Settings → Secrets and variables → Actions):
+#      SITE_URL          → https://tudominio.com
+#      NOTIFY_SECRET     → el mismo Bearer de Cloudflare
+# 3. Ajusta title/body/url al flujo real de publicación de posts.
+#
+# Por defecto NO se activa (archivo .example). Solo úsalo si quieres
+# un disparo automático; si no, llama a /api/notify con curl a mano.
+# ─────────────────────────────────────────────────────────────
+
+name: Notify subscribers (example)
+
+on:
+  # Descomenta para activar en cada push a main:
+  # push:
+  #   branches: [main]
+  workflow_dispatch:
+    inputs:
+      title:
+        description: 'Título de la notificación'
+        required: true
+        default: 'Nuevo post en el blog'
+      body:
+        description: 'Resumen corto'
+        required: true
+        default: 'Hay una nueva entrada. ¡Échale un vistazo!'
+      url:
+        description: 'Ruta o URL del post'
+        required: true
+        default: '/blog.html'
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Enviar Web Push a todos los suscriptores
+        env:
+          SITE_URL: ${{ secrets.SITE_URL }}
+          NOTIFY_SECRET: ${{ secrets.NOTIFY_SECRET }}
+          TITLE: ${{ github.event.inputs.title || 'Nuevo post en el blog' }}
+          BODY: ${{ github.event.inputs.body || 'Hay una nueva entrada. ¡Échale un vistazo!' }}
+          URL: ${{ github.event.inputs.url || '/blog.html' }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SITE_URL:-}" ] || [ -z "${NOTIFY_SECRET:-}" ]; then
+            echo "Faltan secrets SITE_URL o NOTIFY_SECRET"
+            exit 1
+          fi
+
+          curl -fsS -X POST "${SITE_URL}/api/notify" \
+            -H "Authorization: Bearer ${NOTIFY_SECRET}" \
+            -H "Content-Type: application/json" \
+            -d "$(jq -n \
+              --arg title "$TITLE" \
+              --arg body "$BODY" \
+              --arg url "$URL" \
+              '{title:$title, body:$body, url:$url, icon:"/favicon.jpeg"}')"

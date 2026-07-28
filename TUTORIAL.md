@@ -5,6 +5,7 @@
 2. [Create New Blog Entries](#create-new-blog-entries)
 3. [Keep the Site Updated](#keep-the-site-updated)
 4. [Troubleshooting](#troubleshooting)
+5. [Web Push notifications](#web-push-notifications)
 
 ---
 
@@ -507,3 +508,15 @@ php -S localhost:8000
 - Add more interactive features
 
 Enjoy creating and sharing spiritual content! 🙏
+
+---
+
+## Web Push notifications
+
+El blog puede enviar notificaciones nativas del navegador cuando publicas un post.
+
+1. Configura VAPID, KV y secrets (una sola vez).
+2. Los visitantes pulsan **Activar notificaciones** en `blog.html`.
+3. Tras publicar, llama a `POST /api/notify` con curl o `./scripts/send-notification.sh`.
+
+Guía completa: **[docs/PUSH-NOTIFICATIONS.md](docs/PUSH-NOTIFICATIONS.md)**
