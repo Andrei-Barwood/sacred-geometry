@@ -1,0 +1,17 @@
+# Referencia local. El deploy por GitHub usa la config del dashboard de Pages.
+# Copia a wrangler.toml solo para desarrollo local:
+#   cp wrangler.toml.example wrangler.toml
+#   npx wrangler pages dev .
+#
+# Dashboard recomendado (proyecto sacred-geometry):
+#   Framework preset: None
+#   Build command: npm run build   (o vacío)
+#   Build output directory: /      (raíz del repo)
+#   Root directory: (vacío)
+#   Environment variable: NODE_VERSION=20
+#   Compatibility flags: nodejs_compat  (Settings → Functions)
+
+name = "sacred-geometry"
+compatibility_date = "2024-11-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "."

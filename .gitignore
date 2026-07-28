@@ -9,3 +9,4 @@ node_modules/
 .dev.vars
 *.pem
 vapid-keys.txt
+.cf-build-out/
