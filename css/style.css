@@ -1151,6 +1151,7 @@ footer {
 
 /* ====================================
    Web Push — botón de notificaciones
+   Alineado con --accent rosado (#EA428B) y pastillas del blog
    ==================================== */
 .push-notifications {
   display: flex;
@@ -1162,53 +1163,78 @@ footer {
   text-align: center;
 }
 
-.push-btn {
-  background: var(--primary);
-  color: #fff;
-  border: none;
-  padding: 0.85rem 1.75rem;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1rem;
-  font-family: 'El Messiri', serif;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 6px rgba(50, 83, 148, 0.3);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
+.push-notifications .push-btn,
+button.push-btn {
+  background: var(--accent) !important;
+  color: #fff !important;
+  border: 2px solid var(--accent) !important;
+  padding: 0.85rem 1.85rem !important;
+  border-radius: 25px !important;
+  cursor: pointer !important;
+  font-weight: 600 !important;
+  font-size: 1.05rem !important;
+  font-family: 'El Messiri', serif !important;
+  letter-spacing: 0.02em;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 12px rgba(234, 66, 139, 0.35) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.5rem !important;
+  -webkit-appearance: none !important;
+  appearance: none !important;
 }
 
-.push-btn:hover:not(:disabled) {
-  background: var(--accent);
-  box-shadow: 0 6px 12px rgba(234, 66, 139, 0.4);
-  transform: translateY(-2px);
+.push-notifications .push-btn:hover:not(:disabled),
+button.push-btn:hover:not(:disabled) {
+  background: #d6367a !important;
+  border-color: #d6367a !important;
+  box-shadow: 0 6px 16px rgba(234, 66, 139, 0.45) !important;
+  transform: translateY(-2px) !important;
+  color: #fff !important;
 }
 
-.push-btn:active:not(:disabled) {
-  transform: translateY(0);
+.push-notifications .push-btn:active:not(:disabled),
+button.push-btn:active:not(:disabled) {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 6px rgba(234, 66, 139, 0.3) !important;
+  background: #c42e6c !important;
+  border-color: #c42e6c !important;
+  color: #fff !important;
 }
 
-.push-btn:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
+.push-notifications .push-btn:focus-visible,
+button.push-btn:focus-visible {
+  outline: 2px solid var(--accent) !important;
+  outline-offset: 3px !important;
 }
 
-.push-btn:disabled {
-  cursor: default;
-  opacity: 0.85;
+.push-notifications .push-btn:disabled:not(.push-btn--active),
+button.push-btn:disabled:not(.push-btn--active) {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  transform: none !important;
 }
 
-.push-btn--active {
-  background: #2a7a4b;
-  box-shadow: 0 4px 6px rgba(42, 122, 75, 0.3);
+/* Activado: outline rosado (misma familia visual, no verde genérico) */
+.push-notifications .push-btn.push-btn--active,
+button.push-btn.push-btn--active {
+  background: transparent !important;
+  color: var(--accent) !important;
+  border: 2px solid var(--accent) !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  cursor: default !important;
+  transform: none !important;
 }
 
-.push-btn--active:hover {
-  background: #2a7a4b;
-  transform: none;
-  box-shadow: 0 4px 6px rgba(42, 122, 75, 0.3);
+.push-notifications .push-btn.push-btn--active:hover,
+button.push-btn.push-btn--active:hover {
+  background: rgba(234, 66, 139, 0.08) !important;
+  color: var(--accent) !important;
+  border-color: var(--accent) !important;
+  transform: none !important;
+  box-shadow: none !important;
 }
 
 .push-status {
@@ -1224,15 +1250,24 @@ footer {
 }
 
 .push-status[data-state='subscribed'] {
-  color: #2a7a4b;
+  color: var(--accent);
 }
 
 [data-theme='dark'] .push-status[data-state='subscribed'] {
-  color: #6dcea0;
+  color: #f48fb1;
 }
 
-[data-theme='dark'] .push-btn--active {
-  background: #3d9a62;
+[data-theme='dark'] .push-notifications .push-btn.push-btn--active,
+[data-theme='dark'] button.push-btn.push-btn--active {
+  color: #f48fb1 !important;
+  border-color: #f48fb1 !important;
+}
+
+[data-theme='dark'] .push-notifications .push-btn.push-btn--active:hover,
+[data-theme='dark'] button.push-btn.push-btn--active:hover {
+  background: rgba(244, 143, 177, 0.12) !important;
+  color: #f48fb1 !important;
+  border-color: #f48fb1 !important;
 }
 
 /* Utility Classes */
