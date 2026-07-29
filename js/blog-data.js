@@ -1610,18 +1610,23 @@ export const blogEntries = [
   }
 ];
 
-// Helper function to get latest entries
+/** Orden cronológico: más antiguo primero, más reciente al final. */
+function sortByDateAscending(entries) {
+  return [...entries].sort((a, b) => new Date(a.date) - new Date(b.date));
+}
+
+// Helper function to get latest entries (home: las más recientes arriba)
 export function getLatestEntries(limit = 3) {
   return [...getVisibleEntries()]
     .sort((a, b) => new Date(b.date) - new Date(a.date))
     .slice(0, limit);
 }
 
-// Helper function to get entries by type
+// Helper function to get entries by type (blog: antiguo → reciente)
 export function getEntriesByType(type) {
   const visible = getVisibleEntries();
-  if (type === 'All') return visible;
-  return visible.filter(entry => entry.type === type);
+  const list = type === 'All' ? visible : visible.filter(entry => entry.type === type);
+  return sortByDateAscending(list);
 }
 
 // Helper function to get an entry by ID
