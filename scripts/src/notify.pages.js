@@ -174,9 +174,8 @@ async function sendToAll(kv, vapid, notification) {
 
   await mapPool(rows, SEND_CONCURRENCY, async (row) => {
     const subscription = parseSubscription(row.value);
-    if (!subscription) {
+    if (!subscription || !looksLikeValidPushKeys(subscription.keys)) {
       stats.invalid++;
-      // Suscripción corrupta: borrar
       try {
         await kv.delete(row.name);
         stats.cleaned++;
@@ -219,15 +218,59 @@ async function sendToAll(kv, vapid, notification) {
         );
       }
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      // Claves p256dh basura (p. ej. tests con "abc") o endpoint de prueba
+      if (isUnusableSubscriptionError(msg)) {
+        try {
+          await kv.delete(row.name);
+          stats.cleaned++;
+          stats.invalid++;
+        } catch {
+          stats.failed++;
+        }
+        if (stats.errors.length < 10) {
+          stats.errors.push(`cleaned invalid sub: ${msg.slice(0, 120)}`);
+        }
+        return;
+      }
+
       stats.failed++;
       if (stats.errors.length < 10) {
-        const msg = err instanceof Error ? err.message : String(err);
         stats.errors.push(msg);
       }
     }
   });
 
   return stats;
+}
+
+/**
+ * p256dh de Web Push es una clave pública P-256 en base64url (~65 bytes → ~87 chars).
+ * auth es 16 bytes → ~22 chars. Valores de prueba tipo "abc" se rechazan aquí.
+ * @param {{ p256dh: string, auth: string }} keys
+ */
+function looksLikeValidPushKeys(keys) {
+  if (!keys?.p256dh || !keys?.auth) return false;
+  // base64url sin padding
+  const b64 = /^[A-Za-z0-9_-]+$/;
+  if (!b64.test(keys.p256dh) || !b64.test(keys.auth)) return false;
+  if (keys.p256dh.length < 80 || keys.p256dh.length > 120) return false;
+  if (keys.auth.length < 20 || keys.auth.length > 40) return false;
+  return true;
+}
+
+/**
+ * @param {string} msg
+ */
+function isUnusableSubscriptionError(msg) {
+  const m = msg.toLowerCase();
+  return (
+    m.includes('point is not on curve') ||
+    m.includes('invalid ec key') ||
+    m.includes('invalid key') ||
+    m.includes('bad decrypt') ||
+    m.includes('unable to import')
+  );
 }
 
 /**

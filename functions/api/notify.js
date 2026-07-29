@@ -719,7 +719,7 @@ async function sendToAll(kv, vapid, notification) {
   const messageData = JSON.stringify(notification);
   await mapPool(rows, SEND_CONCURRENCY, async (row) => {
     const subscription = parseSubscription(row.value);
-    if (!subscription) {
+    if (!subscription || !looksLikeValidPushKeys(subscription.keys)) {
       stats.invalid++;
       try {
         await kv.delete(row.name);
@@ -757,14 +757,39 @@ async function sendToAll(kv, vapid, notification) {
         );
       }
     } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (isUnusableSubscriptionError(msg)) {
+        try {
+          await kv.delete(row.name);
+          stats.cleaned++;
+          stats.invalid++;
+        } catch {
+          stats.failed++;
+        }
+        if (stats.errors.length < 10) {
+          stats.errors.push(`cleaned invalid sub: ${msg.slice(0, 120)}`);
+        }
+        return;
+      }
       stats.failed++;
       if (stats.errors.length < 10) {
-        const msg = err instanceof Error ? err.message : String(err);
         stats.errors.push(msg);
       }
     }
   });
   return stats;
+}
+function looksLikeValidPushKeys(keys) {
+  if (!keys?.p256dh || !keys?.auth) return false;
+  const b64 = /^[A-Za-z0-9_-]+$/;
+  if (!b64.test(keys.p256dh) || !b64.test(keys.auth)) return false;
+  if (keys.p256dh.length < 80 || keys.p256dh.length > 120) return false;
+  if (keys.auth.length < 20 || keys.auth.length > 40) return false;
+  return true;
+}
+function isUnusableSubscriptionError(msg) {
+  const m = msg.toLowerCase();
+  return m.includes("point is not on curve") || m.includes("invalid ec key") || m.includes("invalid key") || m.includes("bad decrypt") || m.includes("unable to import");
 }
 function timingSafeEqual(a, b) {
   if (typeof a !== "string" || typeof b !== "string") return false;
