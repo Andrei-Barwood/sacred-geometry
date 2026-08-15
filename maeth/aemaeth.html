@@ -11,6 +11,19 @@
   <link rel="stylesheet" href="../css/style.css">
   <link rel="stylesheet" href="../css/aemaeth.css">
   <link rel="stylesheet" href="https://v8.js-dos.com/latest/js-dos.css">
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['\\(', '\\)']],
+        displayMath: [['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
   <script src="https://v8.js-dos.com/latest/js-dos.js"></script>
   <script>
     document.addEventListener('alpine:init', () => {
@@ -113,6 +126,12 @@
     </section>
 
     <section class="container aemaeth-container" style="max-width: 900px; margin: 0 auto; padding: 2rem;">
+      <details class="chapter-1-fold" id="capitulo-1">
+        <summary class="chapter-1-summary" aria-label="Capítulo 1.0">
+          <span class="chapter-1-title">1.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
       <!-- Tabs Navigation -->
       <div class="aemaeth-tabs">
         <button class="tab-btn active" data-target="sec-1-6">Sec 1.6</button>
@@ -417,7 +436,7 @@
         <div class="card interactive-card">
           <div class="calc-grid">
             <div class="calc-item">
-              <label>Expresión (Ej: <code>6*(4+8)</code>, <code>sqrt(3^2 + 4^2)</code>, <code>atan(4/3)</code>)</label>
+              <label>Expresión (Ej: <code>6*(4+8)</code>, \(\sqrt{3^2+4^2}\), \(\operatorname{atan}(4/3)\))</label>
               <input type="text" id="expr-1-11" placeholder="Ej. sqrt(400 / (6^2 + 10))" />
               <button id="btn-calc-1-11" class="action-btn mt-1">Evaluar Expresión</button>
             </div>
@@ -630,6 +649,800 @@
           </details>
         </div>
       </div>
+
+      <section class="glossary-section" id="glosario-1-0" aria-labelledby="glossary-heading">
+        <h2 id="glossary-heading">Glosario</h2>
+        <p class="glossary-lead">Términos del análisis de circuitos aplicados a la ingeniería eléctrica de fuentes renovables en el siglo XXI.</p>
+        <dl class="glossary-grid">
+          <div class="glossary-item">
+            <dt>C++</dt>
+            <dd>Lenguaje de computadora con enlace de comunicación eficiente entre el usuario y el lenguaje de máquina de la unidad central de procesamiento (CPU). En plantas renovables se emplea para el firmware de inversores, BMS y controladores de aerogeneradores, donde el tiempo real y el acceso directo al hardware de potencia son críticos.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Celda voltaica</dt>
+            <dd>Dispositivo de almacenamiento o conversión que transforma energía química o lumínica en energía eléctrica. En el siglo XXI abarca la celda fotovoltaica (silicio, perovskita, tándem) y las celdas electroquímicas de baterías de ion-litio, sodio-ion o flujo redox que respaldan la generación intermitente.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Circuito integrado (CI)</dt>
+            <dd>Estructura minúscula que contiene un amplio número de dispositivos electrónicos diseñados para realizar un conjunto particular de funciones: control MPPT, DSP de inversores, drivers de SiC/GaN y protecciones de convertidores en sistemas solares, eólicos e hidroeléctricos.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Efecto Edison</dt>
+            <dd>Establecimiento de un flujo de carga entre dos elementos en un tubo al vacío. Su legado en renovables es el estudio de emisión, arcos y descargas que deben evitarse en cajas de conexión fotovoltaicas, seccionadores de media tensión y conectores de strings a cielo abierto.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Electricidad estática</dt>
+            <dd>Carga inmóvil en estado de equilibrio. En parques solares y eólicos se controla con puesta a tierra, descargadores y protección ESD para no dañar módulos, palas, inversores ni la electrónica de los sensores de recurso.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Electromagnetismo</dt>
+            <dd>La relación entre efectos magnéticos y eléctricos. Es el fundamento de los generadores síncronos de imanes permanentes, de los transformadores de evacuación y de las máquinas de las centrales hidroeléctricas y mareomotrices.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>ENIAC</dt>
+            <dd>La primera computadora completamente electrónica. Su equivalente contemporáneo en el sector son los EMS, los SCADA y los gemelos digitales que supervisan en tiempo real generación, almacenamiento y demanda en redes con alta penetración renovable.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Jarra Leyden</dt>
+            <dd>Uno de los primeros dispositivos de almacenamiento de cargas. Hoy se materializa en condensadores de enlace de CC de los inversores, supercondensadores para huecos de tensión y bancos de compensación reactiva de plantas renovables.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Joule (J)</dt>
+            <dd>Unidad de medición para la energía en el sistema MKS o en el SI. Equivale a 0,7378 pies-libra en el sistema inglés y a \(10^{7}\) ergios en el CGS. En renovables se trabaja de forma habitual en kilovatios-hora: \(1\,\mathrm{kWh} = 3{,}6 \times 10^{6}\,\mathrm{J}\).</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Kelvin (K)</dt>
+            <dd>Unidad de medición para la temperatura en el SI. Es igual a 273,15 + °C en los sistemas MKS y CGS. Se usa para el coeficiente de temperatura de los módulos fotovoltaicos, el derating térmico de inversores y los modelos de densidad del aire en eólica.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Kilogramo (kg)</dt>
+            <dd>Unidad de medición para la masa en el sistema MKS y el SI. Es igual a 1000 gramos en el sistema CGS. Describe la masa de góndolas y palas, la densidad energética de baterías (Wh/kg) y el lastre de estructuras flotantes marinas.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Lenguaje</dt>
+            <dd>Vínculo de comunicación entre el usuario y la computadora utilizado para definir las operaciones a efectuar y los resultados que se desplegarán o imprimirán. En la red renovable incluye IEC 61131-3, Python, IEC 61850, Modbus y SunSpec.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Libra (lb)</dt>
+            <dd>Unidad de medición para la fuerza en el sistema inglés. Es igual a 4,45 newton en el SI o el MKS. Persiste en especificaciones de anclajes, tornillería y cargas de viento de aerogeneradores certificados en Norteamérica.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Máquina de diferencias</dt>
+            <dd>Una de las primeras calculadoras mecánicas. Su heredera actual es el solver numérico de flujos de potencia, el software de predicción de recurso y el gemelo digital que anticipa la producción de un activo renovable.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Menú</dt>
+            <dd>Listado de posibilidades generado por la computadora para que el usuario determine la siguiente operación que ha de realizarse. En planta es el HMI del inversor, del PPC o del SCADA desde el que se elige consigna, modo o informe.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Metro (m)</dt>
+            <dd>Unidad de medición para la longitud en el SI o el MKS. Es igual a 1,094 yardas en el sistema inglés y a 100 centímetros en el CGS. Mide la altura de buje, la envergadura de pala, las zanjas de media tensión y el paso entre filas fotovoltaicas.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Newton (N)</dt>
+            <dd>Unidad de medición para la fuerza en el SI y el MKS. Es igual a 100.000 dinas en el sistema CGS. Cuantifica el empuje del viento sobre las palas, la tracción de cables submarinos y las cargas de nieve sobre estructuras solares.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Notación científica</dt>
+            <dd>Método para describir números muy grandes o muy pequeños mediante el uso de potencias de diez, las cuales requieren que el multiplicador sea un número entre 1 y 10. Es habitual al expresar irradiancia, capacitancia parásita o energía anual en julios.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Notación de ingeniería</dt>
+            <dd>Método de notación que especifica que todas las potencias de diez empleadas para un número sean múltiplos de 3 con una mantisa mayor o igual a 1 pero menor que 1000. Es la base de los prefijos kW, MW, GWh, µF y mH del diseño de plantas renovables.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Notación de punto fijo</dt>
+            <dd>Notación que utiliza el punto decimal en una ubicación particular para definir la magnitud de un número. Se emplea en DSP de bajo coste de convertidores y en medidores de energía embebidos.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Notación de punto flotante</dt>
+            <dd>Notación que permite que la magnitud de un número defina el lugar donde el punto decimal deberá ser colocado. Es la aritmética de los controladores de inversor, de los EMS y de los modelos meteorológicos de recurso.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Paquete de software</dt>
+            <dd>Programa de computadora desarrollado para realizar operaciones específicas de análisis y diseño o para generar resultados con un formato particular: PVSyst, HOMER, DIgSILENT PowerFactory, PSCAD, MATLAB/Simulink y plataformas de pronóstico de recurso.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Programa</dt>
+            <dd>Lista secuencial de comandos, instrucciones, etc., para realizar una tarea específica mediante una computadora: arranque de inversor, limitación de potencia, reposición de servicio con BESS o despacho de un parque híbrido.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>PSpice</dt>
+            <dd>Paquete de software diseñado para analizar distintos sistemas eléctricos y electrónicos de cd, ca y transitorios. En el siglo XXI convive con LTspice, PSIM y PLECS para diseñar convertidores CC-CC, inversores trifásicos y filtros LCL de plantas renovables.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Segundo (s)</dt>
+            <dd>Unidad de medición para el tiempo en los sistemas MKS, inglés, CGS y el SI. Define la frecuencia de red (50/60 Hz), la inercia sintética, los huecos de tensión y el muestreo de los registradores de calidad de onda.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Sistema CGS</dt>
+            <dd>Sistema que emplea los Centímetros, Gramos y Segundos como sus unidades fundamentales de medida. Hoy es residual, pero aún aparece en bibliografía de campos electromagnéticos y en conversiones históricas de densidad de flujo.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Sistema Internacional (SI)</dt>
+            <dd>Convención de unidades adoptada por la IEEE, en 1965, y la USASI, en 1967, como el Sistema Internacional de Unidades (Système International d’Unités). Es el marco de las normas IEC 61724, IEC 61400 e IEC 62933 que rigen fotovoltaica, eólica y almacenamiento.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Sistema MKS</dt>
+            <dd>Sistema que utiliza al Metro, al Kilogramo y al Segundo como sus unidades fundamentales de medida. Es el precursor directo del SI y sigue siendo la base conceptual de los balances de potencia y energía en plantas renovables.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Slug</dt>
+            <dd>Unidad de medición para la masa en el sistema inglés. Es igual a 14,6 kilogramos en el SI o el MKS. Aparece en cálculos dinámicos de palas y estructuras cuando el fabricante entrega datos en unidades imperiales.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Transistor</dt>
+            <dd>El primer amplificador semiconductor. En la ingeniería renovable del siglo XXI se materializa en IGBT, MOSFET de SiC y GaN que conmutan cientos de kilovatios en inversores string, centrales y convertidores de aerogeneradores.</dd>
+          </div>
+          <div class="glossary-item">
+            <dt>Válvula de Fleming</dt>
+            <dd>Fue el primer dispositivo electrónico, el diodo. Su descendiente es el diodo de potencia, Schottky y de rueda libre que rectifica, protege y bloquea la corriente inversa en strings fotovoltaicos y convertidores.</dd>
+          </div>
+        </dl>
+      </section>
+        </div>
+      </details>
+
+      <details class="chapter-1-fold" id="capitulo-2">
+        <summary class="chapter-1-summary" aria-label="Capítulo 2.0">
+          <span class="chapter-1-title">2.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Corriente y voltaje: la carga que se mueve y el trabajo que cuesta moverla.
+            En el siglo XXI esos dos conceptos diseñan el string fotovoltaico, el bus de
+            un BESS, el convertidor de un aerogenerador y el medidor que certifica la energía
+            inyectada a la red.
+          </p>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-2-1">Sec 2.1</button>
+            <button class="tab-btn" data-target="sec-2-2">Sec 2.2</button>
+            <button class="tab-btn" data-target="sec-2-3">Sec 2.3</button>
+            <button class="tab-btn" data-target="sec-2-4">Sec 2.4</button>
+            <button class="tab-btn" data-target="sec-2-5">Sec 2.5</button>
+            <button class="tab-btn" data-target="sec-2-6">Sec 2.6</button>
+            <button class="tab-btn" data-target="sec-2-7">Sec 2.7</button>
+          </div>
+
+          <div class="tab-content active" id="sec-2-1">
+            <h2>Sección 2.1: Los átomos y su estructura</h2>
+            <p class="chapter-discourse">
+              Un conductor es generoso con sus electrones de valencia; un aislante los retiene;
+              un semiconductor los libera solo cuando un fotón, un dopante o un campo se lo
+              piden. El aluminio (13 electrones, 3 de valencia) es el metal de los cables
+              fotovoltaicos AA-8000 y de las barras de media tensión. La plata (47 electrones,
+              1 de valencia en 5s) es la pasta de la rejilla frontal de las celdas c-Si, TOPCon
+              y HJT. La ley de Coulomb,
+              \(F = k \dfrac{|Q_1 Q_2|}{r^2}\)
+              con \(k = 8{,}99 \times 10^{9}\,\mathrm{N{\cdot}m^{2}/C^{2}}\),
+              explica la fuerza entre cargas, el ESD que mata un driver de SiC y el transporte
+              iónico dentro de una celda LFP.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-2-1">Selecciona un problema:</label>
+                <select id="preset-2-1" class="book-preset-select" data-section="2-1">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: Configuración electrónica de Al y Ag</option>
+                  <option value="p2">Prob 2: Fuerza protón–electrón en el hidrógeno</option>
+                  <option value="p3a">Prob 3.a: Atracción Q1=+1 µC, Q2=−2 µC, r=1 m</option>
+                  <option value="p3b">Prob 3.b: Atracción a r=3 m</option>
+                  <option value="p3c">Prob 3.c: Atracción a r=10 m</option>
+                  <option value="p4a">Prob 4.a: Repulsión +8 µC y +40 µC, r=1 mi</option>
+                  <option value="p4b">Prob 4.b: Repulsión a r=0.01 m</option>
+                  <option value="p4c">Prob 4.c: Repulsión a r=1/16 pulg</option>
+                  <option value="p5">Prob 5: Curva F(r) de +2 µC y −4 µC</option>
+                  <option value="p6">Prob 6: Distancia entre dos cargas de 20 µC</option>
+                  <option value="p7a">Prob 7.a: Fuerza a 10 m si a 2 m es 1.8 N</option>
+                  <option value="p7b">Prob 7.b: Hallar Q1 y Q2 si Q1/Q2 = 1/2</option>
+                </select>
+              </div>
+              <div id="desc-preset-2-1" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 2.34 — Atracción</h3>
+              <div class="charge-figure" aria-hidden="true">
+                <div class="charge-ball charge-pos">+1&nbsp;µC</div>
+                <span class="charge-span">r</span>
+                <div class="charge-ball charge-neg">−2&nbsp;µC</div>
+              </div>
+              <h3>Figura 2.35 — Repulsión</h3>
+              <div class="charge-figure" aria-hidden="true">
+                <div class="charge-ball charge-pos">+8&nbsp;µC</div>
+                <span class="charge-span">r</span>
+                <div class="charge-ball charge-pos">+40&nbsp;µC</div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador de Coulomb</h3>
+              <p>Deja vacío exactamente el campo que quieres despejar (F o r). Las cargas se ingresan con signo.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="c2-q1">\(Q_1\):</label>
+                  <input type="text" id="c2-q1" placeholder="Ej. 1" />
+                  <select id="c2-q1-u">
+                    <option value="1">C</option>
+                    <option value="1e-3">mC</option>
+                    <option value="1e-6" selected>µC</option>
+                    <option value="1e-9">nC</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="c2-q2">\(Q_2\):</label>
+                  <input type="text" id="c2-q2" placeholder="Ej. -2" />
+                  <select id="c2-q2-u">
+                    <option value="1">C</option>
+                    <option value="1e-3">mC</option>
+                    <option value="1e-6" selected>µC</option>
+                    <option value="1e-9">nC</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="c2-r">r:</label>
+                  <input type="text" id="c2-r" placeholder="Ej. 1" />
+                  <select id="c2-r-u">
+                    <option value="1" selected>m</option>
+                    <option value="0.01">cm</option>
+                    <option value="0.001">mm</option>
+                    <option value="0.0254">in</option>
+                    <option value="0.3048">ft</option>
+                    <option value="1609.344">mi</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="c2-f">F (N):</label>
+                  <input type="text" id="c2-f" placeholder="Vacío para calcular F" />
+                </div>
+                <button id="btn-coulomb-2-1" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-2-1" class="procedure-box">-</div>
+                </div>
+              </div>
+              <div id="plot-2-1-wrap" class="plot-wrap" hidden>
+                <h3>Fuerza frente a separación</h3>
+                <svg id="plot-2-1" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="Gráfica F contra r"></svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-2-2">
+            <h2>Sección 2.2: Corriente</h2>
+            <p class="chapter-discourse">
+              La corriente es carga por unidad de tiempo:
+              \(I = Q / t\),
+              con \(1\,\mathrm{A} = 1\,\mathrm{C/s}\). Un coulomb transporta
+              \(6{,}242 \times 10^{18}\)
+              electrones. En planta, \(I\) es la corriente de string (Isc, Imp), el C-rate
+              del BESS, la consigna de un inversor o el umbral de un fusible gPV.
+              Un fusible de 1 A “estalla” cuando la carga que lo cruza implica I mayor
+              que su valor nominal durante el tiempo de fusión.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-2-2">Selecciona un problema:</label>
+                <select id="preset-2-2" class="book-preset-select" data-section="2-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p8">Prob 8: 650 C en 50 s</option>
+                  <option value="p9">Prob 9: 465 C en 2.5 min</option>
+                  <option value="p10">Prob 10: 40 A durante 1 min → Q</option>
+                  <option value="p11">Prob 11: 750 mA durante 2 min → Q</option>
+                  <option value="p12">Prob 12: 2 mA y 4600×10⁻⁶ C → t</option>
+                  <option value="p13">Prob 13: 21.847×10¹⁸ e⁻ en 7 s</option>
+                  <option value="p14">Prob 14: Electrones en 1 A durante 1 min</option>
+                  <option value="p15">Prob 15: ¿Estalla el fusible de 1 A?</option>
+                  <option value="p16">Prob 16: 0.784×10¹⁸ e⁻ en 643 ms</option>
+                  <option value="p17">Prob 17: Centavo por electrón vs dólar por electrón</option>
+                </select>
+              </div>
+              <div id="desc-preset-2-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador \(I = Q / t\)</h3>
+              <p>Deja exactamente un campo vacío entre I, Q y t. Opcional: ingresa electrones en lugar de coulombs.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="c2-i">I:</label>
+                  <input type="text" id="c2-i" placeholder="Ej. 13" />
+                  <select id="c2-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="c2-q">Q:</label>
+                  <input type="text" id="c2-q" placeholder="Ej. 650" />
+                  <select id="c2-q-u">
+                    <option value="1" selected>C</option>
+                    <option value="1e-3">mC</option>
+                    <option value="1e-6">µC</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="c2-n">N (e⁻):</label>
+                  <input type="text" id="c2-n" placeholder="Opcional, Ej. 21.847e18" />
+                </div>
+                <div class="k-input">
+                  <label for="c2-t">t:</label>
+                  <input type="text" id="c2-t" placeholder="Ej. 50" />
+                  <select id="c2-t-u">
+                    <option value="1" selected>s</option>
+                    <option value="0.001">ms</option>
+                    <option value="1e-9">ns</option>
+                    <option value="60">min</option>
+                    <option value="3600">h</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="c2-fuse">Fusible (A):</label>
+                  <input type="text" id="c2-fuse" placeholder="Vacío si no aplica" />
+                </div>
+                <button id="btn-current-2-2" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-2-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-2-3">
+            <h2>Sección 2.3: Voltaje</h2>
+            <p class="chapter-discourse">
+              El volt es trabajo por unidad de carga:
+              \(V = W / Q\).
+              Un volt mueve \(1\,\mathrm{C}\) con \(1\,\mathrm{J}\). En renovables es el Voc del módulo (≈ 40–55 V),
+              el bus de 600 / 1000 / 1500 Vcc de la planta, los 3,2 V de una celda LFP
+              o los ±800 V de un convertidor de aerogenerador de imanes permanentes.
+              Combinado con la corriente,
+              \(W = V I t\) y
+              \(P = V I\).
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-2-3">Selecciona un problema:</label>
+                <select id="preset-2-3" class="book-preset-select" data-section="2-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p18">Prob 18: 96 mJ para mover 50×10¹⁸ e⁻</option>
+                  <option value="p19">Prob 19: Trabajo para 6 C a 42 V</option>
+                  <option value="p20">Prob 20: Q si 96 J cruzan 16 V</option>
+                  <option value="p21">Prob 21: Q a través de 22.5 V con 90 J</option>
+                  <option value="p22">Prob 22: Caída de potencial, 200 mA, 40 J, 30 s</option>
+                  <option value="p23">Prob 23: 420 C/min, 742 J en 30 s</option>
+                  <option value="p24">Prob 24: 24 V, 0.4 J en 5 ms → I</option>
+                </select>
+              </div>
+              <div id="desc-preset-2-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador \(V = W / Q\)</h3>
+              <p>Deja vacío \(V\), \(W\) o \(Q\). Si das \(I\) y \(t\), el solucionador obtiene \(Q = I t\).</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="v2-v">V:</label>
+                  <input type="text" id="v2-v" placeholder="Ej. 42" />
+                  <select id="v2-v-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="v2-w">W:</label>
+                  <input type="text" id="v2-w" placeholder="Ej. 96" />
+                  <select id="v2-w-u">
+                    <option value="1" selected>J</option>
+                    <option value="0.001">mJ</option>
+                    <option value="1000">kJ</option>
+                    <option value="3.6e6">kWh</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="v2-q">Q:</label>
+                  <input type="text" id="v2-q" placeholder="Ej. 6" />
+                  <select id="v2-q-u">
+                    <option value="1" selected>C</option>
+                    <option value="1e-3">mC</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="v2-n">N (e⁻):</label>
+                  <input type="text" id="v2-n" placeholder="Opcional" />
+                </div>
+                <div class="k-input">
+                  <label for="v2-i">I:</label>
+                  <input type="text" id="v2-i" placeholder="Opcional" />
+                  <select id="v2-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="v2-t">t:</label>
+                  <input type="text" id="v2-t" placeholder="Opcional" />
+                  <select id="v2-t-u">
+                    <option value="1" selected>s</option>
+                    <option value="0.001">ms</option>
+                    <option value="60">min</option>
+                  </select>
+                </div>
+                <button id="btn-voltage-2-3" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-2-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-2-4">
+            <h2>Sección 2.4: Fuentes de alimentación fijas (cd)</h2>
+            <p class="chapter-discourse">
+              Tres familias alimentan en cd una planta renovable. La <em>batería</em>
+              (celda secundaria LFP, NMC, sodio-ion o flujo) guarda energía química y la
+              entrega con un valor nominal en ampere-hora:
+              \(\mathrm{Ah} = I \times t\),
+              \(W = V \times \mathrm{Ah} \times 3600\) J
+              = \(V \times \mathrm{Ah} / 1000\) kWh.
+              La <em>rectificación</em> convierte la ca del generador eólico o hidroeléctrico
+              en el bus de cd del convertidor. El <em>generador de cd</em> sobrevive como
+              máquina de imanes permanentes más el rectificador del aerogenerador, o como
+              la propia curva I–V del módulo fotovoltaico, que se comporta como fuente de
+              corriente cerca de Isc y como fuente de voltaje cerca de Voc.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-2-4">Selecciona un problema:</label>
+                <select id="preset-2-4" class="book-preset-select" data-section="2-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p25">Prob 25: 200 Ah durante 40 h → I</option>
+                  <option value="p26">Prob 26: 0.8 A durante 76 h → Ah</option>
+                  <option value="p27">Prob 27: 32 Ah a 1.28 A → t</option>
+                  <option value="p28">Prob 28: Ah de un rack LFP a 25 °C y 0 °C</option>
+                  <option value="p29">Prob 29: Autonomía de un BESS a 550 A</option>
+                  <option value="p30">Prob 30: 50 A vs 150 A desde 150 Ah</option>
+                  <option value="p31">Prob 31: 12 V 40 Ah vs 60 Ah</option>
+                  <option value="p32">Prob 32: Energía de una celda LFP 3.2 V 2.5 Ah</option>
+                  <option value="p33">Prob 33: Logger 12 V 3 Ah durante 5.5 h</option>
+                  <option value="p34">Prob 34: Baterías, rectificación y generadores</option>
+                  <option value="p35">Prob 35: Fuente de corriente vs fuente de voltaje</option>
+                </select>
+              </div>
+              <div id="desc-preset-2-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Capacidad Ah y energía de un BESS</h3>
+              <p>Deja vacío Ah, I o t. El voltaje convierte la capacidad en julios y kWh.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="ah-ah">Ah:</label>
+                  <input type="text" id="ah-ah" placeholder="Ej. 200" />
+                </div>
+                <div class="k-input">
+                  <label for="ah-i">I (A):</label>
+                  <input type="text" id="ah-i" placeholder="Ej. 5" />
+                </div>
+                <div class="k-input">
+                  <label for="ah-t">t:</label>
+                  <input type="text" id="ah-t" placeholder="Ej. 40" />
+                  <select id="ah-t-u">
+                    <option value="1" selected>h</option>
+                    <option value="0.0166667">min</option>
+                    <option value="0.000277778">s</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="ah-v">V:</label>
+                  <input type="text" id="ah-v" placeholder="Ej. 12 o 51.2" />
+                </div>
+                <button id="btn-ah-2-4" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-2-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-2-5">
+            <h2>Sección 2.5: Conductores y aislantes</h2>
+            <p class="chapter-discourse">
+              Un conductor deja pasar un flujo generoso de electrones con muy poco voltaje.
+              Un aislante exige un campo enorme antes de conducir; cuando lo hace, se
+              alcanzó la <em>fuerza de ruptura</em> (kV/mm) y el material se perfora.
+              En una planta renovable el cobre lleva la corriente del inversor, el
+              transformador y la malla de tierra; el aluminio lleva los strings y las
+              líneas de media tensión; el XLPE, el vidrio, la cerámica y el aire aíslan
+              el módulo, el seccionador y la subestación.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-2-5">Selecciona un problema:</label>
+                <select id="preset-2-5" class="book-preset-select" data-section="2-5">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p36">Prob 36: Dos propiedades atómicas del cobre</option>
+                  <option value="p37">Prob 37: Dos conductores fuera de la tabla 2.1</option>
+                  <option value="p38">Prob 38: Aislante y fuerza de ruptura</option>
+                  <option value="p39">Prob 39: Tres usos de aislantes en renovables</option>
+                </select>
+              </div>
+              <div id="desc-preset-2-5" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Materiales de una planta renovable</h3>
+              <p>Selecciona un material para ver su conductividad de orden de magnitud y su papel en el siglo XXI.</p>
+              <div class="input-group">
+                <label for="mat-2-5">Material:</label>
+                <select id="mat-2-5" class="book-preset-select">
+                  <option value="" disabled selected>-- Selecciona un material --</option>
+                  <option value="ag">Plata (Ag)</option>
+                  <option value="cu">Cobre (Cu)</option>
+                  <option value="al">Aluminio (Al)</option>
+                  <option value="au">Oro (Au)</option>
+                  <option value="fe">Acero / hierro</option>
+                  <option value="si">Silicio dopado (celda PV)</option>
+                  <option value="xlpe">XLPE</option>
+                  <option value="glass">Vidrio solar</option>
+                  <option value="air">Aire seco</option>
+                </select>
+              </div>
+              <div id="mat-2-5-out" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-2-6">
+            <h2>Sección 2.6: Semiconductores</h2>
+            <p class="chapter-discourse">
+              Un semiconductor tiene una conductancia entre la del aislante y la del
+              conductor. El silicio (\(E_g \approx 1{,}12\,\mathrm{eV}\)) es la celda fotovoltaica y el IGBT
+              clásico. El germanio (\(E_g \approx 0{,}66\,\mathrm{eV}\)) fue el transistor histórico; hoy es
+              residual. El carburo de silicio y el nitruro de galio (\(E_g \approx 3{,}3\)–\(3{,}4\,\mathrm{eV}\))
+              conmutan cientos de kilovatios en inversores string, centrales y
+              convertidores eólicos del siglo XXI, con menos pérdidas y más temperatura
+              de unión que el silicio.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-2-6">Selecciona un problema:</label>
+                <select id="preset-2-6" class="book-preset-select" data-section="2-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p40">Prob 40: Qué es un semiconductor</option>
+                  <option value="p41">Prob 41: Silicio, germanio y los de banda ancha</option>
+                </select>
+              </div>
+              <div id="desc-preset-2-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Familia semiconductora en renovables</h3>
+              <div class="input-group">
+                <label for="sc-2-6">Material:</label>
+                <select id="sc-2-6" class="book-preset-select">
+                  <option value="" disabled selected>-- Selecciona un semiconductor --</option>
+                  <option value="si">Silicio (Si)</option>
+                  <option value="ge">Germanio (Ge)</option>
+                  <option value="sic">Carburo de silicio (SiC)</option>
+                  <option value="gan">Nitruro de galio (GaN)</option>
+                  <option value="cdte">Telururo de cadmio (CdTe)</option>
+                  <option value="perov">Perovskita / tándem</option>
+                </select>
+              </div>
+              <div id="sc-2-6-out" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-2-7">
+            <h2>Sección 2.7: Amperímetros y voltímetros</h2>
+            <p class="chapter-discourse">
+              El amperímetro se inserta en <em>serie</em> con el elemento: mide la
+              corriente que lo atraviesa y, en cd, suele ser un shunt o un sensor de
+              efecto Hall en el string, el inversor o el BESS. El voltímetro se conecta
+              en <em>paralelo</em> entre dos puntos: mide Voc, Vmp, el bus de cd o la
+              tensión de polo a tierra. Energía y carga siguen siendo
+              \(W = V I t\) y
+              \(Q = I t\).
+              El medidor de facturación de una planta es, a la vez, voltímetro, amperímetro
+              y registrador de kWh.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-2-7">Selecciona un problema:</label>
+                <select id="preset-2-7" class="book-preset-select" data-section="2-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p42">Prob 42: Conexión de amperímetro y voltímetro</option>
+                  <option value="p43">Prob 43: 2.5 A durante 4 min → Q</option>
+                  <option value="p44">Prob 44: 12.5 V, 10 mA, 20 s → W y Q</option>
+                </select>
+              </div>
+              <div id="desc-preset-2-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Lectura de medidores</h3>
+              <p>Ingresa la lectura del amperímetro, del voltímetro y el intervalo. Se obtienen Q y W.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="m2-i">I:</label>
+                  <input type="text" id="m2-i" placeholder="Ej. 2.5" />
+                  <select id="m2-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="m2-v">V:</label>
+                  <input type="text" id="m2-v" placeholder="Ej. 12.5" />
+                </div>
+                <div class="k-input">
+                  <label for="m2-t">t:</label>
+                  <input type="text" id="m2-t" placeholder="Ej. 20" />
+                  <select id="m2-t-u">
+                    <option value="1" selected>s</option>
+                    <option value="60">min</option>
+                    <option value="3600">h</option>
+                  </select>
+                </div>
+                <button id="btn-meter-2-7" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-2-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-2-0" aria-labelledby="glossary-2-heading">
+            <h2 id="glossary-2-heading">Glosario</h2>
+            <p class="glossary-lead">Términos de corriente y voltaje aplicados a la ingeniería eléctrica de fuentes renovables en el siglo XXI.</p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Aislantes</dt>
+                <dd>Materiales en los que un voltaje muy alto debe ser aplicado para producir algún flujo de corriente que se puede medir. En planta son el XLPE de los cables de string y de media tensión, el vidrio del módulo, la cerámica de los seccionadores y el aire de las distancias de fuga.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ampere (A)</dt>
+                <dd>La unidad de medición del SI aplicada al flujo de carga a través de un conductor. Un ampere es un coulomb por segundo. Es la unidad de Isc, Imp, de la corriente de un aerogenerador y del C-rate de un BESS.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Amperímetro</dt>
+                <dd>Instrumento diseñado para medir la corriente a través de elementos conectados en serie con el medidor. En renovables es el shunt, el sensor Hall o el transformador de corriente del string, del inversor y del punto de conexión.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Celda</dt>
+                <dd>Fuente fundamental de energía eléctrica desarrollada mediante la conversión de energía química o solar. Hoy es la celda fotovoltaica (Si, CdTe, perovskita) o la celda electroquímica LFP, NMC, sodio-ion o de flujo.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Celda primaria</dt>
+                <dd>Fuentes de voltaje que no pueden recargarse. En el campo sobreviven como pilas de registradores de recurso o de sensores remotos; la planta misma se diseña con celdas secundarias.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Celda secundaria</dt>
+                <dd>Fuentes de voltaje que pueden recargarse. Son el corazón del BESS: LFP para duración, NMC para densidad, sodio-ion para coste y vanadio para ciclos profundos.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Celda solar</dt>
+                <dd>Fuentes de voltaje disponibles mediante la conversión de energía luminosa (fotones) en energía eléctrica. El estándar del siglo XXI es el silicio cristalino; le siguen el CdTe de capa fina y los tándems perovskita-silicio.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Cobre</dt>
+                <dd>Material cuyas propiedades físicas hacen que sea particularmente útil como conductor de electricidad. Lleva el bus de cd, los devanados del transformador de evacuación, las pletinas del inversor y la malla de tierra.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Conductores</dt>
+                <dd>Materiales que permiten un flujo generoso de electrones con muy poco voltaje aplicado. En renovables: cobre, aluminio AA-8000 de cables fotovoltaicos y, en la rejilla de la celda, plata.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Corriente directa</dt>
+                <dd>Corriente que tiene una sola dirección (unidireccional) y magnitud fija en el tiempo. Es la corriente del string fotovoltaico, del enlace de cd del inversor y de la descarga de un BESS.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Coulomb (C)</dt>
+                <dd>La unidad fundamental de medición del SI para la carga. Es igual a la carga transportada por \(6{,}242 \times 10^{18}\) electrones. Integra la corriente del string o del BESS: \(Q = I t\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Diferencia de potencial</dt>
+                <dd>Diferencia algebraica en el potencial (o voltaje) entre dos puntos en un sistema eléctrico. Es Voc, Vmp, la tensión polo-tierra de 1500 Vcc o el bus ± de un convertidor eólico.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Electrolitos</dt>
+                <dd>Elemento de contacto y fuente de iones entre los electrodos de una batería. En LFP es una sal de litio en disolvente orgánico; en flujo redox, el vanadio disuelto; en hidrógeno verde, el KOH o la membrana PEM.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Electrón</dt>
+                <dd>Partícula con polaridad negativa que orbita el núcleo del átomo. Su movimiento ordenado es la corriente del cable fotovoltaico y del IGBT; su excitación por un fotón es la fotocorriente de la celda.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Electrón libre</dt>
+                <dd>Electrón no asociado con ningún átomo en particular, relativamente libre de moverse a través de una estructura cristalina regular bajo la influencia de fuerzas externas. En el cobre del busbar y en el silicio dopado del módulo es el portador de la corriente útil.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Energía potencial</dt>
+                <dd>Energía que una masa posee por virtud de su posición. El análogo eléctrico es \(QV\): la energía almacenada en el BESS o en el condensador del enlace de cd, lista para convertirse en kWh inyectados.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente de corriente de cd</dt>
+                <dd>Fuente que proporciona un nivel de corriente fija incluso cuando la carga a la que se aplica pueda causar que el voltaje en sus terminales cambie. El módulo fotovoltaico, cerca de Isc, se modela así; un inversor en modo corriente inyecta I de consigna a la red.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Generador de cd</dt>
+                <dd>Fuente de voltaje de cd disponible mediante la rotación del eje del dispositivo por algún medio externo. Hoy es el generador síncrono de imanes permanentes del aerogenerador más su rectificador, o la turbina hidroeléctrica acoplada a un convertidor.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Gravedad específica</dt>
+                <dd>Proporción del peso de un volumen dado de una sustancia respecto al peso de un volumen igual de agua a 4 °C. En renovables controla el electrolito de baterías de plomo residuales, la densidad de salmueras de almacenamiento térmico y el lastre de flotadores marinos.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ion positivo</dt>
+                <dd>Átomo que tiene carga neta positiva debido a la pérdida de uno de sus electrones cargados negativamente. El \(\mathrm{Li}^{+}\) que cruza el electrolito, el \(\mathrm{Na}^{+}\) de las celdas de sodio y el \(\mathrm{H}^{+}\) de un electrolizador PEM son el transporte de energía química del siglo XXI.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ley de Coulomb</dt>
+                <dd>Ecuación que define la fuerza de atracción o de repulsión entre dos cargas: \(F = k |Q_1 Q_2| / r^{2}\). Gobierna el ESD sobre la electrónica del inversor, la adherencia de polvo en el vidrio del módulo y las fuerzas iónicas dentro de la batería.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Neutrón</dt>
+                <dd>Partícula sin carga eléctrica que se encuentra en el núcleo del átomo. Fija el isótopo del silicio de la celda y del cobre del cable; no transporta corriente, pero determina la masa y la sección de captura en materiales de planta.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Núcleo</dt>
+                <dd>Centro estructural de un átomo que contiene tanto protones como neutrones. Su carga positiva ata a los electrones de valencia: pocos en Cu y Al (buenos conductores), más retenidos en el XLPE y el vidrio (aislantes).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Protón</dt>
+                <dd>Partícula de polaridad positiva que se encuentra en el núcleo de un átomo. El número atómico (13 del Al, 29 del Cu, 47 de la Ag) decide si el metal sirve de cable fotovoltaico, de pletina o de rejilla de celda.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Rectificación</dt>
+                <dd>Proceso por el cual una señal de ca se convierte a una que cuenta con un nivel de cd promedio. Es el puente del aerogenerador hacia el bus de cd, el front-end de un cargador de BESS y el primer escalón de muchos convertidores hidroeléctricos.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Semiconductor</dt>
+                <dd>Material que tiene un valor de conductancia entre el de un aislante y el de un conductor. Es de gran importancia en la fabricación de dispositivos electrónicos semiconductores: la celda de Si, el IGBT, el MOSFET de SiC y el de GaN del inversor.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Valor nominal ampere-hora (Ah)</dt>
+                <dd>Valor nominal de una fuente de energía que mostrará cuánto tiempo un nivel particular de corriente puede consumirse de una fuente. En un BESS se publica en Ah o kWh; 100 Ah a 400 V son 40 kWh utilizables antes de aplicar DoD y rendimiento.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Volt (V)</dt>
+                <dd>Unidad de medición aplicada a la diferencia de potencial entre dos puntos. Si un joule de energía se requiere para mover un coulomb de carga entre dos puntos, la diferencia de potencial se dice que es de un volt. Escala el Voc del módulo, el bus de 1500 Vcc y la celda LFP de 3,2 V.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Voltímetro</dt>
+                <dd>Instrumento diseñado para medir el voltaje a través de un elemento o entre dos puntos dentro de una red. En planta es el canal de tensión del inversor, del PPC y del medidor de facturación que registra Voc, Vbus y la tensión de red.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
     </section>
   </main>
 
