@@ -523,6 +523,272 @@ const presetsData = {
       desc: "Prob. 59 — Ejemplo 3.3 (R = ρ L / A).\nSe verifica en la pestaña 3.2: elige cobre, ingresa L y d (o A) y deja R vacío. El solucionador reproduce R = ρ L / A en CM·Ω/pie.\nPara escribir la notación (ρ, subíndices, fracciones) usa Archimedes." },
     p60: {
       desc: "Prob. 60 — Ejemplo 3.11 (temperatura).\nSe verifica en la pestaña 3.5: R₂ = R₁ (T₂ − T_inf) / (T₁ − T_inf) con T_inf = −234.5 °C para el cobre, o R₂ = R₁ [1 + α₁ (T₂ − T₁)].\nArchimedes sirve para plantar α₂₀, T_inf y los kelvin sin pelearse con el teclado." }
+  },
+  "4-1": {
+    p1: { fields: { "ohm4-v": "", "ohm4-i": "2.5", "ohm4-r": "6", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 1 — Dump load de un aerogenerador de 6 Ω con 2.5 A (eólica, no convencional).\nV = I R = 2.5 · 6 = 15 V.\nP = I²R = 6.25 · 6 = 37.5 W.\nEl enunciado original dice «caída de potencia»: la ley de Ohm da el voltaje; I²R es el calor que el ballast tiene que tirar al aire. En 2026 ese resistor está en el chopper de un aerogenerador o en el ballast de una mini-hidro cuando la red no absorbe." },
+    p2: { fields: { "ohm4-v": "12", "ohm4-i": "", "ohm4-r": "72", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 2 — Resistencia de 72 Ω a 12 V: ignitor de un quemador de biomasa o resistencia auxiliar de un colector solar térmico (convencional).\nI = V / R = 12 / 72 = 0.1667 A = 166.7 mA." },
+    p3: { fields: { "ohm4-v": "6", "ohm4-i": "1.5", "ohm4-r": "", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "0.001", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 3 — Limitar a 1.5 mA un piranómetro de silicio o el LED de un tracker con 6 V de caída (FV, no convencional).\nR = V / I = 6 / 0.0015 = 4000 Ω = 4 kΩ." },
+    p4: { fields: { "ohm4-v": "12", "ohm4-i": "", "ohm4-r": "0.056", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 4 — Arranque desde un banco auxiliar de 12 V. R = 0.056 Ω: motor de yaw de un aerogenerador o servomotor de compuerta de una mini-hidro.\nI = 12 / 0.056 = 214.3 A.\nEs la corriente de inrush: el cable y el fusible se dimensionan a ese pico, no al I nominal." },
+    p5: { fields: { "ohm4-v": "", "ohm4-i": "3.6", "ohm4-r": "0.02", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1e-6", "ohm4-r-u": "1e6" }, click: "btn-ohm-4-1",
+      desc: "Prob. 5 — Aislamiento de un string FV (0.02 MΩ = 20 kΩ) con 3.6 µA de fuga.\nV = I R = 3.6e-6 · 2.0e4 = 0.072 V = 72 mV.\nUn megaóhmetro de planta a 1000–1500 Vcc vería megaohmios, no 20 kΩ: 20 kΩ ya es un aislamiento degradado (humedad en la caja de combinadores)." },
+    p6: { fields: { "ohm4-v": "62", "ohm4-i": "", "ohm4-r": "15", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "0.001", "ohm4-r-u": "1e3" }, click: "btn-ohm-4-1",
+      desc: "Prob. 6 — Canal de voltímetro del PPC / SCADA, Ri = 15 kΩ, leyendo 62 V (toma de un divisor del bus).\nI = 62 / 15 000 = 4.133 mA.\nEl instrumento 2026 tiene Ri de megaohmios; 15 kΩ es el modelo de laboratorio del libro, útil para ver que el medidor también consume." },
+    p7: { fields: { "ohm4-v": "120", "ohm4-i": "2.2", "ohm4-r": "", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 7 — Frigorífico de una cabaña híbrida (FV + mini-hidro) a 2.2 A / 120 V.\nR = 120 / 2.2 = 54.55 Ω.\nEs la R equivalente de la carga, no un resistor de carbón: el compresor es un motor." },
+    p8: { fields: { "ohm4-v": "120", "ohm4-i": "", "ohm4-r": "7.5", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "0.001", "ohm4-r-u": "1e3" }, click: "btn-ohm-4-1",
+      desc: "Prob. 8 — RTU / logger de recurso (eólico o FV) con Ri = 7.5 kΩ a 120 V de auxiliares.\nI = 120 / 7500 = 16.00 mA.\nP = 1.92 W: es la electrónica que el UPS de planta tiene que sostener si cae la red." },
+    p9: { fields: { "ohm4-v": "120", "ohm4-i": "4.2", "ohm4-r": "", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 9 — Bomba de calor geotérmica (convencional) clasificada 4.2 A a 120 V.\nR = 120 / 4.2 = 28.57 Ω.\nP = 504 W: el COP mueve más calor que esos 504 W eléctricos; la ley de Ohm solo ve el lado eléctrico." },
+    p10: { fields: { "ohm4-v": "120", "ohm4-i": "0.76", "ohm4-r": "", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 10 — Trace heating de una línea de biodiesel / biogás (biomasa, convencional) a 0.76 A / 120 V.\nR = 120 / 0.76 = 157.9 Ω.\nP = 91.2 W por tramo: es el orden de un cable autorregulante en un tanque." },
+    p11: { fields: { "ohm4-v": "24", "ohm4-i": "20", "ohm4-r": "", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "0.001", "ohm4-i-u": "1e-6", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 11 — Entrada de un driver de SiC (inversor string / convertidor eólico): 20 µA a 24 mV.\nR = V / I = 0.024 / 20e-6 = 1200 Ω.\nNo es el R_DS(on) (miliohmios): es la R de entrada del control. El MOSFET de potencia conduce amperes; su puerta, microamperes." },
+    p12: { fields: { "ohm4-v": "", "ohm4-i": "15", "ohm4-r": "0.5", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 12 — Resistencia interna de un generador hidroeléctrico o de un rack de BESS: 0.5 Ω a 15 A.\nV = I R = 7.50 V de caída interna.\nA 15 A se pierden 112.5 W en calor: por eso el busbar 2026 se especifica en miliohmios, no en medios ohmios." },
+    p13a: { fields: { "ohm4-v": "120", "ohm4-i": "9.5", "ohm4-r": "", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1" }, click: "btn-ohm-4-1",
+      desc: "Prob. 13.a — Ballast resistivo de un aerogenerador (o carga de una mini-hidro aislada) a 9.5 A / 120 V.\nR = 120 / 9.5 = 12.63 Ω.\nP = 1140 W: es un calefactor de 1.14 kW disfrazado de «resistor»." },
+    p13b: { fields: { "ohm4-v": "120", "ohm4-i": "9.5", "ohm4-r": "", "ohm4-t": "1" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "1", "ohm4-r-u": "1", "ohm4-t-u": "3600" }, click: "btn-ohm-4-1",
+      desc: "Prob. 13.b — Energía en 1 h, con W = V I t (cap. 2).\nP = 1140 W. W = 1140 · 3600 = 4.104×10⁶ J = 1.140 kWh.\nEn una hora el ballast convirtió 1.14 kWh de viento (o de agua) en calor. El medidor del PCC lo habría inyectado a la red si el chopper no lo hubiera disipado." }
+  },
+  "4-2": {
+    p14: { fields: { "lin-r1": "100", "lin-r2": "0.5", "lin-vmax": "10" },
+      selects: { "lin-i-u": "1" }, click: "btn-lin-4-2",
+      desc: "Prob. 14 — Rectas de 100 Ω (shunt / bleeder de BESS) y 0.5 Ω (dump load eólico o ballast hidro) sobre la fig. 4.6.\nI = V / R. A 10 V: 100 Ω → 0.100 A; 0.5 Ω → 20 A.\nLa de 0.5 Ω no cabe en un eje de 1 A: hay que reproducir la gráfica. Pendiente 1/R: el dump load es casi vertical; el bleeder, casi horizontal." },
+    p15: { fields: { "pw-r1": "20", "pw-v1": "10", "pw-r2": "2", "pw-v2": "", "pw-r3": "", "pw-probe": "10 12" },
+      click: "btn-pw-4-2",
+      desc: "Prob. 15 — Precharge de un BESS o de un enlace de cd eólico: 20 Ω de 0 a 10 V y 2 Ω para voltajes mayores (el contactor ya cerró).\nHasta 10 V: I = V / 20 → a 10 V, 0.50 A.\nDespués: I = 0.50 + (V − 10) / 2. A 12 V, I = 1.50 A.\nNo es un ohmio único: es la característica de un dispositivo que cambia de régimen. El fusible se dimensiona al tramo de 2 Ω." },
+    p16: { fields: { "lin-r1": "2000", "lin-r2": "50000", "lin-vmax": "20" },
+      selects: { "lin-i-u": "1000" }, click: "btn-lin-4-2",
+      desc: "Prob. 16 — 2 kΩ (divisor del bus de 1500 Vcc, escala de laboratorio 0–20 V) y 50 kΩ (monitor de aislamiento ISO).\nEje horizontal 0–20 V, vertical en mA.\nA 20 V: 2 kΩ → 10.0 mA; 50 kΩ → 0.40 mA.\nLas dos son rectas; la de 50 kΩ casi se confunde con el eje V." },
+    p17: { fields: { "ohm4-v": "", "ohm4-i": "400", "ohm4-r": "2", "ohm4-t": "" },
+      selects: { "ohm4-v-u": "1", "ohm4-i-u": "0.001", "ohm4-r-u": "1e3" }, click: "btn-ohm-4-1",
+      desc: "Prob. 17 — ΔV en 2 kΩ (sensor de un string o bleeder) con ΔI = 400 mA.\nΔV = ΔI · R = 0.400 · 2000 = 800 V.\nUn cambio de 400 mA a través de 2 kΩ no es un shunt: es un evento de arco o un error de escala. Un shunt de string 2026 es de miliohmios y ΔV de milivoltios." },
+    p18a: { fields: { "pw-r1": "500", "pw-v1": "1", "pw-r2": "50", "pw-v2": "2", "pw-r3": "-20", "pw-probe": "" },
+      click: "btn-pw-4-2",
+      desc: "Prob. 18.a — Característica tipo diodo túnel (Esaki): 500 Ω de 0 a 1 V, 50 Ω de 1 a 2 V, −20 Ω por encima.\nLa R negativa es diferencial (pendiente dV/dI), no un ohmio que genere potencia. En 2026 el análogo de planta es el foldback de un inversor grid-forming y el pliegue N de algunas uniones tándem de laboratorio; no se usa un túnel como componente de potencia." },
+    p18b: { fields: { "pw-r1": "500", "pw-v1": "1", "pw-r2": "50", "pw-v2": "2", "pw-r3": "-20", "pw-probe": "0.7 1.5 2.5" },
+      click: "btn-pw-4-2",
+      desc: "Prob. 18.b — Corrientes en la característica del 18.a (R incremental).\n0.7 V (tramo 500 Ω): I = 0.7 / 500 = 1.40 mA.\n1.5 V: I(1 V) = 2.00 mA; ΔI = 0.5 / 50 = 10 mA → I = 12.0 mA.\n2.5 V: I(2 V) = 22.0 mA; ΔI = 0.5 / (−20) = −25 mA → I = −3.00 mA.\nEl tramo negativo cruza I = 0: es la firma del túnel / del foldback, no de un resistor de dump load." }
+  },
+  "4-3": {
+    p19: { fields: { "pow-v": "", "pow-i": "", "pow-r": "", "pow-p": "", "pow-t": "7", "pow-w": "420" },
+      selects: { "pow-t-u": "60", "pow-p-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 19 — 420 J absorbidos por un dump load (eólico) o por un ballast hidro en 7 min.\nP = W / t = 420 / 420 = 1.00 W.\nUn julio por segundo, sostenido 7 minutos: es el calor de un resistor de laboratorio, no de un parque, pero la fórmula es la misma que usa el EMS." },
+    p20: { fields: { "pow-v": "", "pow-i": "", "pow-r": "", "pow-p": "40", "pow-t": "", "pow-w": "640" },
+      selects: { "pow-p-u": "1", "pow-t-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 20 — Auxiliar de inversor a 40 J/s (40 W). Tiempo para entregar 640 J.\nt = W / P = 640 / 40 = 16.0 s." },
+    p21a: { fields: { "pow-v": "", "pow-i": "", "pow-r": "", "pow-p": "2", "pow-t": "8", "pow-w": "" },
+      selects: { "pow-p-u": "1", "pow-t-u": "3600" }, click: "btn-pow-4-3",
+      desc: "Prob. 21.a — Baliza LED de 2 W en una torre eólica o en una chimenea de biomasa, 8 h de noche.\nW = P t = 2 · 8 · 3600 = 57 600 J." },
+    p21b: { fields: { "pow-v": "", "pow-i": "", "pow-r": "", "pow-p": "2", "pow-t": "8", "pow-w": "" },
+      selects: { "pow-p-u": "1", "pow-t-u": "3600" }, click: "btn-pow-4-3",
+      desc: "Prob. 21.b — Misma baliza en kWh: 2 W · 8 h = 16 Wh = 0.016 kWh.\nEl medidor de auxiliares de planta registra kWh, no julios." },
+    p22: { fields: { "pow-v": "", "pow-i": "5", "pow-r": "10", "pow-p": "", "pow-t": "1", "pow-w": "" },
+      selects: { "pow-r-u": "1", "pow-i-u": "1", "pow-t-u": "60" }, click: "btn-pow-4-3",
+      desc: "Prob. 22 — 10 Ω (interconexión de un BESS o dump) con 300 C/min.\nI = 300 C / 60 s = 5.00 A. P = I²R = 25 · 10 = 250 W.\nV = I R = 50 V. En un minuto pasaron 300 C y se disiparon 15 kJ." },
+    p23: { fields: { "pow-v": "3", "pow-i": "2", "pow-r": "", "pow-p": "", "pow-t": "", "pow-w": "12" },
+      selects: { "pow-i-u": "1", "pow-t-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 23 — Calefactor de una celda LFP (BESS, no convencional): 2 A a 3 V para disipar 12 J.\nP = V I = 6 W. t = W / P = 12 / 6 = 2.00 s.\nEl pad de la celda no se deja 2 A fijos: el BMS lo modula. La cuenta es la misma." },
+    p24: { fields: { "pow-v": "6", "pow-i": "0.8", "pow-r": "", "pow-p": "", "pow-t": "1", "pow-w": "" },
+      selects: { "pow-i-u": "1", "pow-t-u": "60" }, click: "btn-pow-4-3",
+      desc: "Prob. 24 — Batería de 6 V de un tracker agrovoltaico. Carga a 48 C/min.\nI = 48 / 60 = 0.800 A. P = V I = 6 · 0.8 = 4.80 W." },
+    p25: { fields: { "pow-v": "", "pow-i": "7", "pow-r": "4", "pow-p": "", "pow-t": "", "pow-w": "" },
+      selects: { "pow-i-u": "0.001", "pow-r-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 25 — Sensor de 4 Ω a 7 mA (shunt de un string piloto o NTC polarizado).\nP = I²R = (0.007)² · 4 = 1.96×10⁻⁴ W = 0.196 mW." },
+    p26: { fields: { "pow-v": "9", "pow-i": "", "pow-r": "3", "pow-p": "", "pow-t": "", "pow-w": "" },
+      selects: { "pow-v-u": "0.001", "pow-r-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 26 — Caída de 9 mV en 3 Ω: shunt de un ramal de BESS o de un string.\nPon 9 mV = 0.009 V. I = 0.009 / 3 = 3.00 mA. P = 27.0 µW.\nUn shunt de planta real cae 50–100 mV a I nominal, no 9 mV a 3 mA; la fórmula no cambia." },
+    p27: { fields: { "pow-v": "", "pow-i": "", "pow-r": "4", "pow-p": "64", "pow-t": "", "pow-w": "" },
+      selects: { "pow-r-u": "1", "pow-p-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 27 — Dump load de 4 Ω que disipa 64 W (eólica / mini-hidro).\nI = √(P / R) = √(64 / 4) = 4.00 A. V = 16.0 V." },
+    p28: { fields: { "pow-v": "", "pow-i": "", "pow-r": "1000", "pow-p": "0.5", "pow-t": "", "pow-w": "" },
+      selects: { "pow-r-u": "1", "pow-p-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 28 — Bleeder de 1000 Ω / ½ W en el bus de cd de un microinversor.\nI_máx = √(P / R) = √(0.5 / 1000) = 22.36 mA.\nV_máx = √(P R) = 22.36 V. Superar ½ W cocina el resistor y deja el bus sin descarga." },
+    p29: { fields: { "pow-v": "", "pow-i": "", "pow-r": "2.2", "pow-p": "42", "pow-t": "", "pow-w": "" },
+      selects: { "pow-r-u": "1e3", "pow-p-u": "0.001" }, click: "btn-pow-4-3",
+      desc: "Prob. 29 — 2.2 kΩ en el rack de comunicaciones de planta disipa 42 mW.\nV = √(P R) = √(0.042 · 2200) = 9.612 V." },
+    p30: { fields: { "pow-v": "9", "pow-i": "45", "pow-r": "", "pow-p": "", "pow-t": "", "pow-w": "" },
+      selects: { "pow-i-u": "0.001" }, click: "btn-pow-4-3",
+      desc: "Prob. 30 — Nodo IoT / logger de 9 V, 45 mA (recurso eólico o piranómetro).\nP = V I = 9 · 0.045 = 0.405 W. Es el valor nominal de potencia de la ficha." },
+    p31: { fields: { "pow-v": "120", "pow-i": "", "pow-r": "", "pow-p": "100", "pow-t": "", "pow-w": "" },
+      selects: { "pow-p-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 31 — Lámpara / calefactor de 100 W a 120 V (emergencia de subestación o hopper de biomasa).\nR_caliente = V² / P = 14 400 / 100 = 144 Ω.\nI = P / V = 0.833 A.\nEl tungsteno (o el NiCr) tiene R_frío menor: el inrush es mayor que 0.833 A." },
+    p32: { fields: { "pow-v": "", "pow-i": "3.75", "pow-r": "", "pow-p": "450", "pow-t": "", "pow-w": "" },
+      selects: { "pow-p-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 32 — Bomba de calor / auxiliar geotérmico de 450 W a 3.75 A.\nV = P / I = 450 / 3.75 = 120 V. R = V / I = 32.0 Ω." },
+    p33a: { fields: { "pow-v": "3", "pow-i": "", "pow-r": "", "pow-p": "0.4", "pow-t": "", "pow-w": "" },
+      selects: { "pow-p-u": "0.001" }, click: "btn-pow-4-3",
+      desc: "Prob. 33.a — Logger / IV-tracer de bolsillo a 3 V, 0.4 mW.\nI = P / V = 4.0e-4 / 3 = 1.333×10⁻⁴ A = 0.133 mA." },
+    p33b: { fields: { "pow-v": "3", "pow-i": "", "pow-r": "", "pow-p": "0.4", "pow-t": "500", "pow-w": "" },
+      selects: { "pow-p-u": "0.001", "pow-t-u": "3600" }, click: "btn-pow-4-3",
+      desc: "Prob. 33.b — 500 h con la misma pila de 3 V.\nAh = I t = 1.333e-4 A · 500 h = 0.0667 Ah.\nUna celda de botón de 200 mAh sobra; el dato útil es el ampere-hora, no el julio." },
+    p34: { fields: { "pow-v": "", "pow-i": "", "pow-r": "20", "pow-p": "100", "pow-t": "", "pow-w": "" },
+      selects: { "pow-r-u": "1e3", "pow-p-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 34 — Bleeder de 20 kΩ / 100 W en un bus de 1500 Vcc.\nI_máx = √(P / R) = √(100 / 20 000) = 70.71 mA.\nV_máx = √(P R) = 1414 V.\nA 1500 Vcc este resistor ya está fuera de placa: o se sube P, o se pone una cadena." },
+    p35a: { fields: { "pi-r": "100", "pi-imax": "100", "pi-pmark": "" },
+      selects: { "pi-i-u": "0.001", "pi-p-u": "1" }, click: "btn-pi-4-3",
+      desc: "Prob. 35.a — P(I) para 100 Ω, P de 0 a 1 W, I de 0 a 100 mA.\nP = I²R = 100 I². A 100 mA, P = 1.00 W. Es la curva de un bleeder o de un dump pequeño." },
+    p35b: {
+      desc: "Prob. 35.b — No es lineal. P ∝ I²: es una parábola. Duplicar I cuadruplica el calor. Por eso un string al doble de Imp no «se calienta el doble» en el cable: se calienta cuatro veces (si R es fija)." },
+    p35c: { fields: { "pi-r": "100", "pi-imax": "100", "pi-pmark": "500" },
+      selects: { "pi-i-u": "0.001", "pi-p-u": "0.001" }, click: "btn-pi-4-3",
+      desc: "Prob. 35.c — 500 mW en 100 Ω.\nI = √(P / R) = √(0.5 / 100) = 70.71 mA.\nSe lee en la gráfica: no está a mitad de 100 mA, porque la curva no es una recta." },
+    p36a: { fields: { "pow-v": "9", "pow-i": "0.455", "pow-r": "", "pow-p": "", "pow-t": "", "pow-w": "" },
+      selects: { "pow-i-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 36.a — HMI portátil / tablet de SCADA a 0.455 A / 9 V (sala de control de un parque).\nP = 9 · 0.455 = 4.095 W." },
+    p36b: { fields: { "pow-v": "9", "pow-i": "0.455", "pow-r": "", "pow-p": "", "pow-t": "", "pow-w": "" },
+      selects: { "pow-i-u": "1" }, click: "btn-pow-4-3",
+      desc: "Prob. 36.b — R interna equivalente: R = V / I = 9 / 0.455 = 19.78 Ω." },
+    p36c: { fields: { "pow-v": "9", "pow-i": "0.455", "pow-r": "", "pow-p": "", "pow-t": "6", "pow-w": "" },
+      selects: { "pow-i-u": "1", "pow-t-u": "3600" }, click: "btn-pow-4-3",
+      desc: "Prob. 36.c — Energía en 6 h de turno.\nW = 4.095 · 6 · 3600 = 8.845×10⁴ J = 0.02457 kWh.\nLa batería interna tiene que guardar al menos eso (más DoD y rendimiento)." },
+    p37a: { fields: { "pcc-v": "120", "pcc-i": "100" }, click: "btn-pcc-4-3",
+      desc: "Prob. 37.a — Acometida / PCC de una microred rural 120 V, 100 A (FV + mini-hidro + BESS detrás del medidor).\nP_máx = V I = 120 · 100 = 12.00 kW." },
+    p37b: { fields: { "pcc-v": "120", "pcc-i": "100", "pcc-l1h": "5", "pcc-l1p": "", "pcc-l1n": "Motor de molino (biomasa)",
+        "pcc-l2p": "3000", "pcc-l2h": "", "pcc-l2n": "Secador de biomasa",
+        "pcc-l3p": "2400", "pcc-l3h": "", "pcc-l3n": "Estufa / caldera aux.",
+        "pcc-l4p": "1000", "pcc-l4h": "", "pcc-l4n": "Resistencia / plancha" },
+      click: "btn-pcc-4-3",
+      desc: "Prob. 37.b — Cargas simultáneas: motor 5 hp, secador 3000 W, estufa 2400 W, resistencia 1000 W.\n5 hp = 3730 W. Suma = 10 130 W < 12 000 W. Sí cabe, con 1.87 kW de margen.\nEl motor de molino es biomasa (convencional); el PCC puede estar alimentado por FV y eólica (no convencionales). El interruptor no distingue el origen: distingue kW." }
+  },
+  "4-5": {
+    p38: { fields: { "eta-out": "0.5", "eta-in": "450", "eta-n": "", "eta-v": "" },
+      selects: { "eta-out-u": "746", "eta-in-u": "1" }, click: "btn-eta-4-5",
+      desc: "Prob. 38 — Micro-hidro o bomba geotérmica: 0.5 hp de salida, 450 W de entrada.\nP_sal = 0.5 · 746 = 373 W. η = 373 / 450 = 82.89 %." },
+    p39: { fields: { "eta-out": "1.8", "eta-in": "", "eta-n": "68.5", "eta-v": "120" },
+      selects: { "eta-out-u": "746" }, click: "btn-eta-4-5",
+      desc: "Prob. 39 — Astilladora de biomasa, 68.5 % de eficiencia, 1.8 hp de corte, red 120 V.\nP_sal = 1.8 · 746 = 1343 W. P_ent = 1343 / 0.685 = 1960 W. I = 1960 / 120 = 16.34 A." },
+    p40: { fields: { "eta-out": "1", "eta-in": "", "eta-n": "", "eta-v": "220", "eta-i": "4" },
+      selects: { "eta-out-u": "746" }, click: "btn-eta-4-5",
+      desc: "Prob. 40 — Motor de 1 hp, 4 A a 220 V (ventilador de ciclo binario geotérmico o secador de biomasa).\nP_sal = 746 W. P_ent = 4 · 220 = 880 W. η = 746 / 880 = 84.77 %." },
+    p41a: { fields: { "eta-out": "50", "eta-in": "", "eta-n": "", "eta-v": "120", "eta-i": "2.4" },
+      selects: { "eta-out-u": "1" }, click: "btn-eta-4-5",
+      desc: "Prob. 41.a — Rack de audio / comms de planta: 2.4 A a 120 V, 50 W útiles.\nP_ent = 2.4 · 120 = 288 W. Pérdida = 288 − 50 = 238 W en calor." },
+    p41b: { fields: { "eta-out": "50", "eta-in": "288", "eta-n": "", "eta-v": "120" },
+      selects: { "eta-out-u": "1", "eta-in-u": "1" }, click: "btn-eta-4-5",
+      desc: "Prob. 41.b — η = 50 / 288 = 17.36 %. Un amplificador clásico; un inversor SiC 2026 ronda el 98 %. Misma fórmula, otro eslabón." },
+    p42: { fields: { "eta-out": "3.6", "eta-in": "", "eta-n": "87", "eta-v": "220" },
+      selects: { "eta-out-u": "746" }, click: "btn-eta-4-5",
+      desc: "Prob. 42 — Motor / generador al 87 %, 3.6 hp, 220 V (Pelton + generador, o yaw de un aerogenerador grande).\nP_sal = 2686 W. P_ent = 3087 W. I = 14.03 A." },
+    p43a: { fields: { "eta-out": "2", "eta-in": "", "eta-n": "90", "eta-v": "110" },
+      selects: { "eta-out-u": "746" }, click: "btn-eta-4-5",
+      desc: "Prob. 43.a — Bomba de riego FV de 2 hp, 90 %, 110 V.\nP_sal = 1492 W. P_ent = 1658 W extraídos de la línea (o del inversor de bomba)." },
+    p43b: { fields: { "eta-out": "2", "eta-in": "", "eta-n": "90", "eta-v": "110" },
+      selects: { "eta-out-u": "746" }, click: "btn-eta-4-5",
+      desc: "Prob. 43.b — I = 1658 / 110 = 15.07 A a 90 %." },
+    p43c: { fields: { "eta-out": "2", "eta-in": "", "eta-n": "70", "eta-v": "110" },
+      selects: { "eta-out-u": "746" }, click: "btn-eta-4-5",
+      desc: "Prob. 43.c — Al 70 % (máquina vieja, sin VFD): P_ent = 2131 W. I = 19.38 A.\nBajar 20 puntos de η sube 4.3 A: el cable y el inversor de bomba se dimensionan al peor rendimiento, no al de catálogo." },
+    p44: { fields: { "eta-out": "15", "eta-in": "", "eta-n": "90", "eta-v": "220" },
+      selects: { "eta-out-u": "746" }, click: "btn-eta-4-5",
+      desc: "Prob. 44 — Ascensor de torre eólica o de presa hidroeléctrica, 15 hp, 90 %, 220 V.\nP_sal = 11 190 W. P_ent = 12 433 W. I = 56.52 A." },
+    p45: { fields: { "cas-1": "87", "cas-2": "75", "cas-3": "", "cas-nt": "", "cas-e": "", "cas-pin": "", "cas-pout": "" },
+      checks: { "cas-double": false }, click: "btn-cas-4-5",
+      desc: "Prob. 45 — Motor de 2 hp al 87 % y correa de un molino de biomasa al 75 % por deslizamiento.\nη_t = 0.87 · 0.75 = 0.6525 = 65.25 %.\nEl eslabón mecánico se come más que el eléctrico. Un acoplamiento directo o un VFD 2026 recupera esos puntos." },
+    p46: { fields: { "cas-1": "80", "cas-2": "80", "cas-3": "", "cas-nt": "", "cas-e": "60", "cas-pin": "", "cas-pout": "" },
+      checks: { "cas-double": false }, click: "btn-cas-4-5",
+      desc: "Prob. 46 — Dos etapas al 80 % (p. ej. convertidor de una mini-hidro + transformador, o FV + inversor en un ejemplo didáctico) con 60 J de entrada.\nW_sal = 60 · 0.80 · 0.80 = 38.4 J." },
+    p47: { fields: { "cas-1": "90", "cas-2": "", "cas-3": "", "cas-nt": "72", "cas-e": "", "cas-pin": "", "cas-pout": "" },
+      checks: { "cas-double": false }, click: "btn-cas-4-5",
+      desc: "Prob. 47 — η_t = 72 %, una etapa 0.90 (inversor). La otra: η₂ = 0.72 / 0.90 = 0.80 = 80 %.\nEs el transformador, el cable o el MPPT. El solucionador necesita las dos etas conocidas o Pin/Pout; aquí η₂ = η_t / η₁." },
+    p48: { fields: { "cas-1": "", "cas-2": "", "cas-3": "", "cas-nt": "", "cas-e": "", "cas-pin": "400", "cas-pout": "128" },
+      checks: { "cas-double": true }, click: "btn-cas-4-5",
+      desc: "Prob. 48 — 400 W de entrada, 128 W de salida, una etapa el doble de eficiente que la otra.\nη_t = 128 / 400 = 0.32. Con η₂ = 2 η₁: 2 η₁² = 0.32 → η₁ = 40 %, η₂ = 80 %.\nMarca la casilla «una el doble de la otra» y pulsa calcular." },
+    p49a: { fields: { "cas-1": "98", "cas-2": "87", "cas-3": "21", "cas-nt": "", "cas-e": "", "cas-pin": "", "cas-pout": "" },
+      checks: { "cas-double": false }, click: "btn-cas-4-5",
+      desc: "Prob. 49.a — Tres eslabones: transformador 98 %, generador / motor 87 %, rectificador de tiristores 21 % (un front-end viejo de un parque o un electrolizador ineficiente).\nη_t = 0.98 · 0.87 · 0.21 = 17.90 %." },
+    p49b: { fields: { "cas-1": "98", "cas-2": "87", "cas-3": "90", "cas-nt": "", "cas-e": "", "cas-pin": "", "cas-pout": "" },
+      checks: { "cas-double": false }, click: "btn-cas-4-5",
+      desc: "Prob. 49.b — Se sustituye el 21 % por un convertidor SiC al 90 %.\nη_t = 0.98 · 0.87 · 0.90 = 76.73 %.\nIncremento: 76.73 − 17.90 = 58.83 puntos porcentuales (relativo: ×4.29).\nEl eslabón flojo era el 21 %: cambiarlo vale más que retocar el 98 %." },
+    p50a: {
+      desc: "Prob. 50.a — Conversiones.\n1 Wh = 3600 J.\n1 kWh = 3.6×10⁶ J.\nEl medidor del PCC cuenta kWh; el pad de una celda LFP, julios. Mismo W = P t." },
+    p50b: {
+      desc: "Prob. 50.b — Wh (o J) para un logger, un pad de BESS, un sensor, un microinversor en standby. kWh (o MWh) para la factura, el LCOE, la producción diaria de un parque FV o eólico y el RTE de un BESS de horas. Usar kWh en un pad de 12 J es teatro; usar julios en un parque de 100 MW, también." }
+  },
+  "4-6": {
+    p51a: { fields: { "ohm4-v": "15", "ohm4-i": "", "ohm4-r": "10", "ohm4-t": "1" },
+      selects: { "ohm4-v-u": "1", "ohm4-r-u": "1", "ohm4-t-u": "60" }, click: "btn-ohm-4-1",
+      desc: "Prob. 51.a — 10 Ω sobre un banco de 15 V (BESS auxiliar o mini-hidro aislada), 1 min.\nI = 1.50 A. P = 22.5 W. W = 22.5 · 60 = 1350 J = 3.75×10⁻⁴ kWh." },
+    p51b: {
+      desc: "Prob. 51.b — A 2 min la energía se duplica (2700 J). La potencia no: sigue en 22.5 W.\nW ∝ t; P no. Un string dos minutos a Imp entrega el doble de julios, no «se calienta el doble» en el sentido de I²R (eso depende de I, no de t). El calor acumulado sí crece con t si no hay refrigeración." },
+    p52: { fields: { "en-p": "230", "en-t": "", "en-hweek": "12", "en-months": "5", "en-w": "", "en-kwh": "", "en-rate": "9", "en-budget": "", "en-v": "", "en-eta": "" },
+      selects: { "en-p-u": "1" }, click: "btn-en-4-6",
+      desc: "Prob. 52 — Motor de 230 W (tracker agrovoltaico o bomba geotérmica) 12 h/semana, 5 meses. 4/3 semanas = 1 mes.\nt = 12 · 5 · (4/3) = 80 h. W = 230 · 80 = 18 400 Wh = 18.4 kWh." },
+    p53: { fields: { "en-p": "1500", "en-t": "", "en-hweek": "", "en-months": "", "en-w": "", "en-kwh": "10", "en-rate": "9", "en-budget": "", "en-v": "", "en-eta": "" },
+      selects: { "en-p-u": "1" }, click: "btn-en-4-6",
+      desc: "Prob. 53 — Calefactor / dump load de 1500 W hasta 10 kWh.\nEl solucionador necesita W = 10 kWh = 3.6e7 J, o bien P y W. t = 10 kWh / 1.5 kW = 6.667 h = 6 h 40 min." },
+    p54: { fields: { "en-p": "30", "en-t": "3", "en-hweek": "", "en-months": "", "en-w": "", "en-kwh": "", "en-rate": "9", "en-budget": "", "en-v": "", "en-eta": "" },
+      selects: { "en-p-u": "1", "en-t-u": "3600" }, click: "btn-en-4-6",
+      desc: "Prob. 54 — Logger / radio de planta de 30 W, 3 h, 9 ¢/kWh (tarifa residencial ilustrativa 2026).\nE = 0.090 kWh. Costo = 0.090 · 0.09 = $0.0081 (0.81 ¢)." },
+    p55a: { fields: { "en-p": "", "en-t": "10", "en-hweek": "", "en-months": "", "en-w": "", "en-kwh": "500", "en-rate": "9", "en-budget": "", "en-v": "", "en-eta": "" },
+      selects: { "en-t-u": "3600" }, click: "btn-en-4-6",
+      desc: "Prob. 55.a — Una mini-hidro o un bloque FV convierte 500 kWh en 10 h.\nP = 500 kWh / 10 h = 50.0 kW.\nEscribe 500 en kWh vía W = 500 · 3.6e6 J, o usa 50 kW de potencia. El dato del libro es la energía eléctrica convertida (a calor de proceso o a red)." },
+    p55b: { fields: { "en-p": "50", "en-t": "10", "en-hweek": "", "en-months": "", "en-w": "", "en-rate": "9", "en-budget": "", "en-v": "208", "en-eta": "" },
+      selects: { "en-p-u": "1000", "en-t-u": "3600" }, click: "btn-en-4-6",
+      desc: "Prob. 55.b — A 208 V (acometida trifásica de planta, línea a línea de un auxiliar).\nI = P / V = 50 000 / 208 = 240.4 A.\nEso es un alimentador de auxiliares, no un string." },
+    p55c: { fields: { "en-p": "50", "en-t": "10", "en-hweek": "", "en-months": "", "en-w": "", "en-rate": "9", "en-budget": "", "en-v": "208", "en-eta": "82" },
+      selects: { "en-p-u": "1000", "en-t-u": "3600" }, click: "btn-en-4-6",
+      desc: "Prob. 55.c — η = 82 % (ciclo geotérmico binario, o un tren viejo FV+inversor+trafo).\nSi 500 kWh es la energía procesada, se pierde 18 % → 90 kWh en 10 h (9 kW térmicos continuos)." },
+    p56a: { fields: { "en-p": "250", "en-t": "", "en-hweek": "", "en-months": "", "en-w": "", "en-kwh": "", "en-rate": "9", "en-budget": "1", "en-v": "", "en-eta": "" },
+      selects: { "en-p-u": "1" }, click: "btn-en-4-6",
+      desc: "Prob. 56.a — HMI / videowall de 250 W con $1 a 9 ¢/kWh.\n$1 compra 1 / 0.09 = 11.11 kWh. t = 11.11 / 0.250 = 44.44 h." },
+    p56b: { fields: { "en-p": "4.8", "en-t": "", "en-hweek": "", "en-months": "", "en-w": "", "en-kwh": "", "en-rate": "9", "en-budget": "1", "en-v": "", "en-eta": "" },
+      selects: { "en-p-u": "1000" }, click: "btn-en-4-6",
+      desc: "Prob. 56.b — Secador de biomasa de 4.8 kW con $1.\nt = 11.11 kWh / 4.8 kW = 2.315 h ≈ 2 h 19 min." },
+    p56c: {
+      desc: "Prob. 56.c — El mismo dólar dura 44 h en un HMI de 250 W y 2.3 h en un secador de 4.8 kW. El costo por hora es proporcional a P. El LCOE de un parque FV 2026 (decenas de USD/MWh) es otra escala: aquí 9 ¢/kWh es tarifa residencial ilustrativa, no el costo de generar." },
+    p57: { fields: { "cost-rate": "9", "c6-n1": "HVAC sala de inversores", "c6-p1": "860", "c6-t1": "24",
+        "c6-n2": "Secador de biomasa", "c6-p2": "4800", "c6-t2": "0.5",
+        "c6-n3": "Bomba de lavado / geo", "c6-p3": "400", "c6-t3": "1",
+        "c6-n4": "Lavado de módulos / CIP", "c6-p4": "1200", "c6-t4": "0.75" },
+      click: "btn-cost-4-6",
+      desc: "Prob. 57 — Auxiliares de una planta híbrida, 9 ¢/kWh.\nHVAC inversores 860 W × 24 h = 20.64 kWh\nSecador biomasa 4800 W × 0.5 h = 2.40 kWh\nBomba 400 W × 1 h = 0.40 kWh\nLavado módulos 1200 W × 0.75 h = 0.90 kWh\nTotal 24.34 kWh × 0.09 $/kWh = $2.191." },
+    p58: { fields: { "cost-rate": "9", "c6-n1": "Tracker / yaw", "c6-p1": "110", "c6-t1": "4",
+        "c6-n2": "Proyector de sala", "c6-p2": "1200", "c6-t2": "0.333",
+        "c6-n3": "Grabadora / NAS de planta", "c6-p3": "60", "c6-t3": "1.5",
+        "c6-n4": "HMI color", "c6-p4": "150", "c6-t4": "3.75" },
+      click: "btn-cost-4-6",
+      desc: "Prob. 58 — Sala de control, 9 ¢/kWh.\nYaw/tracker 110 W × 4 h = 0.440 kWh\nProyector 1200 W × 20 min = 0.400 kWh\nNAS 60 W × 1.5 h = 0.090 kWh\nHMI 150 W × 3 h 45 min = 0.5625 kWh\nTotal 1.4925 kWh × 0.09 = $0.1343." }
+  },
+  "4-9": {
+    p59: { fields: { "sp-e": "400", "sp-r": "0.04", "sp-i": "", "sp-t": "1" },
+      selects: { "sp-e-u": "0.001", "sp-r-u": "1e6", "sp-t-u": "1" },
+      checks: { "sp-invert": false }, click: "btn-sp-4-9",
+      desc: "Prob. 59 — Figura 4.29 con E = 400 mV, R = 0.04 MΩ = 40 kΩ (canal de un shunt de BESS o de un piranómetro).\nI = 0.400 / 40 000 = 10.00 µA. P = 4.00 µW. W (1 s) = 4.00 µJ." },
+    p60: { fields: { "sp-e": "0.02", "sp-r": "240", "sp-i": "", "sp-t": "1" },
+      selects: { "sp-e-u": "1", "sp-r-u": "1", "sp-t-u": "1" },
+      checks: { "sp-invert": true }, click: "btn-sp-4-9",
+      desc: "Prob. 60 — Polaridad invertida, E = 0.02 V, R = 240 Ω (offset de un sensor de recurso).\nI = 0.02 / 240 = 83.33 µA, sentido opuesto. P = 1.667 µW.\nMarca «invertir polaridad»: las magnitudes no cambian, solo el signo de I." },
+    p61: { fields: { "c9-rate": "9",
+        "c9-n1": "Logger / RTU", "c9-p1": "30", "c9-t1": "3",
+        "c9-n2": "HMI SCADA", "c9-p2": "250", "c9-t2": "8",
+        "c9-n3": "Tracker (yaw)", "c9-p3": "110", "c9-t3": "4",
+        "c9-n4": "Proyector de sala", "c9-p4": "1200", "c9-t4": "0.333",
+        "c9-n5": "Servidor de planta", "c9-p5": "150", "c9-t5": "3.75" },
+      click: "btn-c9-4-9",
+      desc: "Prob. 61 — Cinco aparatos a 9 ¢/kWh (el «programa» del libro, en el navegador).\nLogger 30 W × 3 h, HMI 250 W × 8 h, yaw 110 W × 4 h, proyector 1200 W × 20 min, servidor 150 W × 3.75 h." },
+    p62: { fields: { "sp-e": "", "sp-r": "10", "sp-i": "2", "sp-t": "2" },
+      selects: { "sp-r-u": "1", "sp-i-u": "1", "sp-t-u": "1" },
+      checks: { "sp-invert": false }, click: "btn-sp-4-9",
+      desc: "Prob. 62 — Dados I, R y t, salen V, P y W.\nEjemplo: I = 2 A, R = 10 Ω, t = 2 s (celda LFP + dump).\nV = I R = 20 V. P = I²R = 40 W. W = 80 J.\nEl ejercicio original pide imprimir con unidades: el recuadro lo hace." }
   }
 };
 
@@ -542,6 +808,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSec2_6();
   initSec2_7();
   initSec3();
+  initSec4();
   initMiniCalc();
   initChapterFold();
 });
@@ -2327,7 +2594,7 @@ function initPresets() {
           document.getElementById('m2-t-u').value = data.tu;
           document.getElementById('btn-meter-2-7').click();
         }
-      } else if (String(section).startsWith('3-')) {
+      } else if (String(section).startsWith('3-') || String(section).startsWith('4-')) {
         applyPresetFields(data);
       }
     });
@@ -2345,8 +2612,687 @@ function applyPresetFields(data) {
       if (el) el.value = v;
     });
   }
+  if (data.checks) {
+    Object.entries(data.checks).forEach(([id, v]) => {
+      const el = document.getElementById(id);
+      if (el) el.checked = !!v;
+    });
+  }
   if (data.click) {
     const btn = document.getElementById(data.click);
     if (btn) btn.click();
+  }
+}
+
+const HP_W = 746;
+const J_PER_KWH = 3.6e6;
+const J_PER_WH = 3600;
+const MONTH_S = 806400; // 4/3 semanas
+
+function writeQtyField(id, unitId, si) {
+  const u = unitId ? readUnit(unitId) : 1;
+  if (!u) {
+    setField(id, si);
+    return;
+  }
+  setField(id, si / u);
+}
+
+function readEtaFrac(id) {
+  const v = readOptionalNumber(id);
+  if (v === null) return null;
+  if (v > 1) return v / 100;
+  return v;
+}
+
+function formatEta(frac) {
+  return `${formatQtyPlain(frac * 100)} %`;
+}
+
+function initSec4() {
+  initSec4_1();
+  initSec4_2();
+  initSec4_3();
+  initSec4_5();
+  initSec4_6();
+  initSec4_9();
+}
+
+function initSec4_1() {
+  const btn = document.getElementById("btn-ohm-4-1");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const out = document.getElementById("proc-4-1");
+    try {
+      let V = readOptionalNumber("ohm4-v");
+      let I = readOptionalNumber("ohm4-i");
+      let R = readOptionalNumber("ohm4-r");
+      let t = readOptionalNumber("ohm4-t");
+      if (V !== null) V *= readUnit("ohm4-v-u");
+      if (I !== null) I *= readUnit("ohm4-i-u");
+      if (R !== null) R *= readUnit("ohm4-r-u");
+      if (t !== null) t *= readUnit("ohm4-t-u");
+      const known = [V, I, R].filter((v) => v !== null).length;
+      if (known < 2) throw new Error("Indica dos de V, I, R (o las tres para comprobar).");
+      let proc = `${mj("V = I R")}.\n`;
+      if (V === null) {
+        if (R === 0) throw new Error("R = 0 no define V (cortocircuito).");
+        V = I * R;
+        writeQtyField("ohm4-v", "ohm4-v-u", V);
+        proc += `${mj(`V = (${texQtyBody(I, "A")})(${texQtyBody(R, "\\Omega")}) = ${texQtyBody(V, "V")}`)}.\n`;
+      } else if (I === null) {
+        if (R === 0) throw new Error("R = 0: corriente no definida por Ohm sola.");
+        I = V / R;
+        writeQtyField("ohm4-i", "ohm4-i-u", I);
+        proc += `${mj(`I = V / R = ${texQtyBody(V, "V")} / ${texQtyBody(R, "\\Omega")} = ${texQtyBody(I, "A")}`)}.\n`;
+      } else if (R === null) {
+        if (I === 0) throw new Error("I = 0 no define R.");
+        R = V / I;
+        writeQtyField("ohm4-r", "ohm4-r-u", R);
+        proc += `${mj(`R = V / I = ${texQtyBody(V, "V")} / ${texQtyBody(I, "A")} = ${texQtyBody(R, "\\Omega")}`)}.\n`;
+      } else {
+        const Vcalc = I * R;
+        proc += `Comprobación: ${mj(`IR = ${texQtyBody(Vcalc, "V")}`)} (ingresado ${formatQty(V, "V")}).\n`;
+        if (Math.abs(Vcalc - V) / Math.max(Math.abs(Vcalc), 1e-30) > 0.02) {
+          proc += "Los tres datos no cuadran: revisa unidades o deja uno vacío.\n";
+        }
+      }
+      const P = V * I;
+      proc += `${mj("P = V I = I^{2} R = V^{2} / R")}.\n`;
+      proc += `${mj(`P = ${texQtyBody(P, "W")}`)}`;
+      if (Math.abs(P) >= 1000) proc += ` = ${mj(texQtyBody(P / 1000, "kW"))}`;
+      proc += ".\n";
+      if (t !== null) {
+        const W = P * t;
+        proc += `${mj("W = P t")}. ${mj(`W = ${texQtyBody(W, "J")} = ${texQtyBody(W / J_PER_KWH, "kWh")}`)}`;
+        proc += ` en ${formatQty(t, "s")}.`;
+      }
+      setMathText(out, proc);
+    } catch (e) {
+      setMathText(out, e.message);
+    }
+  });
+}
+
+function drawXYPlot(svg, cfg) {
+  const W = 640, H = 320, L = 62, R = 20, T = 20, B = 46;
+  const plotW = W - L - R, plotH = H - T - B;
+  const xMin = cfg.xMin, xMax = cfg.xMax;
+  const yMin = cfg.yMin, yMax = cfg.yMax;
+  const xOf = (x) => L + ((x - xMin) / (xMax - xMin)) * plotW;
+  const yOf = (y) => T + plotH - ((y - yMin) / (yMax - yMin)) * plotH;
+  const xTicks = cfg.xTicks || [];
+  const yTicks = cfg.yTicks || [];
+  const gridX = xTicks.map((x) => {
+    const px = xOf(x);
+    return `<line x1="${px}" y1="${T}" x2="${px}" y2="${T + plotH}" stroke="currentColor" opacity="0.12"/>
+      <text x="${px}" y="${H - 18}" text-anchor="middle" font-size="11" fill="currentColor">${x}</text>`;
+  }).join("");
+  const gridY = yTicks.map((y) => {
+    const py = yOf(y);
+    return `<line x1="${L}" y1="${py}" x2="${W - R}" y2="${py}" stroke="currentColor" opacity="0.12"/>
+      <text x="${L - 6}" y="${py + 4}" text-anchor="end" font-size="11" fill="currentColor">${y}</text>`;
+  }).join("");
+  const zero = (yMin < 0 && yMax > 0)
+    ? `<line x1="${L}" y1="${yOf(0)}" x2="${W - R}" y2="${yOf(0)}" stroke="currentColor" stroke-width="1" opacity="0.45"/>`
+    : "";
+  const polylines = (cfg.series || []).map((s) => {
+    const pts = s.pts.map((p) => `${xOf(p.x).toFixed(1)},${yOf(p.y).toFixed(1)}`).join(" ");
+    return `<polyline fill="none" stroke="${s.color}" stroke-width="2.4" points="${pts}"/>`;
+  }).join("");
+  const marks = (cfg.marks || []).map((m) =>
+    `<circle cx="${xOf(m.x)}" cy="${yOf(m.y)}" r="4.2" fill="${m.color || "#c0392b"}" />`
+  ).join("");
+  svg.innerHTML = `
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>
+    ${gridX}${gridY}${zero}
+    <line x1="${L}" y1="${T}" x2="${L}" y2="${T + plotH}" stroke="currentColor" stroke-width="1.4"/>
+    <line x1="${L}" y1="${T + plotH}" x2="${W - R}" y2="${T + plotH}" stroke="currentColor" stroke-width="1.4"/>
+    ${polylines}${marks}
+    <text x="${W / 2}" y="${H - 4}" text-anchor="middle" font-size="12" fill="currentColor">${cfg.xLabel || ""}</text>
+    <text x="16" y="${T + plotH / 2}" text-anchor="middle" font-size="12" fill="currentColor" transform="rotate(-90 16 ${T + plotH / 2})">${cfg.yLabel || ""}</text>
+  `;
+}
+
+function niceTicks(min, max, n = 5) {
+  if (max === min) max = min + 1;
+  const span = max - min;
+  const step0 = span / n;
+  const mag = Math.pow(10, Math.floor(Math.log10(step0)));
+  const resid = step0 / mag;
+  const step = resid >= 5 ? 5 * mag : resid >= 2 ? 2 * mag : mag;
+  const start = Math.ceil(min / step) * step;
+  const ticks = [];
+  for (let v = start; v <= max + step * 1e-9; v += step) {
+    ticks.push(Number(v.toPrecision(6)));
+  }
+  if (!ticks.includes(min) && Math.abs(min) < step * 1e-6) ticks.unshift(0);
+  return ticks;
+}
+
+function initSec4_2() {
+  const btnLin = document.getElementById("btn-lin-4-2");
+  if (btnLin) {
+    btnLin.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-2-lin");
+      try {
+        const r1 = readOptionalNumber("lin-r1");
+        const r2 = readOptionalNumber("lin-r2");
+        const vmax = readOptionalNumber("lin-vmax") ?? 10;
+        const iScale = readUnit("lin-i-u");
+        if (r1 === null || r2 === null) throw new Error("Indica R₁ y R₂.");
+        if (r1 === 0 || r2 === 0) throw new Error("R = 0 no se traza (corriente infinita).");
+        const i1 = vmax / r1;
+        const i2 = vmax / r2;
+        const iMax = Math.max(i1, i2);
+        const yUnit = iScale === 1000 ? "mA" : "A";
+        const yMax = iScale === 1000 ? iMax * 1000 : iMax;
+        const scaleY = (i) => (iScale === 1000 ? i * 1000 : i);
+        const mk = (R) => {
+          const pts = [];
+          for (let k = 0; k <= 40; k++) {
+            const V = vmax * (k / 40);
+            pts.push({ x: V, y: scaleY(V / R) });
+          }
+          return pts;
+        };
+        const wrap = document.getElementById("plot-4-2-lin-wrap");
+        wrap.hidden = false;
+        drawXYPlot(document.getElementById("plot-4-2-lin"), {
+          xMin: 0, xMax: vmax, yMin: 0, yMax: yMax * 1.05,
+          xTicks: niceTicks(0, vmax, 5),
+          yTicks: niceTicks(0, yMax * 1.05, 5),
+          xLabel: "V (V)", yLabel: `I (${yUnit})`,
+          series: [
+            { pts: mk(r1), color: "#1a6b4a" },
+            { pts: mk(r2), color: "#c0392b" }
+          ]
+        });
+        document.getElementById("legend-4-2-lin").innerHTML =
+          `<span><i class="plot-swatch" style="background:#1a6b4a"></i>R₁ = ${formatQtyPlain(r1)} Ω → I(${formatQtyPlain(vmax)} V) = ${formatQtyPlain(scaleY(i1))} ${yUnit}</span>
+           <span><i class="plot-swatch" style="background:#c0392b"></i>R₂ = ${formatQtyPlain(r2)} Ω → I(${formatQtyPlain(vmax)} V) = ${formatQtyPlain(scaleY(i2))} ${yUnit}</span>`;
+        let proc = `${mj("I = V / R")} (recta por el origen, pendiente ${mj("1/R")}).\n`;
+        proc += `R₁ = ${formatQty(r1, "\\Omega")}: a ${formatQty(vmax, "V")}, I = ${formatQty(i1, "A")} = ${formatQty(i1 * 1000, "mA")}.\n`;
+        proc += `R₂ = ${formatQty(r2, "\\Omega")}: a ${formatQty(vmax, "V")}, I = ${formatQty(i2, "A")} = ${formatQty(i2 * 1000, "mA")}.\n`;
+        proc += "Un ohmio pequeño es casi vertical (dump load, ballast). Un kΩ es casi horizontal (divisor, ISO).";
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+
+  const btnPw = document.getElementById("btn-pw-4-2");
+  if (btnPw) {
+    btnPw.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-2-pw");
+      try {
+        const r1 = readOptionalNumber("pw-r1");
+        const v1 = readOptionalNumber("pw-v1");
+        const r2 = readOptionalNumber("pw-r2");
+        const v2 = readOptionalNumber("pw-v2");
+        const r3 = readOptionalNumber("pw-r3");
+        const probeRaw = (document.getElementById("pw-probe")?.value || "").trim();
+        if (r1 === null || v1 === null || r2 === null) throw new Error("Indica R₁, V₁ y R₂.");
+        const Iof = (V) => {
+          if (V <= v1) return V / r1;
+          const I1 = v1 / r1;
+          if (v2 === null || r3 === null || V <= v2) return I1 + (V - v1) / r2;
+          const I2 = I1 + (v2 - v1) / r2;
+          return I2 + (V - v2) / r3;
+        };
+        const vmax = v2 !== null && r3 !== null ? v2 * 1.4 : v1 * 1.6;
+        const probes = probeRaw
+          ? probeRaw.split(/[,\s]+/).map((s) => parseNumberInput(s)).filter((n) => !isNaN(n))
+          : [];
+        const xs = [0];
+        for (let k = 1; k <= 80; k++) xs.push(vmax * (k / 80));
+        probes.forEach((p) => xs.push(p));
+        xs.sort((a, b) => a - b);
+        const pts = xs.map((x) => ({ x, y: Iof(x) }));
+        const ys = pts.map((p) => p.y);
+        let yMin = Math.min(0, ...ys);
+        let yMax = Math.max(0, ...ys);
+        if (yMin === yMax) { yMax = 1; yMin = 0; }
+        const pad = (yMax - yMin) * 0.08;
+        yMin -= pad; yMax += pad;
+        const wrap = document.getElementById("plot-4-2-pw-wrap");
+        wrap.hidden = false;
+        drawXYPlot(document.getElementById("plot-4-2-pw"), {
+          xMin: 0, xMax: Math.max(vmax, ...probes, 1),
+          yMin, yMax,
+          xTicks: niceTicks(0, Math.max(vmax, ...probes, 1), 5),
+          yTicks: niceTicks(yMin, yMax, 5),
+          xLabel: "V (V)", yLabel: "I (A)",
+          series: [{ pts, color: "#2471a3" }],
+          marks: probes.map((V) => ({ x: V, y: Iof(V), color: "#c0392b" }))
+        });
+        let proc = "R incremental por tramos (dV/dI), no un ohmio único desde el origen.\n";
+        proc += `0 a ${formatQty(v1, "V")}: R = ${formatQty(r1, "\\Omega")}, I = V / R₁.\n`;
+        proc += `A ${formatQty(v1, "V")}: I = ${formatQty(v1 / r1, "A")} = ${formatQty((v1 / r1) * 1000, "mA")}.\n`;
+        if (v2 === null || r3 === null) {
+          proc += `V > ${formatQty(v1, "V")}: R = ${formatQty(r2, "\\Omega")} incremental.\n`;
+          proc += `${mj(`I = I(V_1) + (V - V_1)/R_2`)}.\n`;
+        } else {
+          const I2 = v1 / r1 + (v2 - v1) / r2;
+          proc += `${formatQty(v1, "V")} a ${formatQty(v2, "V")}: R = ${formatQty(r2, "\\Omega")}. I(${formatQty(v2, "V")}) = ${formatQty(I2, "A")} = ${formatQty(I2 * 1000, "mA")}.\n`;
+          proc += `V > ${formatQty(v2, "V")}: R = ${formatQty(r3, "\\Omega")} (negativa = NDR / foldback).\n`;
+        }
+        probes.forEach((V) => {
+          const I = Iof(V);
+          proc += `Sonda ${formatQty(V, "V")}: I = ${formatQty(I, "A")} = ${formatQty(I * 1000, "mA")}.\n`;
+        });
+        setMathText(out, proc.trim());
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+}
+
+function initSec4_3() {
+  const btn = document.getElementById("btn-pow-4-3");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-3");
+      try {
+        let V = readOptionalNumber("pow-v");
+        let I = readOptionalNumber("pow-i");
+        let R = readOptionalNumber("pow-r");
+        let P = readOptionalNumber("pow-p");
+        let t = readOptionalNumber("pow-t");
+        let W = readOptionalNumber("pow-w");
+        if (V !== null) V *= readUnit("pow-v-u");
+        if (I !== null) I *= readUnit("pow-i-u");
+        if (R !== null) R *= readUnit("pow-r-u");
+        if (P !== null) P *= readUnit("pow-p-u");
+        if (t !== null) t *= readUnit("pow-t-u");
+        if (W !== null && P === null && t !== null) P = W / t;
+        else if (W !== null && t === null && P !== null) t = W / P;
+        else if (P !== null && t !== null && W === null) W = P * t;
+
+        if (V !== null && I !== null && R === null) R = I !== 0 ? V / I : null;
+        if (V !== null && R !== null && I === null) I = R !== 0 ? V / R : null;
+        if (I !== null && R !== null && V === null) V = I * R;
+
+        if (P === null) {
+          if (V !== null && I !== null) P = V * I;
+          else if (I !== null && R !== null) P = I * I * R;
+          else if (V !== null && R !== null) P = (V * V) / R;
+        }
+        if (P !== null) {
+          if (V !== null && I === null) I = V !== 0 ? P / V : null;
+          if (I !== null && V === null) V = I !== 0 ? P / I : null;
+          if (R === null && I !== null && I !== 0) R = P / (I * I);
+          if (R === null && V !== null && P !== 0) R = (V * V) / P;
+          if (V === null && R !== null) V = Math.sqrt(Math.abs(P * R)) * (P < 0 ? -1 : 1);
+          if (I === null && R !== null && R !== 0) I = Math.sqrt(Math.abs(P / R)) * (P < 0 ? -1 : 1);
+        }
+        if (t !== null && P !== null && W === null) W = P * t;
+        if (W !== null && t !== null && P === null) P = W / t;
+        if (W !== null && P !== null && t === null) t = W / P;
+
+        if (P === null && V === null && I === null && R === null && W === null) {
+          throw new Error("Faltan datos. Completa dos de V, I, R o P, o bien W y t.");
+        }
+        let proc = `${mj("P = V I = I^{2} R = V^{2} / R = W / t")}.\n`;
+        if (V !== null) proc += `${mj(`V = ${texQtyBody(V, "V")}`)}  `;
+        if (I !== null) proc += `${mj(`I = ${texQtyBody(I, "A")}`)}  `;
+        if (R !== null) proc += `${mj(`R = ${texQtyBody(R, "\\Omega")}`)}  `;
+        proc += "\n";
+        if (P !== null) {
+          proc += `${mj(`P = ${texQtyBody(P, "W")}`)}`;
+          if (Math.abs(P) >= 1000) proc += ` = ${mj(texQtyBody(P / 1000, "kW"))}`;
+          proc += ` = ${mj(texQtyBody(P / HP_W, "hp"))}.\n`;
+        }
+        if (t !== null) proc += `${mj(`t = ${texQtyBody(t, "s")}`)} = ${formatQtyPlain(t / 3600)} h.\n`;
+        if (W !== null) {
+          proc += `${mj(`W = ${texQtyBody(W, "J")}`)} = ${mj(texQtyBody(W / J_PER_WH, "Wh"))} = ${mj(texQtyBody(W / J_PER_KWH, "kWh"))}.`;
+        }
+        setMathText(out, proc.trim());
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+
+  const btnPi = document.getElementById("btn-pi-4-3");
+  if (btnPi) {
+    btnPi.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-3-pi");
+      try {
+        const R = readOptionalNumber("pi-r");
+        let imax = readOptionalNumber("pi-imax");
+        let pmark = readOptionalNumber("pi-pmark");
+        if (R === null || imax === null) throw new Error("Indica R e I máx.");
+        imax *= readUnit("pi-i-u");
+        if (pmark !== null) pmark *= readUnit("pi-p-u");
+        const pMax = imax * imax * R;
+        const pts = [];
+        for (let k = 0; k <= 50; k++) {
+          const I = imax * (k / 50);
+          pts.push({ x: I * (readUnit("pi-i-u") === 0.001 ? 1000 : 1), y: I * I * R });
+        }
+        const xMax = readUnit("pi-i-u") === 0.001 ? imax * 1000 : imax;
+        const marks = [];
+        let Istar = null;
+        if (pmark !== null) {
+          Istar = Math.sqrt(pmark / R);
+          marks.push({
+            x: Istar * (readUnit("pi-i-u") === 0.001 ? 1000 : 1),
+            y: pmark,
+            color: "#c0392b"
+          });
+        }
+        const wrap = document.getElementById("plot-4-3-wrap");
+        wrap.hidden = false;
+        drawXYPlot(document.getElementById("plot-4-3"), {
+          xMin: 0, xMax: xMax, yMin: 0, yMax: Math.max(pMax, pmark || 0) * 1.05,
+          xTicks: niceTicks(0, xMax, 5),
+          yTicks: niceTicks(0, Math.max(pMax, pmark || 0) * 1.05, 5),
+          xLabel: readUnit("pi-i-u") === 0.001 ? "I (mA)" : "I (A)",
+          yLabel: "P (W)",
+          series: [{ pts, color: "#1a6b4a" }],
+          marks
+        });
+        let proc = `${mj("P = I^{2} R")} con R = ${formatQty(R, "\\Omega")}. Es una parábola, no una recta.\n`;
+        proc += `A I = ${formatQty(imax, "A")} (${formatQty(imax * 1000, "mA")}), P = ${formatQty(pMax, "W")}.\n`;
+        proc += "Duplicar I cuadruplica P. Un string al doble de Imp no calienta el cable el doble: lo calienta cuatro veces.\n";
+        if (Istar !== null) {
+          proc += `Para P = ${formatQty(pmark, "W")}: ${mj(`I = \\sqrt{P/R} = ${texQtyBody(Istar, "A")}`)} = ${formatQty(Istar * 1000, "mA")}.`;
+        }
+        setMathText(out, proc.trim());
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+
+  const btnPcc = document.getElementById("btn-pcc-4-3");
+  if (btnPcc) {
+    btnPcc.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-3-pcc");
+      try {
+        const V = readOptionalNumber("pcc-v");
+        const I = readOptionalNumber("pcc-i");
+        if (V === null || I === null) throw new Error("Indica V e I máx de la acometida.");
+        const cap = V * I;
+        let proc = `${mj(`P_{\\mathrm{máx}} = V I = ${texQtyBody(V, "V")} \\cdot ${texQtyBody(I, "A")} = ${texQtyBody(cap, "W")} = ${texQtyBody(cap / 1000, "kW")}`)}.\n`;
+        let sum = 0;
+        for (let n = 1; n <= 4; n++) {
+          const name = (document.getElementById(`pcc-l${n}n`)?.value || `Carga ${n}`).trim() || `Carga ${n}`;
+          const pW = readOptionalNumber(`pcc-l${n}p`);
+          const hp = readOptionalNumber(`pcc-l${n}h`);
+          let P = 0;
+          if (hp !== null) P += hp * HP_W;
+          if (pW !== null) P += pW;
+          if (P === 0 && hp === null && pW === null) continue;
+          sum += P;
+          proc += `${name}: ${formatQty(P, "W")}`;
+          if (hp !== null) proc += ` (${formatQtyPlain(hp)} hp × 746 W)`;
+          proc += ".\n";
+        }
+        proc += `Suma = ${formatQty(sum, "W")} = ${formatQty(sum / 1000, "kW")}.\n`;
+        if (sum <= cap) {
+          proc += `Cabe: margen ${formatQty(cap - sum, "W")} (${formatQtyPlain(100 * (1 - sum / cap))} % libre).`;
+        } else {
+          proc += `No cabe: exceso ${formatQty(sum - cap, "W")}. Hay que deslastrar, subir el PCC o desplazar cargas.`;
+        }
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+}
+
+function initSec4_5() {
+  const btn = document.getElementById("btn-eta-4-5");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-5");
+      try {
+        let Pout = readOptionalNumber("eta-out");
+        let Pin = readOptionalNumber("eta-in");
+        let eta = readEtaFrac("eta-n");
+        const V = readOptionalNumber("eta-v");
+        const Iin = readOptionalNumber("eta-i");
+        if (Pout !== null) Pout *= readUnit("eta-out-u");
+        if (Pin !== null) Pin *= readUnit("eta-in-u");
+        if (Pin === null && V !== null && Iin !== null) Pin = V * Iin;
+        if (Pout !== null && Pin !== null && eta === null) eta = Pout / Pin;
+        else if (Pout !== null && eta !== null && Pin === null) Pin = Pout / eta;
+        else if (Pin !== null && eta !== null && Pout === null) Pout = eta * Pin;
+        if (Pout === null || Pin === null || eta === null) {
+          throw new Error("Indica dos de P_sal, P_ent y η (V e I de entrada sustituyen a P_ent).");
+        }
+        let proc = `${mj("\\eta = P_{\\mathrm{sal}} / P_{\\mathrm{ent}}")}.  ${mj("1\\,\\mathrm{hp} = 746\\,\\mathrm{W}")}.\n`;
+        proc += `${mj(`P_{\\mathrm{sal}} = ${texQtyBody(Pout, "W")} = ${texQtyBody(Pout / HP_W, "hp")}`)}.\n`;
+        proc += `${mj(`P_{\\mathrm{ent}} = ${texQtyBody(Pin, "W")}`)}.\n`;
+        proc += `${mj(`\\eta = ${texQtyBody(eta * 100)}\\,\\%`)}.\n`;
+        proc += `Pérdida = ${formatQty(Pin - Pout, "W")} (${formatEta(1 - eta)}).\n`;
+        if (V !== null) {
+          const I = Pin / V;
+          proc += `${mj(`I_{\\mathrm{ent}} = P_{\\mathrm{ent}} / V = ${texQtyBody(I, "A")}`)}.`;
+        }
+        setMathText(out, proc.trim());
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+
+  const btnCas = document.getElementById("btn-cas-4-5");
+  if (btnCas) {
+    btnCas.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-5-cas");
+      try {
+        let e1 = readEtaFrac("cas-1");
+        let e2 = readEtaFrac("cas-2");
+        let e3 = readEtaFrac("cas-3");
+        let et = readEtaFrac("cas-nt");
+        const Ein = readOptionalNumber("cas-e");
+        const Pin = readOptionalNumber("cas-pin");
+        const Pout = readOptionalNumber("cas-pout");
+        const dbl = !!document.getElementById("cas-double")?.checked;
+        if (Pin !== null && Pout !== null && et === null) et = Pout / Pin;
+        if (dbl) {
+          if (et === null) throw new Error("Para «una el doble de la otra» indica P_ent y P_sal (o η total).");
+          e1 = Math.sqrt(et / 2);
+          e2 = 2 * e1;
+          e3 = null;
+        } else if (et !== null) {
+          const given = [e1, e2, e3].filter((v) => v !== null);
+          if (given.length === 1) {
+            e2 = et / given[0];
+          } else if (given.length === 2) {
+            const prod2 = given[0] * given[1];
+            if (Math.abs(prod2 - et) / Math.max(et, 1e-12) > 0.02) {
+              e3 = et / prod2;
+            }
+          }
+        }
+        const stages = [e1, e2, e3].filter((v) => v !== null);
+        if (!stages.length && et === null) throw new Error("Indica al menos una eficiencia o Pin y Pout.");
+        const prod = stages.reduce((a, b) => a * b, 1);
+        const etaT = et !== null && !dbl && stages.length === 0 ? et : prod;
+        let proc = `${mj("\\eta_{\\mathrm{t}} = \\eta_1 \\eta_2 \\eta_3")}. Las etapas en serie se multiplican.\n`;
+        stages.forEach((e, i) => {
+          proc += `η${i + 1} = ${formatEta(e)}.\n`;
+        });
+        if (dbl) {
+          proc += `η_t = ${formatEta(et)}. Con η₂ = 2 η₁: 2 η₁² = η_t → η₁ = ${formatEta(e1)}, η₂ = ${formatEta(e2)}.\n`;
+        }
+        proc += `η_t = ${formatEta(etaT)}.\n`;
+        if (Ein !== null) proc += `E_sal = ${formatQty(Ein * etaT, "J")} (entrada ${formatQty(Ein, "J")}).\n`;
+        if (Pin !== null) {
+          proc += `P_sal = ${formatQty(Pin * etaT, "W")} (entrada ${formatQty(Pin, "W")}).\n`;
+        }
+        if (Pout !== null && Pin !== null) {
+          proc += `Comprobación P_sal / P_ent = ${formatEta(Pout / Pin)}.`;
+        }
+        setMathText(out, proc.trim());
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+}
+
+function initSec4_6() {
+  const btn = document.getElementById("btn-en-4-6");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-6");
+      try {
+        let P = readOptionalNumber("en-p");
+        let t = readOptionalNumber("en-t");
+        let W = readOptionalNumber("en-w");
+        const kwhIn = readOptionalNumber("en-kwh");
+        const hweek = readOptionalNumber("en-hweek");
+        const months = readOptionalNumber("en-months");
+        const rateC = readOptionalNumber("en-rate");
+        const budget = readOptionalNumber("en-budget");
+        const V = readOptionalNumber("en-v");
+        const eta = readEtaFrac("en-eta");
+        if (P !== null) P *= readUnit("en-p-u");
+        if (t !== null) t *= readUnit("en-t-u");
+        if (kwhIn !== null && W === null) W = kwhIn * J_PER_KWH;
+        if (hweek !== null && months !== null) {
+          const hours = hweek * months * (4 / 3);
+          t = hours * 3600;
+        }
+        const rate = rateC !== null ? rateC / 100 : null;
+        if (budget !== null && P !== null && t === null && W === null) {
+          if (!rate) throw new Error("Indica la tarifa en ¢/kWh.");
+          const kwhBuy = budget / rate;
+          t = (kwhBuy * 1000 / P) * 3600;
+          W = P * t;
+        }
+        if (P !== null && t !== null && W === null) W = P * t;
+        else if (W !== null && t !== null && P === null) P = W / t;
+        else if (W !== null && P !== null && t === null) t = W / P;
+        if (W === null && P === null) throw new Error("Indica P y t, o la energía (J o kWh), o P y un presupuesto.");
+        const kWh = W / J_PER_KWH;
+        let proc = `${mj("W = P t")}.  ${mj("1\\,\\mathrm{kWh} = 3.6\\times 10^{6}\\,\\mathrm{J}")}.\n`;
+        if (hweek !== null && months !== null) {
+          proc += `Mes del libro = 4/3 semanas. t = ${formatQtyPlain(hweek)} h/sem × ${formatQtyPlain(months)} meses × 4/3 = ${formatQtyPlain(hweek * months * 4 / 3)} h.\n`;
+        }
+        if (P !== null) proc += `${mj(`P = ${texQtyBody(P, "W")} = ${texQtyBody(P / 1000, "kW")}`)}.\n`;
+        if (t !== null) proc += `${mj(`t = ${texQtyBody(t, "s")}`)} = ${formatQtyPlain(t / 3600)} h.\n`;
+        proc += `${mj(`W = ${texQtyBody(W, "J")} = ${texQtyBody(kWh, "kWh")}`)}.\n`;
+        if (rate !== null) {
+          const cost = kWh * rate;
+          proc += `Tarifa ${formatQtyPlain(rateC)} ¢/kWh = ${formatQtyPlain(rate)} $/kWh. Costo = ${formatQtyPlain(cost)} $.\n`;
+        }
+        if (budget !== null && P !== null) {
+          proc += `Con ${formatQtyPlain(budget)} $ a esa tarifa: ${formatQtyPlain(budget / rate)} kWh → t = ${formatQtyPlain(t / 3600)} h.\n`;
+        }
+        if (V !== null && P !== null) {
+          proc += `${mj(`I = P / V = ${texQtyBody(P / V, "A")}`)} a ${formatQty(V, "V")}.\n`;
+        }
+        if (eta !== null) {
+          proc += `η = ${formatEta(eta)}. Energía perdida o no aprovechada = ${formatQty(kWh * (1 - eta), "kWh")} (${formatQty(W * (1 - eta), "J")}).`;
+        }
+        setMathText(out, proc.trim());
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+
+  const btnCost = document.getElementById("btn-cost-4-6");
+  if (btnCost) {
+    btnCost.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-6-cost");
+      try {
+        setMathText(out, tallyCostRows("cost-rate", 4, "c6"));
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+}
+
+function tallyCostRows(rateId, n, prefix) {
+  const rateC = readOptionalNumber(rateId);
+  if (rateC === null) throw new Error("Indica la tarifa en ¢/kWh.");
+  const rate = rateC / 100;
+  let proc = `Tarifa ${formatQtyPlain(rateC)} ¢/kWh = ${formatQtyPlain(rate)} $/kWh.\n`;
+  let kTot = 0;
+  for (let i = 1; i <= n; i++) {
+    const name = (document.getElementById(`${prefix}-n${i}`)?.value || `Aparato ${i}`).trim();
+    const P = readOptionalNumber(`${prefix}-p${i}`);
+    const t = readOptionalNumber(`${prefix}-t${i}`);
+    if (P === null || t === null) continue;
+    const kWh = (P / 1000) * t;
+    const cost = kWh * rate;
+    kTot += kWh;
+    proc += `${name}: ${formatQtyPlain(P)} W × ${formatQtyPlain(t)} h = ${formatQtyPlain(kWh)} kWh → ${formatQtyPlain(cost)} $.\n`;
+  }
+  proc += `Total ${formatQtyPlain(kTot)} kWh × ${formatQtyPlain(rate)} $/kWh = ${formatQtyPlain(kTot * rate)} $.`;
+  return proc;
+}
+
+function initSec4_9() {
+  const btn = document.getElementById("btn-sp-4-9");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-9");
+      try {
+        let E = readOptionalNumber("sp-e");
+        let R = readOptionalNumber("sp-r");
+        let I = readOptionalNumber("sp-i");
+        let t = readOptionalNumber("sp-t");
+        if (E !== null) E *= readUnit("sp-e-u");
+        if (R !== null) R *= readUnit("sp-r-u");
+        if (I !== null) I *= readUnit("sp-i-u");
+        if (t !== null) t *= readUnit("sp-t-u");
+        else t = 1;
+        const invert = !!document.getElementById("sp-invert")?.checked;
+        if (E === null && I !== null && R !== null) E = I * R;
+        if (I === null && E !== null && R !== null) {
+          if (R === 0) throw new Error("R = 0: cortocircuito.");
+          I = E / R;
+        }
+        if (R === null && E !== null && I !== null) {
+          if (I === 0) throw new Error("I = 0 no define R.");
+          R = E / I;
+        }
+        if (E === null || I === null || R === null) throw new Error("Indica E y R, o I y R (ejercicio 62).");
+        const sign = invert ? -1 : 1;
+        const Isigned = sign * I;
+        const P = Math.abs(E * I);
+        const W = P * t;
+        let proc = `${mj("I = E / R")}, ${mj("P = E I = I^{2} R")}, ${mj("W = P t")}.\n`;
+        proc += `${mj(`E = ${texQtyBody(E, "V")}`)}, ${mj(`R = ${texQtyBody(R, "\\Omega")}`)}`;
+        proc += invert ? " (polaridad invertida).\n" : ".\n";
+        proc += `${mj(`I = ${texQtyBody(Isigned, "A")} = ${texQtyBody(Isigned * 1e6, "\\mu A")}`)}`;
+        proc += invert ? " (sentido opuesto al de la fig. 4.29).\n" : ".\n";
+        proc += `${mj(`P = ${texQtyBody(P, "W")}`)}.\n`;
+        proc += `${mj(`W = ${texQtyBody(W, "J")}`)} en ${formatQty(t, "s")}.`;
+        const plus = document.getElementById("fig-4-29-plus");
+        const minus = document.getElementById("fig-4-29-minus");
+        if (plus && minus) {
+          plus.textContent = invert ? "−" : "+";
+          minus.textContent = invert ? "+" : "−";
+        }
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+
+  const btnC = document.getElementById("btn-c9-4-9");
+  if (btnC) {
+    btnC.addEventListener("click", () => {
+      const out = document.getElementById("proc-4-9-cost");
+      try {
+        setMathText(out, tallyCostRows("c9-rate", 5, "c9"));
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
   }
 }

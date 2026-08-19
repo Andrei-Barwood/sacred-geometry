@@ -2599,6 +2599,952 @@
           </section>
         </div>
       </details>
+
+      <details class="chapter-1-fold" id="capitulo-4">
+        <summary class="chapter-1-summary" aria-label="Capítulo 4.0">
+          <span class="chapter-1-title">4.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Ley de Ohm, potencia, eficiencia y energía: las cuatro cuentas con las que
+            se dimensiona un string, un dump load, un inversor y una factura.
+            \(V = IR\), \(P = VI = I^{2}R = V^{2}/R\), \(\eta = P_{\mathrm{sal}}/P_{\mathrm{ent}}\)
+            y \(W = Pt\) no cambiaron; lo que cambió es el aparato. En 2026 esas
+            ecuaciones diseñan fuentes <strong>renovables convencionales</strong>
+            (hidroeléctrica, geotérmica, biomasa/biogás, solar térmica CSP) y
+            <strong>no convencionales</strong> (fotovoltaica TOPCon/HJT/tándem, eólica
+            onshore y marina, mareomotriz, undimotriz, OTEC, hidrógeno verde y BESS).
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(V=IR\), \(P=I^{2}R\), \(\eta\) y \(W=Pt\)
+              sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-4-1">Sec 4.1</button>
+            <button class="tab-btn" data-target="sec-4-2">Sec 4.2</button>
+            <button class="tab-btn" data-target="sec-4-3">Sec 4.3</button>
+            <button class="tab-btn" data-target="sec-4-5">Sec 4.5</button>
+            <button class="tab-btn" data-target="sec-4-6">Sec 4.6</button>
+            <button class="tab-btn" data-target="sec-4-9">Sec 4.9</button>
+          </div>
+
+          <div class="tab-content active" id="sec-4-1">
+            <h2>Sección 4.1: Ley de Ohm</h2>
+            <p class="chapter-discourse">
+              \(V = IR\). Un volt a través de un ohmio establece un ampere. En planta
+              esa terna fija el calibre del string, la caída en el bus de un BESS, el
+              \(R_{\mathrm{DS(on)}}\) del SiC y la corriente de un dump load eólico o
+              de un ballast hidroeléctrico. Deja vacía exactamente una de \(V\), \(I\) o \(R\).
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-4-1">Selecciona un problema:</label>
+                <select id="preset-4-1" class="book-preset-select" data-section="4-1">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: Dump load eólico 6 Ω, 2.5 A</option>
+                  <option value="p2">Prob 2: Resistencia 72 Ω a 12 V (geo/FV)</option>
+                  <option value="p3">Prob 3: Limitar 1.5 mA a 6 V (piranómetro)</option>
+                  <option value="p4">Prob 4: Arranque 12 V, 0.056 Ω (yaw / compuerta)</option>
+                  <option value="p5">Prob 5: Aislamiento 0.02 MΩ, 3.6 µA</option>
+                  <option value="p6">Prob 6: Voltímetro 15 kΩ, 62 V</option>
+                  <option value="p7">Prob 7: Frigorífico híbrido 2.2 A a 120 V</option>
+                  <option value="p8">Prob 8: RTU / logger 7.5 kΩ a 120 V</option>
+                  <option value="p9">Prob 9: Bomba de calor 4.2 A a 120 V</option>
+                  <option value="p10">Prob 10: Trace heating 0.76 A a 120 V</option>
+                  <option value="p11">Prob 11: Driver SiC 20 µA, 24 mV</option>
+                  <option value="p12">Prob 12: Ri = 0.5 Ω, 15 A (hidro / BESS)</option>
+                  <option value="p13a">Prob 13.a: Ballast 9.5 A a 120 V</option>
+                  <option value="p13b">Prob 13.b: Energía convertida en 1 h</option>
+                </select>
+              </div>
+              <div id="desc-preset-4-1" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 4.1 — Fuente y resistencia</h3>
+              <svg class="circuit-svg" viewBox="0 0 560 180" role="img" aria-label="Fuente E, resistor R y corriente I">
+                <line x1="70" y1="40" x2="70" y2="140" stroke="currentColor" stroke-width="2"/>
+                <line x1="55" y1="55" x2="85" y2="55" stroke="currentColor" stroke-width="2"/>
+                <line x1="60" y1="125" x2="80" y2="125" stroke="currentColor" stroke-width="2"/>
+                <text x="32" y="98" font-size="16" fill="currentColor">E</text>
+                <line x1="70" y1="40" x2="250" y2="40" stroke="#2471a3" stroke-width="2.4"/>
+                <polygon points="250,40 232,34 232,46" fill="#2471a3"/>
+                <text x="140" y="28" font-size="14" fill="#2471a3">I</text>
+                <rect x="250" y="28" width="90" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="250" y1="34" x2="340" y2="34" stroke="currentColor" stroke-width="1.4"/>
+                <line x1="250" y1="46" x2="340" y2="46" stroke="currentColor" stroke-width="1.4"/>
+                <text x="278" y="22" font-size="14" fill="currentColor">R</text>
+                <line x1="340" y1="40" x2="430" y2="40" stroke="currentColor" stroke-width="2"/>
+                <line x1="430" y1="40" x2="430" y2="140" stroke="currentColor" stroke-width="2"/>
+                <line x1="430" y1="140" x2="70" y2="140" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <p class="caption-fig">Figura 4.1 — Circuito de la ley de Ohm</p>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador \(V = IR\)</h3>
+              <p class="hint-inline">Deja vacía exactamente una de \(V\), \(I\) o \(R\). Si las tres están, se comprueba. \(P\) y \(W\) salen si hay datos.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="ohm4-v">V:</label>
+                  <input type="text" id="ohm4-v" placeholder="Ej. 12" />
+                  <select id="ohm4-v-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="ohm4-i">I:</label>
+                  <input type="text" id="ohm4-i" placeholder="Ej. 2.5" />
+                  <select id="ohm4-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="ohm4-r">R:</label>
+                  <input type="text" id="ohm4-r" placeholder="Ej. 6" />
+                  <select id="ohm4-r-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="ohm4-t">t (opcional):</label>
+                  <input type="text" id="ohm4-t" placeholder="Ej. 1" />
+                  <select id="ohm4-t-u">
+                    <option value="1">s</option>
+                    <option value="60">min</option>
+                    <option value="3600" selected>h</option>
+                  </select>
+                </div>
+                <button id="btn-ohm-4-1" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-1" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-4-2">
+            <h2>Sección 4.2: Trazado de la ley de Ohm</h2>
+            <p class="chapter-discourse">
+              Un ohmio fijo es una recta por el origen en el plano \(I\)–\(V\):
+              \(I = V/R\). Pendiente \(1/R\). Un dump load eólico de \(0{,}5\,\Omega\)
+              es casi vertical; un divisor de \(50\,\mathrm{k}\Omega\) del bus de
+              \(1500\,\mathrm{V_{cc}}\) es casi horizontal. Los convertidores, el
+              precharge de un BESS y el diodo túnel (y su analogía 2026: el pliegue
+              N de algunas celdas tándem y el foldback de un grid-forming) ya no son
+              una sola recta: la \(R\) cambia de tramo.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-4-2">Selecciona un problema:</label>
+                <select id="preset-4-2" class="book-preset-select" data-section="4-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p14">Prob 14: Rectas 100 Ω y 0.5 Ω</option>
+                  <option value="p15">Prob 15: Precharge 20 Ω / 2 Ω</option>
+                  <option value="p16">Prob 16: 2 kΩ y 50 kΩ, 0–20 V en mA</option>
+                  <option value="p17">Prob 17: ΔV en 2 kΩ con ΔI = 400 mA</option>
+                  <option value="p18a">Prob 18.a: Característica tipo diodo túnel</option>
+                  <option value="p18b">Prob 18.b: I a 0.7 V, 1.5 V y 2.5 V</option>
+                </select>
+              </div>
+              <div id="desc-preset-4-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 4.6 — Dos resistencias lineales</h3>
+              <p class="hint-inline">Traza \(I=V/R\) de dos ohmios en los mismos ejes. Si la escala no cabe, el solucionador reproduce la gráfica.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="lin-r1">R₁ (Ω):</label>
+                  <input type="text" id="lin-r1" placeholder="Ej. 100" />
+                </div>
+                <div class="k-input">
+                  <label for="lin-r2">R₂ (Ω):</label>
+                  <input type="text" id="lin-r2" placeholder="Ej. 0.5" />
+                </div>
+                <div class="k-input">
+                  <label for="lin-vmax">V máx:</label>
+                  <input type="text" id="lin-vmax" placeholder="Ej. 10" />
+                  <select id="lin-i-u">
+                    <option value="1" selected>eje I en A</option>
+                    <option value="1000">eje I en mA</option>
+                  </select>
+                </div>
+                <button id="btn-lin-4-2" class="action-btn mt-1">Trazar</button>
+              </div>
+              <div class="plot-wrap" id="plot-4-2-lin-wrap" hidden>
+                <svg class="ohm-plot" id="plot-4-2-lin" viewBox="0 0 640 320" role="img" aria-label="Gráfica I–V de dos resistencias"></svg>
+                <div class="plot-legend" id="legend-4-2-lin"></div>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-2-lin" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Característica por tramos (precharge, foldback, diodo túnel)</h3>
+              <p class="hint-inline">
+                \(R\) de \(0\) a \(V_1\), luego \(R\) incremental hasta \(V_2\), luego
+                \(R\) (puede ser negativa). Deja \(V_2\) vacío si solo hay dos tramos.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="pw-r1">R₁ (Ω) hasta V₁:</label>
+                  <input type="text" id="pw-r1" placeholder="Ej. 500" />
+                </div>
+                <div class="k-input">
+                  <label for="pw-v1">V₁ (V):</label>
+                  <input type="text" id="pw-v1" placeholder="Ej. 1" />
+                </div>
+                <div class="k-input">
+                  <label for="pw-r2">R₂ (Ω) hasta V₂:</label>
+                  <input type="text" id="pw-r2" placeholder="Ej. 50" />
+                </div>
+                <div class="k-input">
+                  <label for="pw-v2">V₂ (V, opcional):</label>
+                  <input type="text" id="pw-v2" placeholder="Ej. 2" />
+                </div>
+                <div class="k-input">
+                  <label for="pw-r3">R₃ (Ω) después:</label>
+                  <input type="text" id="pw-r3" placeholder="Ej. -20" />
+                </div>
+                <div class="k-input">
+                  <label for="pw-probe">Sondear V (V):</label>
+                  <input type="text" id="pw-probe" placeholder="Ej. 0.7  1.5  2.5" />
+                </div>
+                <button id="btn-pw-4-2" class="action-btn mt-1">Trazar y sondear</button>
+              </div>
+              <div class="plot-wrap" id="plot-4-2-pw-wrap" hidden>
+                <svg class="ohm-plot" id="plot-4-2-pw" viewBox="0 0 640 320" role="img" aria-label="Característica I–V por tramos"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-2-pw" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-4-3">
+            <h2>Sección 4.3: Potencia</h2>
+            <p class="chapter-discourse">
+              \(P = VI = I^{2}R = V^{2}/R = W/t\). El watt es un julio por segundo.
+              En 2026 es el kW del inversor string, el MW del parque eólico, el
+              \(I^{2}R\) que el LCOE ya no perdona y el calor que un dump load o un
+              electrolizador tienen que evacuar. \(1\,\mathrm{hp} = 746\,\mathrm{W}\).
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-4-3">Selecciona un problema:</label>
+                <select id="preset-4-3" class="book-preset-select" data-section="4-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p19">Prob 19: 420 J en 7 min</option>
+                  <option value="p20">Prob 20: 40 J/s, tiempo para 640 J</option>
+                  <option value="p21a">Prob 21.a: LED 2 W durante 8 h (J)</option>
+                  <option value="p21b">Prob 21.b: LED 2 W durante 8 h (kWh)</option>
+                  <option value="p22">Prob 22: 10 Ω a 300 C/min</option>
+                  <option value="p23">Prob 23: 2 A, 3 V, 12 J → t</option>
+                  <option value="p24">Prob 24: Batería 6 V a 48 C/min</option>
+                  <option value="p25">Prob 25: 4 Ω, 7 mA</option>
+                  <option value="p26">Prob 26: 3 Ω, 9 mV</option>
+                  <option value="p27">Prob 27: 4 Ω, 64 W → I</option>
+                  <option value="p28">Prob 28: ½ W, 1000 Ω → I máx</option>
+                  <option value="p29">Prob 29: 2.2 kΩ, 42 mW → V</option>
+                  <option value="p30">Prob 30: 45 mA a 9 V</option>
+                  <option value="p31">Prob 31: 100 W a 120 V (R e I)</option>
+                  <option value="p32">Prob 32: 450 W, 3.75 A</option>
+                  <option value="p33a">Prob 33.a: Logger 3 V, 0.4 mW → I</option>
+                  <option value="p33b">Prob 33.b: 500 h → Ah</option>
+                  <option value="p34">Prob 34: 20 kΩ, 100 W → I máx y V máx</option>
+                  <option value="p35a">Prob 35.a: P(I) de 100 Ω</option>
+                  <option value="p35b">Prob 35.b: ¿Lineal?</option>
+                  <option value="p35c">Prob 35.c: I a 500 mW</option>
+                  <option value="p36a">Prob 36.a: HMI 0.455 A a 9 V → P</option>
+                  <option value="p36b">Prob 36.b: Resistencia interna</option>
+                  <option value="p36c">Prob 36.c: Energía en 6 h</option>
+                  <option value="p37a">Prob 37.a: Acometida 120 V, 100 A</option>
+                  <option value="p37b">Prob 37.b: Cargas simultáneas del microred</option>
+                </select>
+              </div>
+              <div id="desc-preset-4-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador de potencia</h3>
+              <p class="hint-inline">Completa dos de \(V, I, R\) (o \(P\) y una de ellas). \(t\) convierte \(P\) en \(W\).</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="pow-v">V:</label>
+                  <input type="text" id="pow-v" placeholder="Ej. 120" />
+                  <select id="pow-v-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="pow-i">I:</label>
+                  <input type="text" id="pow-i" placeholder="Ej. 2.5" />
+                  <select id="pow-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="pow-r">R:</label>
+                  <input type="text" id="pow-r" placeholder="Ej. 6" />
+                  <select id="pow-r-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="pow-p">P:</label>
+                  <input type="text" id="pow-p" placeholder="Ej. 100" />
+                  <select id="pow-p-u">
+                    <option value="1" selected>W</option>
+                    <option value="0.001">mW</option>
+                    <option value="1000">kW</option>
+                    <option value="746">hp</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="pow-t">t:</label>
+                  <input type="text" id="pow-t" placeholder="Ej. 8" />
+                  <select id="pow-t-u">
+                    <option value="1">s</option>
+                    <option value="60">min</option>
+                    <option value="3600" selected>h</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="pow-w">W (J):</label>
+                  <input type="text" id="pow-w" placeholder="Ej. 420" />
+                </div>
+                <button id="btn-pow-4-3" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 4.12 — \(P\) en función de \(I\) para un ohmio fijo</h3>
+              <p class="hint-inline">\(P = I^{2}R\) es una parábola. Elige \(R\), el rango de \(I\) y un nivel de potencia a leer.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="pi-r">R (Ω):</label>
+                  <input type="text" id="pi-r" placeholder="Ej. 100" />
+                </div>
+                <div class="k-input">
+                  <label for="pi-imax">I máx:</label>
+                  <input type="text" id="pi-imax" placeholder="Ej. 0.1" />
+                  <select id="pi-i-u">
+                    <option value="1">A</option>
+                    <option value="0.001" selected>mA</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="pi-pmark">P marca:</label>
+                  <input type="text" id="pi-pmark" placeholder="Ej. 0.5" />
+                  <select id="pi-p-u">
+                    <option value="1">W</option>
+                    <option value="0.001" selected>mW</option>
+                  </select>
+                </div>
+                <button id="btn-pi-4-3" class="action-btn mt-1">Graficar</button>
+              </div>
+              <div class="plot-wrap" id="plot-4-3-wrap" hidden>
+                <svg class="ohm-plot" id="plot-4-3" viewBox="0 0 640 320" role="img" aria-label="Potencia frente a corriente"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-3-pi" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Problema 37 — Capacidad de una acometida / PCC</h3>
+              <p class="hint-inline">Comprueba si las cargas caben en \(V \times I_{\mathrm{máx}}\). Un hp = 746 W.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="pcc-v">V (V):</label>
+                  <input type="text" id="pcc-v" placeholder="120" value="120" />
+                </div>
+                <div class="k-input">
+                  <label for="pcc-i">I máx (A):</label>
+                  <input type="text" id="pcc-i" placeholder="100" value="100" />
+                </div>
+              </div>
+              <div class="load-grid" id="pcc-loads">
+                <span><strong>Carga</strong></span><span><strong>P (W)</strong></span><span><strong>o hp</strong></span><span></span>
+                <label for="pcc-l1n">1</label>
+                <input type="text" id="pcc-l1p" placeholder="W" />
+                <input type="text" id="pcc-l1h" placeholder="hp" />
+                <input type="text" id="pcc-l1n" placeholder="nombre" value="Motor de molino" />
+                <label for="pcc-l2n">2</label>
+                <input type="text" id="pcc-l2p" placeholder="W" value="3000" />
+                <input type="text" id="pcc-l2h" placeholder="hp" />
+                <input type="text" id="pcc-l2n" placeholder="nombre" value="Secador de biomasa" />
+                <label for="pcc-l3n">3</label>
+                <input type="text" id="pcc-l3p" placeholder="W" value="2400" />
+                <input type="text" id="pcc-l3h" placeholder="hp" />
+                <input type="text" id="pcc-l3n" placeholder="nombre" value="Estufa / caldera aux." />
+                <label for="pcc-l4n">4</label>
+                <input type="text" id="pcc-l4p" placeholder="W" value="1000" />
+                <input type="text" id="pcc-l4h" placeholder="hp" />
+                <input type="text" id="pcc-l4n" placeholder="nombre" value="Plancha / resistencia" />
+              </div>
+              <p class="hint-inline" style="margin-top: 0.75rem;">El motor del problema 37.b es de 5 hp: escribe 5 en la columna hp de la fila 1.</p>
+              <button id="btn-pcc-4-3" class="action-btn mt-1">Comprobar acometida</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-3-pcc" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-4-5">
+            <h2>Sección 4.5: Eficiencia</h2>
+            <p class="chapter-discourse">
+              \(\eta = P_{\mathrm{sal}} / P_{\mathrm{ent}}\). En cascada se multiplican:
+              \(\eta_{\mathrm{t}} = \eta_1\eta_2\eta_3\).
+              Un módulo TOPCon al 23 %, un inversor SiC al 98.5 % y un transformador
+              al 99 % no dan 23 %: dan el producto. Lo mismo una turbina Pelton, un
+              generador y un convertidor, o la ida y vuelta de un BESS (RTE). El
+              eslabón flojo —un rectificador del 21 %, una correa al 75 %— se come
+              el resto.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-4-5">Selecciona un problema:</label>
+                <select id="preset-4-5" class="book-preset-select" data-section="4-5">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p38">Prob 38: 0.5 hp de salida, 450 W de entrada</option>
+                  <option value="p39">Prob 39: Astilladora 68.5 %, 1.8 hp, 120 V</option>
+                  <option value="p40">Prob 40: Motor 1 hp, 4 A a 220 V</option>
+                  <option value="p41a">Prob 41.a: 2.4 A a 120 V, 50 W útiles → pérdida</option>
+                  <option value="p41b">Prob 41.b: Eficiencia del sistema</option>
+                  <option value="p42">Prob 42: Motor 87 %, 3.6 hp, 220 V → I</option>
+                  <option value="p43a">Prob 43.a: 2 hp, 90 %, 110 V → W de red</option>
+                  <option value="p43b">Prob 43.b: Corriente a 90 %</option>
+                  <option value="p43c">Prob 43.c: Corriente a 70 %</option>
+                  <option value="p44">Prob 44: Ascensor 15 hp, 90 %, 220 V</option>
+                  <option value="p45">Prob 45: Motor 87 % y correa 75 %</option>
+                  <option value="p46">Prob 46: Dos etapas 80 %, 60 J de entrada</option>
+                  <option value="p47">Prob 47: ηt = 72 %, una etapa 90 %</option>
+                  <option value="p48">Prob 48: 400 W → 128 W, una el doble de la otra</option>
+                  <option value="p49a">Prob 49.a: 98 %, 87 % y 21 %</option>
+                  <option value="p49b">Prob 49.b: Sustituir 21 % por 90 %</option>
+                  <option value="p50a">Prob 50.a: 1 Wh y 1 kWh a julios</option>
+                  <option value="p50b">Prob 50.b: Cuándo usar Wh o kWh</option>
+                </select>
+              </div>
+              <div id="desc-preset-4-5" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador \(\eta = P_{\mathrm{sal}}/P_{\mathrm{ent}}\)</h3>
+              <p class="hint-inline">Deja vacía una de \(P_{\mathrm{sal}}\), \(P_{\mathrm{ent}}\) o \(\eta\). \(P_{\mathrm{sal}}\) admite hp.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="eta-out">P sal:</label>
+                  <input type="text" id="eta-out" placeholder="Ej. 0.5" />
+                  <select id="eta-out-u">
+                    <option value="1" selected>W</option>
+                    <option value="1000">kW</option>
+                    <option value="746">hp</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="eta-in">P ent:</label>
+                  <input type="text" id="eta-in" placeholder="Ej. 450" />
+                  <select id="eta-in-u">
+                    <option value="1" selected>W</option>
+                    <option value="1000">kW</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="eta-n">η (%):</label>
+                  <input type="text" id="eta-n" placeholder="Ej. 87" />
+                </div>
+                <div class="k-input">
+                  <label for="eta-v">V (para I):</label>
+                  <input type="text" id="eta-v" placeholder="Ej. 220" />
+                </div>
+                <div class="k-input">
+                  <label for="eta-i">I (A, opcional):</label>
+                  <input type="text" id="eta-i" placeholder="Ej. 4" />
+                </div>
+                <button id="btn-eta-4-5" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-5" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Cascada de rendimientos</h3>
+              <p class="hint-inline">Etapas en serie (módulo × inversor × transformador, turbina × generador, motor × correa). Vacía = 100 %.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="cas-1">η₁ (%):</label>
+                  <input type="text" id="cas-1" placeholder="Ej. 98" />
+                </div>
+                <div class="k-input">
+                  <label for="cas-2">η₂ (%):</label>
+                  <input type="text" id="cas-2" placeholder="Ej. 87" />
+                </div>
+                <div class="k-input">
+                  <label for="cas-3">η₃ (%):</label>
+                  <input type="text" id="cas-3" placeholder="Ej. 21" />
+                </div>
+                <div class="k-input">
+                  <label for="cas-nt">η total (% , opcional):</label>
+                  <input type="text" id="cas-nt" placeholder="Ej. 72" />
+                </div>
+                <div class="k-input">
+                  <label for="cas-e">Energía de entrada (J):</label>
+                  <input type="text" id="cas-e" placeholder="Ej. 60" />
+                </div>
+                <div class="k-input">
+                  <label for="cas-pin">o P entrada (W):</label>
+                  <input type="text" id="cas-pin" placeholder="Ej. 400" />
+                </div>
+                <div class="k-input">
+                  <label for="cas-pout">P salida (W):</label>
+                  <input type="text" id="cas-pout" placeholder="Ej. 128" />
+                </div>
+                <div class="k-input">
+                  <label>
+                    <input type="checkbox" id="cas-double" />
+                    Una etapa el doble de la otra (solo dos)
+                  </label>
+                </div>
+                <button id="btn-cas-4-5" class="action-btn mt-1">Calcular cascada</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-5-cas" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-4-6">
+            <h2>Sección 4.6: Energía</h2>
+            <p class="chapter-discourse">
+              \(W = Pt\). El medidor del punto de conexión registra kWh, no julios.
+              \(1\,\mathrm{kWh} = 3{,}6\times 10^{6}\,\mathrm{J}\).
+              El LCOE de un parque FV o eólico 2026 se cotiza en USD/MWh; la tarifa
+              residencial de estos ejercicios se deja en 9 ¢/kWh para que los números
+              del libro sigan cuadrando. Duplicar el tiempo duplica la energía, no la
+              potencia: un string a \(P_{\mathrm{mpp}}\) dos minutos no «se calienta
+              el doble»; entrega el doble de julios al bus.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-4-6">Selecciona un problema:</label>
+                <select id="preset-4-6" class="book-preset-select" data-section="4-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p51a">Prob 51.a: 10 Ω a 15 V, energía en 1 min</option>
+                  <option value="p51b">Prob 51.b: ¿Y a 2 min? ¿Sube P?</option>
+                  <option value="p52">Prob 52: 230 W, 12 h/sem, 5 meses</option>
+                  <option value="p53">Prob 53: 1500 W hasta 10 kWh</option>
+                  <option value="p54">Prob 54: Logger 30 W, 3 h a 9 ¢/kWh</option>
+                  <option value="p55a">Prob 55.a: 500 kWh en 10 h → P</option>
+                  <option value="p55b">Prob 55.b: I a 208 V</option>
+                  <option value="p55c">Prob 55.c: Pérdida a η = 82 %</option>
+                  <option value="p56a">Prob 56.a: 250 W con $1 a 9 ¢/kWh</option>
+                  <option value="p56b">Prob 56.b: 4.8 kW con $1</option>
+                  <option value="p56c">Prob 56.c: Efecto del nivel de potencia</option>
+                  <option value="p57">Prob 57: Auxiliares de planta a 9 ¢/kWh</option>
+                  <option value="p58">Prob 58: Sala de control a 9 ¢/kWh</option>
+                </select>
+              </div>
+              <div id="desc-preset-4-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador \(W = Pt\) y costo</h3>
+              <p class="hint-inline">El mes de estos ejercicios vale \(4/3\) semanas. Deja vacía \(W\), \(P\) o \(t\).</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="en-p">P:</label>
+                  <input type="text" id="en-p" placeholder="Ej. 230" />
+                  <select id="en-p-u">
+                    <option value="1" selected>W</option>
+                    <option value="1000">kW</option>
+                    <option value="746">hp</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="en-t">t:</label>
+                  <input type="text" id="en-t" placeholder="Ej. 12" />
+                  <select id="en-t-u">
+                    <option value="1">s</option>
+                    <option value="60">min</option>
+                    <option value="3600" selected>h</option>
+                    <option value="86400">día</option>
+                    <option value="604800">semana</option>
+                    <option value="806400">mes (4/3 sem)</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="en-hweek">h / semana (opcional):</label>
+                  <input type="text" id="en-hweek" placeholder="Ej. 12" />
+                </div>
+                <div class="k-input">
+                  <label for="en-months">meses (opcional):</label>
+                  <input type="text" id="en-months" placeholder="Ej. 5" />
+                </div>
+                <div class="k-input">
+                  <label for="en-w">W (J):</label>
+                  <input type="text" id="en-w" placeholder="julios" />
+                </div>
+                <div class="k-input">
+                  <label for="en-kwh">o energía (kWh):</label>
+                  <input type="text" id="en-kwh" placeholder="Ej. 10" />
+                </div>
+                <div class="k-input">
+                  <label for="en-rate">tarifa (¢/kWh):</label>
+                  <input type="text" id="en-rate" placeholder="9" value="9" />
+                </div>
+                <div class="k-input">
+                  <label for="en-budget">presupuesto ($):</label>
+                  <input type="text" id="en-budget" placeholder="Ej. 1" />
+                </div>
+                <div class="k-input">
+                  <label for="en-v">V (para I):</label>
+                  <input type="text" id="en-v" placeholder="Ej. 208" />
+                </div>
+                <div class="k-input">
+                  <label for="en-eta">η (% , opcional):</label>
+                  <input type="text" id="en-eta" placeholder="Ej. 82" />
+                </div>
+                <button id="btn-en-4-6" class="action-btn mt-1">Calcular</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Costo de varios aparatos (probs. 57 y 58)</h3>
+              <p class="hint-inline">Potencia en W, tiempo en horas. La tarifa es ¢/kWh (9 ¢ = 0.09 $/kWh).</p>
+              <div class="k-input" style="margin-bottom: 0.75rem;">
+                <label for="cost-rate">¢/kWh:</label>
+                <input type="text" id="cost-rate" value="9" />
+              </div>
+              <div class="data-table-wrap">
+                <table class="cost-table" id="cost-table-4-6">
+                  <thead>
+                    <tr>
+                      <th>Aparato</th>
+                      <th>P (W)</th>
+                      <th>t (h)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" id="c6-n1" value="HVAC sala de inversores" /></td>
+                      <td><input type="text" id="c6-p1" value="860" /></td>
+                      <td><input type="text" id="c6-t1" value="24" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="c6-n2" value="Secador de biomasa" /></td>
+                      <td><input type="text" id="c6-p2" value="4800" /></td>
+                      <td><input type="text" id="c6-t2" value="0.5" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="c6-n3" value="Bomba de lavado / geo" /></td>
+                      <td><input type="text" id="c6-p3" value="400" /></td>
+                      <td><input type="text" id="c6-t3" value="1" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="c6-n4" value="Lavado de módulos / CIP" /></td>
+                      <td><input type="text" id="c6-p4" value="1200" /></td>
+                      <td><input type="text" id="c6-t4" value="0.75" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <button id="btn-cost-4-6" class="action-btn mt-1">Calcular costo total</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-6-cost" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-4-9">
+            <h2>Sección 4.9: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              PSpice y el lenguage de programación del libro se sustituyen aquí por
+              el mismo solucionador que ya usas: \(E\), \(R\) y \(t\) bastan para
+              \(I\), \(P\) y \(W\). Un shunt de 400 mV o un sensor de 20 mV se
+              analizan igual que el circuito de la figura 4.29. Invertir la polaridad
+              de la batería solo cambia el sentido de \(I\); las magnitudes no.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios Preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-4-9">Selecciona un problema:</label>
+                <select id="preset-4-9" class="book-preset-select" data-section="4-9">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p59">Prob 59: E = 400 mV, R = 0.04 MΩ</option>
+                  <option value="p60">Prob 60: Polaridad invertida, 0.02 V, 240 Ω</option>
+                  <option value="p61">Prob 61: Costo de cinco aparatos a 9 ¢/kWh</option>
+                  <option value="p62">Prob 62: I, R, t → V, P, W</option>
+                </select>
+              </div>
+              <div id="desc-preset-4-9" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 4.29 — Fuente \(E\) y resistencia \(R\)</h3>
+              <svg class="circuit-svg" viewBox="0 0 560 180" role="img" aria-label="Fuente E y resistor R, polaridad reversible">
+                <line x1="80" y1="40" x2="80" y2="140" stroke="currentColor" stroke-width="2"/>
+                <line x1="65" y1="58" x2="95" y2="58" stroke="currentColor" stroke-width="2"/>
+                <line x1="70" y1="122" x2="90" y2="122" stroke="currentColor" stroke-width="2"/>
+                <text x="28" y="78" font-size="14" fill="#1e8449" id="fig-4-29-plus">+</text>
+                <text x="30" y="128" font-size="14" fill="#c0392b" id="fig-4-29-minus">−</text>
+                <text x="100" y="96" font-size="16" fill="currentColor">E</text>
+                <line x1="80" y1="40" x2="260" y2="40" stroke="#2471a3" stroke-width="2.4"/>
+                <polygon points="260,40 242,34 242,46" fill="#2471a3"/>
+                <text x="150" y="28" font-size="14" fill="#2471a3">I</text>
+                <rect x="260" y="28" width="100" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="260" y1="34" x2="360" y2="34" stroke="currentColor" stroke-width="1.4"/>
+                <line x1="260" y1="46" x2="360" y2="46" stroke="currentColor" stroke-width="1.4"/>
+                <text x="298" y="22" font-size="14" fill="currentColor">R</text>
+                <line x1="360" y1="40" x2="440" y2="40" stroke="currentColor" stroke-width="2"/>
+                <line x1="440" y1="40" x2="440" y2="140" stroke="currentColor" stroke-width="2"/>
+                <line x1="440" y1="140" x2="80" y2="140" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <p class="caption-fig">Figura 4.29 — Circuito de los problemas 59, 60 y 62</p>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Análisis \(E\), \(R\), \(t\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="sp-e">E:</label>
+                  <input type="text" id="sp-e" placeholder="Ej. 0.4" />
+                  <select id="sp-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="sp-r">R:</label>
+                  <input type="text" id="sp-r" placeholder="Ej. 0.04" />
+                  <select id="sp-r-u">
+                    <option value="1">Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6" selected>MΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="sp-i">I (si se pide el 62):</label>
+                  <input type="text" id="sp-i" placeholder="opcional" />
+                  <select id="sp-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="sp-t">t:</label>
+                  <input type="text" id="sp-t" placeholder="Ej. 1" />
+                  <select id="sp-t-u">
+                    <option value="1" selected>s</option>
+                    <option value="60">min</option>
+                    <option value="3600">h</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label>
+                    <input type="checkbox" id="sp-invert" />
+                    Invertir polaridad de E
+                  </label>
+                </div>
+                <button id="btn-sp-4-9" class="action-btn mt-1">Analizar circuito</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-9" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Programa de costo — cinco aparatos (prob. 61)</h3>
+              <p class="hint-inline">Misma tarifa, tiempos distintos. Es el ejercicio de programación del libro, resuelto en el navegador.</p>
+              <div class="k-input" style="margin-bottom: 0.75rem;">
+                <label for="c9-rate">¢/kWh:</label>
+                <input type="text" id="c9-rate" value="9" />
+              </div>
+              <div class="data-table-wrap">
+                <table class="cost-table">
+                  <thead>
+                    <tr>
+                      <th>Aparato</th>
+                      <th>P (W)</th>
+                      <th>t (h)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" id="c9-n1" value="Logger / RTU" /></td>
+                      <td><input type="text" id="c9-p1" value="30" /></td>
+                      <td><input type="text" id="c9-t1" value="3" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="c9-n2" value="HMI SCADA" /></td>
+                      <td><input type="text" id="c9-p2" value="250" /></td>
+                      <td><input type="text" id="c9-t2" value="8" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="c9-n3" value="Tracker (yaw)" /></td>
+                      <td><input type="text" id="c9-p3" value="110" /></td>
+                      <td><input type="text" id="c9-t3" value="4" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="c9-n4" value="Proyector de sala" /></td>
+                      <td><input type="text" id="c9-p4" value="1200" /></td>
+                      <td><input type="text" id="c9-t4" value="0.333" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="c9-n5" value="Servidor de planta" /></td>
+                      <td><input type="text" id="c9-p5" value="150" /></td>
+                      <td><input type="text" id="c9-t5" value="3.75" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <button id="btn-c9-4-9" class="action-btn mt-1">Calcular</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-4-9-cost" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-4-0" aria-labelledby="glossary-4-heading">
+            <h2 id="glossary-4-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de Ohm, potencia, eficiencia y energía del capítulo 4,
+              reescritos para la ingeniería eléctrica de renovables convencionales
+              y no convencionales en 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Caballo de potencia (hp)</dt>
+                <dd>Medida equivalente a 746 watts en el sistema eléctrico. Sigue en las placas de bombas de riego fotovoltaico, motobombas geotérmicas, yaw de aerogenerador y ascensor de torre. En SI se especifica kW; \(1\,\mathrm{hp} = 746\,\mathrm{W}\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Cortacircuito</dt>
+                <dd>Dispositivo de dos terminales diseñado para asegurar que la corriente no exceda los niveles de seguridad. Si se «desconecta», puede restablecerse con un interruptor o un botón. En 2026 es el breaker magnetotérmico del tablero auxiliar, el AC breaker del inversor y el rearmable de un string box; no sustituye al fusible gPV.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Diodo</dt>
+                <dd>Dispositivo semiconductor cuyo comportamiento es, de manera ideal, el de un interruptor que pasa corriente en una sola dirección. Bypass de módulo, anti-retorno de string, rueda libre del chopper eólico y Schottky del convertidor SiC.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Diodo túnel</dt>
+                <dd>Diodo con un tramo de resistencia diferencial negativa en su I–V. El ejercicio 18 lo usa como modelo; en 2026 el análogo de planta es el foldback de un grid-forming y el pliegue N de algunas uniones tándem de investigación, no un componente de potencia.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Eficiencia (η)</dt>
+                <dd>Razón de potencia de salida a potencia de entrada: \(\eta = P_{\mathrm{sal}}/P_{\mathrm{ent}}\). Informa de inmediato sobre la conversión de un inversor (euro/CEC), de una Pelton, de un ciclo binario geotérmico o de la ida y vuelta de un BESS (RTE).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Energía (W)</dt>
+                <dd>Cantidad cuyo cambio de estado se determina mediante el producto de la tasa de conversión (\(P\)) y el periodo (\(t\)): \(W = Pt\). Se mide en julios (J) o watts-segundo (Ws). El medidor de facturación la integra en kWh; \(1\,\mathrm{kWh} = 3{,}6\times 10^{6}\,\mathrm{J}\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fusible</dt>
+                <dd>Dispositivo con dos terminales cuya única finalidad es asegurar que los niveles de corriente en un circuito no exceden los de seguridad. El gPV del combinador, el aR del inversor y el NH de media tensión no se rearman: se reemplazan. Un cortacircuito sí.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ley de Ohm</dt>
+                <dd>Ecuación que establece una relación entre la corriente, el voltaje y la resistencia: \(V = IR\). Dimensiona el dump load, el shunt, el \(R_{\mathrm{DS(on)}}\) del SiC y la caída en el cable de un string o de un ramal de BESS.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Medidor de kilowatts-hora</dt>
+                <dd>Instrumento para medir los kilowatts-hora de energía suministrada a un usuario de electricidad residencial o comercial. En planta 2026 es el medidor de facturación del PCC (clase 0.2 S), el de generación neta y el del autoconsumo detrás del medidor.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Potencia</dt>
+                <dd>Indicación de cuánto trabajo puede ser realizado en una cantidad específica de tiempo. Se mide en julios/segundo (J/s) o watts (W). Es el kW del inversor, el MW del parque y el \(I^{2}R\) que el LCOE 2026 ya no ignora.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Watímetro</dt>
+                <dd>Instrumento capaz de medir la potencia entregada a un elemento detectando tanto el voltaje como la corriente. En 2026 es el canal P del inversor, del PPC y del analizador de red; no un instrumento de laboratorio de dos bobinas.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable convencional</dt>
+                <dd>Hidroeléctrica (embalse, filo de agua, mini-hidro), geotérmica (flash y ciclo binario) y biomasa/biogás consolidado; en algunos marcos, la solar térmica CSP. Maduras, despachables en distinto grado, con máquina rotativa o ciclo de vapor.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>Fotovoltaica (c-Si TOPCon/HJT, tándem, flotante, agrovoltaica), eólica onshore y marina, mareomotriz, undimotriz, OTEC, hidrógeno verde y almacenamiento BESS. Variables o nuevas en el despacho; el inversor y el EMS hacen de «máquina».</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ohm (Ω)</dt>
+                <dd>Unidad SI de resistencia. Un volt a través de un ohmio establece un ampere. Escala desde el miliohmio del \(R_{\mathrm{DS(on)}}\) y del busbar hasta el megaohmio del aislamiento XLPE y del monitor ISO del bus de 1500 Vcc.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
     </section>
   </main>
 
