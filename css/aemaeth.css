@@ -466,3 +466,237 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
     gap: 0;
   }
 }
+
+/* Chapter 3.0 — resistance, AWG, color code, devices */
+.archimedes-cta-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin: 0 0 1.75rem;
+}
+
+.archimedes-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: var(--primary);
+  color: #fff;
+  text-decoration: none;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 0.98rem;
+  padding: 0.85rem 1.35rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: background 0.3s, color 0.3s, transform 0.1s;
+}
+
+.archimedes-cta:hover {
+  background: var(--secondary);
+  color: var(--text-dark);
+}
+
+.archimedes-cta:active {
+  transform: scale(0.98);
+}
+
+.archimedes-cta:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.archimedes-cta-note {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.92rem;
+  color: var(--text-medium);
+  margin: 0;
+  max-width: 36rem;
+}
+
+.caption-fig {
+  font-family: 'Inter', sans-serif;
+  text-align: center;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  color: var(--text-medium);
+  margin: 0.35rem 0 1.25rem;
+  text-transform: uppercase;
+}
+
+.wire-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  align-items: flex-start;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.wire-row {
+  display: grid;
+  grid-template-columns: minmax(7.5rem, 11rem) 1fr;
+  gap: 0.85rem 1.1rem;
+  align-items: center;
+  width: 100%;
+}
+
+.wire-meta {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.92rem;
+  color: var(--text-dark);
+  line-height: 1.4;
+}
+
+.wire-meta strong {
+  display: block;
+  color: var(--primary);
+}
+
+.wire-visual {
+  display: flex;
+  align-items: center;
+}
+
+.wire-cyl {
+  border-radius: 999px;
+  background: linear-gradient(180deg, #f4f4f4 0%, #b8b8b8 45%, #8a8a8a 100%);
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+.wire-ag { width: 18%; min-width: 2.2rem; height: 0.42rem; background: linear-gradient(180deg, #f8f8f8, #c5c5c5 50%, #9a9a9a); }
+.wire-cu { width: 42%; min-width: 4.5rem; height: 1.15rem; background: linear-gradient(180deg, #e8b07a, #b87333 48%, #8a4b1f); }
+.wire-al { width: 100%; height: 3.4rem; background: linear-gradient(180deg, #f2f3f5, #c5c9cf 48%, #8e949c); }
+
+.plate-svg,
+.circuit-svg,
+.rod-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.4rem 0 0.2rem;
+}
+
+.data-table-wrap {
+  overflow-x: auto;
+  margin: 0.5rem 0 0.25rem;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.88rem;
+}
+
+.data-table th,
+.data-table td {
+  padding: 0.45rem 0.55rem;
+  border-bottom: 1px solid var(--border);
+  text-align: right;
+  white-space: nowrap;
+}
+
+.data-table th:first-child,
+.data-table td:first-child {
+  text-align: left;
+  font-weight: 600;
+}
+
+.data-table th {
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .data-table th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.data-table tr.is-hit td {
+  background: rgba(46, 134, 171, 0.14);
+}
+
+.resistor-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.85rem;
+  margin: 0.4rem 0 1rem;
+}
+
+.resistor-body {
+  position: relative;
+  width: min(100%, 280px);
+  height: 58px;
+  background: linear-gradient(180deg, #d8b07a, #b07a3a 50%, #8a5a28);
+  border-radius: 18px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 38px;
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.25);
+}
+
+.resistor-body::before,
+.resistor-body::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 36px;
+  height: 6px;
+  background: #9aa0a6;
+  transform: translateY(-50%);
+}
+
+.resistor-body::before { left: -28px; }
+.resistor-body::after { right: -28px; }
+
+.resistor-band {
+  width: 14px;
+  margin: 0;
+  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  border-right: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.band-black { background: #1b1b1b; }
+.band-brown { background: #6b3a1f; }
+.band-red { background: #c0392b; }
+.band-orange { background: #e67e22; }
+.band-yellow { background: #f1c40f; }
+.band-green { background: #1e8449; }
+.band-blue { background: #2471a3; }
+.band-violet { background: #6c3483; }
+.band-gray { background: #7f8c8d; }
+.band-white { background: #f4f6f7; }
+.band-gold { background: linear-gradient(180deg, #f6e27a, #c9a227); }
+.band-silver { background: linear-gradient(180deg, #e8eaed, #9aa0a6); }
+.band-none { background: transparent; border-color: transparent; }
+
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.problem-list {
+  margin: 0 0 1rem;
+  padding-left: 1.2rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-medium);
+  line-height: 1.55;
+}
+
+.problem-list li {
+  margin: 0.25rem 0;
+}
+
+.checklist {
+  margin: 0;
+  padding-left: 1.15rem;
+  font-family: 'Inter', sans-serif;
+  line-height: 1.55;
+}
+
+.checklist li { margin: 0.35rem 0; }
