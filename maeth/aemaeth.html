@@ -5013,6 +5013,923 @@
         </div>
       </details>
 
+      <details class="chapter-1-fold" id="capitulo-6">
+        <summary class="chapter-1-summary" aria-label="Capítulo 6.0">
+          <span class="chapter-1-title">6.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Circuitos en paralelo: dos nudos comunes y varias trayectorias
+            para la carga.
+            \(G_T = G_1 + G_2 + \cdots + G_N\),
+            \(R_T = 1 / G_T\),
+            \(V\) es el mismo en cada rama,
+            \(I_x = E / R_x\),
+            \(I_s = \sum I_x\)
+            y la ley de corriente de Kirchhoff
+            \(\sum I_{\mathrm{entran}} = \sum I_{\mathrm{salen}}\)
+            son las cuentas con las que se dimensiona un combiner
+            fotovoltaico, un bus de \(1500\,V_{\mathrm{cc}}\),
+            varios racks de BESS en paralelo, inversores
+            grid-forming del mismo firmware y el alumbrado auxiliar
+            de planta. En 2026 las ecuaciones no cambiaron; cambió
+            el aparato. Un string TOPCon, un rack LFP y un
+            electrolizador en el mismo bus son la misma red.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(G_T = \sum 1/R\),
+              \(I_x = I_T R_T / R_x\) y
+              \(\sum I = 0\) sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-6-2">Sec 6.2</button>
+            <button class="tab-btn" data-target="sec-6-3">Sec 6.3</button>
+            <button class="tab-btn" data-target="sec-6-4">Sec 6.4</button>
+            <button class="tab-btn" data-target="sec-6-5">Sec 6.5</button>
+            <button class="tab-btn" data-target="sec-6-6">Sec 6.6</button>
+            <button class="tab-btn" data-target="sec-6-7">Sec 6.7</button>
+            <button class="tab-btn" data-target="sec-6-8">Sec 6.8–6.9</button>
+            <button class="tab-btn" data-target="sec-6-12">Sec 6.12</button>
+          </div>
+
+          <div class="tab-content active" id="sec-6-2">
+            <h2>Sección 6.2: Elementos en paralelo</h2>
+            <p class="chapter-discourse">
+              Dos elementos están en paralelo si comparten
+              <em>ambos</em> nudos (los dos terminales).
+              La corriente se parte; el voltaje no.
+              Un string no está en paralelo con el feeder que lo
+              alimenta: el feeder está en serie con el paralelo de
+              los strings. Un cortocircuito en una rama se lleva
+              todo el bus (falla DC); un abierto (fusible gPV)
+              saca solo esa rama — el resto sigue a \(E\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-6-2">Selecciona un problema:</label>
+                <select id="preset-6-2" class="book-preset-select" data-section="6-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1a">Prob 1.a: Combiner de tres strings (fig. 6.67.a)</option>
+                  <option value="p1b">Prob 1.b: Feeder y dos MPPT (fig. 6.67.b)</option>
+                  <option value="p1c">Prob 1.c: Tres ramas al bus (fig. 6.67.c)</option>
+                  <option value="p2">Prob 2: Bus DC de planta híbrida (fig. 6.68)</option>
+                </select>
+              </div>
+              <div id="desc-preset-6-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 6.67 y 6.68 — Serie frente a paralelo</h3>
+              <div class="input-group">
+                <label for="s62-fig">Configuración:</label>
+                <select id="s62-fig">
+                  <option value="a">6.67.a — gPV + tres strings</option>
+                  <option value="b">6.67.b — feeder + dos MPPT</option>
+                  <option value="c">6.67.c — 1 || (2+3) || 4</option>
+                  <option value="d">6.68 — bus híbrido BESS / FV / H₂</option>
+                </select>
+                <button id="btn-s62" class="action-btn">Clasificar</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s62" viewBox="0 0 460 210" role="img"
+                aria-label="Configuración serie-paralelo de un combiner"></svg>
+              <p class="caption-fig">Figura 6.67 / 6.68 — Lo que comparte dos nudos es paralelo; lo que comparte uno es serie. Un combiner 2026 es el dibujo (a).</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Clasificación:</strong>
+                  <div id="proc-6-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-6-3">
+            <h2>Sección 6.3: Conductancia y resistencia totales</h2>
+            <p class="chapter-discourse">
+              \(G_T = \sum G_x = \sum 1/R_x\),
+              \(R_T = 1/G_T\).
+              La rama más pequeña domina \(G_T\)
+              (un shunt de \(10\,\Omega\) apaga a un bleeder de
+              \(40\,\mathrm{k}\Omega\)).
+              En un combiner, \(N\) strings iguales dan
+              \(R_T = R/N\).
+              Una rama puede ser ella misma una serie
+              (dos módulos, un cable más un dump): se suma primero,
+              luego se paraleliza.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-6-3">Selecciona un problema:</label>
+                <select id="preset-6-3" class="book-preset-select" data-section="6-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p3a">Prob 3.a: 9 || 18 Ω (dump)</option>
+                  <option value="p3b">Prob 3.b: 3 || 2 || 6 kΩ</option>
+                  <option value="p3c">Prob 3.c: 3.3 || 5.6 kΩ (E24)</option>
+                  <option value="p3d">Prob 3.d: 4 || 8 || 4 || 8 Ω</option>
+                  <option value="p3e">Prob 3.e: 10 Ω || 2 kΩ || 40 kΩ</option>
+                  <option value="p3f">Prob 3.f: seis E24 de lastre</option>
+                  <option value="p4a">Prob 4.a: GT = 0.55 S, hallar R</option>
+                  <option value="p4b">Prob 4.b: GT = 0.45 mS, hallar R</option>
+                  <option value="p5a">Prob 5.a: RT = 6 Ω, hallar R</option>
+                  <option value="p5b">Prob 5.b: RT = 4 Ω, R1 = R2</option>
+                  <option value="p6">Prob 6: R2 = 5 R1, R3 = ½ R1, RT = 20 Ω</option>
+                  <option value="p7">Prob 7: R1 || (24+24) || 120 = 10 Ω</option>
+                </select>
+              </div>
+              <div id="desc-preset-6-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.69 — Ramas en paralelo</h3>
+              <svg class="circuit-svg" id="svg-s63" viewBox="0 0 640 200" role="img"
+                aria-label="Fuente E y resistencias en paralelo"></svg>
+              <p class="caption-fig">Figura 6.69 — Cada rama entre los dos nudos del bus. La columna «serie en rama» suma un segundo elemento (prob. 6 y 7).</p>
+            </div>
+            <div class="card interactive-card">
+              <h3>Solucionador de \(G_T\) y \(R_T\)</h3>
+              <p class="hint-inline">
+                Deja vacíos los desconocidos. Un \(G_T\) o un \(R_T\)
+                halla la R que falta. \(N\) copia la rama \(N\) veces
+                (ocho focos, doce strings). Razones \(R_2 = k_2 R_1\)
+                para el prob. 6.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s63-gt">GT conocido:</label>
+                  <input type="text" id="s63-gt" placeholder="opcional" />
+                  <select id="s63-gt-u">
+                    <option value="1" selected>S</option>
+                    <option value="0.001">mS</option>
+                    <option value="1e-6">µS</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s63-rt">RT conocido:</label>
+                  <input type="text" id="s63-rt" placeholder="opcional" />
+                  <select id="s63-rt-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s63-k2">R2 / R1:</label>
+                  <input type="text" id="s63-k2" placeholder="prob. 6" />
+                </div>
+                <div class="k-input">
+                  <label for="s63-k3">R3 / R1:</label>
+                  <input type="text" id="s63-k3" placeholder="prob. 6" />
+                </div>
+              </div>
+              <div class="data-table-wrap">
+                <table class="series-table">
+                  <thead>
+                    <tr>
+                      <th>Rama</th><th>R</th><th>Unidad</th>
+                      <th>Serie</th><th>Unidad</th><th>N</th><th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody id="s63-tbody"></tbody>
+                </table>
+              </div>
+              <button id="btn-s63" class="action-btn mt-1">Calcular GT y RT</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-6-4">
+            <h2>Sección 6.4: Circuitos en paralelo</h2>
+            <p class="chapter-discourse">
+              Con \(E\) en el bus, cada rama es un Ohm independiente:
+              \(I_x = E / R_x\), \(P_x = E^{2} / R_x\).
+              La fuente entrega \(I_s = E G_T\) y
+              \(P = E I_s = \sum P_x\).
+              Un foco que abre no apaga a los demás
+              (alumbrado auxiliar, strings de un combiner).
+              El wattaje se elige entre \(½\), \(1\), \(2\) y \(50\,\mathrm{W}\)
+              — o el kW del dump, a otra escala.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-6-4">Selecciona un problema:</label>
+                <select id="preset-6-4" class="book-preset-select" data-section="6-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p8">Prob 8: 48 V, 8 || 24 kΩ — I, P, wattaje</option>
+                  <option value="p9">Prob 9: 0.9 V, 3 || 6 || 1.5 Ω</option>
+                  <option value="p10">Prob 10: 12 V, 2.2 || 4.7 || 6.8 kΩ</option>
+                  <option value="p11">Prob 11: Ocho focos LED en paralelo a 120 V</option>
+                  <option value="p12">Prob 12: Servicio 120 V, 20 A, focos / lavadora / TV</option>
+                  <option value="p13a">Prob 13.a: 30 V, 20 || 5 Ω</option>
+                  <option value="p13b">Prob 13.b: Rail −8 V, 10k || 1k || 10k</option>
+                  <option value="p14">Prob 14: 12 V, 6 A, hallar R1</option>
+                  <option value="p15">Prob 15: Rack 60 V, 5 || 10 || 20 Ω</option>
+                  <option value="p16">Prob 16: Rails +24 V y −8 V, triángulo 8/4/12 Ω</option>
+                  <option value="p17">Prob 17: +24 V, 10 k / 4 k / 2 k</option>
+                </select>
+              </div>
+              <div id="desc-preset-6-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.74 — Bus y ramas</h3>
+              <svg class="circuit-svg" id="svg-s64" viewBox="0 0 640 200" role="img"
+                aria-label="Fuente y ramas en paralelo"></svg>
+              <p class="caption-fig">Figura 6.74 — 48 V de auxiliar de contenedor y dos bleeder. El dibujo se redibuja al pulsar Calcular.</p>
+            </div>
+            <div class="card interactive-card">
+              <h3>Solucionador de circuito en paralelo</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s64-e">E:</label>
+                  <input type="text" id="s64-e" placeholder="Ej. 48" />
+                  <select id="s64-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s64-i">Is:</label>
+                  <input type="text" id="s64-i" placeholder="opcional" />
+                  <select id="s64-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s64-rt">RT conocido:</label>
+                  <input type="text" id="s64-rt" placeholder="opcional" />
+                  <select id="s64-rt-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s64-gt">GT conocido:</label>
+                  <input type="text" id="s64-gt" placeholder="opcional" />
+                  <select id="s64-gt-u">
+                    <option value="1" selected>S</option>
+                    <option value="0.001">mS</option>
+                  </select>
+                </div>
+              </div>
+              <div class="data-table-wrap">
+                <table class="series-table">
+                  <thead>
+                    <tr>
+                      <th>Rama</th><th>R</th><th>Unidad</th>
+                      <th>Serie</th><th>Unidad</th><th>N</th><th>Estado</th>
+                      <th>I conocida</th><th>P conocida</th>
+                    </tr>
+                  </thead>
+                  <tbody id="s64-tbody"></tbody>
+                </table>
+              </div>
+              <div class="k-input" style="margin-top:0.75rem;">
+                <label>
+                  <input type="checkbox" id="s64-watt" checked />
+                  Recomendar wattaje (½ / 1 / 2 / 50 W)
+                </label>
+              </div>
+              <button id="btn-s64" class="action-btn mt-1">Calcular I, P y LCK</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.78 — Servicio en paralelo por potencia</h3>
+              <p class="hint-inline">
+                Cargas de planta o de campamento de O&amp;M:
+                \(I = P / V\). El interruptor de \(20\,\mathrm{A}\)
+                es el gPV / termomagnético del tablero.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s64l-e">V servicio:</label>
+                  <input type="text" id="s64l-e" value="120" />
+                  <select id="s64l-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s64l-br">Interruptor:</label>
+                  <input type="text" id="s64l-br" value="20" />
+                  <span>A</span>
+                </div>
+              </div>
+              <div class="data-table-wrap">
+                <table class="series-table">
+                  <thead>
+                    <tr><th>Carga</th><th>P unitaria (W)</th><th>N</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" id="s64l-n1" value="focos 60 W" /></td>
+                      <td><input type="text" id="s64l-p1" value="60" /></td>
+                      <td><input type="text" id="s64l-c1" value="10" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s64l-n2" value="lavadora" /></td>
+                      <td><input type="text" id="s64l-p2" value="400" /></td>
+                      <td><input type="text" id="s64l-c2" value="1" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s64l-n3" value="televisor" /></td>
+                      <td><input type="text" id="s64l-p3" value="360" /></td>
+                      <td><input type="text" id="s64l-c3" value="1" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s64l-n4" placeholder="otra" /></td>
+                      <td><input type="text" id="s64l-p4" /></td>
+                      <td><input type="text" id="s64l-c4" value="1" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <button id="btn-s64load" class="action-btn mt-1">Calcular servicio</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-4-load" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.82 — Dos rails y un nudo flotante</h3>
+              <p class="hint-inline">
+                Auxiliar bipolar (\(+\mathrm{V}\) / \(-\mathrm{V}\))
+                de un contenedor: \(V_A\) y \(V_B\) fijos, \(V_C\)
+                por nudos. \(R_{AB}\) es la carga entre rails.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s64n-va">VA:</label><input type="text" id="s64n-va" placeholder="24" /></div>
+                <div class="k-input"><label for="s64n-vb">VB:</label><input type="text" id="s64n-vb" placeholder="-8" /></div>
+                <div class="k-input"><label for="s64n-rab">RAB (Ω):</label><input type="text" id="s64n-rab" placeholder="4" /></div>
+                <div class="k-input"><label for="s64n-rac">RAC (Ω):</label><input type="text" id="s64n-rac" placeholder="8" /></div>
+                <div class="k-input"><label for="s64n-rbc">RBC (Ω):</label><input type="text" id="s64n-rbc" placeholder="12" /></div>
+              </div>
+              <button id="btn-s64n" class="action-btn mt-1">Resolver nudos</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-4-n" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-6-5">
+            <h2>Sección 6.5: Ley de corriente de Kirchhoff</h2>
+            <p class="chapter-discourse">
+              En un nudo, \(\sum I_{\mathrm{entran}} = \sum I_{\mathrm{salen}}\).
+              No hace falta que la red sea «paralelo pura»: basta un
+              punto de unión. En planta es la barra de un combiner,
+              el PCC de varios inversores y el nudo de un puente de
+              piranómetro. El signo sigue la flecha que dibujaste:
+              si sale negativo, la flecha iba al revés.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-6-5">Selecciona un problema:</label>
+                <select id="preset-6-5" class="book-preset-select" data-section="6-5">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p18a">Prob 18.a: Combiner, I1 I2 I3</option>
+                  <option value="p18b">Prob 18.b: Feeder → tie → rack</option>
+                  <option value="p19a">Prob 19.a: RTU en mA</option>
+                  <option value="p19b">Prob 19.b: Puente de piranómetro (µA)</option>
+                  <option value="p20">Prob 20: 9 / 5 / 2 mA, hallar R1 R3 E</option>
+                  <option value="p21a">Prob 21.a: 10 V, 3 A, 2 A en R1</option>
+                  <option value="p21b">Prob 21.b: 2 A en 6 Ω, P = 12 W</option>
+                  <option value="p21c">Prob 21.c: 64 V, 100 mA, hallar R</option>
+                  <option value="p21d">Prob 21.d: 30 W en 30 Ω, R2 = R3</option>
+                </select>
+              </div>
+              <div id="desc-preset-6-5" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.84 — Nudos de un combiner</h3>
+              <div class="kcl-node-grid">
+                <div class="kcl-node-card">
+                  <h4>Nudo A</h4>
+                  <div class="data-table-wrap">
+                    <table class="series-table">
+                      <thead><tr><th>Nombre</th><th>I</th><th>Unidad</th><th>Flecha</th></tr></thead>
+                      <tbody id="s65A-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+                <div class="kcl-node-card">
+                  <h4>Nudo B</h4>
+                  <div class="data-table-wrap">
+                    <table class="series-table">
+                      <thead><tr><th>Nombre</th><th>I</th><th>Unidad</th><th>Flecha</th></tr></thead>
+                      <tbody id="s65B-tbody"></tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+              <p class="hint-inline">Usa el mismo nombre (I1, I2…) en los dos nudos para encadenar la solución.</p>
+              <button id="btn-s65" class="action-btn mt-1">Aplicar LCK</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-5" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-6-6">
+            <h2>Sección 6.6: Regla del divisor de corriente</h2>
+            <p class="chapter-discourse">
+              \(I_x = I_T \, R_T / R_x = I_T \, G_x / G_T\)
+              parte \(I_T\) sin calcular \(E\) primero.
+              La rama de menor \(R\) se lleva la mayor parte
+              (string más corto, dump más chico, rack con menos
+              Ri). Las razones \(I_i/I_j = R_j/R_i\) se leen de
+              un vistazo en un combiner de cuatro lastres.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-6-6">Selecciona un problema:</label>
+                <select id="preset-6-6" class="book-preset-select" data-section="6-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p22">Prob 22: I1 = 6 A, razones 4/12/2/40 Ω</option>
+                  <option value="p23a">Prob 23.a: 12 A, 6 || 3 Ω</option>
+                  <option value="p23b">Prob 23.b: 6 A, (8||8) vs (6||6||6)</option>
+                  <option value="p23c">Prob 23.c: 500 mA, 1 Ω || (2||3)</option>
+                  <option value="p23d">Prob 23.d: Puente 4/12/18 Ω, I1 = 4 A</option>
+                  <option value="p24">Prob 24: 10 A, 1 || 10 || 1k || 100k — a ojo</option>
+                  <option value="p25a">Prob 25.a: 1 A en 6 Ω || 2 Ω</option>
+                  <option value="p25b">Prob 25.b: 6 µA, 2+9 || R || 9</option>
+                  <option value="p26">Prob 26: I1 = 3 I2, hallar R</option>
+                  <option value="p27">Prob 27: Diseñar I2 = 4 I1, I3 = 3 I2</option>
+                </select>
+              </div>
+              <div id="desc-preset-6-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.88 — Divisor de corriente</h3>
+              <svg class="circuit-svg" id="svg-s66" viewBox="0 0 640 200" role="img"
+                aria-label="Ramas en paralelo con IT"></svg>
+              <p class="caption-fig">Figura 6.88 — IT entra al bus y se parte. Indica IT o la I de una rama.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s66-i">IT:</label>
+                  <input type="text" id="s66-i" placeholder="Ej. 12" />
+                  <select id="s66-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                  </select>
+                </div>
+              </div>
+              <div class="data-table-wrap">
+                <table class="series-table">
+                  <thead>
+                    <tr>
+                      <th>Rama</th><th>R</th><th>Unidad</th>
+                      <th>Serie</th><th>Unidad</th><th>N</th><th>Estado</th>
+                      <th>I conocida</th><th>P</th>
+                    </tr>
+                  </thead>
+                  <tbody id="s66-tbody"></tbody>
+                </table>
+              </div>
+              <button id="btn-s66" class="action-btn mt-1">Partir IT</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.93 — Diseñar razones de corriente</h3>
+              <p class="hint-inline">
+                Tres ramas a \(E\) (tres strings / tres dumps) con
+                \(I_2 = a I_1\) e \(I_3 = b I_2\).
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s66d-e">E:</label>
+                  <input type="text" id="s66d-e" placeholder="24" />
+                  <select id="s66d-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s66d-i">IT:</label>
+                  <input type="text" id="s66d-i" placeholder="68" />
+                  <select id="s66d-i-u">
+                    <option value="1">A</option>
+                    <option value="0.001" selected>mA</option>
+                  </select>
+                </div>
+                <div class="k-input"><label for="s66d-a">I2 / I1:</label><input type="text" id="s66d-a" placeholder="4" /></div>
+                <div class="k-input"><label for="s66d-b">I3 / I2:</label><input type="text" id="s66d-b" placeholder="3" /></div>
+              </div>
+              <button id="btn-s66d" class="action-btn mt-1">Diseñar R1 R2 R3</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-6d" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-6-7">
+            <h2>Sección 6.7: Fuentes de voltaje en paralelo</h2>
+            <p class="chapter-discourse">
+              Solo se paralelizan fuentes <em>idénticas</em>
+              (mismo \(E\), mismo firmware): dos racks LFP, dos
+              inversores grid-forming, dos bancos de \(12\,\mathrm{V}\)
+              de arranque. Comparten \(I_T\) a partes iguales.
+              Paralelizar \(12\,\mathrm{V}\) con \(16\,\mathrm{V}\)
+              es un cortocircuito entre ellas.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-6-7">Selecciona un problema:</label>
+                <select id="preset-6-7" class="book-preset-select" data-section="6-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p28">Prob 28: Dos bancos 12 V, 8 || 56 Ω</option>
+                  <option value="p29">Prob 29: Dos 16 V, 5 A c/u, 8 Ω || R</option>
+                </select>
+              </div>
+              <div id="desc-preset-6-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.94 — Racks idénticos en paralelo</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s67-e">E:</label>
+                  <input type="text" id="s67-e" placeholder="12" />
+                  <select id="s67-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                  </select>
+                </div>
+                <div class="k-input"><label for="s67-n">N fuentes:</label><input type="text" id="s67-n" value="2" /></div>
+                <div class="k-input"><label for="s67-r1">R carga 1 (Ω):</label><input type="text" id="s67-r1" placeholder="8" /></div>
+                <div class="k-input"><label for="s67-r2">R carga 2 (Ω):</label><input type="text" id="s67-r2" placeholder="56" /></div>
+                <div class="k-input">
+                  <label for="s67-it">IT conocido:</label>
+                  <input type="text" id="s67-it" placeholder="opcional" />
+                  <select id="s67-it-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s67" class="action-btn mt-1">Repartir IT</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-6-8">
+            <h2>Sección 6.8–6.9: Abiertos, cortos y voltímetros</h2>
+            <p class="chapter-discourse">
+              Un abierto en paralelo saca la rama; el bus sigue a \(E\).
+              Un corto se lleva el bus (\(V = 0\), \(I_{\mathrm{cc}} = E / R_s\)).
+              Un voltímetro es una \(R_m\) en paralelo con el tap:
+              el DMM de \(11\,\mathrm{M}\Omega\) no carga un divisor
+              de \(\mathrm{k}\Omega\); el VOM de \(20\,\mathrm{k}\Omega/\mathrm{V}\)
+              sí, y peor en un bleeder ISO.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-6-8">Selecciona un problema:</label>
+                <select id="preset-6-8" class="book-preset-select" data-section="6-8">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p30a">Prob 30.a: 12 V, 100 Ω + 10 kΩ</option>
+                  <option value="p30b">Prob 30.b: RL en corto</option>
+                  <option value="p30c">Prob 30.c: RL abierto</option>
+                  <option value="p31a">Prob 31.a: VL de circuito abierto</option>
+                  <option value="p31b">Prob 31.b: 2.2 kΩ en corto</option>
+                  <option value="p31c">Prob 31.c: 4.7 kΩ abierto</option>
+                  <option value="p32">Prob 32: I1, I2 y V de dos cortos</option>
+                  <option value="p33a">Prob 33.a: V2 ideal 6 V, 10k / 20k</option>
+                  <option value="p33b">Prob 33.b: DMM 11 MΩ</option>
+                  <option value="p33c">Prob 33.c: VOM 20 kΩ/V, escala 10 V</option>
+                  <option value="p33d">Prob 33.d: 100 k / 200 k</option>
+                  <option value="p33e">Prob 33.e: Conclusión del voltímetro</option>
+                  <option value="p34">Prob 34: ¿Opera 6 || 3 || 4 kΩ?</option>
+                  <option value="p35">Prob 35: ¿Va = 8.8 V es correcto?</option>
+                  <option value="p36a">Prob 36.a: Va salta a +20 V</option>
+                  <option value="p36b">Prob 36.b: Va = 6 V en vez de −1 V</option>
+                </select>
+              </div>
+              <div id="desc-preset-6-8" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.96 — Feeder, carga, abierto y corto</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s68-e">E:</label>
+                  <input type="text" id="s68-e" placeholder="12" />
+                  <select id="s68-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s68-rs">Rs:</label>
+                  <input type="text" id="s68-rs" placeholder="100" />
+                  <select id="s68-rs-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s68-rl">RL:</label>
+                  <input type="text" id="s68-rl" placeholder="10" />
+                  <select id="s68-rl-u">
+                    <option value="1">Ω</option>
+                    <option value="1e3" selected>kΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s68-mode">Estado:</label>
+                  <select id="s68-mode">
+                    <option value="normal" selected>normal</option>
+                    <option value="short">RL en corto</option>
+                    <option value="open">RL abierto</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s68" class="action-btn mt-1">Calcular Is y VL</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-8" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.99 — Efecto de carga del voltímetro</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s69-e">E:</label>
+                  <input type="text" id="s69-e" placeholder="6" />
+                  <select id="s69-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s69-r1">R1:</label>
+                  <input type="text" id="s69-r1" placeholder="10" />
+                  <select id="s69-r1-u">
+                    <option value="1">Ω</option>
+                    <option value="1e3" selected>kΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s69-r2">R2:</label>
+                  <input type="text" id="s69-r2" placeholder="20" />
+                  <select id="s69-r2-u">
+                    <option value="1">Ω</option>
+                    <option value="1e3" selected>kΩ</option>
+                  </select>
+                </div>
+                <div class="k-input"><label for="s69-rm">Rm DMM (Ω):</label><input type="text" id="s69-rm" placeholder="11e6" /></div>
+                <div class="k-input"><label for="s69-ohv">VOM Ω/V:</label><input type="text" id="s69-ohv" placeholder="20000" /></div>
+                <div class="k-input"><label for="s69-sc">Escala (V):</label><input type="text" id="s69-sc" placeholder="10" /></div>
+              </div>
+              <button id="btn-s69" class="action-btn mt-1">Comparar DMM y VOM</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-9" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 6.100 — ¿Opera la red?</h3>
+              <p class="hint-inline">Tres ramas en paralelo. Si I medida &lt; I esperada y V = E, una rama abrió.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s610-e">E (V):</label><input type="text" id="s610-e" placeholder="6" /></div>
+                <div class="k-input"><label for="s610-im">I medida (mA):</label><input type="text" id="s610-im" placeholder="3.5" /></div>
+                <div class="k-input"><label for="s610-vm">V medida (V):</label><input type="text" id="s610-vm" placeholder="6" /></div>
+              </div>
+              <div class="data-table-wrap">
+                <table class="series-table">
+                  <thead><tr><th>Rama</th><th>R (kΩ)</th></tr></thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" id="s610-n1" value="6 kΩ" /></td>
+                      <td><input type="text" id="s610-r1" value="6" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s610-n2" value="3 kΩ" /></td>
+                      <td><input type="text" id="s610-r2" value="3" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s610-n3" value="4 kΩ" /></td>
+                      <td><input type="text" id="s610-r3" value="4" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <button id="btn-s610" class="action-btn mt-1">Diagnosticar</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-10" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 6.101 y 6.102 — Dos fuentes y un nudo</h3>
+              <p class="hint-inline">
+                \(V_a = (E_L R_R + E_R R_L)/(R_L+R_R)\).
+                Una lectura que no cuadra suele ser polaridad invertida
+                o un abierto hacia un rail.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s611-vl">EL (V):</label><input type="text" id="s611-vl" placeholder="12" /></div>
+                <div class="k-input"><label for="s611-vr">ER (V):</label><input type="text" id="s611-vr" placeholder="4" /></div>
+                <div class="k-input">
+                  <label for="s611-rl">RL:</label>
+                  <input type="text" id="s611-rl" placeholder="1" />
+                  <select id="s611-rl-u">
+                    <option value="1">Ω</option>
+                    <option value="1e3" selected>kΩ</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s611-rr">RR:</label>
+                  <input type="text" id="s611-rr" placeholder="4" />
+                  <select id="s611-rr-u">
+                    <option value="1">Ω</option>
+                    <option value="1e3" selected>kΩ</option>
+                  </select>
+                </div>
+                <div class="k-input"><label for="s611-va">Va leído (V):</label><input type="text" id="s611-va" placeholder="opcional" /></div>
+              </div>
+              <button id="btn-s611" class="action-btn mt-1">Comprobar Va</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-11" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-6-12">
+            <h2>Sección 6.12: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              PSpice y el «lenguaje de programación» del libro se
+              sustituyen aquí por el mismo solucionador: un combiner
+              de \(N\) strings, el LCK de dos nudos y el efecto de
+              carga de un VOM. Tabular \(I_s(N)\) enseña por qué
+              añadir un string no cambia \(V\) y sí escala \(I_s\)
+              — y por qué un fusible abierto no apaga el resto.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-6-12">Selecciona un problema:</label>
+                <select id="preset-6-12" class="book-preset-select" data-section="6-12">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p37">Prob 37: Corrientes del servicio 6.78</option>
+                  <option value="p38">Prob 38: LCK de la fig. 6.84</option>
+                  <option value="p39">Prob 39: RT y GT de N ramas</option>
+                  <option value="p40">Prob 40: Barrido de N strings / carga del VOM</option>
+                </select>
+              </div>
+              <div id="desc-preset-6-12" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Barrido de N strings en un combiner</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s612-e">E del bus:</label>
+                  <input type="text" id="s612-e" placeholder="6" />
+                  <select id="s612-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s612-r">R de un string:</label>
+                  <input type="text" id="s612-r" placeholder="20" />
+                  <select id="s612-r-u">
+                    <option value="1">Ω</option>
+                    <option value="1e3" selected>kΩ</option>
+                  </select>
+                </div>
+                <div class="k-input"><label for="s612-nmin">N min:</label><input type="text" id="s612-nmin" value="1" /></div>
+                <div class="k-input"><label for="s612-nmax">N max:</label><input type="text" id="s612-nmax" value="12" /></div>
+              </div>
+              <button id="btn-s612" class="action-btn mt-1">Tabular Is(N)</button>
+              <div class="data-table-wrap" id="wrap-6-12" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-6-12">
+                  <thead>
+                    <tr><th>N</th><th>RT (Ω)</th><th>Is (A)</th><th>Ix (A)</th><th>P (W)</th></tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-6-12" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-6-0" aria-labelledby="glossary-6-heading">
+            <h2 id="glossary-6-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de circuitos en paralelo, Kirchhoff, divisor de
+              corriente y efecto de carga del capítulo 6, reescritos
+              para la ingeniería eléctrica de renovables
+              convencionales y no convencionales en 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Circuito abierto</dt>
+                <dd>En una red, ausencia de una conexión directa entre dos puntos. Un fusible gPV abierto, un MC4 desconectado o un string fuera: esa rama deja de contribuir a \(G_T\); las demás siguen a \(E\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Circuito en paralelo</dt>
+                <dd>Configuración en la cual los elementos tienen dos puntos en común. Strings de un combiner, racks de un BESS, inversores en el PCC, focos del alumbrado auxiliar.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Clasificación ohm/volt (Ω/V)</dt>
+                <dd>Clasificación usada para determinar la sensibilidad de la corriente al movimiento y la resistencia interna del medidor. Un VOM de \(20\,\mathrm{k}\Omega/\mathrm{V}\) en la escala de \(10\,\mathrm{V}\) es \(R_m = 200\,\mathrm{k}\Omega\); carga un bleeder ISO. El DMM de \(10\,\mathrm{M}\Omega\) no.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Cortocircuito</dt>
+                <dd>Conexión directa de bajo valor resistivo que puede alterar considerablemente el comportamiento de un elemento o sistema. En paralelo es un fallo de bus: \(V = 0\), \(I_{\mathrm{cc}}\) la fija \(R_s\) del feeder o la Icc del rack. Un SPD que conduce o un arco en el combiner son el caso de planta.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ley de corriente de Kirchhoff (LCK)</dt>
+                <dd>La suma algebraica de las corrientes que entran y salen de un nudo es cero. Cierra el KCL de la barra de un combiner, del PCC y de los pines de un driver SiC.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Nodo</dt>
+                <dd>Unión de dos o más ramas. El bus positivo de \(1500\,V_{\mathrm{cc}}\), el negativo / PE y el nudo de un puente de medida.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Regla del divisor de corriente (RDC)</dt>
+                <dd>Método por el cual la corriente a través de elementos en paralelo se puede determinar sin encontrar primero el voltaje: \(I_x = I_T R_T / R_x\). Es el reparto entre strings, entre dumps y entre racks idénticos.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Conductancia (G)</dt>
+                <dd>Recíproco de la resistencia, en siemens. En paralelo se suma: \(G_T = \sum G_x\). Un string de menor \(R\) (más \(G\)) se lleva más corriente del combiner.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Combiner / caja combinadora</dt>
+                <dd>Nudo paralelo industrial de 2026: \(N\) strings TOPCon al mismo bus de \(1500\,V_{\mathrm{cc}}\), cada uno con su gPV. \(I_s = N I_{\mathrm{mp}}\); un fusible abierto baja \(N\) en uno.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Efecto de carga</dt>
+                <dd>La \(R_m\) del voltímetro en paralelo con el tap reduce \(V\) medido. Crítico en PT resistivos, bleeders ISO y divisores de un piranómetro. Se mitiga con DMM de MΩ o sonda 10:1 / 100:1.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuentes en paralelo</dt>
+                <dd>Solo si son idénticas (mismo \(E\), mismo firmware). Dos racks LFP o dos grid-forming comparten \(I_T/N\). Polaridades o voltajes distintos son un cortocircuito entre ellas.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable convencional</dt>
+                <dd>Hidroeléctrica, geotérmica, biomasa/biogás y, en algunos marcos, CSP. El capítulo 6 las trata como \(E\) en un bus con dumps / lastres en paralelo.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>Fotovoltaica TOPCon/HJT/tándem, eólica, océano, hidrógeno verde y BESS. El combiner, el PCC y el rail auxiliar de \(12/48\,\mathrm{V}\) son las redes en paralelo de 2026.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
     </section>
   </main>
 

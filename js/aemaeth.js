@@ -810,6 +810,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSec3();
   initSec4();
   initSec5();
+  initSec6();
   initMiniCalc();
   initChapterFold();
 });
@@ -2595,7 +2596,7 @@ function initPresets() {
           document.getElementById('m2-t-u').value = data.tu;
           document.getElementById('btn-meter-2-7').click();
         }
-      } else if (String(section).startsWith('3-') || String(section).startsWith('4-') || String(section).startsWith('5-')) {
+      } else if (String(section).startsWith('3-') || String(section).startsWith('4-') || String(section).startsWith('5-') || String(section).startsWith('6-')) {
         applyPresetFields(data);
       }
     });
@@ -2647,6 +2648,28 @@ function applyPresetFields(data) {
       if (row.p != null) setField(`${prefix}-p${i}`, row.p);
       const ru = document.getElementById(`${prefix}-ru${i}`);
       if (ru && row.ru != null) ru.value = String(row.ru);
+      const st = document.getElementById(`${prefix}-st${i}`);
+      if (st && row.st) st.value = row.st;
+    });
+  }
+  if (data.clearParallel) {
+    clearParallelPrefix(data.clearParallel.prefix, data.clearParallel.n || 6);
+  }
+  if (data.parallel) {
+    const { prefix, rows } = data.parallel;
+    clearParallelPrefix(prefix, 6);
+    rows.forEach((row, idx) => {
+      const i = idx + 1;
+      if (row.name != null) setField(`${prefix}-n${i}`, row.name);
+      if (row.r != null) setField(`${prefix}-r${i}`, row.r);
+      if (row.rs != null) setField(`${prefix}-rs${i}`, row.rs);
+      if (row.i != null) setField(`${prefix}-ix${i}`, row.i);
+      if (row.p != null) setField(`${prefix}-p${i}`, row.p);
+      if (row.n != null) setField(`${prefix}-copies${i}`, row.n);
+      const ru = document.getElementById(`${prefix}-ru${i}`);
+      if (ru && row.ru != null) ru.value = String(row.ru);
+      const rsu = document.getElementById(`${prefix}-rsu${i}`);
+      if (rsu && row.rsu != null) rsu.value = String(row.rsu);
       const st = document.getElementById(`${prefix}-st${i}`);
       if (st && row.st) st.value = row.st;
     });
@@ -4658,6 +4681,1515 @@ Object.assign(presetsData, {
       fields: { "s512-e": "12", "s512-rs": "8", "s512-rmin": "1", "s512-rmax": "20", "s512-step": "1" },
       click: "btn-s512",
       desc: "Prob. 40 — E = 12 V, Rs = 8 Ω, RL de 1 a 20 Ω (dump / lastre).\nPmax cuando RL = Rs = 8 Ω: I = 0.750 A, Pmax = 4.50 W.\nNo es el MPPT de un módulo 2026 (ese sigue el codo de la I–V); sí es máxima transferencia de un Thevenin lineal."
+    }
+  }
+});
+
+function recommendWattPlant(p) {
+  const abs = Math.abs(p);
+  if (abs <= 0.5) return "½ W";
+  if (abs <= 1) return "1 W";
+  if (abs <= 2) return "2 W";
+  if (abs <= 50) return "50 W";
+  const ceil = Math.ceil(abs);
+  return `${ceil} W (escala de planta)`;
+}
+
+function ohmUnitSelect(id, selected) {
+  const s = String(selected || "1");
+  const opts = [
+    ["1", "Ω"],
+    ["1e3", "kΩ"],
+    ["1e6", "MΩ"],
+    ["0.001", "mΩ"]
+  ];
+  return `<select id="${id}">${opts.map(([v, lab]) =>
+    `<option value="${v}"${v === s ? " selected" : ""}>${lab}</option>`).join("")}</select>`;
+}
+
+function clearParallelPrefix(prefix, n) {
+  for (let i = 1; i <= n; i++) {
+    setField(`${prefix}-n${i}`, `R${i}`);
+    setField(`${prefix}-r${i}`, "");
+    setField(`${prefix}-rs${i}`, "");
+    setField(`${prefix}-ix${i}`, "");
+    setField(`${prefix}-p${i}`, "");
+    setField(`${prefix}-copies${i}`, "1");
+    const ru = document.getElementById(`${prefix}-ru${i}`);
+    if (ru) ru.value = "1";
+    const rsu = document.getElementById(`${prefix}-rsu${i}`);
+    if (rsu) rsu.value = "1";
+    const st = document.getElementById(`${prefix}-st${i}`);
+    if (st) st.value = "parallel";
+  }
+  ["e", "i", "rt", "gt"].forEach((k) => {
+    const el = document.getElementById(`${prefix}-${k}`);
+    if (el) el.value = "";
+  });
+}
+
+function fillParallelRows(prefix, n, extras) {
+  const tbody = document.getElementById(`${prefix}-tbody`);
+  if (!tbody) return;
+  const showI = extras && extras.showI;
+  let html = "";
+  for (let i = 1; i <= n; i++) {
+    html += `<tr>
+      <td><input type="text" id="${prefix}-n${i}" value="R${i}" /></td>
+      <td><input type="text" id="${prefix}-r${i}" placeholder="—" /></td>
+      <td>${ohmUnitSelect(`${prefix}-ru${i}`)}</td>
+      <td><input type="text" id="${prefix}-rs${i}" placeholder="—" /></td>
+      <td>${ohmUnitSelect(`${prefix}-rsu${i}`)}</td>
+      <td><input type="text" id="${prefix}-copies${i}" value="1" /></td>
+      <td>
+        <select id="${prefix}-st${i}">
+          <option value="parallel" selected>paralelo</option>
+          <option value="open">abierto</option>
+          <option value="short">cortocircuito</option>
+        </select>
+      </td>
+      ${showI ? `<td><input type="text" id="${prefix}-ix${i}" placeholder="A" /></td>
+      <td><input type="text" id="${prefix}-p${i}" placeholder="W" /></td>` : ""}
+    </tr>`;
+  }
+  tbody.innerHTML = html;
+}
+
+function readParallelRows(prefix, n) {
+  const raw = [];
+  for (let i = 1; i <= n; i++) {
+    const nameEl = document.getElementById(`${prefix}-n${i}`);
+    if (!nameEl) continue;
+    const name = (nameEl.value || `R${i}`).trim() || `R${i}`;
+    const st = document.getElementById(`${prefix}-st${i}`)?.value || "parallel";
+    const ru = Number(document.getElementById(`${prefix}-ru${i}`)?.value || 1);
+    const rsu = Number(document.getElementById(`${prefix}-rsu${i}`)?.value || 1);
+    const rRaw = (document.getElementById(`${prefix}-r${i}`)?.value || "").trim();
+    const rsRaw = (document.getElementById(`${prefix}-rs${i}`)?.value || "").trim();
+    const iRaw = (document.getElementById(`${prefix}-ix${i}`)?.value || "").trim();
+    const pRaw = (document.getElementById(`${prefix}-p${i}`)?.value || "").trim();
+    const nRaw = (document.getElementById(`${prefix}-copies${i}`)?.value || "").trim();
+    const r = rRaw === "" ? null : parseNumberInput(rRaw) * ru;
+    const rs = rsRaw === "" ? 0 : parseNumberInput(rsRaw) * rsu;
+    const ix = iRaw === "" ? null : parseNumberInput(iRaw);
+    const p = pRaw === "" ? null : parseNumberInput(pRaw);
+    const copies = nRaw === "" ? 1 : parseNumberInput(nRaw);
+    const unused = st === "parallel" && r === null && ix === null && p === null
+      && rsRaw === "" && name === `R${i}` && (nRaw === "" || copies === 1);
+    raw.push({ i, name, st, r, rs, ix, p, copies: copies > 0 ? copies : 1, ru, rsu, unused });
+  }
+  let last = -1;
+  raw.forEach((row, idx) => { if (!row.unused) last = idx; });
+  return raw.filter((_, idx) => idx <= last).map(({ unused, ...row }) => row);
+}
+
+function branchReff(el) {
+  if (el.st === "short") return 0;
+  if (el.st === "open") return Infinity;
+  if (el.r == null) return null;
+  const series = el.r + (el.rs || 0);
+  if (series === 0) return 0;
+  return series / (el.copies || 1);
+}
+
+function analyzeParallel({ E, I, RT, GT, rows, wantWatt, ratios }) {
+  const items = rows.map((row) => ({ ...row }));
+  let proc = `${mj("G_T = \\sum G_x")}, ${mj("R_T = 1 / G_T")}, ${mj("I_x = E / R_x")}, ${mj("I_s = E / R_T")}.\n`;
+
+  if (ratios && ratios.r2of1 != null && ratios.r3of1 != null) {
+    const targetRT = RT;
+    if (targetRT == null || targetRT <= 0) throw new Error("Indica RT para fijar las razones.");
+    const k2 = ratios.r2of1;
+    const k3 = ratios.r3of1;
+    const R1 = targetRT * (1 + 1 / (k2 + k3));
+    items[0].r = R1;
+    items[0].rs = 0;
+    if (items[1]) {
+      items[1].r = k2 * R1;
+      items[1].rs = k3 * R1;
+    } else {
+      items.push({
+        i: 2, name: "R2+R3", st: "parallel", r: k2 * R1, rs: k3 * R1, copies: 1
+      });
+    }
+    proc += `Razones: ${mj(`R_2 = ${texQtyBody(k2)} R_1`)}, ${mj(`R_3 = ${texQtyBody(k3)} R_1`)}.\n`;
+    proc += `${mj("R_1 \\parallel (R_2 + R_3) = R_T")} → `;
+    proc += `${mj(`R_1 = ${texQtyBody(R1, "\\Omega")}`)}, ${mj(`R_2 = ${texQtyBody(k2 * R1, "\\Omega")}`)}, ${mj(`R_3 = ${texQtyBody(k3 * R1, "\\Omega")}`)}.\n`;
+  }
+
+  items.forEach((el) => {
+    if (el.st === "short") proc += `${el.name}: cortocircuito en el bus (falla DC / SPD que conduce) → ${mj("R_T = 0")}.\n`;
+    else if (el.st === "open") proc += `${el.name}: abierto (fusible gPV / string fuera) → no suma a ${mj("G_T")}.\n`;
+  });
+
+  const live = items.filter((el) => el.st !== "open");
+  if (!items.length) throw new Error("Indica al menos una rama.");
+  if (!live.length) throw new Error("Todas las ramas están abiertas: no hay trayectoria.");
+  if (live.some((el) => el.st === "short")) {
+    const shorts = live.filter((el) => el.st === "short");
+    proc += `Corto en ${shorts.map((s) => s.name).join(", ")}: el bus se va a 0 V. `;
+    proc += `La fuente ve un fallo; ${mj("I_s")} no está definida por Ohm (solo por la Icc de la fuente / del rack).\n`;
+    return { proc, E, I, RT: 0, GT: Infinity, items: live };
+  }
+
+  if (E == null) {
+    for (const el of live) {
+      const re = el.r != null ? branchReff(el) : null;
+      if (re != null && el.ix != null) {
+        E = el.ix * re;
+        proc += `${mj("E = I_x R")} en ${el.name}: ${formatQty(E, "V")}.\n`;
+        break;
+      }
+      if (el.p != null && el.ix != null && el.ix !== 0) {
+        E = el.p / el.ix;
+        proc += `${mj("E = P / I")} en ${el.name}: ${formatQty(E, "V")}.\n`;
+        break;
+      }
+      if (el.p != null && re != null && re > 0) {
+        E = Math.sqrt(Math.abs(el.p * re));
+        proc += `${mj("E = \\sqrt{P R}")} en ${el.name}: ${formatQty(E, "V")}.\n`;
+        break;
+      }
+    }
+  }
+
+  if (E != null) {
+    live.forEach((el) => {
+      if (el.r != null) return;
+      if (el.ix != null && el.ix !== 0) {
+        const seriesExtra = el.rs || 0;
+        const copies = el.copies || 1;
+        el.r = (E / el.ix) * copies - seriesExtra;
+        proc += `${el.name}: ${mj(`R = E / I_x = ${texQtyBody(el.r, "\\Omega")}`)}.\n`;
+      } else if (el.p != null && el.p !== 0) {
+        const copies = el.copies || 1;
+        const reff = (E * E) / el.p;
+        el.r = reff * copies - (el.rs || 0);
+        proc += `${el.name}: ${mj(`R = E^{2} / P = ${texQtyBody(el.r, "\\Omega")}`)}.\n`;
+      }
+    });
+  }
+
+  let unknown = live.filter((el) => el.r == null);
+  const knownG = live.reduce((s, el) => {
+    if (el.r == null) return s;
+    const re = branchReff(el);
+    return s + (re > 0 ? 1 / re : 0);
+  }, 0);
+
+  let GTtarget = GT;
+  if (GTtarget == null && RT != null && RT !== 0) GTtarget = 1 / RT;
+  if (GTtarget == null && E != null && I != null && E !== 0) GTtarget = I / E;
+
+  if (unknown.length === 1 && GTtarget != null) {
+    const gNeed = GTtarget - knownG;
+    if (gNeed <= 1e-15) throw new Error("GT/RT no deja conductancia positiva para la R vacía.");
+    const reff = 1 / gNeed;
+    const el = unknown[0];
+    el.r = reff * (el.copies || 1) - (el.rs || 0);
+    proc += `${el.name}: ${mj(`G = G_T - \\sum G_{\\mathrm{conocidas}} = ${texQtyBody(gNeed, "S")}`)} → `;
+    proc += `${mj(`R = ${texQtyBody(el.r, "\\Omega")}`)}.\n`;
+    unknown = [];
+  } else if (unknown.length > 1 && GTtarget != null) {
+    const gNeed = GTtarget - knownG;
+    if (gNeed <= 1e-15) throw new Error("GT/RT no deja conductancia para las R vacías.");
+    const eachG = gNeed / unknown.length;
+    unknown.forEach((el) => {
+      const reff = 1 / eachG;
+      el.r = reff * (el.copies || 1) - (el.rs || 0);
+    });
+    proc += `Varias R vacías con ${mj("G_T")} / ${mj("R_T")} conocido: se suponen iguales (p. ej. ${mj("R_1 = R_2")}). Cada una ${formatQty(unknown[0].r, "\\Omega")}.\n`;
+    unknown = [];
+  }
+
+  if (live.some((el) => el.r == null)) {
+    throw new Error("Falta una R (o un dato E/I/P/RT/GT que la fije).");
+  }
+
+  const GTcalc = live.reduce((s, el) => s + 1 / branchReff(el), 0);
+  const RTcalc = GTcalc === 0 ? Infinity : 1 / GTcalc;
+  if (GT == null) GT = GTcalc;
+  if (RT == null) RT = RTcalc;
+  proc += `${mj(`G_T = ${texQtyBody(GTcalc, "S")}`)}, ${mj(`R_T = ${texQtyBody(RTcalc, "\\Omega")}`)}.\n`;
+
+  if (I == null && E != null) {
+    I = E * GTcalc;
+    proc += `${mj(`I_s = E G_T = E / R_T = ${texQtyBody(I, "A")}`)}.\n`;
+  } else if (E == null && I != null) {
+    E = I * RTcalc;
+    proc += `${mj(`E = I_s R_T = ${texQtyBody(E, "V")}`)}.\n`;
+  }
+
+  let sumI = 0;
+  let sumP = 0;
+  live.forEach((el) => {
+    const re = branchReff(el);
+    el.reff = re;
+    if (E != null) {
+      el.ix = E / re;
+      el.p = (E * E) / re;
+      el.v = E;
+    } else if (I != null) {
+      el.ix = I * (RTcalc / re);
+      el.p = el.ix * el.ix * re;
+      el.v = el.ix * re;
+    }
+    sumI += el.ix || 0;
+    sumP += el.p || 0;
+    const extra = (el.rs || 0) > 0 ? ` (rama ${formatQty(el.r, "\\Omega")}+${formatQty(el.rs, "\\Omega")})` : "";
+    const copies = (el.copies || 1) > 1 ? ` ×${el.copies}` : "";
+    proc += `${el.name}${copies}${extra}: ${mj(`R_{\\mathrm{eq}} = ${texQtyBody(re, "\\Omega")}`)}`;
+    if (el.ix != null) proc += `, ${mj(`I = ${texQtyBody(el.ix, "A")}`)}`;
+    if (el.p != null) {
+      proc += `, ${mj(`P = ${texQtyBody(el.p, "W")}`)}`;
+      if (wantWatt) proc += ` → wattaje mín. ${recommendWattPlant(el.p)}`;
+    }
+    proc += ".\n";
+  });
+
+  if (E != null && I != null) {
+    proc += `LCK: ${mj(`\\sum I_x = ${texQtyBody(sumI, "A")}`)} vs ${mj(`I_s = ${texQtyBody(I, "A")}`)}`;
+    proc += Math.abs(sumI - I) / Math.max(Math.abs(I), 1e-12) < 0.02 ? " — se cumple.\n" : " — revisar.\n";
+    const psrc = E * I;
+    proc += `Potencia: ${mj(`\\sum P = ${texQtyBody(sumP, "W")}`)} vs ${mj(`E I_s = ${texQtyBody(psrc, "W")}`)}`;
+    proc += Math.abs(sumP - psrc) / Math.max(Math.abs(psrc), 1e-12) < 0.02 ? " — entregada = disipada." : " — revisar.";
+  }
+  return { proc, E, I, RT: RTcalc, GT: GTcalc, items: live };
+}
+
+function drawParallelNetwork(svg, model) {
+  if (!svg) return;
+  const items = (model && model.items && model.items.length)
+    ? model.items
+    : [{ name: "R1" }, { name: "R2" }, { name: "R3" }];
+  const asCurrent = !!(model && model.asCurrent);
+  const n = items.length;
+  const y0 = 36, y1 = 168, x0 = asCurrent ? 88 : 70, x1 = 560;
+  const usable = x1 - x0 - 80;
+  const slot = usable / Math.max(n, 1);
+  const midY = (y0 + y1) / 2;
+  let res = "";
+  if (asCurrent) {
+    const cr = 18;
+    res += `<line x1="${x0}" y1="${y0}" x2="${x0}" y2="${midY - cr}" stroke="currentColor" stroke-width="2"/>`;
+    res += `<circle cx="${x0}" cy="${midY}" r="${cr}" fill="none" stroke="currentColor" stroke-width="2"/>`;
+    res += `<line x1="${x0}" y1="${midY + 8}" x2="${x0}" y2="${midY - 4}" stroke="#2471a3" stroke-width="2"/>`;
+    res += `<polygon points="${x0},${midY - 12} ${x0 - 5},${midY - 2} ${x0 + 5},${midY - 2}" fill="#2471a3"/>`;
+    res += `<line x1="${x0}" y1="${midY + cr}" x2="${x0}" y2="${y1}" stroke="currentColor" stroke-width="2"/>`;
+    res += `<text x="${x0 - 24}" y="${midY - 4}" text-anchor="end" font-size="14" fill="#2471a3">IT</text>`;
+    if (model && model.I != null) {
+      res += `<text x="${x0 - 24}" y="${midY + 12}" text-anchor="end" font-size="11" fill="#2471a3">${Number(model.I.toPrecision(3))} A</text>`;
+    }
+  } else {
+    res += `<line x1="${x0}" y1="${y0}" x2="${x0}" y2="${y1}" stroke="currentColor" stroke-width="2"/>`;
+    res += `<line x1="${x0 - 16}" y1="${y0 + 22}" x2="${x0 + 16}" y2="${y0 + 22}" stroke="currentColor" stroke-width="2.4"/>`;
+    res += `<line x1="${x0 - 10}" y1="${y1 - 22}" x2="${x0 + 10}" y2="${y1 - 22}" stroke="currentColor" stroke-width="2"/>`;
+    res += `<text x="${x0 - 48}" y="${midY + 5}" font-size="15" fill="currentColor">E</text>`;
+    if (model && model.E != null) {
+      res += `<text x="${x0 - 52}" y="${midY + 22}" font-size="11" fill="currentColor">${Number(model.E.toPrecision(4))} V</text>`;
+    }
+  }
+  res += `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y0}" stroke="currentColor" stroke-width="2"/>`;
+  res += `<line x1="${x0}" y1="${y1}" x2="${x1}" y2="${y1}" stroke="currentColor" stroke-width="2"/>`;
+  items.forEach((el, k) => {
+    const cx = x0 + 50 + slot * (k + 0.5);
+    const top = y0 + 18;
+    const bot = y1 - 18;
+    const h = bot - top;
+    res += `<line x1="${cx}" y1="${y0}" x2="${cx}" y2="${top}" stroke="currentColor" stroke-width="2"/>`;
+    res += `<line x1="${cx}" y1="${bot}" x2="${cx}" y2="${y1}" stroke="currentColor" stroke-width="2"/>`;
+    if (el.st === "open") {
+      res += `<circle cx="${cx}" cy="${top + 8}" r="3.2" fill="none" stroke="#c0392b" stroke-width="2"/>`;
+      res += `<circle cx="${cx}" cy="${bot - 8}" r="3.2" fill="none" stroke="#c0392b" stroke-width="2"/>`;
+      res += `<text x="${cx}" y="${(top + bot) / 2}" text-anchor="middle" font-size="11" fill="#c0392b">${el.name}</text>`;
+    } else if (el.st === "short") {
+      res += `<line x1="${cx}" y1="${top}" x2="${cx}" y2="${bot}" stroke="#2471a3" stroke-width="3"/>`;
+      res += `<text x="${cx + 8}" y="${(top + bot) / 2}" font-size="11" fill="#2471a3">${el.name} corto</text>`;
+    } else {
+      const hasSeries = (el.rs || 0) > 0;
+      if (hasSeries) {
+        const mid = (top + bot) / 2;
+        res += `<rect x="${cx - 16}" y="${top}" width="32" height="${h / 2 - 6}" fill="none" stroke="currentColor" stroke-width="2"/>`;
+        res += `<rect x="${cx - 16}" y="${mid + 6}" width="32" height="${h / 2 - 6}" fill="none" stroke="currentColor" stroke-width="2"/>`;
+        res += `<text x="${cx + 20}" y="${top + 16}" font-size="11" fill="currentColor">${el.name}</text>`;
+        if (el.r != null) res += `<text x="${cx + 20}" y="${top + 30}" font-size="10" fill="currentColor">${formatOhmLabel(el.r)}</text>`;
+        if (el.rs) res += `<text x="${cx + 20}" y="${mid + 22}" font-size="10" fill="currentColor">${formatOhmLabel(el.rs)}</text>`;
+      } else {
+        res += `<rect x="${cx - 16}" y="${top}" width="32" height="${h}" fill="none" stroke="currentColor" stroke-width="2"/>`;
+        res += `<text x="${cx + 22}" y="${(top + bot) / 2 - 4}" font-size="12" fill="currentColor">${el.name}</text>`;
+        if (el.r != null) {
+          res += `<text x="${cx + 22}" y="${(top + bot) / 2 + 12}" font-size="11" fill="currentColor">${formatOhmLabel(el.reff != null ? el.reff : el.r)}</text>`;
+        }
+      }
+    }
+    if (asCurrent || el.ix != null) {
+      res += `<polygon points="${cx},${y0 + 8} ${cx - 5},${y0 + 18} ${cx + 5},${y0 + 18}" fill="#2471a3"/>`;
+    }
+    if (asCurrent) {
+      const iLabel = el.ix != null ? `${Number(el.ix.toPrecision(3))} A` : `I${k + 1}`;
+      res += `<text x="${cx + 8}" y="${y0 + 16}" font-size="10" fill="#2471a3">${iLabel}</text>`;
+    }
+  });
+  if (asCurrent || (model && model.I != null)) {
+    const iTag = asCurrent ? "IT" : "Is";
+    const iVal = (model && model.I != null) ? ` ${Number(model.I.toPrecision(3))} A` : "";
+    res += `<polygon points="${x0 + 28},${y0} ${x0 + 14},${y0 - 6} ${x0 + 14},${y0 + 6}" fill="#2471a3"/>`;
+    res += `<text x="${x0 + 34}" y="${y0 - 10}" font-size="12" fill="#2471a3">${iTag}${iVal}</text>`;
+  }
+  setSvgMarkup(svg, res);
+}
+
+function runParallelFromPrefix(prefix, outId, svgId, extras) {
+  const out = document.getElementById(outId);
+  try {
+    let E = readOptionalNumber(`${prefix}-e`);
+    let I = readOptionalNumber(`${prefix}-i`);
+    let RT = readOptionalNumber(`${prefix}-rt`);
+    let GT = readOptionalNumber(`${prefix}-gt`);
+    if (E != null) E *= readUnit(`${prefix}-e-u`);
+    if (I != null) I *= readUnit(`${prefix}-i-u`);
+    if (RT != null) RT *= readUnit(`${prefix}-rt-u`);
+    if (GT != null) GT *= readUnit(`${prefix}-gt-u`);
+    const wantWatt = !!document.getElementById(`${prefix}-watt`)?.checked;
+    const r2of1 = readOptionalNumber(`${prefix}-k2`);
+    const r3of1 = readOptionalNumber(`${prefix}-k3`);
+    const ratios = (r2of1 != null && r3of1 != null) ? { r2of1, r3of1 } : null;
+    const model = analyzeParallel({
+      E, I, RT, GT,
+      rows: readParallelRows(prefix, 6),
+      wantWatt,
+      ratios
+    });
+    setMathText(out, model.proc);
+    drawParallelNetwork(document.getElementById(svgId), model);
+    return model;
+  } catch (e) {
+    setMathText(out, e.message);
+    return null;
+  }
+}
+
+function initSec6() {
+  fillParallelRows("s63", 6, { showI: false });
+  fillParallelRows("s64", 6, { showI: true });
+  fillParallelRows("s66", 6, { showI: true });
+  fillKclRows();
+  drawParallelNetwork(document.getElementById("svg-s63"));
+  drawParallelNetwork(document.getElementById("svg-s64"));
+  drawParallelNetwork(document.getElementById("svg-s66"), { asCurrent: true });
+  initSec6_2();
+  initSec6_3();
+  initSec6_4();
+  initSec6_5();
+  initSec6_6();
+  initSec6_7();
+  initSec6_8();
+  initSec6_12();
+}
+
+function initSec6_2() {
+  const sel = document.getElementById("s62-fig");
+  const btn = document.getElementById("btn-s62");
+  const run = () => {
+    const out = document.getElementById("proc-6-2");
+    const key = sel ? sel.value : "a";
+    const texts = {
+      a: "Fig. 6.67.a — Combiner de tres strings.\nEl fusible / seccionador 1 está en serie con el paralelo de 2, 3 y 4.\n2, 3 y 4 son strings (o dump loads) en paralelo: comparten los dos nudos del bus.\n1 no es paralelo: su corriente es la suma de las tres ramas.\nEn 2026: gPV de un combiner 1500 Vcc delante de tres strings TOPCon.",
+      b: "Fig. 6.67.b — Feeder y dos MPPT.\n1 está en serie con el paralelo de 2 y 3.\n2 y 3 comparten el nudo de la derecha y el retorno: son paralelo.\n1 es el cable DC / Ri del bus; no comparte ambos nudos con 2 ni con 3.\nEn 2026: un tramo de busbar alimentando dos entradas MPPT de un híbrido.",
+      c: "Fig. 6.67.c — Tres ramas en el mismo bus.\n1, (2+3) y 4 están en paralelo (tres caminos entre los dos nudos).\n2 y 3 están en serie (un solo punto común, misma I).\nEn 2026: string 1 || (dos módulos en serie) || string 4, todos al mismo combiner.",
+      d: "Fig. 6.68 — Bus DC de una planta híbrida 2026.\nE: rack BESS / grid-forming. R1: feeder. R3: shunt / retorno.\nEn paralelo: R2 con la red de la derecha (R4 + [R5 || (R6+R7)]).\nEn paralelo: R5 con (R6+R7). En serie: R6 con R7; R4 con ese paralelo; R1 y R3 con todo el resto.\nRamas en paralelo: la de R2 frente a (R4–R5–R6–R7); la de R5 frente a (R6+R7).\nNo hay R1 || R2: R1 no comparte ambos nudos con R2."
+    };
+    setMathText(out, texts[key] || texts.a);
+    const svg = document.getElementById("svg-s62");
+    if (!svg) return;
+    if (key === "a") {
+      setSvgMarkup(svg, `
+        <line x1="40" y1="40" x2="40" y2="160" stroke="currentColor" stroke-width="2"/>
+        <line x1="40" y1="40" x2="150" y2="40" stroke="currentColor" stroke-width="2"/>
+        <rect x="70" y="28" width="50" height="24" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="88" y="45" font-size="13">1</text>
+        <line x1="150" y1="40" x2="230" y2="40" stroke="currentColor" stroke-width="2"/>
+        <line x1="230" y1="40" x2="230" y2="70" stroke="currentColor" stroke-width="2"/>
+        <line x1="310" y1="40" x2="310" y2="70" stroke="currentColor" stroke-width="2"/>
+        <line x1="390" y1="40" x2="390" y2="70" stroke="currentColor" stroke-width="2"/>
+        <line x1="230" y1="40" x2="390" y2="40" stroke="currentColor" stroke-width="2"/>
+        <rect x="214" y="70" width="32" height="48" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <rect x="294" y="70" width="32" height="48" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <rect x="374" y="70" width="32" height="48" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="224" y="98" font-size="13">2</text>
+        <text x="304" y="98" font-size="13">3</text>
+        <text x="384" y="98" font-size="13">4</text>
+        <line x1="230" y1="118" x2="230" y2="160" stroke="currentColor" stroke-width="2"/>
+        <line x1="310" y1="118" x2="310" y2="160" stroke="currentColor" stroke-width="2"/>
+        <line x1="390" y1="118" x2="390" y2="160" stroke="currentColor" stroke-width="2"/>
+        <line x1="40" y1="160" x2="390" y2="160" stroke="currentColor" stroke-width="2"/>
+        <text x="60" y="22" font-size="12" fill="#1e8449">gPV / feeder</text>
+        <text x="250" y="178" font-size="12" fill="#1a5276">tres strings en paralelo</text>`);
+    } else if (key === "b") {
+      setSvgMarkup(svg, `
+        <line x1="40" y1="50" x2="40" y2="150" stroke="currentColor" stroke-width="2"/>
+        <rect x="70" y="38" width="50" height="24" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="88" y="55" font-size="13">1</text>
+        <line x1="40" y1="50" x2="70" y2="50" stroke="currentColor" stroke-width="2"/>
+        <line x1="120" y1="50" x2="200" y2="50" stroke="currentColor" stroke-width="2"/>
+        <line x1="200" y1="50" x2="280" y2="50" stroke="currentColor" stroke-width="2"/>
+        <rect x="248" y="38" width="50" height="24" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="266" y="55" font-size="13">3</text>
+        <line x1="298" y1="50" x2="360" y2="50" stroke="currentColor" stroke-width="2"/>
+        <line x1="360" y1="50" x2="360" y2="150" stroke="currentColor" stroke-width="2"/>
+        <line x1="200" y1="50" x2="200" y2="80" stroke="currentColor" stroke-width="2"/>
+        <rect x="184" y="80" width="32" height="44" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="194" y="106" font-size="13">2</text>
+        <line x1="200" y1="124" x2="200" y2="150" stroke="currentColor" stroke-width="2"/>
+        <line x1="40" y1="150" x2="360" y2="150" stroke="currentColor" stroke-width="2"/>
+        <text x="64" y="28" font-size="12" fill="#1e8449">feeder</text>
+        <text x="168" y="176" font-size="12" fill="#1a5276">2 || 3 (dos MPPT)</text>`);
+    } else if (key === "c") {
+      setSvgMarkup(svg, `
+        <line x1="50" y1="36" x2="400" y2="36" stroke="currentColor" stroke-width="2"/>
+        <line x1="50" y1="170" x2="400" y2="170" stroke="currentColor" stroke-width="2"/>
+        <line x1="90" y1="36" x2="90" y2="60" stroke="currentColor" stroke-width="2"/>
+        <rect x="74" y="60" width="32" height="80" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="84" y="104" font-size="13">1</text>
+        <line x1="90" y1="140" x2="90" y2="170" stroke="currentColor" stroke-width="2"/>
+        <line x1="210" y1="36" x2="210" y2="52" stroke="currentColor" stroke-width="2"/>
+        <rect x="194" y="52" width="32" height="36" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="204" y="75" font-size="13">2</text>
+        <rect x="194" y="112" width="32" height="36" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="204" y="135" font-size="13">3</text>
+        <line x1="210" y1="88" x2="210" y2="112" stroke="currentColor" stroke-width="2"/>
+        <line x1="210" y1="148" x2="210" y2="170" stroke="currentColor" stroke-width="2"/>
+        <line x1="330" y1="36" x2="330" y2="60" stroke="currentColor" stroke-width="2"/>
+        <rect x="314" y="60" width="32" height="80" fill="#d6eaf8" stroke="currentColor" stroke-width="2"/>
+        <text x="324" y="104" font-size="13">4</text>
+        <line x1="330" y1="140" x2="330" y2="170" stroke="currentColor" stroke-width="2"/>
+        <text x="70" y="190" font-size="12" fill="#1a5276">1 || (2+3) || 4  — tres ramas al bus</text>`);
+    } else {
+      setSvgMarkup(svg, `
+        <line x1="36" y1="50" x2="36" y2="160" stroke="currentColor" stroke-width="2"/>
+        <line x1="22" y1="66" x2="50" y2="66" stroke="currentColor" stroke-width="2.4"/>
+        <line x1="26" y1="144" x2="46" y2="144" stroke="currentColor" stroke-width="2"/>
+        <text x="8" y="110" font-size="13">E</text>
+        <line x1="36" y1="50" x2="80" y2="50" stroke="currentColor" stroke-width="2"/>
+        <rect x="80" y="40" width="44" height="20" fill="none" stroke="currentColor" stroke-width="2"/>
+        <text x="90" y="35" font-size="11">R1</text>
+        <line x1="124" y1="50" x2="200" y2="50" stroke="currentColor" stroke-width="2"/>
+        <rect x="200" y="40" width="44" height="20" fill="none" stroke="currentColor" stroke-width="2"/>
+        <text x="210" y="35" font-size="11">R4</text>
+        <line x1="244" y1="50" x2="320" y2="50" stroke="currentColor" stroke-width="2"/>
+        <rect x="320" y="40" width="44" height="20" fill="none" stroke="currentColor" stroke-width="2"/>
+        <text x="330" y="35" font-size="11">R6</text>
+        <line x1="364" y1="50" x2="420" y2="50" stroke="currentColor" stroke-width="2"/>
+        <line x1="148" y1="50" x2="148" y2="80" stroke="currentColor" stroke-width="2"/>
+        <rect x="132" y="80" width="32" height="36" fill="none" stroke="currentColor" stroke-width="2"/>
+        <text x="138" y="102" font-size="11">R2</text>
+        <line x1="268" y1="50" x2="268" y2="80" stroke="currentColor" stroke-width="2"/>
+        <rect x="252" y="80" width="32" height="36" fill="none" stroke="currentColor" stroke-width="2"/>
+        <text x="258" y="102" font-size="11">R5</text>
+        <line x1="420" y1="50" x2="420" y2="80" stroke="currentColor" stroke-width="2"/>
+        <rect x="404" y="80" width="32" height="36" fill="none" stroke="currentColor" stroke-width="2"/>
+        <text x="410" y="102" font-size="11">R7</text>
+        <line x1="148" y1="116" x2="148" y2="160" stroke="currentColor" stroke-width="2"/>
+        <line x1="268" y1="116" x2="268" y2="160" stroke="currentColor" stroke-width="2"/>
+        <line x1="420" y1="116" x2="420" y2="160" stroke="currentColor" stroke-width="2"/>
+        <line x1="36" y1="160" x2="80" y2="160" stroke="currentColor" stroke-width="2"/>
+        <rect x="80" y="150" width="44" height="20" fill="none" stroke="currentColor" stroke-width="2"/>
+        <text x="90" y="184" font-size="11">R3</text>
+        <line x1="124" y1="160" x2="420" y2="160" stroke="currentColor" stroke-width="2"/>
+        <text x="70" y="200" font-size="11" fill="#1a5276">BESS — feeder — PV || (tie + rack || electro)</text>`);
+    }
+  };
+  if (btn) btn.addEventListener("click", run);
+  if (sel) sel.addEventListener("change", run);
+  run();
+}
+
+function initSec6_3() {
+  const btn = document.getElementById("btn-s63");
+  if (btn) btn.addEventListener("click", () => runParallelFromPrefix("s63", "proc-6-3", "svg-s63"));
+}
+
+function initSec6_4() {
+  const btn = document.getElementById("btn-s64");
+  if (btn) btn.addEventListener("click", () => runParallelFromPrefix("s64", "proc-6-4", "svg-s64", { watt: true }));
+  const btnLoad = document.getElementById("btn-s64load");
+  if (btnLoad) {
+    btnLoad.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-4-load");
+      try {
+        const E = (readOptionalNumber("s64l-e") ?? 0) * readUnit("s64l-e-u");
+        if (!E) throw new Error("Indica el voltaje del servicio.");
+        const rows = [];
+        for (let i = 1; i <= 4; i++) {
+          const name = (document.getElementById(`s64l-n${i}`)?.value || `Carga ${i}`).trim();
+          const pRaw = (document.getElementById(`s64l-p${i}`)?.value || "").trim();
+          const nRaw = (document.getElementById(`s64l-c${i}`)?.value || "1").trim();
+          if (pRaw === "") continue;
+          const pEach = parseNumberInput(pRaw);
+          const copies = parseNumberInput(nRaw);
+          rows.push({ name, pEach, copies, p: pEach * copies });
+        }
+        if (!rows.length) throw new Error("Indica al menos una carga (W).");
+        const breaker = readOptionalNumber("s64l-br");
+        let proc = `Servicio ${formatQty(E, "V")}. Cada rama: ${mj("I = P / V")}.\n`;
+        let sumI = 0, sumP = 0;
+        rows.forEach((r) => {
+          const iEach = r.pEach / E;
+          const iTot = r.p / E;
+          sumI += iTot;
+          sumP += r.p;
+          proc += `${r.name}: ${r.copies} × ${formatQty(r.pEach, "W")} → ${formatQty(iEach, "A")} por unidad, ${formatQty(iTot, "A")} la rama.\n`;
+        });
+        const RT = E / sumI;
+        proc += `${mj(`I_s = ${texQtyBody(sumI, "A")}`)}, ${mj(`R_T = E / I_s = ${texQtyBody(RT, "\\Omega")}`)}.\n`;
+        proc += `Fuente: ${mj(`P = E I_s = ${texQtyBody(E * sumI, "W")}`)} vs ΣP = ${formatQty(sumP, "W")}.\n`;
+        if (breaker != null) {
+          proc += `Interruptor ${formatQty(breaker, "A")}: `;
+          proc += sumI > breaker
+            ? `se desconecta (${formatQty(sumI, "A")} > ${formatQty(breaker, "A")}).`
+            : `aguanta (${formatQty(sumI, "A")} < ${formatQty(breaker, "A")}).`;
+        }
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+  const btnNodal = document.getElementById("btn-s64n");
+  if (btnNodal) {
+    btnNodal.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-4-n");
+      try {
+        const va = readOptionalNumber("s64n-va");
+        const vb = readOptionalNumber("s64n-vb");
+        const rab = readOptionalNumber("s64n-rab");
+        const rac = readOptionalNumber("s64n-rac");
+        const rbc = readOptionalNumber("s64n-rbc");
+        if (va == null || vb == null || rab == null || rac == null || rbc == null) {
+          throw new Error("Indica VA, VB y las tres R del triángulo.");
+        }
+        const vc = (va / rac + vb / rbc) / (1 / rac + 1 / rbc);
+        const iab = (va - vb) / rab;
+        const iac = (va - vc) / rac;
+        const ibc = (vc - vb) / rbc;
+        const i1 = iab + iac;
+        const i2 = iab + ibc;
+        const pab = iab * iab * rab;
+        let proc = `Nudo C flotante: ${mj("V_C (1/R_{AC} + 1/R_{BC}) = V_A / R_{AC} + V_B / R_{BC}")}.\n`;
+        proc += `${mj(`V_C = ${texQtyBody(vc, "V")}`)}.\n`;
+        proc += `${mj(`I_{AB} = (V_A - V_B)/R_{AB} = ${texQtyBody(iab, "A")}`)}.\n`;
+        proc += `${mj(`I_{AC} = ${texQtyBody(iac, "A")}`)}, ${mj(`I_{CB} = ${texQtyBody(ibc, "A")}`)}.\n`;
+        proc += `${mj(`I_1`)} (sale de A) = ${formatQty(i1, "A")}. ${mj("I_2")} (entra a B) = ${formatQty(i2, "A")}.\n`;
+        proc += `Potencia en ${mj("R_{AB}")}: ${formatQty(pab, "W")}.`;
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+}
+
+function fillKclRows() {
+  ["A", "B"].forEach((node) => {
+    const tbody = document.getElementById(`s65${node}-tbody`);
+    if (!tbody) return;
+    let html = "";
+    for (let i = 1; i <= 6; i++) {
+      html += `<tr>
+        <td><input type="text" id="s65${node}-n${i}" placeholder="I${i}" /></td>
+        <td><input type="text" id="s65${node}-i${i}" placeholder="—" /></td>
+        <td>
+          <select id="s65${node}-u${i}">
+            <option value="1" selected>A</option>
+            <option value="0.001">mA</option>
+            <option value="1e-6">µA</option>
+          </select>
+        </td>
+        <td>
+          <select id="s65${node}-d${i}">
+            <option value="1" selected>entra (+)</option>
+            <option value="-1">sale (−)</option>
+          </select>
+        </td>
+      </tr>`;
+    }
+    tbody.innerHTML = html;
+  });
+}
+
+function initSec6_5() {
+  fillKclRows();
+  const btn = document.getElementById("btn-s65");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-5");
+      try {
+        const nodes = ["A", "B"];
+        let proc = `${mj("\\sum I_{\\mathrm{entran}} = \\sum I_{\\mathrm{salen}}")} en cada nudo (LCK).\n`;
+        const found = {};
+        const writeNamed = (label, magAmpere) => {
+          found[label] = magAmpere;
+          nodes.forEach((n) => {
+            for (let i = 1; i <= 6; i++) {
+              const nm = (document.getElementById(`s65${n}-n${i}`)?.value || "").trim();
+              if (nm === label) {
+                const u = Number(document.getElementById(`s65${n}-u${i}`)?.value || 1) || 1;
+                setField(`s65${n}-i${i}`, magAmpere / u);
+              }
+            }
+          });
+        };
+        let guard = 0;
+        let progressed = true;
+        while (progressed && guard < 8) {
+          progressed = false;
+          guard += 1;
+          nodes.forEach((node) => {
+            const known = [];
+            const unknown = [];
+            for (let i = 1; i <= 6; i++) {
+              const name = (document.getElementById(`s65${node}-n${i}`)?.value || "").trim();
+              const raw = (document.getElementById(`s65${node}-i${i}`)?.value || "").trim();
+              const dir = Number(document.getElementById(`s65${node}-d${i}`)?.value || 1);
+              const u = Number(document.getElementById(`s65${node}-u${i}`)?.value || 1);
+              if (raw === "" && !name) continue;
+              const label = name || `I${i}`;
+              if (raw === "") unknown.push({ label, dir, i, node, u });
+              else known.push({ label, val: parseNumberInput(raw) * u * dir });
+            }
+            const sumK = known.reduce((s, c) => s + c.val, 0);
+            if (unknown.length === 1) {
+              const u = unknown[0];
+              const mag = (-sumK) / u.dir;
+              proc += `Nudo ${node}: ${u.label} = ${formatQty(mag, "A")} (flecha ${u.dir > 0 ? "entra" : "sale"}`;
+              proc += mag < 0 ? "; el signo negativo invierte la flecha).\n" : ").\n";
+              writeNamed(u.label, mag);
+              progressed = true;
+            } else if (unknown.length === 0 && known.length) {
+              proc += `Nudo ${node}: ${mj(`\\sum = ${texQtyBody(sumK, "A")}`)}`;
+              proc += Math.abs(sumK) < 1e-8 ? " — LCK se cumple.\n" : " — residuo; revisa signos.\n";
+            }
+          });
+        }
+        if (!Object.keys(found).length) proc += "Falta un dato: un nudo debe tener una sola incógnita.";
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+}
+
+function initSec6_6() {
+  const btn = document.getElementById("btn-s66");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-6");
+      try {
+        let IT = readOptionalNumber("s66-i");
+        if (IT != null) IT *= readUnit("s66-i-u");
+        const knownI = [];
+        const rows = readParallelRows("s66", 6);
+        if (!rows.length) throw new Error("Indica las R de las ramas.");
+        rows.forEach((el) => {
+          if (el.ix != null) knownI.push(el);
+        });
+        if (IT == null && knownI.length) {
+          const el = knownI[0];
+          if (el.r == null) throw new Error("La rama con I conocida necesita R.");
+          const re = branchReff(el);
+          const E = el.ix * re;
+          const tmp = analyzeParallel({ E, rows, wantWatt: false });
+          IT = tmp.I;
+          setMathText(out, `Con ${el.name} = ${formatQty(el.ix, "A")} se fija ${mj("E")} y el resto.\n` + tmp.proc);
+          drawParallelNetwork(document.getElementById("svg-s66"), { ...tmp, asCurrent: true });
+          return;
+        }
+        if (IT == null) throw new Error("Indica IT o la corriente de una rama.");
+        const model = analyzeParallel({ I: IT, rows, wantWatt: false });
+        let extra = `Regla del divisor: ${mj("I_x = I_T R_T / R_x = I_T G_x / G_T")}.\n`;
+        extra += `La rama más pequeña se lleva la mayor parte (string de menor R / más módulos en paralelo).\n`;
+        setMathText(out, extra + model.proc);
+        drawParallelNetwork(document.getElementById("svg-s66"), { ...model, asCurrent: true });
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+  const btnD = document.getElementById("btn-s66d");
+  if (btnD) {
+    btnD.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-6d");
+      try {
+        const E = (readOptionalNumber("s66d-e") ?? 0) * readUnit("s66d-e-u");
+        const IT = (readOptionalNumber("s66d-i") ?? 0) * readUnit("s66d-i-u");
+        const a = readOptionalNumber("s66d-a");
+        const b = readOptionalNumber("s66d-b");
+        if (!E || !IT || a == null || b == null) throw new Error("Indica E, IT e I2/I1, I3/I2.");
+        const i1 = IT / (1 + a + a * b);
+        const i2 = a * i1;
+        const i3 = b * i2;
+        const r1 = E / i1, r2 = E / i2, r3 = E / i3;
+        let proc = `Diseño de tres ramas: ${mj("I_2 = a I_1")}, ${mj("I_3 = b I_2")}.\n`;
+        proc += `${mj(`I_1 + a I_1 + a b I_1 = I_T`)} → ${mj(`I_1 = ${texQtyBody(i1, "A")}`)}, `;
+        proc += `${mj(`I_2 = ${texQtyBody(i2, "A")}`)}, ${mj(`I_3 = ${texQtyBody(i3, "A")}`)}.\n`;
+        proc += `${mj(`R_1 = E / I_1 = ${texQtyBody(r1, "\\Omega")}`)}, `;
+        proc += `${mj(`R_2 = ${texQtyBody(r2, "\\Omega")}`)}, ${mj(`R_3 = ${texQtyBody(r3, "\\Omega")}`)}.`;
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+}
+
+function initSec6_7() {
+  const btn = document.getElementById("btn-s67");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const out = document.getElementById("proc-6-7");
+    try {
+      const E = (readOptionalNumber("s67-e") ?? 0) * readUnit("s67-e-u");
+      const nSrc = readOptionalNumber("s67-n") ?? 2;
+      const r1 = readOptionalNumber("s67-r1");
+      const r2 = readOptionalNumber("s67-r2");
+      let IT = readOptionalNumber("s67-it");
+      if (IT != null) IT *= readUnit("s67-it-u");
+      if (!E) throw new Error("Indica E (fuentes idénticas).");
+      const loads = [r1, r2].filter((v) => v != null && v > 0);
+      if (!loads.length && IT == null) throw new Error("Indica al menos una R de carga o IT.");
+      const GT = loads.reduce((s, r) => s + 1 / r, 0);
+      const RT = GT > 0 ? 1 / GT : (IT ? E / IT : null);
+      if (IT == null) IT = E * GT;
+      const each = IT / nSrc;
+      let proc = `Fuentes idénticas en paralelo (racks BESS / inversores grid-forming del mismo firmware):\n`;
+      proc += `comparten ${mj("I_T")} a partes iguales. No se paralelizan fuentes de E distinto.\n`;
+      if (RT != null) proc += `${mj(`R_T^{\\mathrm{cargas}} = ${texQtyBody(RT, "\\Omega")}`)}.\n`;
+      proc += `${mj(`I_T = E / R_T = ${texQtyBody(IT, "A")}`)}.\n`;
+      proc += `${mj(`I_{\\mathrm{fuente}} = I_T / N = ${texQtyBody(each, "A")}`)} (${nSrc} fuentes).\n`;
+      loads.forEach((r, i) => {
+        proc += `Carga ${i + 1}: ${mj(`I = E / R = ${texQtyBody(E / r, "A")}`)}.\n`;
+      });
+      setMathText(out, proc);
+    } catch (e) {
+      setMathText(out, e.message);
+    }
+  });
+}
+
+function initSec6_8() {
+  const btn = document.getElementById("btn-s68");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-8");
+      try {
+        const E = (readOptionalNumber("s68-e") ?? 0) * readUnit("s68-e-u");
+        const rs = (readOptionalNumber("s68-rs") ?? 0) * readUnit("s68-rs-u");
+        const rl = (readOptionalNumber("s68-rl") ?? 0) * readUnit("s68-rl-u");
+        const mode = document.getElementById("s68-mode")?.value || "normal";
+        if (!E) throw new Error("Indica E.");
+        let proc = "";
+        if (mode === "normal") {
+          if (!rs && !rl) throw new Error("Indica Rs y RL.");
+          const I = E / (rs + rl);
+          const VL = I * rl;
+          proc += `Servicio normal: ${mj(`I_s = E / (R_s + R_L) = ${texQtyBody(I, "A")}`)}.\n`;
+          proc += `${mj(`V_L = I R_L = ${texQtyBody(VL, "V")}`)}.`;
+        } else if (mode === "short") {
+          if (!rs) throw new Error("Indica Rs (el corto anula RL).");
+          const I = E / rs;
+          proc += `RL en cortocircuito (falla DC en el ramal de carga): ${mj("V_L = 0")}.\n`;
+          proc += `${mj(`I_s = E / R_s = ${texQtyBody(I, "A")}`)} — la Icc la fija el feeder / Ri.`;
+        } else {
+          proc += `RL abierto (seccionador / MC4 / filamento): ${mj("I_s = 0")}.\n`;
+          proc += `${mj(`V_L = E = ${texQtyBody(E, "V")}`)} (no hay caída en Rs).`;
+        }
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+  const btnV = document.getElementById("btn-s69");
+  if (btnV) {
+    btnV.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-9");
+      try {
+        const E = (readOptionalNumber("s69-e") ?? 0) * readUnit("s69-e-u");
+        const r1 = (readOptionalNumber("s69-r1") ?? 0) * readUnit("s69-r1-u");
+        const r2 = (readOptionalNumber("s69-r2") ?? 0) * readUnit("s69-r2-u");
+        const rm = readOptionalNumber("s69-rm");
+        const ohv = readOptionalNumber("s69-ohv");
+        const scale = readOptionalNumber("s69-sc");
+        if (!E || !r1 || !r2) throw new Error("Indica E, R1 y R2.");
+        const vIdeal = E * r2 / (r1 + r2);
+        let proc = `Sin medidor: ${mj(`V_2 = E R_2 / (R_1 + R_2) = ${texQtyBody(vIdeal, "V")}`)}.\n`;
+        const meters = [];
+        if (rm != null && rm > 0) meters.push({ name: "DMM", Rm: rm });
+        if (ohv != null && scale != null) meters.push({ name: "VOM", Rm: ohv * scale });
+        meters.forEach((m) => {
+          const rp = 1 / (1 / r2 + 1 / m.Rm);
+          const v = E * rp / (r1 + rp);
+          const err = (v - vIdeal) / vIdeal * 100;
+          proc += `${m.name} (${formatQty(m.Rm, "\\Omega")}): ${mj(`R_2 \\parallel R_m = ${texQtyBody(rp, "\\Omega")}`)}, `;
+          proc += `${mj(`V_2 = ${texQtyBody(v, "V")}`)} (${formatQtyPlain(err)} % frente al ideal).\n`;
+        });
+        if (!meters.length) proc += "Indica Rm del DMM y/o Ω/V y escala del VOM para ver el efecto de carga.";
+        else proc += "Conclusión: el DMM de MΩ no carga un divisor de kΩ; el VOM de 20 kΩ/V sí, y peor si R1 y R2 suben a 100/200 kΩ.";
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+  const btnT = document.getElementById("btn-s610");
+  if (btnT) {
+    btnT.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-10");
+      try {
+        const E = (readOptionalNumber("s610-e") ?? 0);
+        const im = (readOptionalNumber("s610-im") ?? 0) * 0.001;
+        const vm = readOptionalNumber("s610-vm");
+        const r1 = readOptionalNumber("s610-r1");
+        const r2 = readOptionalNumber("s610-r2");
+        const r3 = readOptionalNumber("s610-r3");
+        if (!E || !im || !r1 || !r2 || !r3) throw new Error("Indica E, I medida y las tres R.");
+        const branches = [r1 * 1e3, r2 * 1e3, r3 * 1e3];
+        const names = [
+          document.getElementById("s610-n1")?.value || "R1",
+          document.getElementById("s610-n2")?.value || "R2",
+          document.getElementById("s610-n3")?.value || "R3"
+        ];
+        const GT = branches.reduce((s, r) => s + 1 / r, 0);
+        const Iexp = E * GT;
+        let proc = `Esperado: ${mj(`I_s = E \\sum 1/R = ${texQtyBody(Iexp, "A")}`)} (${formatQty(Iexp * 1000, "mA")}).\n`;
+        proc += `Medido: ${formatQty(im, "A")}`;
+        if (vm != null) proc += `, V = ${formatQty(vm, "V")}`;
+        proc += ".\n";
+        if (vm != null && Math.abs(vm - E) / E > 0.05) {
+          proc += "El voltímetro no ve E: hay caída en el feeder o el medidor está mal pinzado.\n";
+        }
+        const rel = Math.abs(im - Iexp) / Iexp;
+        if (rel < 0.04) {
+          proc += "La red opera: I medida ≈ I esperada.";
+        } else {
+          proc += "No opera. Prueba abriendo una rama:\n";
+          branches.forEach((r, idx) => {
+            const g = GT - 1 / r;
+            const i = E * g;
+            const hit = Math.abs(i - im) / Math.max(im, 1e-12) < 0.04;
+            proc += `  si ${names[idx]} abierto: I = ${formatQty(i, "A")}${hit ? " ← coincide con la medida" : ""}.\n`;
+          });
+        }
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+  const btn2s = document.getElementById("btn-s611");
+  if (btn2s) {
+    btn2s.addEventListener("click", () => {
+      const out = document.getElementById("proc-6-11");
+      try {
+        const vl = readOptionalNumber("s611-vl");
+        const vr = readOptionalNumber("s611-vr");
+        const rl = (readOptionalNumber("s611-rl") ?? 0) * readUnit("s611-rl-u");
+        const rr = (readOptionalNumber("s611-rr") ?? 0) * readUnit("s611-rr-u");
+        const vaM = readOptionalNumber("s611-va");
+        if (vl == null || vr == null || !rl || !rr) throw new Error("Indica los dos E y las dos R.");
+        const va = (vl * rr + vr * rl) / (rl + rr);
+        const i = (vl - vr) / (rl + rr);
+        let proc = `Dos fuentes a tierra y un nudo a: ${mj("V_a = (E_L R_R + E_R R_L) / (R_L + R_R)")}.\n`;
+        proc += `${mj(`V_a = ${texQtyBody(va, "V")}`)}, ${mj(`I = (E_L - E_R)/(R_L + R_R) = ${texQtyBody(i, "A")}`)}.\n`;
+        if (vaM != null) {
+          const err = Math.abs(vaM - va);
+          if (err < 0.05 * Math.max(Math.abs(va), 1)) {
+            proc += `La lectura ${formatQty(vaM, "V")} es correcta.`;
+          } else {
+            const vaFlipR = (vl * rr + (-vr) * rl) / (rl + rr);
+            const vaFlipL = ((-vl) * rr + vr * rl) / (rl + rr);
+            proc += `La lectura ${formatQty(vaM, "V")} no es ${formatQty(va, "V")}.\n`;
+            if (Math.abs(vaM - vaFlipR) < 0.08 * Math.max(Math.abs(vaFlipR), 1)) {
+              proc += `Coincide con la fuente de la derecha invertida (${formatQty(vaFlipR, "V")}): polaridad al revés.`;
+            } else if (Math.abs(vaM - vaFlipL) < 0.08 * Math.max(Math.abs(vaFlipL), 1)) {
+              proc += `Coincide con la fuente de la izquierda invertida (${formatQty(vaFlipL, "V")}).`;
+            } else if (Math.abs(vaM - vl) < 0.05 * Math.max(Math.abs(vl), 1)) {
+              proc += "Va = EL: el camino a la derecha está abierto (string / R de la derecha fuera).";
+            } else {
+              proc += "Revisa polaridad de las fuentes o un abierto en una R.";
+            }
+          }
+        }
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+}
+
+function initSec6_12() {
+  const btn = document.getElementById("btn-s612");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const out = document.getElementById("proc-6-12");
+    const wrap = document.getElementById("wrap-6-12");
+    const tbody = document.querySelector("#table-6-12 tbody");
+    try {
+      const E = (readOptionalNumber("s612-e") ?? 0) * readUnit("s612-e-u");
+      const r = (readOptionalNumber("s612-r") ?? 0) * readUnit("s612-r-u");
+      const nmin = parseNumberInput(document.getElementById("s612-nmin")?.value || "1");
+      const nmax = parseNumberInput(document.getElementById("s612-nmax")?.value || "12");
+      if (!E || !r) throw new Error("Indica E y R de un string.");
+      const rows = [];
+      for (let n = nmin; n <= nmax + 1e-9; n += 1) {
+        const RT = r / n;
+        const Is = E / RT;
+        const Ix = E / r;
+        const P = E * Is;
+        rows.push({ n, RT, Is, Ix, P });
+      }
+      if (tbody) {
+        tbody.innerHTML = rows.map((row) =>
+          `<tr><td>${row.n}</td><td>${Number(row.RT.toPrecision(4))}</td><td>${Number(row.Is.toPrecision(4))}</td><td>${Number(row.Ix.toPrecision(4))}</td><td>${Number(row.P.toPrecision(4))}</td></tr>`
+        ).join("");
+      }
+      if (wrap) wrap.style.display = "block";
+      let proc = `N strings idénticos en un combiner: ${mj("R_T = R / N")}, ${mj("I_s = N I_x")}, ${mj("V")} no cambia.\n`;
+      proc += `Un string abierto (fusible) baja N en 1: el resto sigue a ${formatQty(E, "V")} e ${formatQty(E / r, "A")}.\n`;
+      proc += `Eso es la ventaja del paralelo frente al string serie del cap. 5.`;
+      setMathText(out, proc);
+    } catch (e) {
+      setMathText(out, e.message);
+    }
+  });
+}
+
+Object.assign(presetsData, {
+  "6-2": {
+    p1a: {
+      selects: { "s62-fig": "a" },
+      click: "btn-s62",
+      desc: "Prob. 1.a — Combiner de tres strings (fig. 6.67.a).\n1 (gPV / feeder) en serie con el paralelo de 2, 3 y 4.\n2, 3 y 4 en paralelo (tres strings TOPCon al mismo bus)."
+    },
+    p1b: {
+      selects: { "s62-fig": "b" },
+      click: "btn-s62",
+      desc: "Prob. 1.b — Feeder y dos MPPT (fig. 6.67.b).\n1 en serie con (2 || 3). 2 y 3 en paralelo."
+    },
+    p1c: {
+      selects: { "s62-fig": "c" },
+      click: "btn-s62",
+      desc: "Prob. 1.c — Tres ramas al bus (fig. 6.67.c).\n2 y 3 en serie. 1, (2+3) y 4 en paralelo."
+    },
+    p2: {
+      selects: { "s62-fig": "d" },
+      click: "btn-s62",
+      desc: "Prob. 2 — Bus DC de planta híbrida (fig. 6.68).\na) Paralelo: R2 con (R4+[R5||(R6+R7)]); R5 con (R6+R7).\nb) Serie: R6 con R7; R4 con ese paralelo; R1 y R3 con el resto.\nc) Ramas en paralelo: R2 frente al lazo derecho; R5 frente a (R6+R7)."
+    }
+  },
+  "6-3": {
+    p3a: {
+      parallel: { prefix: "s63", rows: [
+        { name: "dump 9 Ω", r: "9" }, { name: "dump 18 Ω", r: "18" }
+      ] },
+      click: "btn-s63",
+      desc: "Prob. 3.a — Dos dump eólicos / lastres hidro 9 Ω || 18 Ω.\nGT = 1/9+1/18 = 0.1667 S. RT = 6.00 Ω."
+    },
+    p3b: {
+      parallel: { prefix: "s63", rows: [
+        { name: "string 3 kΩ", r: "3", ru: "1e3" },
+        { name: "string 2 kΩ", r: "2", ru: "1e3" },
+        { name: "string 6 kΩ", r: "6", ru: "1e3" }
+      ] },
+      click: "btn-s63",
+      desc: "Prob. 3.b — Tres bleeder / strings de medida 3 || 2 || 6 kΩ.\nGT = 1.00 mS. RT = 1.00 kΩ."
+    },
+    p3c: {
+      parallel: { prefix: "s63", rows: [
+        { name: "3.3 kΩ std", r: "3.3", ru: "1e3" },
+        { name: "5.6 kΩ std", r: "5.6", ru: "1e3" }
+      ] },
+      click: "btn-s63",
+      desc: "Prob. 3.c — Valores estándar E24 (divisor / NTC de un logger).\n3.3 k || 5.6 k = 2.08 kΩ. GT = 0.482 mS."
+    },
+    p3d: {
+      parallel: { prefix: "s63", rows: [
+        { name: "4 Ω", r: "4" }, { name: "8 Ω", r: "8" },
+        { name: "4 Ω", r: "4" }, { name: "8 Ω", r: "8" }
+      ] },
+      click: "btn-s63",
+      desc: "Prob. 3.d — Cuatro lastres de un Pelton / dump: 4 || 8 || 4 || 8 Ω.\nGT = 0.750 S. RT = 1.33 Ω."
+    },
+    p3e: {
+      parallel: { prefix: "s63", rows: [
+        { name: "shunt 10 Ω", r: "10" },
+        { name: "2 kΩ", r: "2", ru: "1e3" },
+        { name: "40 kΩ ISO", r: "40", ru: "1e3" }
+      ] },
+      click: "btn-s63",
+      desc: "Prob. 3.e — Shunt 10 Ω || 2 kΩ || 40 kΩ (monitor ISO).\nLa de 10 Ω domina: RT = 9.95 Ω. GT = 0.101 S."
+    },
+    p3f: {
+      parallel: { prefix: "s63", rows: [
+        { name: "9.1 Ω", r: "9.1" }, { name: "9.1 Ω", r: "9.1" },
+        { name: "2.2 Ω", r: "2.2" }, { name: "9.1 Ω", r: "9.1" },
+        { name: "2.2 Ω", r: "2.2" }, { name: "4.7 Ω", r: "4.7" }
+      ] },
+      click: "btn-s63",
+      desc: "Prob. 3.f — Seis valores E24 de un banco de lastre.\nGT = 1.45 S. RT = 0.689 Ω."
+    },
+    p4a: {
+      parallel: { prefix: "s63", rows: [
+        { name: "4 Ω", r: "4" }, { name: "R", r: "" }, { name: "6 Ω", r: "6" }
+      ] },
+      fields: { "s63-gt": "0.55" },
+      click: "btn-s63",
+      desc: "Prob. 4.a — GT = 0.55 S (tres ramas de un dump). 1/4+1/6 = 0.4167 S.\nGR = 0.1333 S → R = 7.50 Ω."
+    },
+    p4b: {
+      parallel: { prefix: "s63", rows: [
+        { name: "5 kΩ", r: "5", ru: "1e3" },
+        { name: "8 kΩ", r: "8", ru: "1e3" },
+        { name: "R bleeder", r: "" }
+      ] },
+      fields: { "s63-gt": "0.45" },
+      selects: { "s63-gt-u": "0.001" },
+      click: "btn-s63",
+      desc: "Prob. 4.b — GT = 0.45 mS, 5 k || 8 k || R (ISO / bleeder).\nG5+G8 = 0.325 mS → GR = 0.125 mS → R = 8.00 kΩ."
+    },
+    p5a: {
+      parallel: { prefix: "s63", rows: [
+        { name: "18 Ω", r: "18" }, { name: "R", r: "" }, { name: "18 Ω", r: "18" }
+      ] },
+      fields: { "s63-rt": "6" },
+      click: "btn-s63",
+      desc: "Prob. 5.a — RT = 6 Ω, dos lastres de 18 Ω y R.\n1/6 = 1/18+1/R+1/18 → R = 18.0 Ω."
+    },
+    p5b: {
+      parallel: { prefix: "s63", rows: [
+        { name: "R1", r: "" }, { name: "9 Ω", r: "9" },
+        { name: "R2=R1", r: "" }, { name: "18 Ω", r: "18" }
+      ] },
+      fields: { "s63-rt": "4" },
+      click: "btn-s63",
+      desc: "Prob. 5.b — RT = 4 Ω, R1 || 9 || R1 || 18 (dos strings iguales).\n2/R1 + 1/9 + 1/18 = 1/4 → R1 = R2 = 24.0 Ω."
+    },
+    p6: {
+      parallel: { prefix: "s63", rows: [
+        { name: "R1 string", r: "" },
+        { name: "R2+R3 (serie)", r: "", rs: "" }
+      ] },
+      fields: { "s63-rt": "20", "s63-k2": "5", "s63-k3": "0.5" },
+      click: "btn-s63",
+      desc: "Prob. 6 — RT = 20 Ω, R2 = 5 R1, R3 = ½ R1. R1 || (R2+R3).\nR1 || 5.5 R1 = 20 → R1 = 23.6 Ω, R2 = 118 Ω, R3 = 11.8 Ω.\nEn 2026: un string equivalente en paralelo con dos tramos de cable/dump en serie."
+    },
+    p7: {
+      parallel: { prefix: "s63", rows: [
+        { name: "R1", r: "" },
+        { name: "24+24 Ω", r: "24", rs: "24" },
+        { name: "120 Ω", r: "120" }
+      ] },
+      fields: { "s63-rt": "10" },
+      click: "btn-s63",
+      desc: "Prob. 7 — RT = 10 Ω. R1 || (24+24) || 120 (puente / diamond de medida).\n48 || 120 = 34.3 Ω. 1/10 = 1/R1 + 1/34.3 → R1 = 14.1 Ω."
+    }
+  },
+  "6-4": {
+    p8: {
+      parallel: { prefix: "s64", rows: [
+        { name: "R1 8 kΩ", r: "8", ru: "1e3" },
+        { name: "R2 24 kΩ", r: "24", ru: "1e3" }
+      ] },
+      fields: { "s64-e": "48" },
+      checks: { "s64-watt": true },
+      click: "btn-s64",
+      desc: "Prob. 8 — Auxiliar 48 V de un contenedor BESS, 8 kΩ || 24 kΩ (bleeder / LED).\na) GT = 0.1667 mS, RT = 6.00 kΩ.\nb) Is = 8.00 mA, I1 = 6.00 mA, I2 = 2.00 mA.\nc) 6+2 = 8 mA.\nd) P1 = 0.288 W, P2 = 0.096 W, Pent = 0.384 W.\ne) Ambas caben en ½ W."
+    },
+    p9: {
+      parallel: { prefix: "s64", rows: [
+        { name: "R1 3 Ω", r: "3" }, { name: "R2 6 Ω", r: "6" }, { name: "R3 1.5 Ω", r: "1.5" }
+      ] },
+      fields: { "s64-e": "0.9" },
+      checks: { "s64-watt": true },
+      click: "btn-s64",
+      desc: "Prob. 9 — Celda / shunt de 0.9 V y tres lastres 3 || 6 || 1.5 Ω.\nRT = 0.857 Ω, Is = 1.05 A. I = 0.300, 0.150, 0.600 A.\nP = 0.270, 0.135, 0.540 W → ½ W, ½ W, 1 W."
+    },
+    p10: {
+      parallel: { prefix: "s64", rows: [
+        { name: "2.2 kΩ", r: "2.2", ru: "1e3" },
+        { name: "4.7 kΩ", r: "4.7", ru: "1e3" },
+        { name: "6.8 kΩ", r: "6.8", ru: "1e3" }
+      ] },
+      fields: { "s64-e": "12" },
+      checks: { "s64-watt": true },
+      click: "btn-s64",
+      desc: "Prob. 10 — Rail 12 V de un híbrido, valores E24 2.2 || 4.7 || 6.8 kΩ.\nGT = 0.814 mS, RT = 1.23 kΩ, Is = 9.77 mA.\nI = 5.45, 2.55, 1.76 mA. P < 0.07 W: las tres en ½ W."
+    },
+    p11: {
+      parallel: { prefix: "s64", rows: [
+        { name: "foco LED", r: "1.8", ru: "1e3", n: "8" }
+      ] },
+      fields: { "s64-e": "120" },
+      checks: { "s64-watt": true },
+      click: "btn-s64",
+      desc: "Prob. 11 — Ocho focos LED de alumbrado de planta en paralelo a 120 V, 1.8 kΩ cada uno.\na) I = 120/1800 = 66.7 mA por foco.\nb) RT = 225 Ω.\nc) P = 8.00 W por foco.\nd) Si uno abre, los otros siguen a 120 V e 66.7 mA (ventaja frente al serie del 5.13).\ne) Paralelo: un fallo no apaga el resto; pide más cobre en el feeder. Serie: un gPV / filamento apaga todo."
+    },
+    p12: {
+      fields: {
+        "s64l-e": "120", "s64l-br": "20",
+        "s64l-n1": "focos 60 W", "s64l-p1": "60", "s64l-c1": "10",
+        "s64l-n2": "lavadora", "s64l-p2": "400", "s64l-c2": "1",
+        "s64l-n3": "televisor", "s64l-p3": "360", "s64l-c3": "1",
+        "s64l-n4": "", "s64l-p4": "", "s64l-c4": "1"
+      },
+      click: "btn-s64load",
+      desc: "Prob. 12 — Servicio residencial / campamento de O&M a 120 V, interruptor 20 A.\nDiez focos 60 W (0.500 A c/u, 5.00 A), lavadora 400 W (3.33 A), TV 360 W (3.00 A).\nIs = 11.3 A < 20 A: no desconecta. RT = 10.6 Ω. Pfuente = 1360 W = ΣP."
+    },
+    p13a: {
+      parallel: { prefix: "s64", rows: [
+        { name: "20 Ω", r: "20" }, { name: "5 Ω", r: "5" }
+      ] },
+      fields: { "s64-e": "30" },
+      click: "btn-s64",
+      desc: "Prob. 13.a — Bus 30 V, 20 Ω || 5 Ω (dos lastres).\nI1 (20 Ω) = 1.50 A. Is = 7.50 A."
+    },
+    p13b: {
+      parallel: { prefix: "s64", rows: [
+        { name: "10 kΩ", r: "10", ru: "1e3" },
+        { name: "1 kΩ", r: "1", ru: "1e3" },
+        { name: "10 kΩ", r: "10", ru: "1e3" }
+      ] },
+      fields: { "s64-e": "-8" },
+      click: "btn-s64",
+      desc: "Prob. 13.b — Rail de −8 V (auxiliar bipolar / referencia de un driver).\nI1 en 10 kΩ = −0.800 mA (hacia el rail negativo). Is = −8.80 mA."
+    },
+    p14: {
+      parallel: { prefix: "s64", rows: [
+        { name: "R1", r: "" }, { name: "R2 6 Ω", r: "6" }
+      ] },
+      fields: { "s64-e": "12", "s64-i": "6" },
+      click: "btn-s64",
+      desc: "Prob. 14 — 12 V, Is = 6 A, 6 Ω en una rama (carga auxiliar / faro).\nI2 = 2.00 A → I1 = 4.00 A → R1 = 3.00 Ω."
+    },
+    p15: {
+      parallel: { prefix: "s64", rows: [
+        { name: "5 Ω feeder", r: "5" },
+        { name: "10 Ω dump", r: "10" },
+        { name: "20 Ω stack", r: "20" }
+      ] },
+      fields: { "s64-e": "60" },
+      click: "btn-s64",
+      desc: "Prob. 15 — Rack 60 V, 5 || 10 || 20 Ω (feeder de medida, dump, stack de electrolizador).\nLas tres ven 60 V. Is = 21.0 A. P = 1260 W = E Is."
+    },
+    p16: {
+      fields: { "s64n-va": "24", "s64n-vb": "-8", "s64n-rab": "4", "s64n-rac": "8", "s64n-rbc": "12" },
+      click: "btn-s64n",
+      desc: "Prob. 16 — Rails +24 V y −8 V (auxiliar bipolar de un contenedor), 8 Ω / 4 Ω / 12 Ω.\nVC = 11.2 V. I1 = 9.60 A, I4Ω = 8.00 A, P4Ω = 256 W, I2 = 9.60 A."
+    },
+    p17: {
+      fields: { "s64n-va": "24", "s64n-vb": "8", "s64n-rab": "4000", "s64n-rac": "10000", "s64n-rbc": "1e12" },
+      click: "btn-s64n",
+      desc: "Prob. 17 — Nudo +24 V: 10 kΩ a 0, 4 kΩ a +8 V, 2 kΩ a 0.\nI (4 kΩ) = (24−8)/4k = 4.00 mA.\nV (2 kΩ) = 24 V. Is = 24/10k + 4 mA + 24/2k = 18.4 mA."
+    }
+  },
+  "6-5": {
+    p18a: {
+      fields: {
+        "s65A-n1": "12 A", "s65A-i1": "12", "s65A-d1": "1",
+        "s65A-n2": "9 A", "s65A-i2": "9", "s65A-d2": "1",
+        "s65A-n3": "4 A", "s65A-i3": "4", "s65A-d3": "1",
+        "s65A-n4": "I1", "s65A-i4": "", "s65A-d4": "-1",
+        "s65A-n5": "", "s65A-i5": "", "s65B-n1": "I1", "s65B-i1": "", "s65B-d1": "1",
+        "s65B-n2": "4 A", "s65B-i2": "4", "s65B-d2": "1",
+        "s65B-n3": "6 A", "s65B-i3": "6", "s65B-d3": "-1",
+        "s65B-n4": "I2", "s65B-i4": "", "s65B-d4": "-1"
+      },
+      click: "btn-s65",
+      desc: "Prob. 18.a — Caja de combinadores / nudos de un busbar.\nNudo izquierdo: 12+9+4 = I1 → I1 = 25.0 A hacia R1.\nNudo derecho: 25+4 = 6+I2 → I2 = 23.0 A.\nNudo de R2: 23 = 3+I3 → I3 = 20.0 A."
+    },
+    p18b: {
+      fields: {
+        "s65A-n1": "20 A", "s65A-i1": "20", "s65A-d1": "1",
+        "s65A-n2": "9 A", "s65A-i2": "9", "s65A-d2": "-1",
+        "s65A-n3": "I1", "s65A-i3": "", "s65A-d3": "-1",
+        "s65A-n4": "", "s65A-i4": "",
+        "s65B-n1": "I1", "s65B-i1": "11", "s65B-d1": "1",
+        "s65B-n2": "5 A", "s65B-i2": "5", "s65B-d2": "-1",
+        "s65B-n3": "I2", "s65B-i3": "", "s65B-d3": "-1",
+        "s65B-n4": ""
+      },
+      click: "btn-s65",
+      desc: "Prob. 18.b — Cadena de nudos (feeder → tie → rack).\nI1 = 20−9 = 11.0 A. I2 = 11−5 = 6.00 A.\nI3 = 6+8 = 14.0 A. I4 = 14−4 = 10.0 A."
+    },
+    p19a: {
+      fields: {
+        "s65A-n1": "5 mA", "s65A-i1": "5", "s65A-d1": "1",
+        "s65A-n2": "4 mA", "s65A-i2": "4", "s65A-d2": "-1",
+        "s65A-n3": "I2", "s65A-i3": "", "s65A-d3": "-1",
+        "s65B-n1": "I1", "s65B-i1": "", "s65B-d1": "1",
+        "s65B-n2": "I2", "s65B-i2": "1", "s65B-d2": "1",
+        "s65B-n3": "8 mA", "s65B-i3": "8", "s65B-d3": "-1",
+        "s65B-n4": "", "s65B-i4": ""
+      },
+      selects: {
+        "s65A-u1": "0.001", "s65A-u2": "0.001", "s65A-u3": "0.001",
+        "s65B-u1": "0.001", "s65B-u2": "0.001", "s65B-u3": "0.001", "s65B-u4": "0.001"
+      },
+      click: "btn-s65",
+      desc: "Prob. 19.a — Sensores / RTU en mA.\nI2 = 5−4 = 1.00 mA. I1 = 8−1 = 7.00 mA. I3 = 7−1.5 = 5.50 mA."
+    },
+    p19b: {
+      fields: {
+        "s65A-n1": "6 µA", "s65A-i1": "6", "s65A-d1": "1",
+        "s65A-n2": "2 µA", "s65A-i2": "2", "s65A-d2": "-1",
+        "s65A-n3": "I2", "s65A-i3": "", "s65A-d3": "-1",
+        "s65B-n1": "2 µA", "s65B-i1": "2", "s65B-d1": "1",
+        "s65B-n2": "0.5 µA", "s65B-i2": "0.5", "s65B-d2": "-1",
+        "s65B-n3": "I3", "s65B-i3": "", "s65B-d3": "1"
+      },
+      selects: {
+        "s65A-u1": "1e-6", "s65A-u2": "1e-6", "s65A-u3": "1e-6",
+        "s65B-u1": "1e-6", "s65B-u2": "1e-6", "s65B-u3": "1e-6"
+      },
+      click: "btn-s65",
+      desc: "Prob. 19.b — Puente de piranómetro / nA–µA.\nI2 = 6−2 = 4.00 µA. I3 = 0.50−2 = −1.50 µA (1.50 µA hacia la izquierda).\nI4 = 4−(−1.5) = 5.50 µA. I1 = 6.00 µA (sale lo que entra)."
+    },
+    p20: {
+      parallel: { prefix: "s64", rows: [
+        { name: "R1", r: "" }, { name: "R2 4 kΩ", r: "4", ru: "1e3" }, { name: "R3 faltante", r: "" }
+      ] },
+      fields: { "s64-i": "9" },
+      selects: { "s64-i-u": "0.001" },
+      desc: "Prob. 20 — 9 mA de un rack, 5 mA tras R1, 2 mA tras R2 = 4 kΩ.\nIR1 = 4 mA, IR2 = 3 mA, IR3 = 2 mA.\nE = 3 mA · 4 kΩ = 12.0 V. R1 = 3.00 kΩ, R3 = 6.00 kΩ, RT = 1.33 kΩ.\nAbre Sec 6.4 y carga R2 = 4 kΩ, E = 12 V para ver el paralelo."
+    },
+    p21a: {
+      parallel: { prefix: "s64", rows: [
+        { name: "R1", r: "", i: "2" }, { name: "R2 faltante", r: "" }
+      ] },
+      fields: { "s64-e": "10", "s64-i": "3" },
+      click: "btn-s64",
+      desc: "Prob. 21.a — 10 V, Is = 3 A, 2 A por R1 (el resto por R2).\nR1 = 5.00 Ω, R2 = 10.0 Ω."
+    },
+    p21b: {
+      parallel: { prefix: "s64", rows: [
+        { name: "6 Ω", r: "6", i: "2" }, { name: "9 Ω", r: "9" }, { name: "R (12 W)", r: "", p: "12" }
+      ] },
+      fields: { "s64-e": "" },
+      click: "btn-s64",
+      desc: "Prob. 21.b — 2 A en 6 Ω → E = 12 V. I9 = 1.33 A. P = 12 W → IR = 1.00 A, R = 12.0 Ω.\nIT = 4.33 A, RT = 2.77 Ω."
+    },
+    p21c: {
+      parallel: { prefix: "s64", rows: [
+        { name: "1 kΩ", r: "1", ru: "1e3" }, { name: "R", r: "" }, { name: "4 kΩ", r: "4", ru: "1e3" }
+      ] },
+      fields: { "s64-e": "64", "s64-i": "100" },
+      selects: { "s64-i-u": "0.001" },
+      click: "btn-s64",
+      desc: "Prob. 21.c — 64 V, Is = 100 mA (inversores / tres ramas).\nI1 = 64 mA, I3 = 16 mA, IR = 20 mA → R = 3.20 kΩ."
+    },
+    p21d: {
+      parallel: { prefix: "s64", rows: [
+        { name: "30 Ω (30 W)", r: "30", p: "30" },
+        { name: "R2", r: "" },
+        { name: "R3=R2", r: "" }
+      ] },
+      fields: { "s64-i": "2" },
+      click: "btn-s64",
+      desc: "Prob. 21.d — 30 W en 30 Ω → I1 = 1.00 A, E = 30 V. Quedan 1 A para R2 = R3 → 0.500 A c/u.\nR2 = R3 = 60.0 Ω, PR2 = 15.0 W."
+    }
+  },
+  "6-6": {
+    p22: {
+      parallel: { prefix: "s66", rows: [
+        { name: "4 Ω", r: "4", i: "6" }, { name: "12 Ω", r: "12" },
+        { name: "2 Ω", r: "2" }, { name: "40 Ω", r: "40" }
+      ] },
+      click: "btn-s66",
+      desc: "Prob. 22 — Divisor por razones (cuatro lastres).\nI1/I2 = 12/4 = 3 → I2 = 2.00 A. I3 = 12.0 A. I4 = 0.600 A.\nIT = 20.6 A. V = 24.0 V."
+    },
+    p23a: {
+      parallel: { prefix: "s66", rows: [
+        { name: "6 Ω", r: "6" }, { name: "3 Ω", r: "3" }
+      ] },
+      fields: { "s66-i": "12" },
+      click: "btn-s66",
+      desc: "Prob. 23.a — 12 A a 6 Ω || 3 Ω (dos strings / dos dumps).\nI1 = 12·3/9 = 4.00 A. I2 = 8.00 A."
+    },
+    p23b: {
+      parallel: { prefix: "s66", rows: [
+        { name: "8||8", r: "4" }, { name: "6||6||6", r: "2" }
+      ] },
+      fields: { "s66-i": "6" },
+      click: "btn-s66",
+      desc: "Prob. 23.b — 6 A a (8||8) frente a (6||6||6).\nReq izq = 4 Ω, der = 2 Ω. I1 = 2.00 A (1.00 A por cada 8 Ω). I2 = 4.00 A (1.33 A por cada 6 Ω)."
+    },
+    p23c: {
+      parallel: { prefix: "s66", rows: [
+        { name: "1 Ω", r: "1" }, { name: "2||3", r: "1.2" }
+      ] },
+      fields: { "s66-i": "500" },
+      selects: { "s66-i-u": "0.001" },
+      click: "btn-s66",
+      desc: "Prob. 23.c — 500 mA, 1 Ω || (2||3 = 1.2 Ω).\nI1 = 273 mA. I(2||3) = 227 mA → I2 = 136 mA, I3 = 90.9 mA. I4 = 500 mA."
+    },
+    p23d: {
+      desc: "Prob. 23.d — Puente 4 Ω / 12 Ω / 18 Ω con I1 = 4 A en la rama inferior derecha.\nSin la cuarta R el puente no cierra en números; con LCK en el nudo derecho I3 = I12Ω + 4 A.\nSi el puente está equilibrado (4/12 = 18/R) entonces R = 54 Ω y la diagonal no lleva corriente."
+    },
+    p24: {
+      parallel: { prefix: "s66", rows: [
+        { name: "1 Ω", r: "1" }, { name: "10 Ω", r: "10" },
+        { name: "1 kΩ", r: "1", ru: "1e3" }, { name: "100 kΩ", r: "100", ru: "1e3" }
+      ] },
+      fields: { "s66-i": "10" },
+      click: "btn-s66",
+      desc: "Prob. 24 — 10 A a 1 || 10 || 1 k || 100 kΩ (un string grueso y tres bleeder).\na) I1 ≈ 10 A (la de 1 Ω se lleva casi todo).\nb) I1/I2 = 10, I3/I4 = 100.\nc) I2/I3 = 100, I1/I4 = 100000.\nd) I1 = 9.09 A (cerca de 10).\ne) I4 = 90.9 µA; I1/I4 = 1.00×10^5, coincide con (c)."
+    },
+    p25a: {
+      parallel: { prefix: "s66", rows: [
+        { name: "2 Ω", r: "2" }, { name: "6 Ω", r: "6", i: "1" }
+      ] },
+      click: "btn-s66",
+      desc: "Prob. 25.a — 1 A en 6 Ω → V = 6 V, I1 = 3.00 A, I = I2 = 4.00 A."
+    },
+    p25b: {
+      parallel: { prefix: "s66", rows: [
+        { name: "2+9 Ω", r: "2", rs: "9" }, { name: "R", r: "" }, { name: "9 Ω", r: "9" }
+      ] },
+      fields: { "s66-i": "6" },
+      selects: { "s66-i-u": "1e-6" },
+      desc: "Prob. 25.b — 6 µA, 2 µA por la rama 2+9 Ω.\nV = 2 µA · 11 Ω = 22 µV. I9 = 2.44 µA. I_R = 1.56 µA → R = 14.1 Ω."
+    },
+    p26: {
+      parallel: { prefix: "s66", rows: [
+        { name: "2.2 kΩ", r: "2.2", ru: "1e3" }, { name: "R", r: "" }
+      ] },
+      fields: { "s66-i": "60" },
+      selects: { "s66-i-u": "0.001" },
+      desc: "Prob. 26 — 60 mA, I1 = 3 I2, 2.2 kΩ || R.\nI2 = 15 mA, I1 = 45 mA. R = 3·2.2 kΩ = 6.60 kΩ (la de más R lleva menos I)."
+    },
+    p27: {
+      fields: { "s66d-e": "24", "s66d-i": "68", "s66d-a": "4", "s66d-b": "3" },
+      selects: { "s66d-i-u": "0.001" },
+      click: "btn-s66d",
+      desc: "Prob. 27 — Diseñar 24 V, 68 mA, I2 = 4 I1, I3 = 3 I2.\nI1 = 4.00 mA, I2 = 16.0 mA, I3 = 48.0 mA.\nR1 = 6.00 kΩ, R2 = 1.50 kΩ, R3 = 500 Ω."
+    }
+  },
+  "6-7": {
+    p28: {
+      fields: { "s67-e": "12", "s67-n": "2", "s67-r1": "8", "s67-r2": "56" },
+      click: "btn-s67",
+      desc: "Prob. 28 — Dos racks / bancos de 12 V idénticos, 8 Ω || 56 Ω.\nRT = 7.00 Ω, IT = 1.71 A. Cada fuente 0.857 A. I2 (al lastre) = 1.71 A."
+    },
+    p29: {
+      fields: { "s67-e": "16", "s67-n": "2", "s67-r1": "8", "s67-r2": "", "s67-it": "10" },
+      click: "btn-s67",
+      desc: "Prob. 29 — Dos fuentes 16 V idénticas, 5 A cada una (IT = 10 A), 8 Ω || R.\nI8 = 2.00 A → IR = 8.00 A → R = 2.00 Ω. I (por R, hacia la izquierda) = 8.00 A."
+    }
+  },
+  "6-8": {
+    p30a: {
+      fields: { "s68-e": "12", "s68-rs": "100", "s68-rl": "10" },
+      selects: { "s68-mode": "normal", "s68-rl-u": "1e3" },
+      click: "btn-s68",
+      desc: "Prob. 30.a — 12 V, Rs = 100 Ω (feeder), RL = 10 kΩ (logger).\nIs = 1.19 mA, VL = 11.9 V."
+    },
+    p30b: {
+      fields: { "s68-e": "12", "s68-rs": "100", "s68-rl": "10" },
+      selects: { "s68-mode": "short", "s68-rl-u": "1e3" },
+      click: "btn-s68",
+      desc: "Prob. 30.b — RL en corto (falla en el ramal).\nIs = 12/100 = 120 mA. VL = 0."
+    },
+    p30c: {
+      fields: { "s68-e": "12", "s68-rs": "100", "s68-rl": "10" },
+      selects: { "s68-mode": "open", "s68-rl-u": "1e3" },
+      click: "btn-s68",
+      desc: "Prob. 30.c — RL abierto (MC4 / seccionador).\nIs = 0, VL = 12.0 V."
+    },
+    p31a: {
+      desc: "Prob. 31.a — 9 V, 2.2 kΩ serie, 4.7 kΩ shunt, 3.3 kΩ hacia VL abierto.\nI(3.3 k) = 0. VL = 9·4.7/(2.2+4.7) = 6.13 V."
+    },
+    p31b: {
+      desc: "Prob. 31.b — El 2.2 kΩ en corto: el shunt ve 9 V. VL (abierto) = 9.00 V."
+    },
+    p31c: {
+      desc: "Prob. 31.c — 4.7 kΩ abierto: no hay corriente. VL = 9.00 V (el 3.3 kΩ cuelga, sin I)."
+    },
+    p32: {
+      desc: "Prob. 32 — 20 V, 6 Ω en corto (I1), 4 Ω serie a la izquierda; 10 Ω en corto (I2), 5 Ω de retorno.\nI1 = 20/4 = 5.00 A, V1 = 0. I2 = 20/5 = 4.00 A, V2 = 0.\nIs = 5+4 = 9.00 A (falla doble en un bus de 20 V: Icc de planta)."
+    },
+    p33a: {
+      fields: { "s69-e": "6", "s69-r1": "10", "s69-r2": "20" },
+      selects: { "s69-r1-u": "1e3", "s69-r2-u": "1e3" },
+      click: "btn-s69",
+      desc: "Prob. 33.a — Divisor 6 V, 10 k || 20 k (tap de un rail de sensor). V2 = 4.00 V."
+    },
+    p33b: {
+      fields: { "s69-e": "6", "s69-r1": "10", "s69-r2": "20", "s69-rm": "11e6" },
+      selects: { "s69-r1-u": "1e3", "s69-r2-u": "1e3" },
+      click: "btn-s69",
+      desc: "Prob. 33.b — DMM de 11 MΩ. V2 = 4.00 V (carga despreciable)."
+    },
+    p33c: {
+      fields: { "s69-e": "6", "s69-r1": "10", "s69-r2": "20", "s69-ohv": "20000", "s69-sc": "10" },
+      selects: { "s69-r1-u": "1e3", "s69-r2-u": "1e3" },
+      click: "btn-s69",
+      desc: "Prob. 33.c — VOM 20 kΩ/V, escala 10 V → Rm = 200 kΩ. V2 = 3.87 V."
+    },
+    p33d: {
+      fields: { "s69-e": "6", "s69-r1": "100", "s69-r2": "200", "s69-rm": "11e6", "s69-ohv": "20000", "s69-sc": "10" },
+      selects: { "s69-r1-u": "1e3", "s69-r2-u": "1e3" },
+      click: "btn-s69",
+      desc: "Prob. 33.d — R1 = 100 kΩ, R2 = 200 kΩ. DMM: 3.98 V. VOM: 3.00 V (carga grave)."
+    },
+    p33e: {
+      desc: "Prob. 33.e — Un voltímetro de baja Rm carga el divisor (peor si las R de planta son altas: bleeder ISO, PT de 1500 Vcc). En 2026 se usa DMM / sonda de 10 MΩ o más, nunca un VOM de 20 kΩ/V en un rail de medida."
+    },
+    p34: {
+      fields: {
+        "s610-e": "6", "s610-im": "3.5", "s610-vm": "6",
+        "s610-n1": "6 kΩ", "s610-r1": "6",
+        "s610-n2": "3 kΩ", "s610-r2": "3",
+        "s610-n3": "4 kΩ", "s610-r3": "4"
+      },
+      click: "btn-s610",
+      desc: "Prob. 34 — 6 V, 6 || 3 || 4 kΩ. I esperada = 4.50 mA; medida 3.50 mA; V = 6 V.\nCoincide con el 6 kΩ abierto (3k||4k = 1.71 kΩ → 3.50 mA). El string / bleeder de 6 kΩ está fuera."
+    },
+    p35: {
+      fields: { "s611-vl": "12", "s611-vr": "4", "s611-rl": "1", "s611-rr": "4", "s611-va": "8.8" },
+      selects: { "s611-rl-u": "1e3", "s611-rr-u": "1e3" },
+      click: "btn-s611",
+      desc: "Prob. 35 — 12 V — 1 kΩ — a — 4 kΩ — 4 V. Va correcto = 10.4 V, no 8.8 V.\n8.8 V es el nudo con la fuente de 4 V invertida. El banco / módulo de 4 V está al revés."
+    },
+    p36a: {
+      fields: { "s611-vl": "20", "s611-vr": "-4", "s611-rl": "7", "s611-rr": "1", "s611-va": "20" },
+      selects: { "s611-rl-u": "1e3", "s611-rr-u": "1e3" },
+      click: "btn-s611",
+      desc: "Prob. 36.a — +20 V — 4k+3k — a — 1 kΩ — (−4 V). Va sano = −1.00 V.\nSi salta a +20 V, el camino a −4 V abrió (1 kΩ / conector / fusible): a se queda en el rail de +20 V."
+    },
+    p36b: {
+      fields: { "s611-vl": "20", "s611-vr": "4", "s611-rl": "7", "s611-rr": "1", "s611-va": "6" },
+      selects: { "s611-rl-u": "1e3", "s611-rr-u": "1e3" },
+      click: "btn-s611",
+      desc: "Prob. 36.b — Va = 6 V en vez de −1 V. Cuadra con la fuente de −4 V invertida (ahora +4 V):\nVa = (20·1 + 4·7)/8 = 6.00 V."
+    }
+  },
+  "6-12": {
+    p37: {
+      desc: "Prob. 37 — Corrientes de la fig. 6.78 (el «PSpice» es el solucionador 6.4 / cargas).\nFocos 5.00 A, lavadora 3.33 A, TV 3.00 A, Is = 11.3 A."
+    },
+    p38: {
+      desc: "Prob. 38 — Incógnitas de la fig. 6.84: solucionador 6.5 / LCK.\nI1 = 25 A, I2 = 23 A, I3 = 20 A (18.a); I1 = 11 A, I2 = 6 A, I3 = 14 A, I4 = 10 A (18.b)."
+    },
+    p39: {
+      desc: "Prob. 39 — «Programa» de RT y GT de N ramas: es el solucionador 6.3 (hasta 6 ramas, N copias, serie dentro de la rama)."
+    },
+    p40: {
+      fields: { "s612-e": "6", "s612-r": "20", "s612-nmin": "1", "s612-nmax": "12" },
+      selects: { "s612-r-u": "1e3" },
+      click: "btn-s612",
+      desc: "Prob. 40 — Barrido del VOM: aquí, N strings de 20 kΩ a 6 V (el efecto de carga del 33 al tabular).\nAl subir N, RT baja y Is sube lineal; cada string sigue a 0.300 mA. El VOM de 200 kΩ deja de ser «invisible» cuando RT se acerca a Rm."
     }
   }
 });
