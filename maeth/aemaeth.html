@@ -5930,6 +5930,1134 @@
         </div>
       </details>
 
+      <details class="chapter-1-fold" id="capitulo-7">
+        <summary class="chapter-1-summary" aria-label="Capítulo 7.0">
+          <span class="chapter-1-title">7.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Redes serie-paralelo: el string es serie, el combiner es
+            paralelo, y la planta 2026 es las dos cosas a la vez.
+            Se reduce de dentro hacia afuera:
+            \(R_T\), luego \(I_s = E / R_T\), luego se reabre cada
+            grupo para hallar \(I_x\) y \(V_x\).
+            Un feeder en serie con dos strings, un bleeder de
+            \(1500\,\mathrm{V_{cc}}\) con taps, una escalera de
+            racks BESS, el shunt de un inversor y el megger de un
+            string son el mismo capítulo. Las ecuaciones no
+            cambiaron; cambió el aparato.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(R_T = R_a + (R_b \parallel R_c)\),
+              \(I_x = I_T R_T / R_x\) y el MNA de un nudo sin pelearse
+              con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-7-2">Sec 7.2</button>
+            <button class="tab-btn" data-target="sec-7-2b">Sec 7.2b</button>
+            <button class="tab-btn" data-target="sec-7-2c">Sec 7.2c</button>
+            <button class="tab-btn" data-target="sec-7-2d">Sec 7.2d</button>
+            <button class="tab-btn" data-target="sec-7-3">Sec 7.3</button>
+            <button class="tab-btn" data-target="sec-7-4">Sec 7.4–7.5</button>
+            <button class="tab-btn" data-target="sec-7-6">Sec 7.6</button>
+            <button class="tab-btn" data-target="sec-7-9">Sec 7.9</button>
+          </div>
+
+          <div class="tab-content active" id="sec-7-2">
+            <h2>Sección 7.2: Identificar y reducir \(R_T\)</h2>
+            <p class="chapter-discourse">
+              Un elemento está en serie si comparte un solo nudo
+              (la misma \(I\)); en paralelo si comparte ambos
+              (la misma \(V\)).
+              En 2026: el cable DC de un string está en serie con
+              el paralelo de dos módulos; un busbar que cortocircuita
+              dos dumps deja \(R_T\) igual a la del feeder.
+              El método: marcar series y paralelos, sustituir,
+              repetir hasta un \(R_T\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-7-2">Selecciona un problema:</label>
+                <select id="preset-7-2" class="book-preset-select" data-section="7-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p2a">Prob 2.a: H de lastres 4 Ω (fig. 7.65.a)</option>
+                  <option value="p2b">Prob 2.b: Feeder + dos dumps (fig. 7.65.b)</option>
+                  <option value="p2c">Prob 2.c: Tap y puente 4 Ω (fig. 7.65.c)</option>
+                  <option value="p2d">Prob 2.d: Busbar que cortocircuita (fig. 7.65.d)</option>
+                  <option value="p3">Prob 3: Dos etapas de combiner (fig. 7.66)</option>
+                  <option value="p4">Prob 4: 64 V, (12∥6)+12 Ω (fig. 7.67)</option>
+                  <option value="p5">Prob 5: Rack 36 V y bleeder (fig. 7.68)</option>
+                </select>
+              </div>
+              <div id="desc-preset-7-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 7.65 — Cuatro topologías de \(R_T\)</h3>
+              <div class="input-group">
+                <label for="s72-fig">Configuración:</label>
+                <select id="s72-fig">
+                  <option value="a">7.65.a — H de cinco 4 Ω</option>
+                  <option value="b">7.65.b — 4 Ω + (4∥4)</option>
+                  <option value="c">7.65.c — puente con retorno</option>
+                  <option value="d">7.65.d — busbar en corto</option>
+                  <option value="66">7.66 — dos etapas</option>
+                  <option value="67">7.67 — (12∥6)+12, 64 V</option>
+                  <option value="68">7.68 — 36 V, 10∥15 y 10+2</option>
+                </select>
+                <button id="btn-s72" class="action-btn">Calcular</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s72" viewBox="0 0 560 220" role="img"
+                aria-label="Red serie-paralelo"></svg>
+              <p class="caption-fig">Figura 7.65–7.68 — Lastres, dumps y bleeders de un bus DC. El corto de (d) es un busbar que anula dos ramas.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-7-2b">
+            <h2>Sección 7.2b: Varios rails y nudos</h2>
+            <p class="chapter-discourse">
+              Un contenedor 2026 tiene rails \(+24\,\mathrm{V}\),
+              \(-8\,\mathrm{V}\) y PE. Cada tramo ve la diferencia
+              de sus dos nudos, no «el» voltaje del dibujo.
+              Un nudo a tierra parte el circuito: lo de un lado
+              no alimenta lo del otro (fig. 7.69).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-7-2b">Selecciona un problema:</label>
+                <select id="preset-7-2b" class="book-preset-select" data-section="7-2b">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p6">Prob 6: Rails +20 V y −7 V (fig. 7.69)</option>
+                  <option value="p7">Prob 7: Auxiliar +24 / −8 V (fig. 7.70)</option>
+                  <option value="p8">Prob 8: Rack 20 V y puente (fig. 7.71)</option>
+                  <option value="p9">Prob 9: Bleeder en árbol (fig. 7.72)</option>
+                </select>
+              </div>
+              <div id="desc-preset-7-2b" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 7.69–7.72 — Rails de auxiliar</h3>
+              <div class="input-group">
+                <label for="s72b-fig">Figura:</label>
+                <select id="s72b-fig">
+                  <option value="69">7.69 — tierra en el medio</option>
+                  <option value="70">7.70 — +24 V y −8 V</option>
+                  <option value="71">7.71 — puente a 20 V</option>
+                  <option value="72">7.72 — árbol de taps</option>
+                </select>
+                <button id="btn-s72b" class="action-btn">Calcular</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s72b" viewBox="0 0 560 240" role="img"
+                aria-label="Rails y nudos de una red serie-paralelo"></svg>
+              <p class="caption-fig">Figuras 7.69–7.72 — Auxiliar de inversor / contenedor. La tierra parte; un tap negativo invierte la flecha.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-2b" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-7-2c">
+            <h2>Sección 7.2c: Redes de planta, BJT y SiC</h2>
+            <p class="chapter-discourse">
+              El mismo método escala a kΩ de un bleeder ISO y a
+              un driver de compuerta.
+              El BJT de la fig. 7.75 es el modelo \(V_{BE}=0{,}7\,\mathrm{V}\)
+              del opto / driver de un IGBT; el FET de la 7.76 es un
+              MOSFET SiC de un DC/DC (\(I_G=0\), \(I_D=I_S\)).
+              Polarizar es fijar un punto de cd con resistencias.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-7-2c">Selecciona un problema:</label>
+                <select id="preset-7-2c" class="book-preset-select" data-section="7-2c">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p10">Prob 10: Bleeder 28 V (fig. 7.73)</option>
+                  <option value="p11">Prob 11: Bus 80 V (fig. 7.74)</option>
+                  <option value="p12">Prob 12: Driver BJT / IGBT (fig. 7.75)</option>
+                  <option value="p13">Prob 13: Polarización SiC (fig. 7.76)</option>
+                  <option value="p14">Prob 14: Puente de medida (fig. 7.77)</option>
+                  <option value="p15">Prob 15: Rails +9 / −19 V (fig. 7.78)</option>
+                  <option value="p16">Prob 16: Auxiliar 24 V (fig. 7.79)</option>
+                </select>
+              </div>
+              <div id="desc-preset-7-2c" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 7.73–7.79 — De un bleeder a un SiC</h3>
+              <div class="input-group">
+                <label for="s72c-fig">Figura:</label>
+                <select id="s72c-fig">
+                  <option value="73">7.73 — 28 V, tres kΩ en paralelo</option>
+                  <option value="74">7.74 — bus 80 V</option>
+                  <option value="75">7.75 — BJT del driver</option>
+                  <option value="76">7.76 — MOSFET SiC</option>
+                  <option value="77">7.77 — puente 32 V</option>
+                  <option value="78">7.78 — +9 V y −19 V</option>
+                  <option value="79">7.79 — auxiliar 24 V</option>
+                </select>
+                <button id="btn-s72c" class="action-btn">Calcular</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s72c" viewBox="0 0 560 260" role="img"
+                aria-label="Red de planta o polarización"></svg>
+              <p class="caption-fig">Figuras 7.73–7.79 — Bleeders ISO, bus de string inverter, driver de IGBT y polarización SiC 2026.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-2c" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-7-2d">
+            <h2>Sección 7.2d: Puentes, cubo y carga del voltímetro</h2>
+            <p class="chapter-discourse">
+              Un puente de lastres, una malla de puesta a tierra
+              (el «cubo» de 12 resistencias) y un DMM sobre un
+              tap son redes serie-paralelo.
+              Si la lectura no cuadra con \(E\) y las \(R\), una
+              rama abrió: el caso 2026 es un bleeder ISO partido.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-7-2d">Selecciona un problema:</label>
+                <select id="preset-7-2d" class="book-preset-select" data-section="7-2d">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p17">Prob 17: Malla 100 V (fig. 7.80)</option>
+                  <option value="p18">Prob 18: Puente 30 V (fig. 7.81)</option>
+                  <option value="p19">Prob 19: Malla 32 V (fig. 7.82)</option>
+                  <option value="p20">Prob 20: Dos fuentes 6 V y 20 V (fig. 7.83)</option>
+                  <option value="p21">Prob 21: Puente mixto (fig. 7.84)</option>
+                  <option value="p22">Prob 22: 120 V, I = 2 A (fig. 7.85)</option>
+                  <option value="p23">Prob 23: Cubo de 10 Ω (fig. 7.86)</option>
+                  <option value="p24">Prob 24: Voltímetro 27 V (fig. 7.87)</option>
+                </select>
+              </div>
+              <div id="desc-preset-7-2d" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 7.80–7.87</h3>
+              <div class="input-group">
+                <label for="s72d-fig">Figura:</label>
+                <select id="s72d-fig">
+                  <option value="80">7.80 — malla 100 V</option>
+                  <option value="81">7.81 — puente 30 V</option>
+                  <option value="82">7.82 — malla 32 V</option>
+                  <option value="83">7.83 — 6 V y 20 V</option>
+                  <option value="84">7.84 — puente mixto</option>
+                  <option value="85">7.85 — 120 V, 2 A</option>
+                  <option value="86">7.86 — cubo / malla PE</option>
+                  <option value="87">7.87 — DMM en el tap</option>
+                </select>
+                <button id="btn-s72d" class="action-btn">Calcular</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s72d" viewBox="0 0 560 250" role="img"
+                aria-label="Puente, cubo o voltímetro"></svg>
+              <p class="caption-fig">Figuras 7.80–7.87 — Mallas de lastre, cubo de puesta a tierra de un skid y efecto de carga / rama abierta.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-2d" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-7-3">
+            <h2>Sección 7.3: Redes de escalera</h2>
+            <p class="chapter-discourse">
+              Una escalera es una cascada de series y derivaciones:
+              el bleeder de un bus, los taps de un banco BESS, un
+              R-2R de consigna, o varios DC/DC en cadena.
+              Se reduce desde el extremo opuesto a la fuente
+              (el último peldaño primero).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-7-3">Selecciona un problema:</label>
+                <select id="preset-7-3" class="book-preset-select" data-section="7-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p25">Prob 25: Escalera 240 V (fig. 7.88)</option>
+                  <option value="p26">Prob 26: Escalera 2 V (fig. 7.89)</option>
+                  <option value="p27">Prob 27: P en 10 Ω (fig. 7.90)</option>
+                  <option value="p28">Prob 28: Escalera múltiple (fig. 7.91)</option>
+                </select>
+              </div>
+              <div id="desc-preset-7-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 7.88–7.91 — Escalera</h3>
+              <div class="input-group">
+                <label for="s73-fig">Figura:</label>
+                <select id="s73-fig">
+                  <option value="88">7.88 — 240 V, 3+5 y derivaciones</option>
+                  <option value="89">7.89 — 2 V, peldaños 4 / 2 / 1</option>
+                  <option value="90">7.90 — 24 V, carga 10 Ω</option>
+                  <option value="91">7.91 — múltiple 12 V</option>
+                </select>
+                <button id="btn-s73" class="action-btn">Calcular</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s73" viewBox="0 0 620 230" role="img"
+                aria-label="Red de escalera"></svg>
+              <p class="caption-fig">Figuras 7.88–7.91 — Escalera de un bleeder / taps de un rack. Se reduce desde la carga.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Escalera genérica (último peldaño primero)</h3>
+              <p class="hint-inline">
+                Cada peldaño: \(R_{\mathrm{serie}}\) en el rail y
+                \(R_{\mathrm{shunt}}\) a PE. El último shunt es la carga.
+                N peldaños de un bleeder 1500 Vcc o de un R-2R.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s73g-e">E:</label>
+                  <input type="text" id="s73g-e" placeholder="240" />
+                  <select id="s73g-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input"><label for="s73g-rs">R serie (Ω):</label><input type="text" id="s73g-rs" placeholder="3" /></div>
+                <div class="k-input"><label for="s73g-rp">R shunt (Ω):</label><input type="text" id="s73g-rp" placeholder="6" /></div>
+                <div class="k-input"><label for="s73g-n">N peldaños:</label><input type="text" id="s73g-n" value="3" /></div>
+              </div>
+              <button id="btn-s73g" class="action-btn mt-1">Reducir escalera</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-3g" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-7-4">
+            <h2>Sección 7.4–7.5: Divisor cargado y potenciómetro</h2>
+            <p class="chapter-discourse">
+              Una fuente con divisor de voltaje (fig. 7.92 / 7.93)
+              es el rail auxiliar de un inversor: \(+120 / 0 / -60\,\mathrm{V}\)
+              o los taps \(48\,\mathrm{V}\) y \(24\,\mathrm{V}\) de un rack.
+              Cada carga extrae \(I\) del tap y cambia las caídas.
+              El potenciómetro (fig. 7.94 / 7.95) es la consigna
+              analógica de un variador, el trimmer de un piranómetro
+              o el tap de SoC: \(R_L\) lo carga y mueve el voltaje.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-7-4">Selecciona un problema:</label>
+                <select id="preset-7-4" class="book-preset-select" data-section="7-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p29">Prob 29: Taps 48 / 24 V (fig. 7.92)</option>
+                  <option value="p30">Prob 30: Rails +120 / −60 V (fig. 7.93)</option>
+                  <option value="p31">Prob 31: Pot. 1 kΩ y RL 10 kΩ (fig. 7.94)</option>
+                  <option value="p32">Prob 32: Pot. 100 Ω, Vab y Vbc (fig. 7.95)</option>
+                </select>
+              </div>
+              <div id="desc-preset-7-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 7.92 / 7.93 — Fuente con divisor cargado</h3>
+              <div class="input-group">
+                <label for="s74-fig">Figura:</label>
+                <select id="s74-fig">
+                  <option value="92">7.92 — taps 48 V y 24 V</option>
+                  <option value="93">7.93 — +120 V y −60 V</option>
+                </select>
+                <button id="btn-s74" class="action-btn">Diseñar R</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s74" viewBox="0 0 420 280" role="img"
+                aria-label="Fuente con divisor de voltaje cargado"></svg>
+              <p class="caption-fig">Figuras 7.92–7.93 — Rails de auxiliar de inversor. Cada carga (RTU, dump, logger) extrae I del tap.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 7.94 / 7.95 — Carga del potenciómetro</h3>
+              <div class="input-group">
+                <label for="s75-fig">Figura:</label>
+                <select id="s75-fig">
+                  <option value="94">7.94 — pot. 1 kΩ, RL 10 kΩ, 3 V</option>
+                  <option value="95">7.95 — pot. 100 Ω, 20 Ω, 1 k / 10 k</option>
+                </select>
+                <button id="btn-s75" class="action-btn">Calcular carga</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s75" viewBox="0 0 420 220" role="img"
+                aria-label="Potenciómetro con carga"></svg>
+              <p class="caption-fig">Figuras 7.94–7.95 — Consigna de un VFD / trimmer de piranómetro. RL en el brazo carga el divisor.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s75-e">E (V):</label><input type="text" id="s75-e" placeholder="12" /></div>
+                <div class="k-input"><label for="s75-rt">R pot (Ω):</label><input type="text" id="s75-rt" placeholder="1000" /></div>
+                <div class="k-input"><label for="s75-rl">RL (Ω):</label><input type="text" id="s75-rl" placeholder="10000" /></div>
+                <div class="k-input"><label for="s75-v">V deseado (V):</label><input type="text" id="s75-v" placeholder="3" /></div>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-5" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-7-6">
+            <h2>Sección 7.6: Amperímetro, voltímetro y ohmímetro</h2>
+            <p class="chapter-discourse">
+              El galvanómetro de d’Arsonval es el modelo de laboratorio.
+              En 2026 el «movimiento» es un shunt Kelvin + ADC o un
+              Hall del combiner; el voltímetro es un DMM de
+              \(10\,\mathrm{M}\Omega\) o una sonda 100:1 del bus de
+              \(1500\,\mathrm{V_{cc}}\); el ohmímetro de alta es el
+              megger / ISO-meter del string.
+              Las cuentas no cambiaron:
+              \(R_{\mathrm{shunt}} = I_m R_m / (I - I_m)\),
+              \(R_{\mathrm{serie}} = V/I_m - R_m\),
+              \(\Omega/\mathrm{V} = 1/I_m\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-7-6">Selecciona un problema:</label>
+                <select id="preset-7-6" class="book-preset-select" data-section="7-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p33">Prob 33: Shunt de 20 A (1 mA, 100 Ω)</option>
+                  <option value="p34">Prob 34: Miliamperímetro 25/50/100 mA</option>
+                  <option value="p35">Prob 35: Voltímetro 15 V</option>
+                  <option value="p36">Prob 36: Voltímetro 5/50/500 V</option>
+                  <option value="p37">Prob 37: DMM 10 MΩ, escala 0.5 V</option>
+                  <option value="p38">Prob 38: Ohmímetro en serie</option>
+                  <option value="p39">Prob 39: Mega-ohmímetro / ISO</option>
+                  <option value="p40a">Prob 40.a: Megger en puente 12 Ω (fig. 7.96.a)</option>
+                  <option value="p40b">Prob 40.b: Tres 18 Ω (fig. 7.96.b)</option>
+                </select>
+              </div>
+              <div id="desc-preset-7-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Diseño de instrumentos</h3>
+              <div class="input-group">
+                <label for="s76-mode">Instrumento:</label>
+                <select id="s76-mode">
+                  <option value="amm">Amperímetro (shunt)</option>
+                  <option value="volt">Voltímetro (R serie)</option>
+                  <option value="ohm">Ohmímetro en serie</option>
+                </select>
+              </div>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s76-im">Im (mA):</label><input type="text" id="s76-im" placeholder="1" /></div>
+                <div class="k-input"><label for="s76-rm">Rm (Ω):</label><input type="text" id="s76-rm" placeholder="100" /></div>
+                <div class="k-input"><label for="s76-fs">Fondo de escala:</label><input type="text" id="s76-fs" placeholder="20" /></div>
+                <div class="k-input">
+                  <label for="s76-fsu">Unidad:</label>
+                  <select id="s76-fsu">
+                    <option value="A" selected>A / V</option>
+                    <option value="mA">mA / mV</option>
+                  </select>
+                </div>
+                <div class="k-input"><label for="s76-e">E ohmímetro (V):</label><input type="text" id="s76-e" placeholder="3" /></div>
+                <div class="k-input"><label for="s76-rz">Rzero máx (Ω):</label><input type="text" id="s76-rz" placeholder="2000" /></div>
+              </div>
+              <button id="btn-s76" class="action-btn mt-1">Diseñar</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 7.96 — Lectura del ohmímetro / megger</h3>
+              <div class="input-group">
+                <label for="s76f-fig">Configuración:</label>
+                <select id="s76f-fig">
+                  <option value="a">7.96.a — puente 12 Ω (aislamiento de un string)</option>
+                  <option value="b">7.96.b — tres 18 Ω con puentes</option>
+                </select>
+                <button id="btn-s76f" class="action-btn">Leer RT</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s76" viewBox="0 0 560 220" role="img"
+                aria-label="Ohmímetro sobre una red"></svg>
+              <p class="caption-fig">Figura 7.96 — El megger de un string / el puente Kelvin de un shunt. Los puentes pueden anular ramas.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-6f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-7-9">
+            <h2>Sección 7.9: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              PSpice, Electronics Workbench y el «programa en C++ /
+              QBASIC / Pascal» del libro se sustituyen aquí por los
+              mismos solucionadores: un MNA de nudos, la escalera y
+              el diseñador de instrumentos.
+              Tabular \(R_T(N)\) de una escalera enseña por qué
+              añadir un tap no es gratis: cada peldaño carga al
+              anterior, igual que un logger en el bleeder ISO.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-7-9">Selecciona un problema:</label>
+                <select id="preset-7-9" class="book-preset-select" data-section="7-9">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p41">Prob 41: V1, V3, Vab, Is (red tipo 7.16)</option>
+                  <option value="p42">Prob 42: Is, I5, V7 (red tipo 7.22)</option>
+                  <option value="p43">Prob 43: Solución completa de una red</option>
+                  <option value="p44">Prob 44: Todas las cantidades de un ejemplo</option>
+                </select>
+              </div>
+              <div id="desc-preset-7-9" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Barrido de N peldaños</h3>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s79-e">E (V):</label><input type="text" id="s79-e" placeholder="240" /></div>
+                <div class="k-input"><label for="s79-rs">R serie (Ω):</label><input type="text" id="s79-rs" placeholder="3" /></div>
+                <div class="k-input"><label for="s79-rp">R shunt (Ω):</label><input type="text" id="s79-rp" placeholder="6" /></div>
+                <div class="k-input"><label for="s79-nmin">N min:</label><input type="text" id="s79-nmin" value="1" /></div>
+                <div class="k-input"><label for="s79-nmax">N max:</label><input type="text" id="s79-nmax" value="8" /></div>
+              </div>
+              <button id="btn-s79" class="action-btn mt-1">Tabular RT(N)</button>
+              <div class="data-table-wrap" id="wrap-7-9" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-7-9">
+                  <thead>
+                    <tr><th>N</th><th>RT (Ω)</th><th>Is (A)</th><th>I carga (A)</th><th>V carga (V)</th></tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-7-9" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-7-0" aria-labelledby="glossary-7-heading">
+            <h2 id="glossary-7-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de redes serie-paralelo, escalera, instrumentos
+              y polarización del capítulo 7, reescritos para la
+              ingeniería eléctrica de renovables convencionales y
+              no convencionales en 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Galvanómetro de d’Arsonval</dt>
+                <dd>Bobina con centro de hierro sobre un imán permanente; la aguja señala la corriente. En laboratorio sigue vigente. En planta 2026 el «movimiento» es un shunt Kelvin + ADC o un Hall del combiner / del driver SiC: la cuenta \(I_m R_m\) es la misma, el aparato no.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Mega-ohmímetro</dt>
+                <dd>Instrumento para medir resistencias muy altas (MΩ–GΩ). En 2026 es el megger / ISO-meter del string TOPCon, el monitor de aislamiento del bus de \(1500\,\mathrm{V_{cc}}\) y el ensayo de un cable HV de eólica: fuente de cientos o miles de volts y medida de \(I\) de fuga.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ohmímetro en serie</dt>
+                <dd>Medidor de resistencia en el que el movimiento está en serie con \(R_x\), una pila y un ajuste a cero. El DMM 2026 lo hace en baja; para aislamiento se pasa al mega-ohmímetro. La escala es inversa: fondo de escala es \(R_x=0\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Red de escalera</dt>
+                <dd>Cascada de combinaciones serie-paralelo con apariencia de escalera. Bleeder de un bus, taps de un rack BESS, R-2R de consigna, varios DC/DC en cadena. Se reduce desde el último peldaño.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Redes en serie-paralelo</dt>
+                <dd>Red con ramas en serie y en paralelo. Un string (serie) en un combiner (paralelo), un feeder en serie con dumps en paralelo, un driver con \(R_C\) y \(R_E\). Método: identificar, reducir, reabrir.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Transistor</dt>
+                <dd>Dispositivo de tres terminales para amplificar o conmutar. En 2026 el de potencia es un MOSFET SiC / IGBT del inversor o del DC/DC; el BJT de \(V_{BE}=0{,}7\,\mathrm{V}\) sobrevive en el opto y en el driver de compuerta. Polarizar es fijar \(V\) e \(I\) de cd con resistencias.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Shunt de amperímetro</dt>
+                <dd>\(R_s = I_m R_m / (I - I_m)\), en paralelo con el movimiento. En 2026 es el shunt Kelvin del inversor, el de un rack BESS o el Hall del combiner: el \(I_m\) del libro es el fondo de escala del canal.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Resistencia serie de voltímetro</dt>
+                <dd>\(R_s = V / I_m - R_m\). El DMM de \(10\,\mathrm{M}\Omega\) ya la lleva; la sonda 100:1 de un bus de \(1500\,\mathrm{V_{cc}}\) es el mismo divisor. Sensibilidad \(\Omega/\mathrm{V} = 1/I_m\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Carga del potenciómetro</dt>
+                <dd>\(R_L\) en el brazo en paralelo con \(R_2\) baja el voltaje del tap. Crítico en consignas analógicas de variador, trimmers de piranómetro y taps de SoC. Se mitiga con \(R_L \gg R_{\mathrm{pot}}\) o con un buffer.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente con divisor de voltaje</dt>
+                <dd>Una \(E\) y una cadena de \(R\) con taps a cargas. Rails \(+120/0/-60\,\mathrm{V}\) de un auxiliar, taps \(48/24\,\mathrm{V}\) de un rack. Cada \(I_L\) se resta del peldaño y rediseña las \(R\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable convencional</dt>
+                <dd>Hidroeléctrica, geotérmica, biomasa/biogás y, en algunos marcos, CSP. El capítulo 7 las trata como \(E\) con feeders, lastres y rails de auxiliar en serie-paralelo.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>Fotovoltaica TOPCon/HJT/tándem, eólica, océano, hidrógeno verde y BESS. El string+combiner, el bleeder ISO, el driver SiC y el megger del cable HV son las redes serie-paralelo de 2026.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
+      <details class="chapter-1-fold" id="capitulo-8">
+        <summary class="chapter-1-summary" aria-label="Capítulo 8.0">
+          <span class="chapter-1-title">8.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Métodos de análisis: fuente de corriente, conversión
+            Thévenin–Norton, corrientes de rama, mallas y nudos.
+            En 2026 un string TOPCon es una fuente de corriente
+            (\(I_{\mathrm{sc}}\), \(R_s\) alta); un inversor
+            grid-following inyecta \(I\) al PCC; un rack LFP en
+            modo tensión es \(E\) con \(R_i\). Convertir
+            \(E,R_s \leftrightarrow I,R_s\) es pasar del modelo
+            de un grid-forming al de un grid-following.
+            Mallas y nudos son el mismo MNA con el que se dimensiona
+            un combiner, un bleeder ISO y un puente de celdas.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(I_N = E/R_s\), las mallas
+              \(R_{ii}I_i + \sum R_{ij}I_j = E_i\) y el nudo
+              \(\sum G V = I\) sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-8-2">Sec 8.2</button>
+            <button class="tab-btn" data-target="sec-8-3">Sec 8.3</button>
+            <button class="tab-btn" data-target="sec-8-4">Sec 8.4</button>
+            <button class="tab-btn" data-target="sec-8-6">Sec 8.6</button>
+            <button class="tab-btn" data-target="sec-8-7">Sec 8.7–8.8</button>
+            <button class="tab-btn" data-target="sec-8-9">Sec 8.9–8.10</button>
+            <button class="tab-btn" data-target="sec-8-11">Sec 8.11</button>
+            <button class="tab-btn" data-target="sec-8-12">Sec 8.12</button>
+          </div>
+
+          <div class="tab-content active" id="sec-8-2">
+            <h2>Sección 8.2: Fuentes de corriente</h2>
+            <p class="chapter-discourse">
+              Una fuente de corriente ideal impone \(I\) y deja que
+              \(V\) la fije la red. Un string FV cerca de
+              \(I_{\mathrm{sc}}\), un inversor en modo corriente y
+              un electrolizador controlado por \(I\) son el caso 2026.
+              Si \(R_s \gg R_L\), la fuente real se aproxima por la
+              ideal (el string apenas nota el cable).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-8-2">Selecciona un problema:</label>
+                <select id="preset-8-2" class="book-preset-select" data-section="8-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: Vab en I = 6 A (fig. 8.93)</option>
+                  <option value="p2">Prob 2: I = 4 A, Rs 10 kΩ vs ideal (fig. 8.94)</option>
+                  <option value="p3">Prob 3: 4 A y 24 V en paralelo (fig. 8.95)</option>
+                  <option value="p4">Prob 4: String 0.6 A (fig. 8.96)</option>
+                </select>
+              </div>
+              <div id="desc-preset-8-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 8.93–8.96 — Fuente de corriente</h3>
+              <div class="input-group">
+                <label for="s82-fig">Figura:</label>
+                <select id="s82-fig">
+                  <option value="93">8.93 — 10 V, 3 Ω, 6 A</option>
+                  <option value="94a">8.94.a — 4 A, Rs 10 kΩ</option>
+                  <option value="94b">8.94.b — 4 A ideal</option>
+                  <option value="95">8.95 — 4 A y rack 24 V</option>
+                  <option value="96">8.96 — 0.6 A y lastres</option>
+                </select>
+                <button id="btn-s82" class="action-btn">Calcular</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s82" viewBox="0 0 560 220" role="img" aria-label="Fuente de corriente"></svg>
+              <p class="caption-fig">Figuras 8.93–8.96 — String / inversor en modo I. V la fija la red; I no.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-8-3">
+            <h2>Sección 8.3: Conversiones de fuentes</h2>
+            <p class="chapter-discourse">
+              \(I_N = E / R_s\), \(E_{\mathrm{Th}} = I R_s\), \(R\) no cambia.
+              Un grid-forming (\(E,R_i\)) y un grid-following
+              (\(I,R_p\)) son duales: el cable es la misma \(R_s\).
+              La conversión es válida hacia fuera de los dos bornes.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-8-3">Selecciona un problema:</label>
+                <select id="preset-8-3" class="book-preset-select" data-section="8-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p5">Prob 5: E → I (fig. 8.97)</option>
+                  <option value="p6">Prob 6: I → E (fig. 8.98)</option>
+                  <option value="p7">Prob 7: 12 A, 4 Ω, RL 2 Ω (fig. 8.99)</option>
+                  <option value="p8">Prob 8: 12 V y 2 A (fig. 8.100)</option>
+                </select>
+              </div>
+              <div id="desc-preset-8-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 8.97–8.100</h3>
+              <div class="input-group">
+                <label for="s83-fig">Figura:</label>
+                <select id="s83-fig">
+                  <option value="97a">8.97.a — 18 V, 6 Ω</option>
+                  <option value="97b">8.97.b — 9 V, 2.2 kΩ</option>
+                  <option value="98a">8.98.a — 1.5 A, 3 Ω</option>
+                  <option value="98b">8.98.b — 6 mA, 4.7 kΩ</option>
+                  <option value="99">8.99 — 12 A, 4 Ω, RL 2 Ω</option>
+                  <option value="100">8.100 — 12 V, 2 A, 39 Ω</option>
+                </select>
+                <button id="btn-s83" class="action-btn">Calcular</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s83" viewBox="0 0 560 220" role="img" aria-label="Conversión de fuentes"></svg>
+              <p class="caption-fig">Figuras 8.97–8.100 — Norton de un string / Thévenin de un rack. Misma Ri.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Conversor \(E,R_s \leftrightarrow I,R_s\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s83c-e">E (V):</label><input type="text" id="s83c-e" placeholder="18" /></div>
+                <div class="k-input"><label for="s83c-i">I (A):</label><input type="text" id="s83c-i" placeholder="" /></div>
+                <div class="k-input"><label for="s83c-r">Rs (Ω):</label><input type="text" id="s83c-r" placeholder="6" /></div>
+              </div>
+              <button id="btn-s83c" class="action-btn mt-1">Convertir</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-3c" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-8-4">
+            <h2>Sección 8.4: Fuentes de corriente en paralelo</h2>
+            <p class="chapter-discourse">
+              Las \(I\) en paralelo se suman (con signo). Es el
+              combiner: \(N\) strings, cada uno un \(I_{\mathrm{mp}}\),
+              más un inversor que extrae \(I\). Polaridades opuestas
+              son un string contra el bus.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-8-4">Selecciona un problema:</label>
+                <select id="preset-8-4" class="book-preset-select" data-section="8-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p9">Prob 9: 7 A y 3 A (fig. 8.101)</option>
+                  <option value="p10">Prob 10: dos racks a corriente (fig. 8.102)</option>
+                  <option value="p11">Prob 11: 8 mA, 3 mA y 12 V (fig. 8.103)</option>
+                </select>
+              </div>
+              <div id="desc-preset-8-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 8.101–8.103</h3>
+              <div class="input-group">
+                <label for="s84-fig">Figura:</label>
+                <select id="s84-fig">
+                  <option value="101">8.101 — 7 A y 3 A</option>
+                  <option value="102">8.102 — 9 V y 20 V</option>
+                  <option value="103">8.103 — 8 mA, 3 mA, 12 V</option>
+                </select>
+                <button id="btn-s84" class="action-btn">Calcular</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s84" viewBox="0 0 560 220" role="img" aria-label="Fuentes de corriente en paralelo"></svg>
+              <p class="caption-fig">Figuras 8.101–8.103 — Combiner: las I se suman; un E se convierte a Norton y entra en la suma.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-8-6">
+            <h2>Sección 8.6: Análisis de corriente de rama</h2>
+            <p class="chapter-discourse">
+              Una incógnita por rama, KVL en cada lazo y KCL en
+              cada nudo. En planta: cada feeder, cada string y cada
+              dump es una rama. El BJT de la fig. 8.108 es el
+              driver de un IGBT (\(V_{BE}=0{,}7\,\mathrm{V}\),
+              \(\beta_{cd}=I_C/I_B\)).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-8-6">Selecciona un problema:</label>
+                <select id="preset-8-6" class="book-preset-select" data-section="8-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p12a">Prob 12.a: dos E, 4/8/2 Ω (fig. 8.104.a)</option>
+                  <option value="p12b">Prob 12.b: 10 V y 12 V (fig. 8.104.b)</option>
+                  <option value="p13i">Prob 13.I: tres E, kΩ (fig. 8.105.I)</option>
+                  <option value="p13ii">Prob 13.II: 9 V y 6 V (fig. 8.105.II)</option>
+                  <option value="p14i">Prob 14.I: Vab e I2 (fig. 8.106.I)</option>
+                  <option value="p14ii">Prob 14.II: 3 A y 4 V (fig. 8.106.II)</option>
+                  <option value="p15">Prob 15: I3 en 4 Ω (fig. 8.107)</option>
+                  <option value="p16">Prob 16: driver BJT / IGBT (fig. 8.108)</option>
+                </select>
+              </div>
+              <div id="desc-preset-8-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 8.104–8.108</h3>
+              <div class="input-group">
+                <label for="s86-fig">Figura:</label>
+                <select id="s86-fig">
+                  <option value="104a">8.104.a — 4 V y 6 V</option>
+                  <option value="104b">8.104.b — 10 V y 12 V</option>
+                  <option value="105i">8.105.I — 10/20/30 V</option>
+                  <option value="105ii">8.105.II — 9 V y 6 V</option>
+                  <option value="106i">8.106.I — 25/60/20 V</option>
+                  <option value="106ii">8.106.II — 3 A y 4 V</option>
+                  <option value="107">8.107 — 10 V y 6 V, I3</option>
+                  <option value="108">8.108 — driver VBE = 0.7 V</option>
+                </select>
+                <button id="btn-s86" class="action-btn">Calcular ramas</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s86" viewBox="0 0 560 240" role="img" aria-label="Análisis de corriente de rama"></svg>
+              <p class="caption-fig">Figuras 8.104–8.108 — Ramas de un bus DC / driver SiC. KCL + KVL por rama.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-8-7">
+            <h2>Sección 8.7–8.8: Análisis de mallas</h2>
+            <p class="chapter-discourse">
+              Una incógnita por lazo. El método de formato arma
+              \(R_{ii}\) (suma del lazo) y \(R_{ij}\) (negativo de
+              lo compartido). Supermalla: cuando una fuente de
+              corriente está en una rama común, se une los dos
+              lazos. En 2026 es el loop de un string + el del
+              rack + el del dump.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-8-7">Selecciona un problema:</label>
+                <select id="preset-8-7" class="book-preset-select" data-section="8-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p17">Prob 17: mallas fig. 8.104</option>
+                  <option value="p21a">Prob 21.a: supermalla / Δ 8.109.a</option>
+                  <option value="p21b">Prob 21.b: 12 V y 16 V (fig. 8.109.b)</option>
+                  <option value="p22i">Prob 22.I: 18 V y 3 V (fig. 8.110.I)</option>
+                  <option value="p22ii">Prob 22.II: Δ de fuentes (fig. 8.110.II)</option>
+                  <option value="p23a">Prob 23.a: malla kΩ (fig. 8.111.a)</option>
+                  <option value="p23b">Prob 23.b: puente 6 V (fig. 8.111.b)</option>
+                  <option value="p24a">Prob 24.a: supermalla 6 A (fig. 8.112.a)</option>
+                  <option value="p24b">Prob 24.b: 8 A y 3 A (fig. 8.112.b)</option>
+                </select>
+              </div>
+              <div id="desc-preset-8-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 8.109–8.112 — Mallas y supermalla</h3>
+              <div class="input-group">
+                <label for="s87-fig">Figura:</label>
+                <select id="s87-fig">
+                  <option value="104a">8.104.a — dos lazos</option>
+                  <option value="109a">8.109.a — Δ de 4/6/15 V</option>
+                  <option value="109b">8.109.b — 12 V y 16 V</option>
+                  <option value="110i">8.110.I — 18 V y 3 V</option>
+                  <option value="110ii">8.110.II — Δ 16/12/15 V</option>
+                  <option value="111a">8.111.a — 5 V, 6 V, 9 V</option>
+                  <option value="111b">8.111.b — 6 V cruzados</option>
+                  <option value="112a">8.112.a — supermalla 6 A</option>
+                  <option value="112b">8.112.b — 8 A y 3 A</option>
+                </select>
+                <button id="btn-s87" class="action-btn">Resolver mallas</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s87" viewBox="0 0 560 240" role="img" aria-label="Análisis de mallas"></svg>
+              <p class="caption-fig">Figuras 8.109–8.112 — Lazos de un bus híbrido. La supermalla es un string en corriente entre dos loops.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-8-9">
+            <h2>Sección 8.9–8.10: Análisis de nudos</h2>
+            <p class="chapter-discourse">
+              Una incógnita por nudo distinto de PE:
+              \(\sum G_k V = \sum I_s\).
+              Supernodo: una fuente \(E\) entre dos nudos no a
+              tierra se trata como un solo nudo con
+              \(V_a - V_b = E\).
+              Es el KCL del bus de un combiner y del PCC.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-8-9">Selecciona un problema:</label>
+                <select id="preset-8-9" class="book-preset-select" data-section="8-9">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p32a">Prob 32.a: 5 A y 3 A (fig. 8.113.a)</option>
+                  <option value="p32b">Prob 32.b: 4 A y 2 A (fig. 8.113.b)</option>
+                  <option value="p33i">Prob 33.I: 5 A, 4 A, 12 V (fig. 8.114.I)</option>
+                  <option value="p33ii">Prob 33.II: 6 A y 7 A (fig. 8.114.II)</option>
+                  <option value="p35i">Prob 35.I: 15 V y 3 A (fig. 8.115.I)</option>
+                  <option value="p35ii">Prob 35.II: 2 A y 16 V (fig. 8.115.II)</option>
+                  <option value="p36i">Prob 36.I: 5 A y 20 V (fig. 8.116.I)</option>
+                  <option value="p36ii">Prob 36.II: 5 A y 2 A (fig. 8.116.II)</option>
+                  <option value="p37i">Prob 37.I: supernodo 24 V (fig. 8.117.I)</option>
+                  <option value="p37ii">Prob 37.II: supernodo 16 V (fig. 8.117.II)</option>
+                </select>
+              </div>
+              <div id="desc-preset-8-9" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 8.113–8.117 — Nudos y supernodo</h3>
+              <div class="input-group">
+                <label for="s89-fig">Figura:</label>
+                <select id="s89-fig">
+                  <option value="113a">8.113.a — 5 A y 3 A</option>
+                  <option value="113b">8.113.b — 4 A y 2 A</option>
+                  <option value="114i">8.114.I — 5 A, 12 V, 4 A</option>
+                  <option value="114ii">8.114.II — 6 A y 7 A</option>
+                  <option value="115i">8.115.I — 15 V y 3 A</option>
+                  <option value="115ii">8.115.II — 2 A y 16 V</option>
+                  <option value="116i">8.116.I — 5 A y 20 V</option>
+                  <option value="116ii">8.116.II — puente 5 A / 2 A</option>
+                  <option value="117i">8.117.I — supernodo 24 V</option>
+                  <option value="117ii">8.117.II — supernodo 16 V</option>
+                </select>
+                <button id="btn-s89" class="action-btn">Resolver nudos</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s89" viewBox="0 0 560 240" role="img" aria-label="Análisis de nudos"></svg>
+              <p class="caption-fig">Figuras 8.113–8.117 — KCL del combiner / PCC. El supernodo es un rack E entre dos barras.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-9" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-8-11">
+            <h2>Sección 8.11: Redes puente</h2>
+            <p class="chapter-discourse">
+              Un puente está equilibrado si
+              \(R_1/R_2 = R_3/R_4\) (o \(R_1 R_4 = R_2 R_3\)):
+              la diagonal \(R_5\) no lleva corriente.
+              En 2026: puente de celdas de un rack, PT resistivo
+              de un bus, RTD de un NTC, aislamiento ISO.
+              El desequilibrio es una celda débil o un string
+              sombreado.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-8-11">Selecciona un problema:</label>
+                <select id="preset-8-11" class="book-preset-select" data-section="8-11">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p42">Prob 42: puente 5/5/10/20 Ω (fig. 8.118)</option>
+                  <option value="p44">Prob 44: puente kΩ 24 V (fig. 8.119)</option>
+                  <option value="p46">Prob 46: 4 mA y 9 V en la diagonal (fig. 8.120)</option>
+                  <option value="p47a">Prob 47.a: puente 2 kΩ (fig. 8.121.a)</option>
+                  <option value="p47b">Prob 47.b: 2 A y cruz (fig. 8.121.b)</option>
+                </select>
+              </div>
+              <div id="desc-preset-8-11" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 8.118–8.121</h3>
+              <div class="input-group">
+                <label for="s811-fig">Figura:</label>
+                <select id="s811-fig">
+                  <option value="118">8.118 — 6 V, 5/5/10/20</option>
+                  <option value="119">8.119 — 24 V, 33k/56k</option>
+                  <option value="120">8.120 — 4 mA y 9 V</option>
+                  <option value="121a">8.121.a — 10 V, 2 kΩ</option>
+                  <option value="121b">8.121.b — 2 A, cruz 10/20</option>
+                </select>
+                <button id="btn-s811" class="action-btn">Analizar puente</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s811" viewBox="0 0 480 240" role="img" aria-label="Red puente"></svg>
+              <p class="caption-fig">Figuras 8.118–8.121 — Puente de celdas / RTD / ISO. Equilibrio: \(R_1 R_4 = R_2 R_3\).</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-11" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-8-12">
+            <h2>Sección 8.12: Conversiones Y-Δ (T-π)</h2>
+            <p class="chapter-discourse">
+              Δ→Y: la \(R\) de un nudo es el producto de las dos
+              Δ que llegan, partido por la suma de las tres.
+              Y→Δ: el inverso.
+              En 2026: filtro de un inversor, terciario de un
+              transformador de planta, malla PE de un skid.
+              Se reduce el puente a un divisor y se lee \(I\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-8-12">Selecciona un problema:</label>
+                <select id="preset-8-12" class="book-preset-select" data-section="8-12">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p48a">Prob 48.a: puente 2/2/1/3/4 Ω (fig. 8.122.a)</option>
+                  <option value="p48b">Prob 48.b: 8 V y 4.7/1.1/6.8 kΩ (fig. 8.122.b)</option>
+                </select>
+              </div>
+              <div id="desc-preset-8-12" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 8.122 — Y-Δ en un puente</h3>
+              <div class="input-group">
+                <label for="s812-fig">Figura:</label>
+                <select id="s812-fig">
+                  <option value="122a">8.122.a — 20 V, 2/2/1/3/4 Ω</option>
+                  <option value="122b">8.122.b — 8 V, kΩ</option>
+                </select>
+                <button id="btn-s812" class="action-btn">Reducir Y-Δ</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s812" viewBox="0 0 480 220" role="img" aria-label="Conversión Y-delta"></svg>
+              <p class="caption-fig">Figura 8.122 — Filtro / malla PE. Δ→Y para leer I del feeder.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-12" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Conversor Δ ↔ Y</h3>
+              <p class="hint-inline">Δ: lados \(R_{ab}, R_{bc}, R_{ca}\). Y: \(R_a, R_b, R_c\) al nudo común.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s812y-ab">Rab / Ra:</label><input type="text" id="s812y-ab" placeholder="2" /></div>
+                <div class="k-input"><label for="s812y-bc">Rbc / Rb:</label><input type="text" id="s812y-bc" placeholder="3" /></div>
+                <div class="k-input"><label for="s812y-ca">Rca / Rc:</label><input type="text" id="s812y-ca" placeholder="4" /></div>
+              </div>
+              <button id="btn-s812d" class="action-btn">Δ → Y</button>
+              <button id="btn-s812y" class="action-btn">Y → Δ</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-8-12y" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-8-0" aria-labelledby="glossary-8-heading">
+            <h2 id="glossary-8-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de fuentes de corriente, conversión, mallas,
+              nudos, puentes y Y-Δ del capítulo 8, reescritos para
+              la ingeniería eléctrica de renovables en 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Fuente de corriente</dt>
+                <dd>Fuente que impone \(I\); \(V\) lo fija la red. String FV cerca de \(I_{\mathrm{sc}}\), inversor grid-following, cargador de rack en modo I, electrolizador. Ideal si \(R_s \to \infty\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Conversión de fuentes</dt>
+                <dd>\(I_N = E/R_s\), \(E_{\mathrm{Th}} = I R_s\), misma \(R_s\). Dualidad grid-forming / grid-following. Válida fuera de los dos bornes.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuentes de corriente en paralelo</dt>
+                <dd>Se suman con signo. Combiner de strings, varios MPPT al mismo bus, un inversor que extrae \(I\). En serie no se suman: queda la más pequeña (un fusible gPV abre).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Análisis de corriente de rama</dt>
+                <dd>Una \(I\) por rama; KCL en nudos y KVL en lazos. Cada feeder, string y dump es una rama del bus DC.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Análisis de mallas</dt>
+                <dd>Una \(I\) por lazo. Formato: \(R_{ii}\) suma del lazo, \(R_{ij}\) negativo de lo compartido. Loop de un string + loop del rack.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Supermalla</dt>
+                <dd>Dos lazos unidos cuando una fuente de corriente está en la rama común. Un string en modo I entre dos buses.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Análisis de nudos</dt>
+                <dd>\(\sum G V = \sum I\). Una incógnita por nudo distinto de PE. KCL del combiner y del PCC.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Supernodo</dt>
+                <dd>Fuente \(E\) entre dos nudos no a tierra: \(V_a-V_b=E\) y un solo KCL conjunto. Un rack en modo tensión entre dos barras.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Red puente</dt>
+                <dd>Cuatro \(R\) en diamante y una diagonal. Equilibrio: \(R_1 R_4 = R_2 R_3\) (la diagonal no lleva I). Puente de celdas, RTD, ISO.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Conversión Y-Δ (T-π)</dt>
+                <dd>Δ→Y: producto de las dos que llegan / suma de las tres. Filtro de inversor, terciario de un trafo de planta, malla PE.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Beta de cd (\(\beta_{cd}\))</dt>
+                <dd>\(I_C/I_B\) del BJT del driver. En 2026 el de potencia es un MOSFET SiC / IGBT; \(\beta\) queda en el opto y en el driver de compuerta.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>FV TOPCon/HJT, eólica, océano, H<sub>2</sub>, BESS. El string es \(I\); el grid-forming es \(E\); el combiner es nudos y mallas de 2026.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
     </section>
   </main>
 

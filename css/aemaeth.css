@@ -800,6 +800,28 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
   border-radius: 8px;
 }
 
+.fig-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.5rem 1rem;
+}
+
+@media (min-width: 720px) {
+  .fig-grid-2 {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.meter-face {
+  fill: #d6eaf8;
+  stroke: #2471a3;
+  stroke-width: 2;
+}
+
+[data-theme="dark"] .meter-face {
+  fill: rgba(36, 113, 163, 0.25);
+}
+
 .plot-legend {
   display: flex;
   flex-wrap: wrap;
