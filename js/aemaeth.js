@@ -809,6 +809,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSec2_7();
   initSec3();
   initSec4();
+  initSec5();
   initMiniCalc();
   initChapterFold();
 });
@@ -2594,7 +2595,7 @@ function initPresets() {
           document.getElementById('m2-t-u').value = data.tu;
           document.getElementById('btn-meter-2-7').click();
         }
-      } else if (String(section).startsWith('3-') || String(section).startsWith('4-')) {
+      } else if (String(section).startsWith('3-') || String(section).startsWith('4-') || String(section).startsWith('5-')) {
         applyPresetFields(data);
       }
     });
@@ -2603,6 +2604,53 @@ function initPresets() {
 
 function applyPresetFields(data) {
   if (!data) return;
+  if (data.clearSources) {
+    for (let i = 1; i <= 4; i++) {
+      setField(`s53-e${i}`, "");
+      setField(`s53-r${i}`, "");
+      setField(`s53-v${i}`, "");
+      setField(`s53-p${i}`, "");
+      const ru = document.getElementById(`s53-ru${i}`);
+      if (ru) ru.value = "1";
+      const eu = document.getElementById(`s53-eu${i}`);
+      if (eu) eu.value = "1";
+    }
+    setField("s53-i", "");
+    const iu = document.getElementById("s53-iu");
+    if (iu) iu.value = "0.001";
+  }
+  if (data.clearDivider) {
+    for (let i = 1; i <= 6; i++) {
+      setField(`s56-n${i}`, `R${i}`);
+      setField(`s56-r${i}`, "");
+      const ru = document.getElementById(`s56-ru${i}`);
+      if (ru) ru.value = "1";
+    }
+    setField("s56-e", "");
+    setField("s56-from", "");
+    setField("s56-to", "");
+    setField("s56-vab", "");
+    const eu = document.getElementById("s56-e-u");
+    if (eu) eu.value = "1";
+  }
+  if (data.clearSeries) {
+    clearSeriesPrefix(data.clearSeries.prefix, data.clearSeries.n || 8);
+  }
+  if (data.series) {
+    const { prefix, rows } = data.series;
+    clearSeriesPrefix(prefix, 8);
+    rows.forEach((row, idx) => {
+      const i = idx + 1;
+      if (row.name != null) setField(`${prefix}-n${i}`, row.name);
+      if (row.r != null) setField(`${prefix}-r${i}`, row.r);
+      if (row.v != null) setField(`${prefix}-v${i}`, row.v);
+      if (row.p != null) setField(`${prefix}-p${i}`, row.p);
+      const ru = document.getElementById(`${prefix}-ru${i}`);
+      if (ru && row.ru != null) ru.value = String(row.ru);
+      const st = document.getElementById(`${prefix}-st${i}`);
+      if (st && row.st) st.value = row.st;
+    });
+  }
   if (data.fields) {
     Object.entries(data.fields).forEach(([id, v]) => setField(id, v));
   }
@@ -3296,3 +3344,1320 @@ function initSec4_9() {
     });
   }
 }
+function clearSeriesPrefix(prefix, n) {
+  for (let i = 1; i <= n; i++) {
+    setField(`${prefix}-n${i}`, `R${i}`);
+    setField(`${prefix}-r${i}`, "");
+    setField(`${prefix}-v${i}`, "");
+    setField(`${prefix}-p${i}`, "");
+    const ru = document.getElementById(`${prefix}-ru${i}`);
+    if (ru) ru.value = "1";
+    const st = document.getElementById(`${prefix}-st${i}`);
+    if (st) st.value = "series";
+  }
+  const e = document.getElementById(`${prefix}-e`);
+  const i = document.getElementById(`${prefix}-i`);
+  const rt = document.getElementById(`${prefix}-rt`);
+  if (e) e.value = "";
+  if (i) i.value = "";
+  if (rt) rt.value = "";
+}
+
+function readSeriesRows(prefix, n) {
+  const rows = [];
+  for (let i = 1; i <= n; i++) {
+    const nameEl = document.getElementById(`${prefix}-n${i}`);
+    if (!nameEl) continue;
+    const name = (nameEl.value || `R${i}`).trim() || `R${i}`;
+    const st = document.getElementById(`${prefix}-st${i}`)?.value || "series";
+    const ru = Number(document.getElementById(`${prefix}-ru${i}`)?.value || 1);
+    const rRaw = (document.getElementById(`${prefix}-r${i}`)?.value || "").trim();
+    const vRaw = (document.getElementById(`${prefix}-v${i}`)?.value || "").trim();
+    const pRaw = (document.getElementById(`${prefix}-p${i}`)?.value || "").trim();
+    const r = rRaw === "" ? null : parseNumberInput(rRaw) * ru;
+    const v = vRaw === "" ? null : parseNumberInput(vRaw);
+    const p = pRaw === "" ? null : parseNumberInput(pRaw);
+    if (st === "series" && r === null && v === null && p === null && rRaw === "" && name === `R${i}`) {
+      continue;
+    }
+    rows.push({ i, name, st, r, v, p, ru });
+  }
+  return rows;
+}
+
+function recommendWatt(p) {
+  const abs = Math.abs(p);
+  if (abs <= 0.5) return "½ W";
+  if (abs <= 1) return "1 W";
+  if (abs <= 2) return "2 W";
+  const ceil = Math.ceil(abs);
+  return `${ceil} W (fuera de ½/1/2; escala de planta)`;
+}
+
+function solveRfromPE(E, R0, P) {
+  const a = P;
+  const b = 2 * P * R0 - E * E;
+  const c = P * R0 * R0;
+  const disc = b * b - 4 * a * c;
+  if (a === 0) throw new Error("P = 0 no fija R.");
+  if (disc < -1e-9) throw new Error("Sin R real para esa P y E.");
+  const s = Math.sqrt(Math.max(disc, 0));
+  const r1 = (-b + s) / (2 * a);
+  const r2 = (-b - s) / (2 * a);
+  const pos = [r1, r2].filter((r) => r > 1e-12);
+  if (!pos.length) throw new Error("R resultante no es positiva.");
+  pos.sort((x, y) => x - y);
+  return pos[0];
+}
+
+function analyzeSeries({ E, I, RT, rows, wantWatt }) {
+  const items = rows.map((row) => ({ ...row }));
+  let proc = `${mj("R_T = \\sum R")}, ${mj("I = E / R_T")}, ${mj("V_x = I R_x")}.\n`;
+
+  items.forEach((el) => {
+    if (el.st === "short") {
+      el.r = 0;
+      el.v = 0;
+      el.p = 0;
+      proc += `${el.name}: cortocircuito (bypass / jumper) → no suma a ${mj("R_T")}.\n`;
+    } else if (el.st === "open") {
+      proc += `${el.name}: abierto (fusible / MC4 / filamento) → fuera del lazo.\n`;
+    }
+  });
+
+  const loop = items.filter((el) => el.st !== "open");
+  if (!loop.length) throw new Error("El lazo está abierto: no hay trayectoria.");
+
+  if (I == null) {
+    for (const el of loop) {
+      if (el.r != null && el.r > 0 && el.v != null) {
+        I = el.v / el.r;
+        proc += `${mj("I = V / R")} en ${el.name}: ${formatQty(I, "A")}.\n`;
+        break;
+      }
+      if (el.r != null && el.r > 0 && el.p != null) {
+        I = Math.sqrt(Math.abs(el.p / el.r)) * (el.p < 0 ? -1 : 1);
+        proc += `${mj("I = \\sqrt{P / R}")} en ${el.name}: ${formatQty(I, "A")}.\n`;
+        break;
+      }
+      if (el.v != null && el.p != null && el.v !== 0) {
+        I = el.p / el.v;
+        proc += `${mj("I = P / V")} en ${el.name}: ${formatQty(I, "A")}.\n`;
+        break;
+      }
+    }
+  }
+
+  if (I != null && I !== 0) {
+    loop.forEach((el) => {
+      if (el.st !== "series" || el.r != null) return;
+      if (el.v != null) {
+        el.r = el.v / I;
+        proc += `${el.name}: ${mj(`R = V / I = ${texQtyBody(el.r, "\\Omega")}`)}.\n`;
+      } else if (el.p != null) {
+        el.r = el.p / (I * I);
+        proc += `${el.name}: ${mj(`R = P / I^{2} = ${texQtyBody(el.r, "\\Omega")}`)}.\n`;
+      }
+    });
+  }
+
+  let still2 = loop.filter((el) => el.st === "series" && el.r === null);
+  if (still2.length === 1 && E != null && still2[0].p != null && I == null) {
+    const el = still2[0];
+    const R0 = loop.reduce((s, x) => s + (x === el || x.r == null ? 0 : x.r), 0);
+    el.r = solveRfromPE(E, R0, el.p);
+    proc += `${el.name}: ${mj("P = E^{2} R / (R_0 + R)^{2}")} → ${formatQty(el.r, "\\Omega")}.\n`;
+  }
+  still2 = loop.filter((el) => el.st === "series" && el.r === null);
+  if (still2.length === 1 && E != null && still2[0].v != null && I == null) {
+    const el = still2[0];
+    const R0 = loop.reduce((s, x) => s + (x === el || x.r == null ? 0 : x.r), 0);
+    if (Math.abs(E - el.v) < 1e-12) throw new Error("V = E no deja R0 en el lazo.");
+    el.r = (el.v * R0) / (E - el.v);
+    proc += `${el.name}: divisor ${mj("V = E R / (R_0 + R)")} → ${formatQty(el.r, "\\Omega")}.\n`;
+  }
+
+  const unknownR = loop.filter((el) => el.st === "series" && el.r === null);
+  const knownRsum = loop.reduce((s, el) => s + (el.r == null ? 0 : el.r), 0);
+  if (RT != null && unknownR.length === 1) {
+    unknownR[0].r = RT - knownRsum;
+    if (unknownR[0].r < -1e-9) throw new Error("RT menor que la suma de R conocidas.");
+    proc += `${unknownR[0].name}: ${mj(`R = R_T - \\sum R_{\\mathrm{conocidas}} = ${texQtyBody(unknownR[0].r, "\\Omega")}`)}.\n`;
+  } else if (RT != null && unknownR.length > 1) {
+    const remain = RT - knownRsum;
+    if (remain < -1e-9) throw new Error("RT menor que la suma de R conocidas.");
+    const each = remain / unknownR.length;
+    unknownR.forEach((el) => { el.r = each; });
+    proc += `Dos o más R vacías con ${mj("R_T")} conocido: se suponen iguales (p. ej. ${mj("R_1 = R_2")}). Cada una ${formatQty(each, "\\Omega")}.\n`;
+  }
+
+  if (loop.some((el) => el.st === "series" && el.r == null)) {
+    throw new Error("Falta una R (o un dato V/P/RT/E que la fije).");
+  }
+
+  const RTcalc = loop.reduce((s, el) => s + el.r, 0);
+  if (RT == null) RT = RTcalc;
+  else if (Math.abs(RT - RTcalc) / Math.max(Math.abs(RT), 1e-12) > 0.02) {
+    proc += `Aviso: RT ingresado ${formatQty(RT, "\\Omega")} vs suma ${formatQty(RTcalc, "\\Omega")}.\n`;
+  }
+  proc += `${mj(`R_T = ${texQtyBody(RTcalc, "\\Omega")}`)}.\n`;
+
+  if (I == null) {
+    if (E == null) throw new Error("Indica E o I (o V/P en un elemento).");
+    if (RTcalc === 0) throw new Error("Lazo en cortocircuito: I no está definida por Ohm.");
+    I = E / RTcalc;
+    proc += `${mj(`I = E / R_T = ${texQtyBody(I, "A")}`)}.\n`;
+  } else if (E == null) {
+    E = I * RTcalc;
+    proc += `${mj(`E = I R_T = ${texQtyBody(E, "V")}`)}.\n`;
+  } else {
+    const Icheck = RTcalc === 0 ? null : E / RTcalc;
+    if (Icheck != null && Math.abs(Icheck - I) / Math.max(Math.abs(I), 1e-12) > 0.03) {
+      proc += `Aviso: I ingresada ${formatQty(I, "A")} vs ${mj("E/R_T")} = ${formatQty(Icheck, "A")}. Se usa la ingresada.\n`;
+    }
+  }
+
+  const dir = I >= 0 ? "horaria (sale del + neto)" : "antihoraria (el equivalente invierte E)";
+  proc += `Sentido de I (convención): ${dir}.\n`;
+
+  let sumV = 0;
+  let sumP = 0;
+  loop.forEach((el) => {
+    el.v = I * el.r;
+    el.p = I * I * el.r;
+    sumV += el.v;
+    sumP += el.p;
+    proc += `${el.name}: ${mj(`V = ${texQtyBody(el.v, "V")}`)}, ${mj(`P = ${texQtyBody(el.p, "W")}`)}`;
+    if (wantWatt) proc += ` → wattaje mín. ${recommendWatt(el.p)}`;
+    proc += ".\n";
+  });
+
+  proc += `KVL: ${mj(`\\sum V = ${texQtyBody(sumV, "V")}`)} vs ${mj(`E = ${texQtyBody(E, "V")}`)}`;
+  proc += Math.abs(sumV - E) / Math.max(Math.abs(E), 1e-12) < 0.02 ? " — se cumple.\n" : " — revisar polaridades.\n";
+  const psrc = E * I;
+  proc += `Potencia: ${mj(`\\sum P = ${texQtyBody(sumP, "W")}`)} vs ${mj(`E I = ${texQtyBody(psrc, "W")}`)}`;
+  proc += Math.abs(sumP - psrc) / Math.max(Math.abs(psrc), 1e-12) < 0.02 ? " — entregada = disipada." : " — revisar.";
+  return { proc, E, I, RT: RTcalc, items: loop, opens: items.filter((el) => el.st === "open") };
+}
+
+function setSvgMarkup(svg, markup) {
+  if (!svg) return;
+  const parsed = new DOMParser().parseFromString(
+    `<svg xmlns="http://www.w3.org/2000/svg">${markup}</svg>`,
+    "image/svg+xml"
+  );
+  const root = parsed.documentElement;
+  if (!root || root.querySelector("parsererror")) {
+    svg.innerHTML = markup;
+    return;
+  }
+  svg.replaceChildren();
+  Array.from(root.childNodes).forEach((node) => {
+    svg.appendChild(document.importNode(node, true));
+  });
+}
+
+function defaultSeriesLoopModel() {
+  return {
+    items: [
+      { i: 1, name: "R1", st: "series" },
+      { i: 2, name: "R2", st: "series" },
+      { i: 3, name: "R3", st: "series" }
+    ],
+    opens: []
+  };
+}
+
+function formatOhmLabel(r) {
+  const a = Math.abs(r);
+  if (a >= 1e6) return `${Number((r / 1e6).toPrecision(3))} MΩ`;
+  if (a >= 1e3) return `${Number((r / 1e3).toPrecision(3))} kΩ`;
+  if (a > 0 && a < 1) return `${Number((r * 1e3).toPrecision(3))} mΩ`;
+  return `${Number(r.toPrecision(4))} Ω`;
+}
+
+function drawSeriesLoop(svg, model) {
+  if (!svg) return;
+  const src = model || defaultSeriesLoopModel();
+  const shown = [...(src.items || []), ...(src.opens || [])]
+    .sort((a, b) => (a.i || 0) - (b.i || 0));
+  const elements = shown.length ? shown : defaultSeriesLoopModel().items;
+  const n = elements.length;
+  const x0 = 80, x1 = 560, yTop = 50, yBot = 170;
+  const padL = 54, padR = 16;
+  const slot = (x1 - x0 - padL - padR) / n;
+  const rw = Math.min(78, Math.max(36, slot * 0.62));
+  const fs = n > 4 ? 10 : 12;
+  let res = "";
+  res += `<line x1="${x0}" y1="${yTop}" x2="${x0}" y2="${yBot}" stroke="currentColor" stroke-width="2"/>`;
+  res += `<line x1="${x0 - 16}" y1="${yTop + 22}" x2="${x0 + 16}" y2="${yTop + 22}" stroke="currentColor" stroke-width="2.4"/>`;
+  res += `<line x1="${x0 - 10}" y1="${yBot - 22}" x2="${x0 + 10}" y2="${yBot - 22}" stroke="currentColor" stroke-width="2"/>`;
+  res += `<text x="${x0 - 44}" y="${yTop + 26}" font-size="13" fill="#1e8449">+</text>`;
+  res += `<text x="${x0 - 42}" y="${yBot - 16}" font-size="13" fill="#c0392b">−</text>`;
+  res += `<text x="${x0 - 48}" y="${(yTop + yBot) / 2 + 5}" font-size="15" fill="currentColor">E</text>`;
+  if (src.E != null) {
+    res += `<text x="${x0 - 54}" y="${(yTop + yBot) / 2 + 22}" font-size="11" fill="currentColor">${Number(src.E.toPrecision(4))} V</text>`;
+  }
+  let cursor = x0;
+  elements.forEach((el, k) => {
+    const cx = x0 + padL + slot * (k + 0.5);
+    const left = cx - rw / 2;
+    const right = cx + rw / 2;
+    res += `<line x1="${cursor}" y1="${yTop}" x2="${left}" y2="${yTop}" stroke="currentColor" stroke-width="2"/>`;
+    if (el.st === "open") {
+      res += `<circle cx="${left}" cy="${yTop}" r="3.2" fill="none" stroke="#c0392b" stroke-width="2"/>`;
+      res += `<circle cx="${right}" cy="${yTop}" r="3.2" fill="none" stroke="#c0392b" stroke-width="2"/>`;
+      res += `<line x1="${left + 6}" y1="${yTop - 10}" x2="${right - 6}" y2="${yTop + 10}" stroke="#c0392b" stroke-width="1.6"/>`;
+      res += `<text x="${cx}" y="${yTop - 16}" text-anchor="middle" font-size="${fs}" fill="#c0392b">${el.name}</text>`;
+      res += `<text x="${cx}" y="${yTop + 28}" text-anchor="middle" font-size="10" fill="#c0392b">abierto</text>`;
+    } else if (el.st === "short") {
+      res += `<rect x="${left}" y="${yTop - 12}" width="${rw}" height="24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="4 3"/>`;
+      res += `<line x1="${left}" y1="${yTop}" x2="${right}" y2="${yTop}" stroke="#2471a3" stroke-width="3"/>`;
+      res += `<text x="${cx}" y="${yTop - 16}" text-anchor="middle" font-size="${fs}" fill="currentColor">${el.name}</text>`;
+      res += `<text x="${cx}" y="${yTop + 32}" text-anchor="middle" font-size="10" fill="#2471a3">corto</text>`;
+    } else {
+      res += `<rect x="${left}" y="${yTop - 12}" width="${rw}" height="24" fill="none" stroke="currentColor" stroke-width="2"/>`;
+      res += `<text x="${cx}" y="${yTop - 16}" text-anchor="middle" font-size="${fs}" fill="currentColor">${el.name}</text>`;
+      if (el.r != null) {
+        res += `<text x="${cx}" y="${yTop + 38}" text-anchor="middle" font-size="11" fill="currentColor">${formatOhmLabel(el.r)}</text>`;
+      }
+    }
+    cursor = right;
+  });
+  res += `<line x1="${cursor}" y1="${yTop}" x2="${x1}" y2="${yTop}" stroke="currentColor" stroke-width="2"/>`;
+  res += `<line x1="${x1}" y1="${yTop}" x2="${x1}" y2="${yBot}" stroke="currentColor" stroke-width="2"/>`;
+  res += `<line x1="${x1}" y1="${yBot}" x2="${x0}" y2="${yBot}" stroke="currentColor" stroke-width="2"/>`;
+  const idir = (src.I || 0) >= 0 ? 1 : -1;
+  const ax = idir > 0 ? x0 + 28 : x1 - 28;
+  if (idir > 0) {
+    res += `<polygon points="${ax + 14},${yTop} ${ax},${yTop - 6} ${ax},${yTop + 6}" fill="#2471a3"/>`;
+    res += `<text x="${ax + 7}" y="${yTop - 12}" text-anchor="middle" font-size="13" fill="#2471a3">I</text>`;
+  } else {
+    res += `<polygon points="${ax - 14},${yTop} ${ax},${yTop + 6} ${ax},${yTop - 6}" fill="#2471a3"/>`;
+    res += `<text x="${ax - 7}" y="${yTop - 12}" text-anchor="middle" font-size="13" fill="#2471a3">I</text>`;
+  }
+  if (src.I != null) {
+    res += `<text x="${ax + (idir > 0 ? 7 : -7)}" y="${yTop + 28}" text-anchor="middle" font-size="11" fill="#2471a3">${Number(src.I.toPrecision(3))} A</text>`;
+  }
+  setSvgMarkup(svg, res);
+}
+
+function initSec5() {
+  initSec5_2();
+  initSec5_3();
+  initSec5_4();
+  initSec5_6();
+  initSec5_7();
+  initSec5_8();
+  initSec5_12();
+}
+
+function initSec5_2() {
+  const svg = document.getElementById("svg-s52");
+  drawSeriesLoop(svg, defaultSeriesLoopModel());
+  const btn = document.getElementById("btn-s52");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const out = document.getElementById("proc-5-2");
+    try {
+      let E = readOptionalNumber("s52-e");
+      let I = readOptionalNumber("s52-i");
+      let RT = readOptionalNumber("s52-rt");
+      if (E != null) E *= readUnit("s52-e-u");
+      if (I != null) I *= readUnit("s52-i-u");
+      if (RT != null) RT *= readUnit("s52-rt-u");
+      const model = analyzeSeries({ E, I, RT, rows: readSeriesRows("s52", 8), wantWatt: false });
+      setMathText(out, model.proc);
+      drawSeriesLoop(svg, model);
+    } catch (e) {
+      setMathText(out, e.message);
+      drawSeriesLoop(svg, defaultSeriesLoopModel());
+    }
+  });
+}
+
+function initSec5_3() {
+  const btn = document.getElementById("btn-s53");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const out = document.getElementById("proc-5-3");
+    try {
+      const sources = [];
+      for (let i = 1; i <= 4; i++) {
+        const raw = (document.getElementById(`s53-e${i}`)?.value || "").trim();
+        if (raw === "") continue;
+        const mag = parseNumberInput(raw) * readUnit(`s53-eu${i}`);
+        const pol = Number(document.getElementById(`s53-pol${i}`)?.value || 1);
+        const name = (document.getElementById(`s53-en${i}`)?.value || `E${i}`).trim();
+        sources.push({ name, signed: pol * mag, mag, pol });
+      }
+      const rows = [];
+      for (let i = 1; i <= 4; i++) {
+        const rRaw = (document.getElementById(`s53-r${i}`)?.value || "").trim();
+        const vRaw = (document.getElementById(`s53-v${i}`)?.value || "").trim();
+        const pRaw = (document.getElementById(`s53-p${i}`)?.value || "").trim();
+        if (rRaw === "" && vRaw === "" && pRaw === "") continue;
+        const ru = Number(document.getElementById(`s53-ru${i}`)?.value || 1);
+        rows.push({
+          i,
+          name: (document.getElementById(`s53-rn${i}`)?.value || `R${i}`).trim(),
+          st: "series",
+          r: rRaw === "" ? null : parseNumberInput(rRaw) * ru,
+          v: vRaw === "" ? null : parseNumberInput(vRaw),
+          p: pRaw === "" ? null : parseNumberInput(pRaw)
+        });
+      }
+      let I = readOptionalNumber("s53-i");
+      if (I != null) I *= readUnit("s53-iu");
+      let Eknown = sources.reduce((s, src) => s + src.signed, 0);
+      const unknownSrc = sources.length < 4 && (document.getElementById("s53-e4")?.value || "").trim() === ""
+        ? null : null;
+      let proc = "Redibujo: una sola fuente neta (horario = positivo).\n";
+      sources.forEach((src) => {
+        proc += `${src.name}: ${formatQty(src.mag, "V")} ${src.pol > 0 ? "a favor" : "en contra"} → ${formatQty(src.signed, "V")}.\n`;
+      });
+
+      if (I == null) {
+        for (const el of rows) {
+          if (el.r != null && el.r > 0 && el.v != null) { I = el.v / el.r; break; }
+          if (el.r != null && el.r > 0 && el.p != null) { I = Math.sqrt(Math.abs(el.p / el.r)); break; }
+        }
+      }
+      rows.forEach((el) => {
+        if (el.r == null && I != null && I !== 0) {
+          if (el.v != null) el.r = el.v / I;
+          else if (el.p != null) el.r = el.p / (I * I);
+        }
+      });
+      if (rows.some((el) => el.r == null)) throw new Error("Falta una R (o V/P/I que la fije).");
+      const RT = rows.reduce((s, el) => s + el.r, 0);
+      proc += `${mj(`R_T = ${texQtyBody(RT, "\\Omega")}`)}.\n`;
+
+      const emptyE = [];
+      for (let i = 1; i <= 4; i++) {
+        const raw = (document.getElementById(`s53-e${i}`)?.value || "").trim();
+        const name = (document.getElementById(`s53-en${i}`)?.value || `E${i}`).trim();
+        const pol = Number(document.getElementById(`s53-pol${i}`)?.value || 1);
+        if (raw === "" && name && (i === 1 || (document.getElementById(`s53-en${i}`)?.value || "") !== `E${i}` || i <= sources.length + 1)) {
+          if (i <= 4 && (document.getElementById(`s53-en${i}`).value || "") && raw === "") {
+            emptyE.push({ i, name, pol });
+          }
+        }
+      }
+      const eFieldsEmpty = [];
+      for (let i = 1; i <= 4; i++) {
+        const raw = (document.getElementById(`s53-e${i}`)?.value || "").trim();
+        const named = (document.getElementById(`s53-en${i}`)?.value || "").trim();
+        if (raw === "" && named && named !== `E${i}`) {
+          eFieldsEmpty.push({ i, name: named, pol: Number(document.getElementById(`s53-pol${i}`)?.value || 1) });
+        }
+      }
+      if (I == null) {
+        if (RT === 0) throw new Error("RT = 0.");
+        I = Eknown / RT;
+        proc += `${mj(`E_{\\mathrm{neto}} = ${texQtyBody(Eknown, "V")}`)}.\n`;
+        proc += `${mj(`I = E_{\\mathrm{neto}} / R_T = ${texQtyBody(I, "A")}`)}.\n`;
+      } else {
+        const Eneed = I * RT;
+        proc += `${mj(`E_{\\mathrm{neto,\,necesario}} = I R_T = ${texQtyBody(Eneed, "V")}`)}.\n`;
+        if (eFieldsEmpty.length === 1) {
+          const miss = eFieldsEmpty[0];
+          const rest = Eknown;
+          const signed = Eneed - rest;
+          const mag = signed / miss.pol;
+          proc += `${miss.name}: ${formatQty(mag, "V")} (${miss.pol > 0 ? "a favor" : "en contra"} horario). `;
+          if (mag < 0) proc += `El signo negativo invierte la polaridad dibujada (|E| = ${formatQty(Math.abs(mag), "V")}).\n`;
+          else proc += "\n";
+          Eknown = Eneed;
+        } else {
+          proc += `Fuentes conocidas suman ${formatQty(Eknown, "V")}. `;
+          proc += Math.abs(Eknown - Eneed) / Math.max(Math.abs(Eneed), 1e-12) < 0.03
+            ? "Cuadran con I.\n"
+            : `No cuadran con I·RT = ${formatQty(Eneed, "V")}: falta una E o una polaridad.\n`;
+        }
+      }
+      const dir = I >= 0 ? "horaria" : "antihoraria";
+      proc += `I = ${formatQty(Math.abs(I), "A")} ${dir}. Redibujado: una fuente de ${formatQty(Math.abs(I * RT), "V")} con ese sentido.\n`;
+      rows.forEach((el) => {
+        const v = I * el.r;
+        const p = I * I * el.r;
+        proc += `${el.name}: ${mj(`V = ${texQtyBody(v, "V")}`)}, ${mj(`P = ${texQtyBody(p, "W")}`)}.\n`;
+      });
+      setMathText(out, proc);
+    } catch (e) {
+      setMathText(out, e.message);
+    }
+  });
+}
+
+function initSec5_4() {
+  const btnK = document.getElementById("btn-s54k");
+  if (btnK) {
+    btnK.addEventListener("click", () => {
+      const out = document.getElementById("proc-5-4-kvl");
+      try {
+        const vals = [];
+        let empty = -1;
+        for (let i = 1; i <= 6; i++) {
+          const raw = (document.getElementById(`s54k-v${i}`)?.value || "").trim();
+          if (raw === "") {
+            if (empty < 0) empty = i;
+            continue;
+          }
+          vals.push({ i, v: parseNumberInput(raw) });
+        }
+        const sum = vals.reduce((s, x) => s + x.v, 0);
+        let proc = `${mj("\\sum_{\\circlearrowright} V = 0")} (lazo) o ${mj("V_{ab} = \\sum V")} (camino).\n`;
+        vals.forEach((x) => { proc += `Tramo ${x.i}: ${formatQty(x.v, "V")}.\n`; });
+        if (empty > 0 && vals.length) {
+          const unk = -sum;
+          proc += `Tramo ${empty} (incógnita, lazo cerrado): ${formatQty(unk, "V")}.\n`;
+          proc += `Comprobación: suma = ${formatQty(sum + unk, "V")}.`;
+        } else {
+          proc += `${mj(`V_{ab} = ${texQtyBody(sum, "V")}`)}. `;
+          proc += sum >= 0 ? "a es positivo respecto de b." : "b es positivo respecto de a (Vab negativo).";
+        }
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+  const btn = document.getElementById("btn-s54");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const out = document.getElementById("proc-5-4");
+    try {
+      let E = readOptionalNumber("s54-e");
+      let I = readOptionalNumber("s54-i");
+      let RT = readOptionalNumber("s54-rt");
+      if (E != null) E *= readUnit("s54-e-u");
+      if (I != null) I *= readUnit("s54-i-u");
+      if (RT != null) RT *= readUnit("s54-rt-u");
+      const wantWatt = !!document.getElementById("s54-watt")?.checked;
+      const model = analyzeSeries({ E, I, RT, rows: readSeriesRows("s54", 8), wantWatt });
+      setMathText(out, model.proc);
+    } catch (e) {
+      setMathText(out, e.message);
+    }
+  });
+}
+
+function readDividerRs() {
+  const rs = [];
+  for (let i = 1; i <= 6; i++) {
+    const raw = (document.getElementById(`s56-r${i}`)?.value || "").trim();
+    const name = (document.getElementById(`s56-n${i}`)?.value || `R${i}`).trim();
+    const ru = Number(document.getElementById(`s56-ru${i}`)?.value || 1);
+    if (raw === "") {
+      rs.push({ i, name, r: null, ru });
+    } else {
+      rs.push({ i, name, r: parseNumberInput(raw) * ru, ru });
+    }
+  }
+  while (rs.length && rs[rs.length - 1].r == null && rs[rs.length - 1].name === `R${rs[rs.length - 1].i}`) {
+    rs.pop();
+  }
+  return rs.filter((el, idx, arr) => el.r != null || idx < arr.findLastIndex((x) => x.r != null || x.name !== `R${x.i}`) + 1);
+}
+
+function initSec5_6() {
+  const btn = document.getElementById("btn-s56");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-5-6");
+      try {
+        let E = readOptionalNumber("s56-e");
+        if (E != null) E *= readUnit("s56-e-u");
+        if (E == null) throw new Error("Indica E.");
+        let from = readOptionalNumber("s56-from") ?? 1;
+        let to = readOptionalNumber("s56-to") ?? 1;
+        from = Math.round(from);
+        to = Math.round(to);
+        let Vab = readOptionalNumber("s56-vab");
+        if (Vab != null) Vab *= readUnit("s56-vab-u");
+        const rs = [];
+        for (let i = 1; i <= 6; i++) {
+          const raw = (document.getElementById(`s56-r${i}`)?.value || "").trim();
+          const name = (document.getElementById(`s56-n${i}`)?.value || `R${i}`).trim();
+          const ru = Number(document.getElementById(`s56-ru${i}`)?.value || 1);
+          if (raw === "" && name === `R${i}`) continue;
+          rs.push({ i, name, r: raw === "" ? null : parseNumberInput(raw) * ru });
+        }
+        if (!rs.length) throw new Error("Indica al menos una R.");
+        const unknowns = rs.filter((el) => el.r == null);
+        if (unknowns.length > 1) throw new Error("Como mucho una R vacía.");
+        if (unknowns.length === 1) {
+          if (Vab == null) throw new Error("Con R vacía indica Vab del tramo.");
+          const el = unknowns[0];
+          const others = rs.filter((x) => x !== el);
+          const RT0 = others.reduce((s, x) => s + x.r, 0);
+          const inside = el.i >= from && el.i <= to;
+          const tap0 = others.filter((x) => x.i >= from && x.i <= to).reduce((s, x) => s + x.r, 0);
+          if (inside) {
+            if (Math.abs(E - Vab) < 1e-12) throw new Error("Vab = E no deja R fuera del tramo.");
+            el.r = (Vab * RT0 - E * tap0) / (E - Vab);
+          } else {
+            if (Math.abs(Vab) < 1e-12) throw new Error("Vab = 0 no fija la R fuera del tramo.");
+            el.r = (E * tap0 - Vab * RT0) / Vab;
+          }
+          if (el.r < 0) throw new Error("R resultante negativa: revisa desde/hasta o Vab.");
+          out; // keep
+        }
+        const RT = rs.reduce((s, x) => s + x.r, 0);
+        const tap = rs.filter((x) => x.i >= from && x.i <= to);
+        const Rtap = tap.reduce((s, x) => s + x.r, 0);
+        const Vx = E * Rtap / RT;
+        const I = E / RT;
+        let proc = `${mj("V_x = E R_x / R_T")}.\n`;
+        proc += `${mj(`R_T = ${texQtyBody(RT, "\\Omega")}`)}, ${mj(`I = ${texQtyBody(I, "A")}`)}.\n`;
+        rs.forEach((el) => {
+          const v = I * el.r;
+          proc += `${el.name}: ${formatQty(el.r, "\\Omega")} → ${formatQty(v, "V")}.\n`;
+        });
+        const names = tap.map((x) => x.name).join(" + ") || "(tramo vacío)";
+        proc += `${mj(`V_{ab}`)} en ${names}: ${formatQty(Vx, "V")}. `;
+        proc += Vx >= 0 ? "a (inicio del tramo) es + respecto de b." : "polaridad invertida.";
+        if (Vab != null && Math.abs(Vab - Vx) / Math.max(Math.abs(Vx), 1e-12) > 0.02) {
+          proc += `\nAviso: Vab ingresado ${formatQty(Vab, "V")} vs calculado ${formatQty(Vx, "V")}.`;
+        }
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+  const btnD = document.getElementById("btn-s56d");
+  if (!btnD) return;
+  btnD.addEventListener("click", () => {
+    const out = document.getElementById("proc-5-6-d");
+    const rail = document.getElementById("tap-rail-5-6");
+    try {
+      let E = readOptionalNumber("s56d-e");
+      let I = readOptionalNumber("s56d-i");
+      if (E != null) E *= readUnit("s56d-e-u");
+      if (I != null) I *= readUnit("s56d-i-u");
+      const taps = (document.getElementById("s56d-taps")?.value || "")
+        .split(/[;,]/).map((s) => s.trim()).filter(Boolean).map((s) => parseNumberInput(s));
+      if (taps.length < 2) throw new Error("Indica al menos dos nodos (p. ej. 12, 8, 0).");
+      if (I == null || I === 0) throw new Error("Indica I de diseño.");
+      const span = taps[0] - taps[taps.length - 1];
+      let proc = `Nodos de más + a más −. ΔV total = ${formatQty(span, "V")}`;
+      if (E != null) proc += ` (E ingresado ${formatQty(E, "V")})`;
+      proc += ".\n";
+      if (E != null && Math.abs(span - E) / Math.max(Math.abs(E), 1e-12) > 0.03) {
+        proc += "Aviso: E no coincide con primer nodo − último. Se usan los nodos.\n";
+      }
+      let html = "";
+      const Rs = [];
+      for (let i = 0; i < taps.length - 1; i++) {
+        const dv = taps[i] - taps[i + 1];
+        const R = dv / I;
+        const P = dv * I;
+        Rs.push({ i: i + 1, dv, R, P });
+        proc += `${mj(`R_${i + 1}`)} entre ${formatQty(taps[i], "V")} y ${formatQty(taps[i + 1], "V")}: `;
+        proc += `${formatQty(R, "\\Omega")}, ${formatQty(P, "W")} → ${recommendWatt(P)}.\n`;
+        html += `<div class="tap-node"><span>${taps[i]} V</span><span></span><span></span></div>`;
+        html += `<div class="tap-seg"><span></span><div class="tap-bar">R${i + 1} = ${Number(R.toPrecision(4))} Ω</div><span>${Number(dv.toPrecision(4))} V</span></div>`;
+      }
+      html += `<div class="tap-node"><span>${taps[taps.length - 1]} V</span><span></span><span></span></div>`;
+      if (taps[taps.length - 1] === 0 || taps.includes(0)) {
+        html += `<div class="tap-gnd"></div>`;
+      }
+      const RT = Rs.reduce((s, x) => s + x.R, 0);
+      proc += `${mj(`R_T = ${texQtyBody(RT, "\\Omega")}`)}, ${mj(`I = ${texQtyBody(I, "A")}`)}.`;
+      if (rail) rail.innerHTML = html;
+      setMathText(out, proc);
+    } catch (e) {
+      if (rail) rail.innerHTML = "";
+      setMathText(out, e.message);
+    }
+  });
+}
+
+function parseCsvNumbers(id) {
+  const raw = (document.getElementById(id)?.value || "").trim();
+  if (!raw) return [];
+  return raw.split(/[;,]/).map((s) => s.trim()).filter(Boolean).map((s) => parseNumberInput(s));
+}
+
+function initSec5_7() {
+  const btn = document.getElementById("btn-s57");
+  if (btn) {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById("proc-5-7");
+      try {
+        const src = parseCsvNumbers("s57-src");
+        if (!src.length) throw new Error("Indica las fuentes (V_izq − V_der), separadas por coma.");
+        let gnd = readOptionalNumber("s57-gnd");
+        const nNodes = src.length + 1;
+        if (gnd == null) gnd = nNodes;
+        gnd = Math.round(gnd);
+        if (gnd < 1 || gnd > nNodes) throw new Error(`Nodo tierra entre 1 y ${nNodes}.`);
+        let ia = readOptionalNumber("s57-va");
+        let ib = readOptionalNumber("s57-vb");
+        ia = ia == null ? 1 : Math.round(ia);
+        ib = ib == null ? nNodes : Math.round(ib);
+        if (ia < 1 || ia > nNodes || ib < 1 || ib > nNodes) {
+          throw new Error(`Nodos Va/Vb entre 1 y ${nNodes}.`);
+        }
+        const V = new Array(nNodes).fill(0);
+        const gi = gnd - 1;
+        V[gi] = 0;
+        for (let i = gi; i < src.length; i++) V[i + 1] = V[i] - src[i];
+        for (let i = gi - 1; i >= 0; i--) V[i] = V[i + 1] + src[i];
+        const Va = V[ia - 1];
+        const Vb = V[ib - 1];
+        const Vab = Va - Vb;
+        let proc = `Cada fuente es ${mj("V_{\\mathrm{izq}} - V_{\\mathrm{der}}")} (+ si el + mira a la izquierda).\n`;
+        proc += `Tierra en el nodo ${gnd} de ${nNodes}.\n`;
+        V.forEach((v, i) => {
+          const tags = [];
+          if (i === ia - 1) tags.push("Va");
+          if (i === ib - 1) tags.push("Vb");
+          if (i === gi) tags.push("tierra");
+          proc += `Nodo ${i + 1}: ${formatQty(v, "V")}${tags.length ? " = " + tags.join(", ") : ""}.\n`;
+        });
+        proc += `${mj(`V_{ab} = V_a - V_b = ${texQtyBody(Vab, "V")}`)}.`;
+        setMathText(out, proc);
+      } catch (e) {
+        setMathText(out, e.message);
+      }
+    });
+  }
+  const btnIc = document.getElementById("btn-s57ic");
+  if (!btnIc) return;
+  btnIc.addEventListener("click", () => {
+    const out = document.getElementById("proc-5-7-ic");
+    try {
+      const pins = [];
+      for (let i = 0; i <= 7; i++) {
+        const v = readOptionalNumber(`s57ic-v${i}`);
+        pins[i] = v;
+      }
+      let proc = "Pines respecto de tierra (V0 suele ser 0).\n";
+      pins.forEach((v, i) => {
+        if (v == null) return;
+        proc += `${mj(`V_${i} = ${texQtyBody(v, "V")}`)}.\n`;
+      });
+      const pairsRaw = (document.getElementById("s57ic-pairs")?.value || "").trim();
+      if (pairsRaw) {
+        pairsRaw.split(/[;,]/).map((s) => s.trim()).filter(Boolean).forEach((p) => {
+          const m = p.match(/^(\d)(\d)$/);
+          if (!m) return;
+          const i = Number(m[1]);
+          const j = Number(m[2]);
+          if (pins[i] == null || pins[j] == null) return;
+          const v = pins[i] - pins[j];
+          proc += `${mj(`V_{${i}${j}} = V_${i} - V_${j} = ${texQtyBody(v, "V")}`)}.\n`;
+        });
+      }
+      const ir = (document.getElementById("s57ic-ir")?.value || "").trim();
+      if (ir) {
+        const parts = ir.split(/[;,]/).map((s) => s.trim());
+        if (parts.length >= 3) {
+          const i = Number(parts[0]);
+          const j = Number(parts[1]);
+          const R = parseNumberInput(parts[2]);
+          if (pins[i] != null && pins[j] != null && R) {
+            const dv = pins[i] - pins[j];
+            const I = dv / R;
+            proc += `Entre pines ${i} y ${j}, R = ${formatQty(R, "\\Omega")}: `;
+            proc += `${mj(`I = ${texQtyBody(I, "A")}`)}`;
+            proc += I >= 0 ? ` (de ${i} hacia ${j}).` : ` (de ${j} hacia ${i}).`;
+          }
+        }
+      }
+      setMathText(out, proc);
+    } catch (e) {
+      setMathText(out, e.message);
+    }
+  });
+}
+
+function initSec5_8() {
+  const btn = document.getElementById("btn-s58");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const out = document.getElementById("proc-5-8");
+    try {
+      let E = readOptionalNumber("s58-e");
+      let VL = readOptionalNumber("s58-vl");
+      let I = readOptionalNumber("s58-i");
+      let RL = readOptionalNumber("s58-rl");
+      let Ri = readOptionalNumber("s58-rint");
+      if (E != null) E *= readUnit("s58-e-u");
+      if (VL != null) VL *= readUnit("s58-vl-u");
+      if (I != null) I *= readUnit("s58-i-u");
+      if (RL != null) RL *= readUnit("s58-rl-u");
+      if (Ri != null) Ri *= readUnit("s58-rint-u");
+
+      if (VL == null && I != null && RL != null) VL = I * RL;
+      if (I == null && VL != null && RL != null && RL !== 0) I = VL / RL;
+      if (RL == null && VL != null && I != null && I !== 0) RL = VL / I;
+      if (E == null && VL != null && I != null && Ri != null) E = VL + I * Ri;
+      if (Ri == null && E != null && VL != null && I != null && I !== 0) Ri = (E - VL) / I;
+      if (I == null && E != null && Ri != null && RL != null) {
+        const den = Ri + RL;
+        if (den === 0) throw new Error("Ri + RL = 0.");
+        I = E / den;
+        VL = I * RL;
+      }
+      if (E == null || VL == null) throw new Error("Faltan datos: indica E (vacío) y carga (VL o I y RL), o Ri.");
+      if (I == null && RL != null && RL !== 0) I = VL / RL;
+      if (Ri == null && I != null && I !== 0) Ri = (E - VL) / I;
+      const Pint = I != null && Ri != null ? I * I * Ri : null;
+      const VR = VL !== 0 ? ((E - VL) / VL) * 100 : null;
+      let proc = `Vacío: ${mj(`V_{\\mathrm{nl}} = E = ${texQtyBody(E, "V")}`)}.\n`;
+      if (VL != null) proc += `Carga: ${mj(`V_L = ${texQtyBody(VL, "V")}`)}.\n`;
+      if (I != null) proc += `${mj(`I = ${texQtyBody(I, "A")}`)}.\n`;
+      if (RL != null) proc += `${mj(`R_L = ${texQtyBody(RL, "\\Omega")}`)}.\n`;
+      if (Ri != null) proc += `${mj(`R_{\\mathrm{int}} = (E - V_L) / I = ${texQtyBody(Ri, "\\Omega")}`)}.\n`;
+      if (Pint != null) proc += `Pérdida en Ri: ${formatQty(Pint, "W")}.\n`;
+      if (VR != null) {
+        proc += `${mj("\\%\\mathrm{VR} = (V_{\\mathrm{nl}} - V_{\\mathrm{fl}}) / V_{\\mathrm{fl}} \\times 100\\%")} = ${formatQtyPlain(VR)} %.`;
+        if (Math.abs(VR) < 2) proc += " Típico de un rack LFP / grid-forming 2026.";
+        else if (Math.abs(VR) < 8) proc += " Aceptable en auxiliar de 12 V / arranque.";
+        else proc += " Alta: la fuente se cae mucho con carga (Ri grande frente a RL).";
+      }
+      setMathText(out, proc);
+    } catch (e) {
+      setMathText(out, e.message);
+    }
+  });
+}
+
+function initSec5_12() {
+  const btn = document.getElementById("btn-s512");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    const out = document.getElementById("proc-5-12");
+    const wrap = document.getElementById("wrap-5-12");
+    const tbody = document.querySelector("#table-5-12 tbody");
+    try {
+      let E = readOptionalNumber("s512-e");
+      let Rs = readOptionalNumber("s512-rs");
+      if (E != null) E *= readUnit("s512-e-u");
+      if (Rs != null) Rs *= readUnit("s512-rs-u");
+      const rmin = parseNumberInput(document.getElementById("s512-rmin")?.value || "1");
+      const rmax = parseNumberInput(document.getElementById("s512-rmax")?.value || "20");
+      const step = parseNumberInput(document.getElementById("s512-step")?.value || "1");
+      if (E == null || Rs == null) throw new Error("Indica E y Rs.");
+      if (step <= 0) throw new Error("Paso debe ser positivo.");
+      const rows = [];
+      let best = null;
+      for (let r = rmin; r <= rmax + 1e-9; r += step) {
+        const I = E / (Rs + r);
+        const VL = I * r;
+        const P = I * I * r;
+        const row = { r, I, VL, P };
+        rows.push(row);
+        if (!best || P > best.P) best = row;
+      }
+      const Pmatch = (E * E) / (4 * Rs);
+      let proc = `${mj("P_L = E^{2} R_L / (R_s + R_L)^{2}")}. Máximo cuando ${mj("R_L = R_s")} (máxima transferencia; no es el MPPT de un módulo FV).\n`;
+      proc += `Con ${mj(`R_L = R_s = ${texQtyBody(Rs, "\\Omega")}`)}: ${mj(`P_{\\max} = E^{2} / 4 R_s = ${texQtyBody(Pmatch, "W")}`)}.\n`;
+      if (best) proc += `En el barrido, el pico está en RL = ${formatQty(best.r, "\\Omega")}, PL = ${formatQty(best.P, "W")}.`;
+      if (tbody) {
+        tbody.innerHTML = rows.map((row) => {
+          const hit = best && Math.abs(row.r - best.r) < 1e-9;
+          return `<tr class="${hit ? "rl-max is-hit" : ""}"><td>${Number(row.r.toPrecision(4))}</td><td>${Number(row.I.toPrecision(4))}</td><td>${Number(row.VL.toPrecision(4))}</td><td>${Number(row.P.toPrecision(4))}</td></tr>`;
+        }).join("");
+      }
+      if (wrap) wrap.style.display = "block";
+      setMathText(out, proc);
+    } catch (e) {
+      setMathText(out, e.message);
+    }
+  });
+}
+
+Object.assign(presetsData, {
+  "5-2": {
+    p1a: {
+      series: { prefix: "s52", rows: [
+        { name: "dump 2 Ω", r: "2" }, { name: "dump 6 Ω", r: "6" }, { name: "dump 12 Ω", r: "12" }
+      ] },
+      fields: { "s52-e": "60", "s52-i": "", "s52-rt": "" },
+      click: "btn-s52",
+      desc: "Prob. 1.a — Tres resistencias de un dump eólico / ballast hidro a 60 V: 2+6+12 Ω.\nRT = 20 Ω. I = 60/20 = 3.00 A.\nV = 6, 18 y 36 V. P = 18, 54 y 108 W. El de 12 Ω pide un wattaje de planta, no ½ W."
+    },
+    p1b: {
+      series: { prefix: "s52", rows: [
+        { name: "200 kΩ", r: "200", ru: "1e3" }, { name: "1 MΩ", r: "1", ru: "1e6" },
+        { name: "330 kΩ", r: "330", ru: "1e3" }, { name: "0.1 MΩ", r: "0.1", ru: "1e6" }
+      ] },
+      fields: { "s52-e": "10", "s52-i": "", "s52-rt": "" },
+      click: "btn-s52",
+      desc: "Prob. 1.b — Divisor / bleeder de un bus de sensor de 10 V (piranómetro, ISO).\n200 k + 1 M + 330 k + 0.1 M = 1.63 MΩ.\nI = 10/1.63e6 = 6.135 µA. Caídas en kV no: 1.23, 6.13, 2.02 y 0.61 V."
+    },
+    p1c: {
+      series: { prefix: "s52", rows: [
+        { name: "15 Ω", r: "15" }, { name: "10 Ω", r: "10" },
+        { name: "25 Ω bypass", r: "25", st: "short" }, { name: "25 Ω bypass", r: "25", st: "short" },
+        { name: "25 Ω", r: "25" }, { name: "10 Ω", r: "10" }
+      ] },
+      fields: { "s52-e": "35", "s52-i": "", "s52-rt": "" },
+      click: "btn-s52",
+      desc: "Prob. 1.c — String 35 V con dos elementos puentados (diodo bypass de celda sombreada, o jumper de precarga).\nLos 25 Ω en corto no suman. RT = 15+10+25+10 = 60 Ω. I = 35/60 = 0.583 A."
+    },
+    p1d: {
+      series: { prefix: "s52", rows: [
+        { name: "1.2 kΩ", r: "1.2", ru: "1e3" }, { name: "4.5 kΩ", r: "4.5", ru: "1e3" },
+        { name: "3 kΩ", r: "3", ru: "1e3" }, { name: "1.3 kΩ", r: "1.3", ru: "1e3" },
+        { name: "2.2 kΩ abierto", r: "2.2", ru: "1e3", st: "open" }
+      ] },
+      fields: { "s52-e": "120", "s52-i": "", "s52-rt": "" },
+      click: "btn-s52",
+      desc: "Prob. 1.d — 120 V. El 2.2 kΩ cuelga de un nodo a un terminal abierto (ramal de medida no cerrado, o MC4 suelto que no está en el lazo).\nRT = 1.2+4.5+3+1.3 = 10 kΩ. I = 120/10k = 12.0 mA."
+    },
+    p2a: {
+      series: { prefix: "s52", rows: [
+        { name: "10 Ω", r: "10" }, { name: "12 Ω", r: "12" }, { name: "R ballast", r: "" }
+      ] },
+      fields: { "s52-e": "30", "s52-i": "", "s52-rt": "30" },
+      click: "btn-s52",
+      desc: "Prob. 2.a — RT = 30 Ω a 30 V (calefacción auxiliar / dump).\nR = 30−10−12 = 8.00 Ω. I = 1.00 A."
+    },
+    p2b: {
+      series: { prefix: "s52", rows: [
+        { name: "12.6 kΩ", r: "12.6", ru: "1e3" }, { name: "R", r: "" },
+        { name: "45 kΩ", r: "45", ru: "1e3" }, { name: "0.4 kΩ", r: "0.4", ru: "1e3" }
+      ] },
+      fields: { "s52-e": "60", "s52-i": "", "s52-rt": "60", "s52-rt-u": "1e3" },
+      selects: { "s52-rt-u": "1e3" },
+      click: "btn-s52",
+      desc: "Prob. 2.b — Divisor de 60 V, RT = 60 kΩ.\nR = 60−12.6−45−0.4 = 2.00 kΩ. I = 1.00 mA."
+    },
+    p2c: {
+      series: { prefix: "s52", rows: [
+        { name: "50 Ω", r: "50" }, { name: "R1", r: "" }, { name: "60 Ω", r: "60" },
+        { name: "R2=R1", r: "" }, { name: "10 Ω", r: "10" }
+      ] },
+      fields: { "s52-e": "120", "s52-i": "", "s52-rt": "220" },
+      click: "btn-s52",
+      desc: "Prob. 2.c — RT = 220 Ω, R2 = R1 (dos tramos iguales de un string de lastre).\n50+60+10+2 R1 = 220 → R1 = R2 = 50.0 Ω. I = 120/220 = 0.545 A."
+    },
+    p2d: {
+      series: { prefix: "s52", rows: [
+        { name: "100 kΩ", r: "100", ru: "1e3" }, { name: "0.2 MΩ", r: "0.2", ru: "1e6" },
+        { name: "R bleeder", r: "" }, { name: "56 kΩ", r: "56", ru: "1e3" }
+      ] },
+      fields: { "s52-e": "50", "s52-i": "", "s52-rt": "1.6", "s52-rt-u": "1e6" },
+      selects: { "s52-rt-u": "1e6" },
+      click: "btn-s52",
+      desc: "Prob. 2.d — Bleeder / monitor ISO, RT = 1.6 MΩ, E = 50 V.\nR = 1.6 M − 0.1 M − 0.2 M − 0.056 M = 1.244 MΩ.\nI = 50/1.6e6 = 31.25 µA."
+    },
+    p3a: {
+      series: { prefix: "s52", rows: [
+        { name: "60 Ω", r: "60" }, { name: "1.2 kΩ", r: "1.2", ru: "1e3" }, { name: "2.74 kΩ", r: "2.74", ru: "1e3" }
+      ] },
+      fields: { "s52-e": "", "s52-i": "4", "s52-rt": "" },
+      selects: { "s52-i-u": "0.001" },
+      click: "btn-s52",
+      desc: "Prob. 3.a — Logger / RTU a 4 mA. RT = 60+1200+2740 = 4.00 kΩ.\nE = I RT = 16.0 V (rail auxiliar de 24 V con margen, o dos celdas LFP en serie no bastan: aquí 16 V)."
+    },
+    p3b: {
+      series: { prefix: "s52", rows: [
+        { name: "1.2 Ω", r: "1.2" }, { name: "8.2 Ω", r: "8.2" }, { name: "4.7 Ω", r: "4.7" }, { name: "2.7 Ω", r: "2.7" }
+      ] },
+      fields: { "s52-e": "", "s52-i": "250", "s52-rt": "" },
+      selects: { "s52-i-u": "0.001" },
+      click: "btn-s52",
+      desc: "Prob. 3.b — 250 mA en un shunt / dump pequeño. RT = 16.8 Ω. E = 4.20 V (una celda LFP a 3.2 V no llega; un módulo de 6 V de riego sí)."
+    },
+    p4a: {
+      series: { prefix: "s52", rows: [
+        { name: "5 Ω", r: "5" }, { name: "2 Ω", r: "2", v: "12" }, { name: "R", r: "" }
+      ] },
+      fields: { "s52-e": "", "s52-i": "", "s52-rt": "16" },
+      click: "btn-s52",
+      desc: "Prob. 4.a — 12 V en 2 Ω (caída de un ramal medido) y RT = 16 Ω.\nI = 12/2 = 6.00 A. R = 16−7 = 9.00 Ω. E = 96.0 V. V5 = 30 V, VR = 54 V."
+    },
+    p4b: {
+      series: { prefix: "s52", rows: [
+        { name: "3.3 kΩ", r: "3.3", ru: "1e3" }, { name: "R", r: "", v: "9" },
+        { name: "2.2 kΩ", r: "2.2", ru: "1e3", p: "0.0792" }
+      ] },
+      fields: { "s52-e": "", "s52-i": "", "s52-rt": "" },
+      click: "btn-s52",
+      desc: "Prob. 4.b — 79.2 mW en 2.2 kΩ (driver / divisor) y 9 V en R.\nI = √(0.0792/2200) = 6.00 mA. R = 9/0.006 = 1.50 kΩ.\nRT = 7.00 kΩ. E = 42.0 V. V3.3 = 19.8 V, V2.2 = 13.2 V."
+    }
+  },
+  "5-3": {
+    p5a: {
+      clearSources: true,
+      fields: {
+        "s53-en1": "rack 8 V", "s53-e1": "8", "s53-en2": "rack 16 V", "s53-e2": "16",
+        "s53-en3": "rack 4 V", "s53-e3": "4", "s53-en4": "E4", "s53-e4": "",
+        "s53-rn1": "4.7 Ω", "s53-r1": "4.7", "s53-v1": "", "s53-p1": "",
+        "s53-rn2": "5.6 Ω", "s53-r2": "5.6", "s53-v2": "", "s53-p2": "",
+        "s53-rn3": "R3", "s53-r3": "", "s53-v3": "", "s53-p3": "",
+        "s53-rn4": "R4", "s53-r4": "", "s53-v4": "", "s53-p4": "",
+        "s53-i": ""
+      },
+      selects: { "s53-pol1": "1", "s53-pol2": "-1", "s53-pol3": "-1", "s53-pol4": "1" },
+      click: "btn-s53",
+      desc: "Prob. 5.a — Tres racks / módulos 8 V (a favor horario), 16 V y 4 V (en contra).\nEneto = 8−16−4 = −12 V. RT = 10.3 Ω.\nI = 1.165 A antihoraria. Equivalente: 12 V con I saliendo del + hacia las R por el camino antihorario."
+    },
+    p5b: {
+      clearSources: true,
+      fields: {
+        "s53-en1": "4 V", "s53-e1": "4", "s53-en2": "18 V", "s53-e2": "18",
+        "s53-en3": "10 V", "s53-e3": "10", "s53-en4": "E4", "s53-e4": "",
+        "s53-rn1": "4.7 Ω", "s53-r1": "4.7", "s53-rn2": "1.2 Ω", "s53-r2": "1.2",
+        "s53-rn3": "5.6 Ω", "s53-r3": "5.6", "s53-rn4": "R4", "s53-r4": "",
+        "s53-v1": "", "s53-p1": "", "s53-v2": "", "s53-p2": "", "s53-v3": "", "s53-p3": "",
+        "s53-v4": "", "s53-p4": "", "s53-i": ""
+      },
+      selects: { "s53-pol1": "1", "s53-pol2": "-1", "s53-pol3": "-1" },
+      click: "btn-s53",
+      desc: "Prob. 5.b — 4 V a favor horario; 18 V y 10 V en contra (string mixto / auxiliar).\nRT = 4.7+1.2+5.6 = 11.5 Ω. Eneto = 4−18−10 = −24 V.\nI = 2.087 A antihoraria."
+    },
+    p6a: {
+      clearSources: true,
+      fields: {
+        "s53-en1": "E desconocida", "s53-e1": "", "s53-en2": "20 V", "s53-e2": "20",
+        "s53-en3": "E3", "s53-e3": "", "s53-en4": "E4", "s53-e4": "",
+        "s53-rn1": "5 kΩ", "s53-r1": "5", "s53-ru1": "1e3",
+        "s53-rn2": "R (100 mW)", "s53-r2": "", "s53-p2": "0.1",
+        "s53-rn3": "R3", "s53-r3": "", "s53-rn4": "R4", "s53-r4": "",
+        "s53-i": "5", "s53-v1": "", "s53-p1": "", "s53-v2": "", "s53-v3": "", "s53-p3": "",
+        "s53-v4": "", "s53-p4": ""
+      },
+      selects: { "s53-pol1": "1", "s53-pol2": "1", "s53-iu": "0.001", "s53-ru1": "1e3" },
+      click: "btn-s53",
+      desc: "Prob. 6.a — I = 5 mA, P = 100 mW en R, 5 kΩ y fuente de 20 V (ambas a favor).\nR = P/I² = 4.00 kΩ. RT = 9.00 kΩ. Eneto = 45 V = E+20 → E = 25.0 V.\nI horaria (sale del + de E hacia 5 kΩ)."
+    },
+    p6b: {
+      clearSources: true,
+      fields: {
+        "s53-en1": "6 V", "s53-e1": "6", "s53-en2": "8 V", "s53-e2": "8",
+        "s53-en3": "E desconocida", "s53-e3": "", "s53-en4": "E4", "s53-e4": "",
+        "s53-rn1": "2 kΩ", "s53-r1": "2", "s53-v1": "16",
+        "s53-rn2": "R", "s53-r2": "", "s53-v2": "12",
+        "s53-rn3": "R3", "s53-r3": "", "s53-rn4": "R4", "s53-r4": "",
+        "s53-i": "", "s53-p1": "", "s53-p2": "", "s53-v3": "", "s53-p3": "", "s53-v4": "", "s53-p4": ""
+      },
+      selects: { "s53-pol1": "-1", "s53-pol2": "1", "s53-pol3": "1", "s53-ru1": "1e3" },
+      click: "btn-s53",
+      desc: "Prob. 6.b — 16 V en 2 kΩ → I = 8.00 mA. 12 V en R → R = 1.50 kΩ.\nRT = 3.50 kΩ. Eneto = 28 V. Con 6 V en contra y 8 V a favor: E = 26.0 V a favor.\nSi el dibujo tenía E al revés, se invierte la polaridad."
+    }
+  },
+  "5-4": {
+    p7a: {
+      fields: { "s54k-v1": "10", "s54k-v2": "-2", "s54k-v3": "-3", "s54k-v4": "", "s54k-v5": "", "s54k-v6": "" },
+      click: "btn-s54k",
+      desc: "Prob. 7.a — Cajas 10 V, 2 V y 3 V. Camino b→a: +10 −2 −3.\nVab = 5.00 V, a positivo respecto de b. Es el KVL de tres celdas / tres pines de un driver."
+    },
+    p7b: {
+      fields: { "s54k-v1": "60", "s54k-v2": "20", "s54k-v3": "-10", "s54k-v4": "", "s54k-v5": "", "s54k-v6": "" },
+      click: "btn-s54k",
+      desc: "Prob. 7.b — Circuito abierto (VR = 0). 60 V + 20 V − 10 V.\nVab = 70.0 V, a positivo. El abierto es un seccionador: no hay I, las fuentes sí fijan Vab."
+    },
+    p8a: {
+      fields: { "s54k-v1": "10", "s54k-v2": "-6", "s54k-v3": "", "s54k-v4": "", "s54k-v5": "", "s54k-v6": "" },
+      click: "btn-s54k",
+      desc: "Prob. 8.a — No es serie pura: KVL en el lazo exterior 10 V − 6 V − V1 = 0 → V1 = 4.00 V.\nLa diagonal ve los 10 V: V2 = 10.0 V. Puente de medida / bypass de un módulo."
+    },
+    p8b: {
+      fields: { "s54k-v1": "10", "s54k-v2": "-6", "s54k-v3": "", "s54k-v4": "", "s54k-v5": "", "s54k-v6": "" },
+      click: "btn-s54k",
+      desc: "Prob. 8.b — Lazo superior: 10 − V2 − 6 = 0 → V2 = 4.00 V (en 5.6 kΩ, I2 = 0.714 mA).\nR1 = 2.2 kΩ está a 24 V (la fuente): V1 = 24.0 V. Dos lazos, no un solo string."
+    },
+    p9: {
+      series: { prefix: "s54", rows: [
+        { name: "2.2 kΩ (V1)", r: "2.2", ru: "1e3" }, { name: "1.2 kΩ", r: "1.2", ru: "1e3" }, { name: "0.56 kΩ", r: "0.56", ru: "1e3" }
+      ] },
+      fields: { "s54-e": "13", "s54-i": "", "s54-rt": "" },
+      click: "btn-s54",
+      desc: "Prob. 9 — 27 V a favor, 9 V y 5 V en contra (string LFP + auxiliar).\nEneto = 13 V. RT = 3.96 kΩ. I = 3.283 mA (horaria, sale del + de 27 V hacia 2.2 kΩ).\nV1 = 7.22 V."
+    },
+    p10: {
+      series: { prefix: "s54", rows: [
+        { name: "3 kΩ", r: "3", ru: "1e3" }, { name: "1 kΩ", r: "1", ru: "1e3" }, { name: "2 kΩ", r: "2", ru: "1e3" }
+      ] },
+      fields: { "s54-e": "120", "s54-i": "", "s54-rt": "" },
+      checks: { "s54-watt": true },
+      click: "btn-s54",
+      desc: "Prob. 10 — Divisor / lastre 120 V: 3+1+2 kΩ. RT = 6 kΩ, I = 20.0 mA.\nV = 60, 20, 40 V. KVL: 120 = 120.\nP = 1.20, 0.40, 0.80 W → wattaje: 2 W, ½ W y 1 W. Pentregada = 2.40 W = ΣP."
+    },
+    p11: {
+      series: { prefix: "s54", rows: [
+        { name: "22 Ω", r: "22" }, { name: "10 Ω", r: "10" }, { name: "5.6 Ω", r: "5.6" }, { name: "33 Ω", r: "33" }
+      ] },
+      fields: { "s54-e": "6", "s54-i": "", "s54-rt": "" },
+      checks: { "s54-watt": true },
+      click: "btn-s54",
+      desc: "Prob. 11 — Celda LFP 6 V y dump 22+10+5.6+33 Ω. RT = 70.6 Ω, I = 85.0 mA.\nV = 1.87, 0.850, 0.476, 2.80 V. P < 0.25 W: todas caben en ½ W.\nΣP = E I ≈ 0.510 W."
+    },
+    p12a: {
+      series: { prefix: "s54", rows: [
+        { name: "20 Ω", r: "20" }, { name: "R", r: "", v: "80" }
+      ] },
+      fields: { "s54-e": "120", "s54-i": "", "s54-rt": "" },
+      click: "btn-s54",
+      desc: "Prob. 12.a — 120 V, 80 V en R (caída medida). V20 = 40 V → I = 2.00 A, R = 40.0 Ω.\nP20 = 80 W, PR = 160 W (dump, no ½ W)."
+    },
+    p12b: {
+      series: { prefix: "s54", rows: [
+        { name: "2.2 Ω", r: "2.2", v: "8" }, { name: "4.7 Ω (V1)", r: "4.7" }, { name: "6.8 Ω (V2)", r: "6.8" }
+      ] },
+      fields: { "s54-e": "", "s54-i": "", "s54-rt": "" },
+      click: "btn-s54",
+      desc: "Prob. 12.b — 8 V en 2.2 Ω → I = 3.64 A. V1 = 17.1 V, V2 = 24.7 V.\nE = 49.8 V (un string de ~16 celdas LFP, o un módulo de 50 V)."
+    },
+    p12c: {
+      series: { prefix: "s54", rows: [
+        { name: "2 Ω", r: "2" }, { name: "1 Ω", r: "1" }, { name: "R", r: "", p: "21" }
+      ] },
+      fields: { "s54-e": "", "s54-i": "1", "s54-rt": "" },
+      click: "btn-s54",
+      desc: "Prob. 12.c — I = 1 A, P = 21 W en R. R = 21.0 Ω, V3 = 21 V, V1 = 2 V, V2 = 1 V.\nE = 24.0 V (auxiliar de contenedor / dos bancos de 12 V)."
+    },
+    p12d: {
+      series: { prefix: "s54", rows: [
+        { name: "R1", r: "" }, { name: "R2 (8 W)", r: "", p: "8" }, { name: "1 Ω (4 W)", r: "1", p: "4" }
+      ] },
+      fields: { "s54-e": "", "s54-i": "", "s54-rt": "16" },
+      click: "btn-s54",
+      desc: "Prob. 12.d — RT = 16 Ω, 4 W en 1 Ω → I = 2.00 A, E = 32.0 V.\n8 W en R2 → R2 = 2.00 Ω. R1 = 13.0 Ω, P1 = 52 W."
+    },
+    p13: {
+      series: { prefix: "s54", rows: [
+        { name: "LED 1", r: "28.125" }, { name: "LED 2", r: "28.125" }, { name: "LED 3", r: "28.125" },
+        { name: "LED 4", r: "28.125" }, { name: "LED 5", r: "28.125" }, { name: "LED 6", r: "28.125" },
+        { name: "LED 7", r: "28.125" }, { name: "LED 8", r: "28.125" }
+      ] },
+      fields: { "s54-e": "120", "s54-i": "", "s54-rt": "" },
+      checks: { "s54-watt": true },
+      click: "btn-s54",
+      desc: "Prob. 13 — Ocho luminarias LED de alumbrado auxiliar de planta en serie a 120 V, 28⅛ Ω cada una (el «árbol» del libro, en 2026).\na) RT = 225 Ω, I = 0.533 A.\nb) P = 8.00 W por foco.\nc) V = 15.0 V por foco.\nd) Si un filamento abre, se apagan las ocho: una sola trayectoria. En un substring FV el diodo bypass evita eso a nivel de celda; a nivel de string, un gPV abierto apaga el string entero."
+    },
+    p14: {
+      series: { prefix: "s54", rows: [
+        { name: "R1 2 Ω", r: "2" }, { name: "R2 4 Ω", r: "4" }, { name: "R dump 24 W", r: "", p: "24" }
+      ] },
+      fields: { "s54-e": "24", "s54-i": "", "s54-rt": "" },
+      click: "btn-s54",
+      desc: "Prob. 14 — 24 V (auxiliar), 2 Ω + 4 Ω + R con P = 24 W.\nP = E² R / (6+R)² → R = 6.00 Ω (raíz doble). I = 2.00 A. P1 = 8 W, P2 = 16 W, total 48 W = E I."
+    }
+  },
+  "5-6": {
+    p15a: {
+      clearDivider: true,
+      fields: { "s56-e": "100", "s56-from": "2", "s56-to": "2", "s56-vab": "",
+        "s56-n1": "25 Ω", "s56-r1": "25", "s56-n2": "50 Ω", "s56-r2": "50",
+        "s56-r3": "", "s56-r4": "", "s56-r5": "", "s56-r6": "" },
+      click: "btn-s56",
+      desc: "Prob. 15.a — 100 V, Vab en 50 Ω. Vab = 100·50/75 = 66.7 V, a positivo (arriba del 50 Ω)."
+    },
+    p15b: {
+      clearDivider: true,
+      fields: { "s56-e": "80", "s56-from": "3", "s56-to": "3", "s56-vab": "",
+        "s56-n1": "20 Ω", "s56-r1": "20", "s56-n2": "10 Ω", "s56-r2": "10",
+        "s56-n3": "4 Ω", "s56-r3": "4", "s56-n4": "6 Ω", "s56-r4": "6",
+        "s56-r5": "", "s56-r6": "" },
+      click: "btn-s56",
+      desc: "Prob. 15.b — 80 V, Vab en 4 Ω. RT = 40 Ω. Vab = 8.00 V, a positivo (el corriente entra por a)."
+    },
+    p15c: {
+      clearDivider: true,
+      fields: { "s56-e": "40", "s56-from": "3", "s56-to": "4", "s56-vab": "",
+        "s56-n1": "4 kΩ", "s56-r1": "4", "s56-n2": "1 kΩ", "s56-r2": "1",
+        "s56-n3": "2 kΩ", "s56-r3": "2", "s56-n4": "3 kΩ", "s56-r4": "3",
+        "s56-r5": "", "s56-r6": "" },
+      selects: { "s56-ru1": "1e3", "s56-ru2": "1e3", "s56-ru3": "1e3", "s56-ru4": "1e3" },
+      click: "btn-s56",
+      desc: "Prob. 15.c — 40 V, Vab en 2 kΩ+3 kΩ. RT = 10 kΩ. Vab = 20.0 V, a positivo."
+    },
+    p15d: {
+      clearDivider: true,
+      fields: { "s56-e": "0.36", "s56-from": "2", "s56-to": "4", "s56-vab": "",
+        "s56-n1": "2.5 Ω", "s56-r1": "2.5", "s56-n2": "1.5 Ω", "s56-r2": "1.5",
+        "s56-n3": "0.6 Ω", "s56-r3": "0.6", "s56-n4": "0.9 Ω", "s56-r4": "0.9",
+        "s56-n5": "0.5 Ω", "s56-r5": "0.5", "s56-r6": "" },
+      click: "btn-s56",
+      desc: "Prob. 15.d — Shunt / sensor 0.36 V. RT = 6.00 Ω, I = 60.0 mA.\nVab entre el nodo tras 2.5 Ω y el nodo tras 0.9 Ω (tramo 1.5+0.6+0.9): 0.180 V, a positivo."
+    },
+    p16a: {
+      clearDivider: true,
+      fields: { "s56-e": "20", "s56-from": "3", "s56-to": "3", "s56-vab": "4",
+        "s56-n1": "2 kΩ", "s56-r1": "2", "s56-n2": "6 kΩ", "s56-r2": "6",
+        "s56-n3": "R", "s56-r3": "", "s56-r4": "", "s56-r5": "", "s56-r6": "" },
+      selects: { "s56-ru1": "1e3", "s56-ru2": "1e3" },
+      click: "btn-s56",
+      desc: "Prob. 16.a — 4 V en R, E = 20 V, 2 kΩ+6 kΩ. R = 2.00 kΩ."
+    },
+    p16b: {
+      clearDivider: true,
+      fields: { "s56-e": "200", "s56-from": "2", "s56-to": "3", "s56-vab": "140",
+        "s56-n1": "3 Ω", "s56-r1": "3", "s56-n2": "6 Ω", "s56-r2": "6",
+        "s56-n3": "R", "s56-r3": "", "s56-r4": "", "s56-r5": "", "s56-r6": "" },
+      click: "btn-s56",
+      desc: "Prob. 16.b — 140 V en el tramo 6 Ω+R, E = 200 V, 3 Ω delante.\nR = 1.00 Ω. I = 20.0 A (bus de baja tensión / dump)."
+    },
+    p17: {
+      fields: { "s56d-e": "40", "s56d-i": "0.4", "s56d-taps": "40, 16, 4, 0" },
+      selects: { "s56d-i-u": "1" },
+      click: "btn-s56d",
+      desc: "Prob. 17 — Cadena a tierra 40 V. R2 = 3 R1 y V1 = 4 V en 10 Ω → I = 0.4 A.\na) V2 = 12 V. b) V3 = 24 V. c) R3 = 60 Ω por inspección (V3 = 6 V1). e) R3 = V3/I = 60 Ω, coincide."
+    },
+    p18: {
+      fields: { "s56d-e": "20", "s56d-i": "1", "s56d-taps": "12, 4, -4, -8" },
+      selects: { "s56d-i-u": "1" },
+      click: "btn-s56d",
+      desc: "Prob. 18 — Rail auxiliar +12 / +4 / −4 / −8 V (BESS / inversor).\nR2 = 8 Ω lleva 8 V → I = 1.00 A. R1 = 8.00 Ω, R3 = 4.00 Ω."
+    },
+    p19: {
+      fields: { "s56d-e": "12", "s56d-i": "50", "s56d-taps": "12, 8, 0" },
+      selects: { "s56d-i-u": "0.001" },
+      click: "btn-s56d",
+      desc: "Prob. 19 — Faro LED / baliza 8 V, 50 mA en el rail de 12 V de un híbrido, EV o contenedor BESS.\nR_drop = 80 Ω, R_faro = 160 Ω. P_drop = 0.200 W → mínimo ¼ W (con margen, ½ W)."
+    },
+    p20: {
+      fields: { "s56d-e": "100", "s56d-i": "16", "s56d-taps": "80, 48, 12, 0, -20" },
+      selects: { "s56d-i-u": "0.001" },
+      click: "btn-s56d",
+      desc: "Prob. 20 — E = 100 V, I = 16 mA, taps +48 / +12 / 0 / −20 (el top es +80 V).\nR1 = 2.00 kΩ, R2 = 2.25 kΩ, R3 = 750 Ω, R4 = 1.25 kΩ."
+    },
+    p21: {
+      fields: { "s56d-e": "72", "s56d-i": "4", "s56d-taps": "72, 60, 0" },
+      selects: { "s56d-i-u": "0.001" },
+      click: "btn-s56d",
+      desc: "Prob. 21 — VR1 = (1/5) VR2, 72 V, I = 4 mA. VR2 = 60 V, VR1 = 12 V.\nR1 = 3.00 kΩ, R2 = 15.0 kΩ."
+    },
+    p22: {
+      clearDivider: true,
+      fields: { "s56-e": "60", "s56-from": "1", "s56-to": "1", "s56-vab": "",
+        "s56-n1": "R1=2 R3", "s56-r1": "2", "s56-n2": "R2=7 R3", "s56-r2": "7",
+        "s56-n3": "R3", "s56-r3": "1", "s56-r4": "", "s56-r5": "", "s56-r6": "" },
+      click: "btn-s56",
+      desc: "Prob. 22 — R1 = 2 R3, R2 = 7 R3, E = 60 V a tierra. Las razones bastan: RT = 10 R3.\nV1 = 12 V, V2 = 42 V, V3 = 6 V (independiente de I)."
+    },
+    p23a: {
+      fields: { "s56d-e": "64", "s56d-i": "10", "s56d-taps": "64, 60, 48, 0" },
+      selects: { "s56d-i-u": "0.001" },
+      click: "btn-s56d",
+      desc: "Prob. 23.a — VR2 = 3 VR1, VR3 = 4 VR2, E = 64 V, I = 10 mA.\nVR1 = 4 V, VR2 = 12 V, VR3 = 48 V. R1 = 400 Ω, R2 = 1.20 kΩ, R3 = 4.80 kΩ."
+    },
+    p23b: {
+      fields: { "s56d-e": "64", "s56d-i": "10", "s56d-taps": "64, 60, 48, 0" },
+      selects: { "s56d-i-u": "1e-6" },
+      click: "btn-s56d",
+      desc: "Prob. 23.b — Misma razón de voltajes, I = 10 µA (consumo de un divisor de medida 2026).\nR1 = 400 kΩ, R2 = 1.20 MΩ, R3 = 4.80 MΩ: mil veces las del 23.a. Las tensiones no cambian."
+    }
+  },
+  "5-7": {
+    p24a: {
+      fields: { "s57-src": "12, 8", "s57-gnd": "3", "s57-va": "1", "s57-vb": "2" },
+      click: "btn-s57",
+      desc: "Prob. 24.a — 12 V con + hacia Va, 8 V de Vb a tierra (+ en Vb).\nTierra = nodo 3. Va = 20.0 V, Vb = 8.00 V, Vab = 12.0 V."
+    },
+    p24b: {
+      fields: { "s57-src": "20, 6, -4", "s57-gnd": "3" },
+      click: "btn-s57",
+      desc: "Prob. 24.b — 20 V y 6 V a la izquierda de tierra (+ hacia Va); 4 V a la derecha (+ hacia Vb → fuente −4 V izq−der).\nVa = 26.0 V, Vb = 4.00 V, Vab = 22.0 V."
+    },
+    p24c: {
+      fields: { "s57-src": "21, 8", "s57-gnd": "3", "s57-va": "1", "s57-vb": "2" },
+      click: "btn-s57",
+      desc: "Prob. 24.c — 21 V con + hacia Va, 8 V de Vb a tierra. Va = 29.0 V, Vb = 8.00 V, Vab = 21.0 V.\nEl +10 V y el 3 V a la izquierda de Va fijan otro terminal (p. ej. 32 V) que no es Vb."
+    },
+    p25a: {
+      fields: { "s57-src": "40, 20", "s57-gnd": "3" },
+      click: "btn-s57",
+      desc: "Prob. 25.a — Rails 120 V y 60 V con 6 Ω y 3 Ω en serie (Eneto = 60 V).\nI = 60/9 = 6.67 A del rail 120 V hacia el 60 V. V en 3 Ω = 20.0 V (+ en el nudo)."
+    },
+    p25b: {
+      fields: { "s57-src": "10, 20, 30", "s57-gnd": "1" },
+      click: "btn-s57",
+      desc: "Prob. 25.b — De −10 V a −70 V: 10+20+30 Ω. I = 1.00 A hacia −70 V.\nEl nodo V (tras 10 Ω) está a −20.0 V."
+    },
+    p26a: {
+      fields: { "s57-src": "16, -8", "s57-gnd": "2" },
+      click: "btn-s57",
+      desc: "Prob. 26.a — 16 V a tierra, 8 V en contra, 10 Ω + 20 Ω.\nI = 8/30 = 0.267 A. Va (tras 10 Ω) = 13.3 V. V1 (20 Ω) = 5.33 V."
+    },
+    p26b: {
+      fields: { "s57-src": "12, 10, 8", "s57-gnd": "1" },
+      click: "btn-s57",
+      desc: "Prob. 26.b — De +12 V a −8 V, 10 V a favor en el centro, 2.2 kΩ + 3.3 kΩ.\nEneto = 30 V, I = 5.45 mA. V1 = 12.0 V, Va = 10.0 V."
+    },
+    p27: {
+      fields: { "s57-src": "20, 14.889, 22.333, -47, 29.778", "s57-gnd": "6" },
+      click: "btn-s57",
+      desc: "Prob. 27 — 20 V en a a tierra, 2 kΩ, 3 kΩ, 47 V (+ en d), 4 kΩ a tierra.\nI = (20+47)/9 kΩ = 7.44 mA (a→e).\nVa = 20 V, Vb = 5.11 V, Vc = −17.2 V, Vd = 29.8 V, Ve = 0.\nVab = 14.9 V, Vdc = 47 V, Vcb = −22.3 V, Vac = 37.2 V, Vdb = 24.7 V."
+    },
+    p28: {
+      fields: { "s57-src": "44, 10.667, 21.333, 32", "s57-gnd": "1" },
+      click: "btn-s57",
+      desc: "Prob. 28 — 44 V sobre tierra, 20 V bajo tierra (Vd = −20 V), cadena 2+4+6 kΩ.\nI = 64 V / 12 kΩ = 5.33 mA (a→d).\nVa = 44 V, Vb = 33.3 V, Vc = 12.0 V, Vd = −20 V.\nVab = 10.7 V, Vcb = −21.3 V, Vcd = 32 V, Vad = 64 V, Vca = −32 V."
+    },
+    p29: {
+      fields: {
+        "s57ic-v0": "0", "s57ic-v1": "20", "s57ic-v2": "-2", "s57ic-v3": "-8",
+        "s57ic-v4": "10", "s57ic-v5": "-2", "s57ic-v6": "4", "s57ic-v7": "4",
+        "s57ic-pairs": "10,23,30,67,56", "s57ic-ir": "2,3,4"
+      },
+      click: "btn-s57ic",
+      desc: "Prob. 29 — Driver / ASIC de planta. V0 = 0, V4 = 10 V (6 mA·2 kΩ sobre V5 = −2 V), V7 = V6 = 4 V.\nV10 = 20 V, V23 = 6 V, V30 = −8 V, V67 = 0, V56 = −6 V.\nI (4 Ω entre 2 y 3) = 1.50 A, del pin 2 (−2 V) al 3 (−8 V)."
+    },
+    p30: {
+      fields: {
+        "s57ic-v0": "0", "s57ic-v1": "20", "s57ic-v2": "8", "s57ic-v3": "0",
+        "s57ic-v4": "", "s57ic-v5": "", "s57ic-v6": "", "s57ic-v7": "",
+        "s57ic-pairs": "03,23,12", "s57ic-ir": "2,0,4000"
+      },
+      click: "btn-s57ic",
+      desc: "Prob. 30 — CI con E = 20 V. 2 mA salen del pin 2 por 3 kΩ+1 kΩ → V2 = 8.00 V. Pin 3 a tierra, V3 = 0.\nV0 = 0, V03 = 0, V23 = 8 V, V12 = 12 V. Ii = 5 mA (retorno de la fuente de 20 V)."
+    }
+  },
+  "5-8": {
+    p31: {
+      fields: { "s58-e": "60", "s58-vl": "", "s58-i": "2", "s58-rl": "28", "s58-rint": "" },
+      click: "btn-s58",
+      desc: "Prob. 31 — Banco / rack a 60 V en vacío, 2 A a 28 Ω (dump o carga de ensayo).\nVL = 56.0 V. Rint = (60−56)/2 = 2.00 Ω."
+    },
+    p32: {
+      fields: { "s58-e": "12", "s58-vl": "", "s58-i": "", "s58-rl": "3.3", "s58-rint": "0.05" },
+      click: "btn-s58",
+      desc: "Prob. 32 — Auxiliar 12 V, Rint = 0.05 Ω, RL = 3.3 Ω (faro / contactor).\nI = 3.58 A, VL = 11.82 V, Pint = 0.641 W."
+    },
+    p33: {
+      fields: { "s58-e": "6", "s58-vl": "", "s58-i": "10", "s58-rl": "0.5", "s58-rint": "" },
+      selects: { "s58-i-u": "0.001", "s58-rl-u": "1e3" },
+      click: "btn-s58",
+      desc: "Prob. 33 — Celda / banco 6 V en vacío, 10 mA a 0.5 kΩ (logger).\nVL = 5.00 V. Rint = 100 Ω."
+    },
+    p34: {
+      fields: { "s58-e": "60", "s58-vl": "", "s58-i": "2", "s58-rl": "28", "s58-rint": "" },
+      click: "btn-s58",
+      desc: "Prob. 34 — %VR del 31: (60−56)/56 × 100 % = 7.14 %. Aceptable en auxiliar; alto para un rack LFP 2026 (se busca < 2 %)."
+    },
+    p35: {
+      fields: { "s58-e": "12", "s58-vl": "", "s58-i": "", "s58-rl": "3.3", "s58-rint": "0.05" },
+      click: "btn-s58",
+      desc: "Prob. 35 — %VR de la fig. 5.100: (12−11.82)/11.82 × 100 % = 1.52 %. Rango de un bus auxiliar bien dimensionado."
+    }
+  },
+  "5-12": {
+    p36: {
+      desc: "Prob. 36 — Mismo lazo que 1.a (el «PSpice» del libro es el solucionador 5.2).\nI = 3.00 A. V2 = 6 V, V6 = 18 V, V12 = 36 V. Abre Sec 5.2 / Prob 1.a."
+    },
+    p37: {
+      desc: "Prob. 37 — Vab del divisor 5.85.d = 0.180 V (Sec 5.6 / Prob 15.d). El esquema del libro se sustituye por el divisor del navegador."
+    },
+    p38: {
+      desc: "Prob. 38 — «Programa» que suma N resistencias en serie: es el solucionador 5.2 (hasta 8 elementos, cortos y abiertos incluidos)."
+    },
+    p39: {
+      desc: "Prob. 39 — «Programa» de la regla del divisor: solucionador 5.6, una fuente y las R que quieras, Vx en un tramo."
+    },
+    p40: {
+      fields: { "s512-e": "12", "s512-rs": "8", "s512-rmin": "1", "s512-rmax": "20", "s512-step": "1" },
+      click: "btn-s512",
+      desc: "Prob. 40 — E = 12 V, Rs = 8 Ω, RL de 1 a 20 Ω (dump / lastre).\nPmax cuando RL = Rs = 8 Ω: I = 0.750 A, Pmax = 4.50 W.\nNo es el MPPT de un módulo 2026 (ese sigue el codo de la I–V); sí es máxima transferencia de un Thevenin lineal."
+    }
+  }
+});

@@ -580,6 +580,8 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
   height: auto;
   display: block;
   margin: 0.4rem 0 0.2rem;
+  color: var(--text-dark);
+  overflow: visible;
 }
 
 .data-table-wrap {
@@ -829,4 +831,136 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
   .load-grid {
     grid-template-columns: 1fr 1fr;
   }
+}
+
+/* Chapter 5.0 — series circuits, KVL, voltage divider */
+.series-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.84rem;
+}
+
+.series-table th,
+.series-table td {
+  padding: 0.35rem 0.4rem;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.series-table th {
+  background: rgba(0, 0, 0, 0.04);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+[data-theme="dark"] .series-table th {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.series-table input[type="text"],
+.series-table select {
+  width: 100%;
+  min-width: 0;
+  padding: 0.4rem 0.5rem;
+  font-size: 0.84rem;
+}
+
+.series-table col.col-name { width: 22%; }
+.series-table col.col-val { width: 16%; }
+.series-table col.col-unit { width: 12%; }
+.series-table col.col-state { width: 18%; }
+.series-table col.col-opt { width: 16%; }
+
+.tap-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
+  margin: 0.6rem 0 0.2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.tap-seg {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr 4.5rem;
+  align-items: center;
+  min-height: 2.4rem;
+}
+
+.tap-node {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr 4.5rem;
+  align-items: center;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.tap-bar {
+  height: 2.2rem;
+  background: linear-gradient(90deg, rgba(36, 113, 163, 0.18), rgba(30, 132, 73, 0.22));
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.tap-gnd {
+  height: 0;
+  border-top: 2px solid currentColor;
+  position: relative;
+  margin: 0.35rem 4.5rem;
+}
+
+.ic-pin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.55rem 0.85rem;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+}
+
+.ic-chip {
+  background: #2c3e50;
+  color: #ecf0f1;
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.55;
+}
+
+[data-theme="dark"] .ic-chip {
+  background: #1c2833;
+}
+
+.watt-pill {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  margin-right: 0.25rem;
+}
+
+.watt-ok {
+  background: rgba(30, 132, 73, 0.16);
+  color: #145a32;
+}
+
+.watt-ng {
+  background: rgba(192, 57, 43, 0.16);
+  color: #7b241c;
+}
+
+[data-theme="dark"] .watt-ok { color: #d5f5e3; }
+[data-theme="dark"] .watt-ng { color: #f5b7b1; }
+
+.rl-max {
+  background: rgba(30, 132, 73, 0.16);
+  font-weight: 700;
 }

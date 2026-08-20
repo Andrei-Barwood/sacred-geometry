@@ -3545,6 +3545,1474 @@
           </section>
         </div>
       </details>
+
+      <details class="chapter-1-fold" id="capitulo-5">
+        <summary class="chapter-1-summary" aria-label="Capítulo 5.0">
+          <span class="chapter-1-title">5.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Circuitos en serie: una sola trayectoria para la carga.
+            \(R_T = R_1 + R_2 + \cdots + R_N\),
+            \(I = E / R_T\) en todos los elementos,
+            \(V_x = I R_x = E \, R_x / R_T\)
+            y la ley de voltaje de Kirchhoff
+            \(\sum V_{\mathrm{elevaciones}} = \sum V_{\mathrm{caídas}}\)
+            son las cuentas con las que se dimensiona un string fotovoltaico,
+            un rack de BESS, un divisor del bus de
+            \(1500\,V_{\mathrm{cc}}\) y el alumbrado auxiliar de planta.
+            En 2026 esas ecuaciones no cambiaron; cambió el aparato.
+            Una celda LFP a \(3{,}2\,\mathrm{V}\), un módulo TOPCon a
+            \(V_{\mathrm{oc}}\approx 50\,\mathrm{V}\) y un rack de
+            \(1500\,V_{\mathrm{cc}}\) son la misma serie.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(R_T\), \(V_x = E R_x / R_T\) y
+              \(\%\mathrm{VR} = (V_{\mathrm{nl}}-V_{\mathrm{fl}})/V_{\mathrm{fl}}\)
+              sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-5-2">Sec 5.2</button>
+            <button class="tab-btn" data-target="sec-5-3">Sec 5.3</button>
+            <button class="tab-btn" data-target="sec-5-4">Sec 5.4</button>
+            <button class="tab-btn" data-target="sec-5-6">Sec 5.6</button>
+            <button class="tab-btn" data-target="sec-5-7">Sec 5.7</button>
+            <button class="tab-btn" data-target="sec-5-8">Sec 5.8–5.9</button>
+            <button class="tab-btn" data-target="sec-5-12">Sec 5.12</button>
+          </div>
+
+          <div class="tab-content active" id="sec-5-2">
+            <h2>Sección 5.2: Circuitos en serie</h2>
+            <p class="chapter-discourse">
+              Los elementos en serie comparten un único punto común y cada
+              terminal no se conecta a un tercer portador de corriente.
+              La corriente es la misma; las caídas se suman.
+              Un string de módulos, un ramal de calefacción de un dump load
+              eólico, un divisor de un piranómetro y tres resistencias de
+              precarga de un BESS se analizan igual.
+              Un cortocircuito anula al elemento (como el diodo bypass de una
+              celda sombreada); un abierto lo saca del lazo (como un fusible
+              gPV abierto: el string entero se apaga).
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-5-2">Selecciona un problema:</label>
+                <select id="preset-5-2" class="book-preset-select" data-section="5-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1a">Prob 1.a: Tres dump loads 2, 6, 12 Ω a 60 V</option>
+                  <option value="p1b">Prob 1.b: Divisor de sensor 10 V, kΩ/MΩ</option>
+                  <option value="p1c">Prob 1.c: Bypass / cortos en un string 35 V</option>
+                  <option value="p1d">Prob 1.d: Ramal abierto 120 V (2.2 kΩ fuera)</option>
+                  <option value="p2a">Prob 2.a: RT = 30 Ω, hallar R del ballast</option>
+                  <option value="p2b">Prob 2.b: RT = 60 kΩ, hallar R del divisor</option>
+                  <option value="p2c">Prob 2.c: Dos resistencias iguales R1 = R2</option>
+                  <option value="p2d">Prob 2.d: RT = 1.6 MΩ, bleeder ISO</option>
+                  <option value="p3a">Prob 3.a: I = 4 mA, hallar E del logger</option>
+                  <option value="p3b">Prob 3.b: I = 250 mA, shunt / dump</option>
+                  <option value="p4a">Prob 4.a: 12 V en 2 Ω, RT = 16 Ω</option>
+                  <option value="p4b">Prob 4.b: 79.2 mW en 2.2 kΩ y 9 V en R</option>
+                </select>
+              </div>
+              <div id="desc-preset-5-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 5.71 — Lazo serie, cortos y abiertos</h3>
+              <svg class="circuit-svg" id="svg-s52" viewBox="0 0 640 220" role="img"
+                aria-label="Fuente E y resistencias en serie, con posible corto o abierto">
+                <line x1="80" y1="50" x2="80" y2="170" stroke="currentColor" stroke-width="2"/>
+                <line x1="64" y1="72" x2="96" y2="72" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="70" y1="148" x2="90" y2="148" stroke="currentColor" stroke-width="2"/>
+                <text x="36" y="82" font-size="13" fill="#1e8449">+</text>
+                <text x="38" y="156" font-size="13" fill="#c0392b">−</text>
+                <text x="32" y="118" font-size="15" fill="currentColor">E</text>
+                <line x1="80" y1="50" x2="150" y2="50" stroke="currentColor" stroke-width="2"/>
+                <rect x="150" y="38" width="80" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="174" y="32" font-size="13" fill="currentColor">R1</text>
+                <line x1="230" y1="50" x2="280" y2="50" stroke="currentColor" stroke-width="2"/>
+                <rect x="280" y="38" width="80" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="304" y="32" font-size="13" fill="currentColor">R2</text>
+                <line x1="360" y1="50" x2="410" y2="50" stroke="currentColor" stroke-width="2"/>
+                <rect x="410" y="38" width="80" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="434" y="32" font-size="13" fill="currentColor">R3</text>
+                <line x1="490" y1="50" x2="560" y2="50" stroke="currentColor" stroke-width="2"/>
+                <polygon points="140,50 124,44 124,56" fill="#2471a3"/>
+                <text x="108" y="38" font-size="13" fill="#2471a3">I</text>
+                <line x1="560" y1="50" x2="560" y2="170" stroke="currentColor" stroke-width="2"/>
+                <line x1="560" y1="170" x2="80" y2="170" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <p class="caption-fig">Figura 5.71 — El lazo se redibuja al pulsar Calcular. Un corto (bypass) anula R; un abierto (fusible, conector MC4 desconectado) abre el string.</p>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador de lazo serie</h3>
+              <p class="hint-inline">
+                Deja vacíos los desconocidos. Un valor de \(R_T\) halla la R que falta.
+                Un \(V\) o una \(P\) en un elemento fija \(I\). Estado
+                <em>cortocircuito</em> = diodo bypass / jumper;
+                <em>abierto</em> = fusible o conector fuera del lazo.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s52-e">E:</label>
+                  <input type="text" id="s52-e" placeholder="Ej. 60" />
+                <select id="s52-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s52-i">I:</label>
+                  <input type="text" id="s52-i" placeholder="opcional" />
+                <select id="s52-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s52-rt">RT conocido:</label>
+                  <input type="text" id="s52-rt" placeholder="opcional" />
+                <select id="s52-rt-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                    <option value="0.001">mΩ</option>
+                </select>
+                </div>
+              </div>
+            <div class="data-table-wrap">
+              <table class="series-table">
+                <colgroup>
+                  <col class="col-name" />
+                  <col class="col-val" />
+                  <col class="col-unit" />
+                  <col class="col-state" />
+                  <col class="col-opt" />
+                  <col class="col-opt" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Elemento</th>
+                    <th>R</th>
+                    <th>Unidad</th>
+                    <th>Estado</th>
+                    <th>V conocido</th>
+                    <th>P conocida</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td><input type="text" id="s52-n1" value="R1" /></td>
+                  <td><input type="text" id="s52-r1" placeholder="—" /></td>
+                  <td>
+                    <select id="s52-ru1">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s52-st1">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s52-v1" placeholder="V" /></td>
+                  <td><input type="text" id="s52-p1" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s52-n2" value="R2" /></td>
+                  <td><input type="text" id="s52-r2" placeholder="—" /></td>
+                  <td>
+                    <select id="s52-ru2">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s52-st2">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s52-v2" placeholder="V" /></td>
+                  <td><input type="text" id="s52-p2" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s52-n3" value="R3" /></td>
+                  <td><input type="text" id="s52-r3" placeholder="—" /></td>
+                  <td>
+                    <select id="s52-ru3">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s52-st3">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s52-v3" placeholder="V" /></td>
+                  <td><input type="text" id="s52-p3" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s52-n4" value="R4" /></td>
+                  <td><input type="text" id="s52-r4" placeholder="—" /></td>
+                  <td>
+                    <select id="s52-ru4">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s52-st4">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s52-v4" placeholder="V" /></td>
+                  <td><input type="text" id="s52-p4" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s52-n5" value="R5" /></td>
+                  <td><input type="text" id="s52-r5" placeholder="—" /></td>
+                  <td>
+                    <select id="s52-ru5">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s52-st5">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s52-v5" placeholder="V" /></td>
+                  <td><input type="text" id="s52-p5" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s52-n6" value="R6" /></td>
+                  <td><input type="text" id="s52-r6" placeholder="—" /></td>
+                  <td>
+                    <select id="s52-ru6">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s52-st6">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s52-v6" placeholder="V" /></td>
+                  <td><input type="text" id="s52-p6" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s52-n7" value="R7" /></td>
+                  <td><input type="text" id="s52-r7" placeholder="—" /></td>
+                  <td>
+                    <select id="s52-ru7">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s52-st7">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s52-v7" placeholder="V" /></td>
+                  <td><input type="text" id="s52-p7" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s52-n8" value="R8" /></td>
+                  <td><input type="text" id="s52-r8" placeholder="—" /></td>
+                  <td>
+                    <select id="s52-ru8">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s52-st8">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s52-v8" placeholder="V" /></td>
+                  <td><input type="text" id="s52-p8" placeholder="W" /></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+              <button id="btn-s52" class="action-btn mt-1">Calcular lazo serie</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-5-3">
+            <h2>Sección 5.3: Fuentes de voltaje en serie</h2>
+            <p class="chapter-discourse">
+              Fuentes en serie se suman algebraicamente: polaridades a favor
+              se añaden, polaridades encontradas se restan. Un string de
+              celdas LFP, dos módulos FV, un rack de BESS y la auxiliar
+              \(24\,\mathrm{V}\) hecha con dos bancos de
+              \(12\,\mathrm{V}\) se redibujan como <em>una</em> fuente
+              neta antes de hallar \(I\). La dirección de la corriente
+              convencional sale del positivo neto.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-5-3">Selecciona un problema:</label>
+                <select id="preset-5-3" class="book-preset-select" data-section="5-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p5a">Prob 5.a: Tres racks 8, 16, 4 V y dump 4.7+5.6 Ω</option>
+                  <option value="p5b">Prob 5.b: 18, 4 y 10 V con 4.7+1.2+5.6 Ω</option>
+                  <option value="p6a">Prob 6.a: I = 5 mA, P = 100 mW, hallar E y R</option>
+                  <option value="p6b">Prob 6.b: 16 V en 2 kΩ, 12 V en R, hallar E y R</option>
+                </select>
+              </div>
+              <div id="desc-preset-5-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 5.75 — Fuentes en serie, un equivalente</h3>
+              <svg class="circuit-svg" viewBox="0 0 620 200" role="img" aria-label="Tres fuentes y dos resistencias en serie">
+                <line x1="70" y1="40" x2="70" y2="160" stroke="currentColor" stroke-width="2"/>
+                <line x1="55" y1="58" x2="85" y2="58" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="62" y1="142" x2="78" y2="142" stroke="currentColor" stroke-width="2"/>
+                <text x="28" y="70" font-size="13" fill="#1e8449">+</text>
+                <text x="30" y="150" font-size="13" fill="#c0392b">−</text>
+                <text x="88" y="108" font-size="14" fill="currentColor">8 V</text>
+                <line x1="70" y1="40" x2="230" y2="40" stroke="currentColor" stroke-width="2"/>
+                <line x1="248" y1="25" x2="248" y2="55" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="268" y1="30" x2="268" y2="50" stroke="currentColor" stroke-width="2"/>
+                <text x="236" y="18" font-size="12" fill="#1e8449">+</text>
+                <text x="262" y="18" font-size="12" fill="#c0392b">−</text>
+                <text x="220" y="72" font-size="13" fill="currentColor">16 V</text>
+                <line x1="268" y1="40" x2="360" y2="40" stroke="currentColor" stroke-width="2"/>
+                <line x1="378" y1="25" x2="378" y2="55" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="398" y1="30" x2="398" y2="50" stroke="currentColor" stroke-width="2"/>
+                <text x="366" y="18" font-size="12" fill="#1e8449">+</text>
+                <text x="392" y="18" font-size="12" fill="#c0392b">−</text>
+                <text x="360" y="72" font-size="13" fill="currentColor">4 V</text>
+                <line x1="398" y1="40" x2="530" y2="40" stroke="currentColor" stroke-width="2"/>
+                <line x1="530" y1="40" x2="530" y2="160" stroke="currentColor" stroke-width="2"/>
+                <rect x="430" y="148" width="70" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="444" y="144" font-size="12" fill="currentColor">5.6 Ω</text>
+                <rect x="200" y="148" width="70" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="214" y="144" font-size="12" fill="currentColor">4.7 Ω</text>
+                <line x1="500" y1="160" x2="430" y2="160" stroke="currentColor" stroke-width="2"/>
+                <line x1="200" y1="160" x2="70" y2="160" stroke="currentColor" stroke-width="2"/>
+                <line x1="270" y1="160" x2="430" y2="160" stroke="currentColor" stroke-width="2"/>
+                <polygon points="120,40 104,34 104,46" fill="#2471a3"/>
+                <text x="128" y="28" font-size="13" fill="#2471a3">I</text>
+              </svg>
+              <p class="caption-fig">Figura 5.75.a — Polaridades: 8 V a favor de I horaria; 16 V y 4 V en contra. Equivalente: 12 V con I antihoraria.</p>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Redibujar y resolver</h3>
+              <p class="hint-inline">
+                Polaridad «a favor» suma al lazo horario. «En contra» resta.
+                El signo de \(E_{\mathrm{neto}}\) decide el sentido de \(I\).
+              </p>
+              <div class="data-table-wrap">
+                <table class="series-table">
+                  <thead>
+                    <tr>
+                      <th>Fuente</th>
+                      <th>E</th>
+                      <th>Unidad</th>
+                      <th>Polaridad (horario)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" id="s53-en1" value="E1" /></td>
+                      <td><input type="text" id="s53-e1" /></td>
+                      <td>
+                        <select id="s53-eu1">
+                          <option value="1" selected>V</option>
+                          <option value="0.001">mV</option>
+                          <option value="1000">kV</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select id="s53-pol1">
+                          <option value="1" selected>a favor (+)</option>
+                          <option value="-1">en contra (−)</option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s53-en2" value="E2" /></td>
+                      <td><input type="text" id="s53-e2" /></td>
+                      <td>
+                        <select id="s53-eu2">
+                          <option value="1" selected>V</option>
+                          <option value="0.001">mV</option>
+                          <option value="1000">kV</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select id="s53-pol2">
+                          <option value="1">a favor (+)</option>
+                          <option value="-1" selected>en contra (−)</option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s53-en3" value="E3" /></td>
+                      <td><input type="text" id="s53-e3" /></td>
+                      <td>
+                        <select id="s53-eu3">
+                          <option value="1" selected>V</option>
+                          <option value="0.001">mV</option>
+                          <option value="1000">kV</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select id="s53-pol3">
+                          <option value="1">a favor (+)</option>
+                          <option value="-1" selected>en contra (−)</option>
+                        </select>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s53-en4" value="E4" /></td>
+                      <td><input type="text" id="s53-e4" /></td>
+                      <td>
+                        <select id="s53-eu4">
+                          <option value="1" selected>V</option>
+                          <option value="0.001">mV</option>
+                          <option value="1000">kV</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select id="s53-pol4">
+                          <option value="1" selected>a favor (+)</option>
+                          <option value="-1">en contra (−)</option>
+                        </select>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p class="hint-inline" style="margin-top:1rem;">Resistencias del lazo. Una P conocida en un elemento (prob. 6) halla R o I.</p>
+              <div class="data-table-wrap">
+                <table class="series-table">
+                  <thead>
+                    <tr>
+                      <th>R</th>
+                      <th>Valor</th>
+                      <th>Unidad</th>
+                      <th>V conocido</th>
+                      <th>P conocida</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><input type="text" id="s53-rn1" value="R1" /></td>
+                      <td><input type="text" id="s53-r1" /></td>
+                      <td>
+                        <select id="s53-ru1">
+                          <option value="1" selected>Ω</option>
+                          <option value="1e3">kΩ</option>
+                          <option value="1e6">MΩ</option>
+                        </select>
+                      </td>
+                      <td><input type="text" id="s53-v1" /></td>
+                      <td><input type="text" id="s53-p1" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s53-rn2" value="R2" /></td>
+                      <td><input type="text" id="s53-r2" /></td>
+                      <td>
+                        <select id="s53-ru2">
+                          <option value="1" selected>Ω</option>
+                          <option value="1e3">kΩ</option>
+                          <option value="1e6">MΩ</option>
+                        </select>
+                      </td>
+                      <td><input type="text" id="s53-v2" /></td>
+                      <td><input type="text" id="s53-p2" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s53-rn3" value="R3" /></td>
+                      <td><input type="text" id="s53-r3" /></td>
+                      <td>
+                        <select id="s53-ru3">
+                          <option value="1" selected>Ω</option>
+                          <option value="1e3">kΩ</option>
+                          <option value="1e6">MΩ</option>
+                        </select>
+                      </td>
+                      <td><input type="text" id="s53-v3" /></td>
+                      <td><input type="text" id="s53-p3" /></td>
+                    </tr>
+                    <tr>
+                      <td><input type="text" id="s53-rn4" value="R4" /></td>
+                      <td><input type="text" id="s53-r4" /></td>
+                      <td>
+                        <select id="s53-ru4">
+                          <option value="1" selected>Ω</option>
+                          <option value="1e3">kΩ</option>
+                          <option value="1e6">MΩ</option>
+                        </select>
+                      </td>
+                      <td><input type="text" id="s53-v4" /></td>
+                      <td><input type="text" id="s53-p4" /></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="k-input" style="margin-top:0.85rem;">
+                <label for="s53-i">I conocido:</label>
+                <input type="text" id="s53-i" placeholder="opcional" />
+                <select id="s53-iu">
+                  <option value="1">A</option>
+                  <option value="0.001" selected>mA</option>
+                  <option value="1e-6">µA</option>
+                </select>
+              </div>
+              <button id="btn-s53" class="action-btn mt-1">Redibujar y calcular I</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-5-4">
+            <h2>Sección 5.4: Ley de voltaje de Kirchhoff</h2>
+            <p class="chapter-discourse">
+              La suma algebraica de elevaciones y caídas alrededor de un lazo
+              cerrado es cero:
+              \(\sum_{\circlearrowright} V = 0\).
+              No hace falta que la red sea «serie pura»: basta un camino
+              cerrado. En planta es el lazo del string, el del bus de un
+              BESS, el de un divisor de medida y el de las cajas de un
+              inversor (pines de un CI de driver SiC). La potencia entregada
+              por las fuentes es igual a la disipada en las cargas; el
+              wattaje del resistor se elige con margen entre ½, 1 y 2 W
+              (o el kW del dump, a otra escala).
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-5-4">Selecciona un problema:</label>
+                <select id="preset-5-4" class="book-preset-select" data-section="5-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p7a">Prob 7.a: Vab en cajas 10, 2 y 3 V</option>
+                  <option value="p7b">Prob 7.b: Circuito abierto, Vab con 60/20/10 V</option>
+                  <option value="p8a">Prob 8.a: Puente, hallar V1 y V2</option>
+                  <option value="p8b">Prob 8.b: Lazo 10 V / 6 V y V1 del 24 V</option>
+                  <option value="p9">Prob 9: I y V1, string 27/9/5 V</option>
+                  <option value="p10">Prob 10: 120 V, 3+1+2 kΩ — KVL, P y wattaje</option>
+                  <option value="p11">Prob 11: 6 V, 22+10+5.6+33 Ω — KVL, P y wattaje</option>
+                  <option value="p12a">Prob 12.a: 80 V en R, 20 Ω, 120 V</option>
+                  <option value="p12b">Prob 12.b: 8 V en 2.2 Ω, hallar E, V1, V2</option>
+                  <option value="p12c">Prob 12.c: I = 1 A, P = 21 W en R</option>
+                  <option value="p12d">Prob 12.d: RT = 16 Ω, 4 W en 1 Ω, 8 W en R2</option>
+                  <option value="p13">Prob 13: Ocho luminarias LED en serie a 120 V</option>
+                  <option value="p14">Prob 14: P = 24 W, hallar R del dump 24 V</option>
+                </select>
+              </div>
+              <div id="desc-preset-5-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Lazo de Kirchhoff (cajas / pines)</h3>
+              <p class="hint-inline">
+                Recorre el camino de \(a\) a \(b\). Un número positivo es una
+                elevación en ese sentido; negativo, una caída. La suma es
+                \(V_{ab}\). Un campo vacío es la incógnita (prob. 8).
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s54k-v1">Tramo 1 (V):</label><input type="text" id="s54k-v1" placeholder="Ej. 10" /></div>
+                <div class="k-input"><label for="s54k-v2">Tramo 2 (V):</label><input type="text" id="s54k-v2" placeholder="Ej. -2" /></div>
+                <div class="k-input"><label for="s54k-v3">Tramo 3 (V):</label><input type="text" id="s54k-v3" placeholder="Ej. -3" /></div>
+                <div class="k-input"><label for="s54k-v4">Tramo 4 (V):</label><input type="text" id="s54k-v4" /></div>
+                <div class="k-input"><label for="s54k-v5">Tramo 5 (V):</label><input type="text" id="s54k-v5" /></div>
+                <div class="k-input"><label for="s54k-v6">Tramo 6 (V):</label><input type="text" id="s54k-v6" /></div>
+              </div>
+              <button id="btn-s54k" class="action-btn mt-1">Sumar lazo (Vab)</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-4-kvl" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Lazo serie con KVL, potencia y wattaje</h3>
+              <p class="hint-inline">
+                Igual que 5.2, más comprobación \(\sum V = E\) y
+                \(\sum P = E I\). El wattaje mínimo se elige entre ½, 1 y 2 W
+                (alumbrado auxiliar, divisores, RTU). Un dump de kW se lee
+                en la misma cuenta, otra escala.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s54-e">E:</label>
+                  <input type="text" id="s54-e" placeholder="Ej. 120" />
+                <select id="s54-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s54-i">I:</label>
+                  <input type="text" id="s54-i" placeholder="opcional" />
+                <select id="s54-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s54-rt">RT conocido:</label>
+                  <input type="text" id="s54-rt" placeholder="opcional" />
+                <select id="s54-rt-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                    <option value="0.001">mΩ</option>
+                </select>
+                </div>
+              </div>
+            <div class="data-table-wrap">
+              <table class="series-table">
+                <colgroup>
+                  <col class="col-name" />
+                  <col class="col-val" />
+                  <col class="col-unit" />
+                  <col class="col-state" />
+                  <col class="col-opt" />
+                  <col class="col-opt" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>Elemento</th>
+                    <th>R</th>
+                    <th>Unidad</th>
+                    <th>Estado</th>
+                    <th>V conocido</th>
+                    <th>P conocida</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td><input type="text" id="s54-n1" value="R1" /></td>
+                  <td><input type="text" id="s54-r1" placeholder="—" /></td>
+                  <td>
+                    <select id="s54-ru1">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s54-st1">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s54-v1" placeholder="V" /></td>
+                  <td><input type="text" id="s54-p1" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s54-n2" value="R2" /></td>
+                  <td><input type="text" id="s54-r2" placeholder="—" /></td>
+                  <td>
+                    <select id="s54-ru2">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s54-st2">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s54-v2" placeholder="V" /></td>
+                  <td><input type="text" id="s54-p2" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s54-n3" value="R3" /></td>
+                  <td><input type="text" id="s54-r3" placeholder="—" /></td>
+                  <td>
+                    <select id="s54-ru3">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s54-st3">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s54-v3" placeholder="V" /></td>
+                  <td><input type="text" id="s54-p3" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s54-n4" value="R4" /></td>
+                  <td><input type="text" id="s54-r4" placeholder="—" /></td>
+                  <td>
+                    <select id="s54-ru4">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s54-st4">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s54-v4" placeholder="V" /></td>
+                  <td><input type="text" id="s54-p4" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s54-n5" value="R5" /></td>
+                  <td><input type="text" id="s54-r5" placeholder="—" /></td>
+                  <td>
+                    <select id="s54-ru5">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s54-st5">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s54-v5" placeholder="V" /></td>
+                  <td><input type="text" id="s54-p5" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s54-n6" value="R6" /></td>
+                  <td><input type="text" id="s54-r6" placeholder="—" /></td>
+                  <td>
+                    <select id="s54-ru6">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s54-st6">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s54-v6" placeholder="V" /></td>
+                  <td><input type="text" id="s54-p6" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s54-n7" value="R7" /></td>
+                  <td><input type="text" id="s54-r7" placeholder="—" /></td>
+                  <td>
+                    <select id="s54-ru7">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s54-st7">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s54-v7" placeholder="V" /></td>
+                  <td><input type="text" id="s54-p7" placeholder="W" /></td>
+                </tr>
+                <tr>
+                  <td><input type="text" id="s54-n8" value="R8" /></td>
+                  <td><input type="text" id="s54-r8" placeholder="—" /></td>
+                  <td>
+                    <select id="s54-ru8">
+                      <option value="1" selected>Ω</option>
+                      <option value="1e3">kΩ</option>
+                      <option value="1e6">MΩ</option>
+                    </select>
+                  </td>
+                  <td>
+                    <select id="s54-st8">
+                      <option value="series" selected>serie</option>
+                      <option value="short">cortocircuito</option>
+                      <option value="open">abierto</option>
+                    </select>
+                  </td>
+                  <td><input type="text" id="s54-v8" placeholder="V" /></td>
+                  <td><input type="text" id="s54-p8" placeholder="W" /></td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+              <div class="k-input" style="margin-top:0.75rem;">
+                <label>
+                  <input type="checkbox" id="s54-watt" checked />
+                  Recomendar wattaje (½ / 1 / 2 W)
+                </label>
+              </div>
+              <button id="btn-s54" class="action-btn mt-1">Calcular KVL y potencia</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-5-6">
+            <h2>Sección 5.6: Regla del divisor de voltaje</h2>
+            <p class="chapter-discourse">
+              \(V_x = E \, \dfrac{R_x}{R_T}\)
+              da la caída en un tramo <em>sin calcular I primero</em>.
+              Es el PT resistivo del bus de \(1500\,V_{\mathrm{cc}}\),
+              el tap de \(+12\,\mathrm{V}\) / \(-20\,\mathrm{V}\) de un
+              rack de BESS, el divisor de un piranómetro y el dropper de un
+              faro LED de 8 V en el rail de 12 V de un híbrido o de un
+              contenedor. La corriente de diseño fija los ohmios;
+              las razones de voltaje no cambian si se escala R
+              (prob. 23.b: de 10 mA a 10 µA).
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-5-6">Selecciona un problema:</label>
+                <select id="preset-5-6" class="book-preset-select" data-section="5-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p15a">Prob 15.a: Vab en 50 Ω, 100 V</option>
+                  <option value="p15b">Prob 15.b: Vab en 4 Ω, cadena 80 V</option>
+                  <option value="p15c">Prob 15.c: Vab en 2 kΩ+3 kΩ, 40 V</option>
+                  <option value="p15d">Prob 15.d: Vab entre taps, 0.36 V</option>
+                  <option value="p16a">Prob 16.a: 4 V en R, hallar R</option>
+                  <option value="p16b">Prob 16.b: 140 V en 6 Ω+R, hallar R</option>
+                  <option value="p17">Prob 17: Cadena a tierra 40 V, R2 = 3 R1</option>
+                  <option value="p18">Prob 18: Taps +12 / +4 / −4 / −8 V</option>
+                  <option value="p19">Prob 19: Faro 8 V 50 mA en rail 12 V</option>
+                  <option value="p20">Prob 20: Taps +48 / +12 / 0 / −20 V, I = 16 mA</option>
+                  <option value="p21">Prob 21: VR1 = (1/5) VR2, 72 V, 4 mA</option>
+                  <option value="p22">Prob 22: R1 = 2 R3, R2 = 7 R3, 60 V</option>
+                  <option value="p23a">Prob 23.a: VR2 = 3 VR1, VR3 = 4 VR2, 10 mA</option>
+                  <option value="p23b">Prob 23.b: Misma razón, I = 10 µA</option>
+                </select>
+              </div>
+              <div id="desc-preset-5-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 5.85 — Divisor y \(V_{ab}\)</h3>
+              <svg class="circuit-svg" viewBox="0 0 420 220" role="img" aria-label="Divisor de dos resistencias y Vab">
+                <line x1="80" y1="30" x2="80" y2="190" stroke="currentColor" stroke-width="2"/>
+                <line x1="65" y1="50" x2="95" y2="50" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="70" y1="170" x2="90" y2="170" stroke="currentColor" stroke-width="2"/>
+                <text x="28" y="110" font-size="14" fill="currentColor">E</text>
+                <line x1="80" y1="30" x2="240" y2="30" stroke="currentColor" stroke-width="2"/>
+                <rect x="200" y="30" width="24" height="70" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="232" y="72" font-size="13" fill="currentColor">R1</text>
+                <circle cx="212" cy="108" r="4" fill="#2471a3"/>
+                <text x="248" y="112" font-size="13" fill="#2471a3">a</text>
+                <rect x="200" y="108" width="24" height="82" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="232" y="156" font-size="13" fill="currentColor">R2</text>
+                <circle cx="212" cy="190" r="4" fill="#2471a3"/>
+                <text x="248" y="194" font-size="13" fill="#2471a3">b</text>
+                <line x1="200" y1="190" x2="80" y2="190" stroke="currentColor" stroke-width="2"/>
+                <path d="M 270 108 Q 330 148 270 190" fill="none" stroke="#2471a3" stroke-width="1.4" stroke-dasharray="4 3"/>
+                <text x="334" y="154" font-size="14" fill="#2471a3">Vab</text>
+              </svg>
+              <p class="caption-fig">Figura 5.85.a — \(V_{ab}\) es la fracción de E que cae en el tramo a–b.</p>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Divisor \(V_x = E R_x / R_T\)</h3>
+              <p class="hint-inline">
+                Lista las R en orden del lazo. «Desde / hasta» son índices
+                1-based del tramo cuya caída es \(V_{ab}\)
+                (p. ej. 2 y 2 = solo R2; 3 y 4 = R3+R4).
+                Un \(V_{ab}\) conocido con una R vacía halla esa R.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s56-e">E:</label>
+                  <input type="text" id="s56-e" placeholder="Ej. 100" />
+                <select id="s56-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s56-from">Desde Rx nº:</label>
+                  <input type="text" id="s56-from" placeholder="1" />
+                </div>
+                <div class="k-input">
+                  <label for="s56-to">Hasta Rx nº:</label>
+                  <input type="text" id="s56-to" placeholder="2" />
+                </div>
+                <div class="k-input">
+                  <label for="s56-vab">Vab conocido:</label>
+                  <input type="text" id="s56-vab" placeholder="opcional" />
+                  <select id="s56-vab-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                  </select>
+                </div>
+              </div>
+              <div class="data-table-wrap">
+                <table class="series-table">
+                  <thead>
+                    <tr><th>#</th><th>Nombre</th><th>R</th><th>Unidad</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>1</td><td><input type="text" id="s56-n1" value="R1" /></td><td><input type="text" id="s56-r1" /></td>
+                      <td><select id="s56-ru1"><option value="1" selected>Ω</option><option value="1e3">kΩ</option><option value="1e6">MΩ</option></select></td></tr>
+                    <tr><td>2</td><td><input type="text" id="s56-n2" value="R2" /></td><td><input type="text" id="s56-r2" /></td>
+                      <td><select id="s56-ru2"><option value="1" selected>Ω</option><option value="1e3">kΩ</option><option value="1e6">MΩ</option></select></td></tr>
+                    <tr><td>3</td><td><input type="text" id="s56-n3" value="R3" /></td><td><input type="text" id="s56-r3" /></td>
+                      <td><select id="s56-ru3"><option value="1" selected>Ω</option><option value="1e3">kΩ</option><option value="1e6">MΩ</option></select></td></tr>
+                    <tr><td>4</td><td><input type="text" id="s56-n4" value="R4" /></td><td><input type="text" id="s56-r4" /></td>
+                      <td><select id="s56-ru4"><option value="1" selected>Ω</option><option value="1e3">kΩ</option><option value="1e6">MΩ</option></select></td></tr>
+                    <tr><td>5</td><td><input type="text" id="s56-n5" value="R5" /></td><td><input type="text" id="s56-r5" /></td>
+                      <td><select id="s56-ru5"><option value="1" selected>Ω</option><option value="1e3">kΩ</option><option value="1e6">MΩ</option></select></td></tr>
+                    <tr><td>6</td><td><input type="text" id="s56-n6" value="R6" /></td><td><input type="text" id="s56-r6" /></td>
+                      <td><select id="s56-ru6"><option value="1" selected>Ω</option><option value="1e3">kΩ</option><option value="1e6">MΩ</option></select></td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <button id="btn-s56" class="action-btn mt-1">Calcular divisor</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Diseño de taps (rail auxiliar / BESS)</h3>
+              <p class="hint-inline">
+                Nodos de más positivo a más negativo, tierra = 0 V.
+                La corriente de diseño \(I\) fija cada R = ΔV / I.
+                El primer nodo debe ser el positivo de E; el último, el negativo.
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s56d-e">E total:</label>
+                  <input type="text" id="s56d-e" placeholder="Ej. 100" />
+                <select id="s56d-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s56d-i">I de diseño:</label>
+                  <input type="text" id="s56d-i" placeholder="Ej. 16" />
+                <select id="s56d-i-u">
+                    <option value="1">A</option>
+                    <option value="0.001" selected>mA</option>
+                    <option value="1e-6">µA</option>
+                </select>
+                </div>
+              </div>
+              <div class="k-input" style="margin-bottom:0.75rem;">
+                <label for="s56d-taps">Nodos (V), de + a −, separados por coma:</label>
+                <input type="text" id="s56d-taps" placeholder="80, 48, 12, 0, -20" style="flex:1;" />
+              </div>
+              <div class="tap-rail" id="tap-rail-5-6" aria-hidden="true"></div>
+              <button id="btn-s56d" class="action-btn mt-1">Diseñar divisor</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-6-d" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-5-7">
+            <h2>Sección 5.7: Notación</h2>
+            <p class="chapter-discourse">
+              Un subíndice doble es una diferencia:
+              \(V_{ab} = V_a - V_b\).
+              Un subíndice simple es el potencial respecto de tierra.
+              En 2026 eso es el PPC, el punto medio de un rack de BESS, el
+              pin de un driver SiC y el bus de
+              \(-\,70\,\mathrm{V}\) de un convertidor auxiliar.
+              Un CI se lee igual: la tensión entre pines es la resta de
+              los nodos etiquetados.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-5-7">Selecciona un problema:</label>
+                <select id="preset-5-7" class="book-preset-select" data-section="5-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p24a">Prob 24.a: Va, Vb, Vab — 12 V y 8 V a tierra</option>
+                  <option value="p24b">Prob 24.b: 20+6 V a un lado, 4 V al otro</option>
+                  <option value="p24c">Prob 24.c: +10 V, 3 V, 21 V y 8 V a tierra</option>
+                  <option value="p25a">Prob 25.a: 120 V y 60 V con 6 Ω y 3 Ω</option>
+                  <option value="p25b">Prob 25.b: −10 V a −70 V, 10+20+30 Ω</option>
+                  <option value="p26a">Prob 26.a: 16 V, 10 Ω, 8 V, 20 Ω a tierra</option>
+                  <option value="p26b">Prob 26.b: +12 V a −8 V, 2.2 kΩ + 10 V + 3.3 kΩ</option>
+                  <option value="p27">Prob 27: Cadena 20 V … 47 V … tierra</option>
+                  <option value="p28">Prob 28: 44 V / 20 V a tierra y cadena 2+4+6 kΩ</option>
+                  <option value="p29">Prob 29: CI, pines 0–7, I en 4 Ω</option>
+                  <option value="p30">Prob 30: CI, Ii, V2 en 3 kΩ+1 kΩ</option>
+                </select>
+              </div>
+              <div id="desc-preset-5-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 5.93 — Nodos y tierra</h3>
+              <svg class="circuit-svg" viewBox="0 0 560 140" role="img" aria-label="Va, 12 V, nodo, 8 V a tierra, Vb">
+                <text x="20" y="58" font-size="16" fill="#2471a3">Va</text>
+                <line x1="50" y1="52" x2="130" y2="52" stroke="currentColor" stroke-width="2"/>
+                <line x1="148" y1="36" x2="148" y2="68" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="168" y1="40" x2="168" y2="64" stroke="currentColor" stroke-width="2"/>
+                <text x="138" y="26" font-size="12" fill="#1e8449">+</text>
+                <text x="164" y="26" font-size="12" fill="#c0392b">−</text>
+                <text x="128" y="88" font-size="13" fill="currentColor">12 V</text>
+                <line x1="168" y1="52" x2="300" y2="52" stroke="currentColor" stroke-width="2"/>
+                <line x1="300" y1="52" x2="300" y2="100" stroke="currentColor" stroke-width="2"/>
+                <line x1="282" y1="100" x2="318" y2="100" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="288" y1="118" x2="312" y2="118" stroke="currentColor" stroke-width="2"/>
+                <text x="322" y="108" font-size="13" fill="currentColor">8 V</text>
+                <line x1="300" y1="118" x2="300" y2="132" stroke="currentColor" stroke-width="2"/>
+                <line x1="286" y1="132" x2="314" y2="132" stroke="currentColor" stroke-width="2"/>
+                <line x1="292" y1="138" x2="308" y2="138" stroke="currentColor" stroke-width="2"/>
+                <line x1="300" y1="52" x2="400" y2="52" stroke="currentColor" stroke-width="2"/>
+                <text x="412" y="58" font-size="16" fill="#2471a3">Vb</text>
+              </svg>
+              <p class="caption-fig">Figura 5.93.a — Tierra en el negativo de 8 V: Vb = 8 V, Va = 20 V, Vab = 12 V.</p>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Escalera de nodos</h3>
+              <p class="hint-inline">
+                Cada fuente se escribe con signo: positivo si el + apunta al
+                nodo de la izquierda (hacia Va). Tierra se marca con 0 en
+                «nodo tierra» (1-based, 0 = ninguna).
+              </p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s57-src">Fuentes (V), coma:</label>
+                  <input type="text" id="s57-src" placeholder="12, -8" style="flex:1;" />
+                </div>
+                <div class="k-input">
+                  <label for="s57-gnd">Nodo tierra (índice):</label>
+                  <input type="text" id="s57-gnd" placeholder="3" />
+                </div>
+                <div class="k-input">
+                  <label for="s57-va">Nodo Va:</label>
+                  <input type="text" id="s57-va" placeholder="1" />
+                </div>
+                <div class="k-input">
+                  <label for="s57-vb">Nodo Vb:</label>
+                  <input type="text" id="s57-vb" placeholder="último" />
+                </div>
+              </div>
+              <button id="btn-s57" class="action-btn mt-1">Calcular Va, Vb, Vab</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>CI / pines (figs. 5.98 y 5.99)</h3>
+              <p class="hint-inline">Voltaje de cada pin respecto de tierra. \(V_{ij} = V_i - V_j\). I = ΔV / R entre los pines del resistor.</p>
+              <div class="ic-pin-grid">
+                <label>V0 (tierra)<input type="text" id="s57ic-v0" value="0" /></label>
+                <label>V1<input type="text" id="s57ic-v1" /></label>
+                <label>V2<input type="text" id="s57ic-v2" /></label>
+                <label>V3<input type="text" id="s57ic-v3" /></label>
+                <label>V4<input type="text" id="s57ic-v4" /></label>
+                <label>V5<input type="text" id="s57ic-v5" /></label>
+                <label>V6<input type="text" id="s57ic-v6" /></label>
+                <label>V7<input type="text" id="s57ic-v7" /></label>
+              </div>
+              <div class="kinematics-group" style="margin-top:0.85rem;">
+                <div class="k-input">
+                  <label for="s57ic-pairs">Pares Vij (ej. 10,23,67):</label>
+                  <input type="text" id="s57ic-pairs" placeholder="10,23,30,67,56" style="flex:1;" />
+                </div>
+                <div class="k-input">
+                  <label for="s57ic-ir">I en pines i-j, R:</label>
+                  <input type="text" id="s57ic-ir" placeholder="2,3,4" />
+                </div>
+              </div>
+              <button id="btn-s57ic" class="action-btn mt-1">Leer pines</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-7-ic" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-5-8">
+            <h2>Sección 5.8–5.9: Resistencia interna y regulación de voltaje</h2>
+            <p class="chapter-discourse">
+              Toda fuente real es \(E\) en serie con \(R_{\mathrm{int}}\):
+              la \(R_s\) de un módulo FV, la Ri de un rack LFP, la
+              impedancia de un generador hidroeléctrico o de un
+              grid-forming. A circuito abierto \(V_{\mathrm{nl}} = E\);
+              con carga \(V_L = E \, R_L / (R_{\mathrm{int}} + R_L)\).
+              La regulación
+              \(\%\mathrm{VR} = \dfrac{V_{\mathrm{nl}} - V_{\mathrm{fl}}}{V_{\mathrm{fl}}} \times 100\%\)
+              dice cuánto se cae el bus al pedir corriente. Un BESS 2026
+              bien diseñado está por debajo del 2 %; una batería de arranque
+              auxiliar, más.
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-5-8">Selecciona un problema:</label>
+                <select id="preset-5-8" class="book-preset-select" data-section="5-8">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p31">Prob 31: 60 V en vacío, 2 A a 28 Ω</option>
+                  <option value="p32">Prob 32: E = 12 V, Rint = 0.05 Ω, RL = 3.3 Ω</option>
+                  <option value="p33">Prob 33: 6 V en vacío, 10 mA a 0.5 kΩ</option>
+                  <option value="p34">Prob 34: %VR de la fuente del 31</option>
+                  <option value="p35">Prob 35: %VR de la figura 5.100</option>
+                </select>
+              </div>
+              <div id="desc-preset-5-8" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 5.100 — Fuente con \(R_{\mathrm{int}}\)</h3>
+              <svg class="circuit-svg" viewBox="0 0 560 180" role="img" aria-label="E, Rint y carga RL">
+                <rect x="40" y="30" width="220" height="120" fill="none" stroke="currentColor" stroke-width="1.4" stroke-dasharray="6 4" rx="8"/>
+                <text x="70" y="24" font-size="12" fill="currentColor">fuente</text>
+                <line x1="90" y1="50" x2="90" y2="130" stroke="currentColor" stroke-width="2"/>
+                <line x1="76" y1="64" x2="104" y2="64" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="82" y1="116" x2="98" y2="116" stroke="currentColor" stroke-width="2"/>
+                <text x="48" y="96" font-size="14" fill="currentColor">E</text>
+                <line x1="90" y1="50" x2="160" y2="50" stroke="currentColor" stroke-width="2"/>
+                <rect x="160" y="38" width="80" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="172" y="32" font-size="12" fill="currentColor">Rint</text>
+                <line x1="240" y1="50" x2="280" y2="50" stroke="currentColor" stroke-width="2"/>
+                <circle cx="280" cy="50" r="4" fill="currentColor"/>
+                <line x1="280" y1="50" x2="400" y2="50" stroke="currentColor" stroke-width="2"/>
+                <rect x="400" y="38" width="80" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="428" y="32" font-size="12" fill="currentColor">RL</text>
+                <line x1="480" y1="50" x2="480" y2="130" stroke="currentColor" stroke-width="2"/>
+                <line x1="480" y1="130" x2="90" y2="130" stroke="currentColor" stroke-width="2"/>
+                <text x="300" y="78" font-size="14" fill="#2471a3">VL</text>
+                <line x1="400" y1="70" x2="400" y2="90" stroke="#2471a3" stroke-width="1.2"/>
+                <text x="388" y="104" font-size="12" fill="#1e8449">+</text>
+                <text x="388" y="128" font-size="12" fill="#c0392b">−</text>
+              </svg>
+              <p class="caption-fig">Figura 5.100 — Thevenin de un rack, de un string FV o de un generador: E y Rint.</p>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Solucionador \(R_{\mathrm{int}}\) y \(\%\mathrm{VR}\)</h3>
+              <p class="hint-inline">Deja vacíos los desconocidos. Cualesquiera dos de E / VL / I / RL / Rint bastan; %VR sale solo.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s58-e">E (vacío):</label>
+                  <input type="text" id="s58-e" placeholder="Ej. 12" />
+                <select id="s58-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s58-vl">VL:</label>
+                  <input type="text" id="s58-vl" placeholder="opcional" />
+                <select id="s58-vl-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s58-i">I:</label>
+                  <input type="text" id="s58-i" placeholder="opcional" />
+                <select id="s58-i-u">
+                    <option value="1" selected>A</option>
+                    <option value="0.001">mA</option>
+                    <option value="1e-6">µA</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s58-rl">RL:</label>
+                  <input type="text" id="s58-rl" placeholder="opcional" />
+                <select id="s58-rl-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                    <option value="0.001">mΩ</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s58-rint">Rint:</label>
+                  <input type="text" id="s58-rint" placeholder="opcional" />
+                <select id="s58-rint-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                    <option value="0.001">mΩ</option>
+                </select>
+                </div>
+              </div>
+              <button id="btn-s58" class="action-btn mt-1">Calcular Ri y %VR</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-8" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-5-12">
+            <h2>Sección 5.12: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              PSpice, Electronics Workbench y el «lenguaje de programación»
+              del libro se sustituyen aquí por el mismo solucionador: un
+              lazo serie, un divisor y un barrido de \(R_L\).
+              El teorema de máxima transferencia de potencia
+              (\(R_L = R_{\mathrm{th}}\)) aparece al tabular
+              \(P_L(R_L)\) — es el matching de un dump eólico, de un
+              lastre hidroeléctrico y, en DC, el primo pobre del MPPT
+              (el MPPT 2026 no fija \(R_L = R_s\) del módulo; sigue el
+              codo de la I–V. El barrido sí enseña por qué).
+            </p>
+
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-5-12">Selecciona un problema:</label>
+                <select id="preset-5-12" class="book-preset-select" data-section="5-12">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p36">Prob 36: Lazo 5.71.a — I y caídas</option>
+                  <option value="p37">Prob 37: Vab del divisor 5.85.d</option>
+                  <option value="p38">Prob 38: RT de N resistencias (el solucionador 5.2)</option>
+                  <option value="p39">Prob 39: Divisor a cada R (el solucionador 5.6)</option>
+                  <option value="p40">Prob 40: Barrido RL = 1…20 Ω, Pmax</option>
+                </select>
+              </div>
+              <div id="desc-preset-5-12" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Figura 5.101 — Fuente, Rs y RL</h3>
+              <svg class="circuit-svg" viewBox="0 0 520 170" role="img" aria-label="12 V, 8 Ω serie y RL">
+                <line x1="80" y1="40" x2="80" y2="130" stroke="currentColor" stroke-width="2"/>
+                <line x1="65" y1="55" x2="95" y2="55" stroke="currentColor" stroke-width="2.4"/>
+                <line x1="70" y1="115" x2="90" y2="115" stroke="currentColor" stroke-width="2"/>
+                <text x="36" y="92" font-size="14" fill="currentColor">12 V</text>
+                <line x1="80" y1="40" x2="200" y2="40" stroke="currentColor" stroke-width="2"/>
+                <rect x="200" y="28" width="80" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="226" y="22" font-size="13" fill="currentColor">8 Ω</text>
+                <line x1="280" y1="40" x2="360" y2="40" stroke="#2471a3" stroke-width="2.4"/>
+                <polygon points="360,40 344,34 344,46" fill="#2471a3"/>
+                <text x="300" y="28" font-size="13" fill="#2471a3">I</text>
+                <rect x="360" y="28" width="80" height="24" fill="none" stroke="currentColor" stroke-width="2"/>
+                <text x="384" y="22" font-size="13" fill="currentColor">RL</text>
+                <line x1="440" y1="40" x2="440" y2="130" stroke="currentColor" stroke-width="2"/>
+                <line x1="440" y1="130" x2="80" y2="130" stroke="currentColor" stroke-width="2"/>
+              </svg>
+              <p class="caption-fig">Figura 5.101 — Thevenin de 12 V y 8 Ω (Rs de un string pequeño o Ri de un banco auxiliar). PL es máxima cuando RL = 8 Ω.</p>
+            </div>
+
+            <div class="card interactive-card">
+              <h3>Barrido de \(R_L\) y máxima potencia</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s512-e">E:</label>
+                  <input type="text" id="s512-e" placeholder="12" />
+                <select id="s512-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s512-rs">Rs:</label>
+                  <input type="text" id="s512-rs" placeholder="8" />
+                <select id="s512-rs-u">
+                    <option value="1" selected>Ω</option>
+                    <option value="1e3">kΩ</option>
+                    <option value="1e6">MΩ</option>
+                    <option value="0.001">mΩ</option>
+                </select>
+                </div>
+                <div class="k-input">
+                  <label for="s512-rmin">RL min (Ω):</label>
+                  <input type="text" id="s512-rmin" value="1" />
+                </div>
+                <div class="k-input">
+                  <label for="s512-rmax">RL max (Ω):</label>
+                  <input type="text" id="s512-rmax" value="20" />
+                </div>
+                <div class="k-input">
+                  <label for="s512-step">Paso (Ω):</label>
+                  <input type="text" id="s512-step" value="1" />
+                </div>
+              </div>
+              <button id="btn-s512" class="action-btn mt-1">Tabular I y PL</button>
+              <div class="data-table-wrap" id="wrap-5-12" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-5-12">
+                  <thead>
+                    <tr><th>RL (Ω)</th><th>I (A)</th><th>VL (V)</th><th>PL (W)</th></tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-5-12" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-5-0" aria-labelledby="glossary-5-heading">
+            <h2 id="glossary-5-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de circuitos en serie, Kirchhoff, divisor y regulación
+              del capítulo 5, reescritos para la ingeniería eléctrica de
+              renovables convencionales y no convencionales en 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Circuito</dt>
+                <dd>Combinación de cierto número de elementos unidos en puntos terminales que proporciona al menos una ruta cerrada a través de la cual la carga puede fluir. Un string FV con inversor, un rack de BESS y el devanado de una Pelton con su dump son circuitos.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Circuito en serie</dt>
+                <dd>Configuración en la que los elementos tienen solo un punto en común y cada terminal no se encuentra conectada a un tercer elemento portador de corriente. Celdas de un módulo, módulos de un string, resistencias de un divisor de 1500 Vcc.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Flujo de corriente convencional</dt>
+                <dd>Dirección definida para el flujo de carga en un sistema eléctrico que es opuesta al flujo del movimiento de los electrones. En planos de planta 2026 se sigue dibujando saliendo del + del string y del rack.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Flujo de electrones</dt>
+                <dd>Flujo de carga en un sistema eléctrico que cuenta con la misma dirección que el movimiento de los electrones. Útil al hablar de la fotocorriente en el Si y del sentido real en un electrolizador; los lazos de este capítulo usan convención.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ley de voltaje de Kirchhoff (LVK)</dt>
+                <dd>La suma algebraica de las elevaciones y caídas de potencial alrededor de un lazo cerrado (o trayectoria) es cero. Cierra el KVL del string, del bus de un BESS y de los pines de un driver SiC.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Lazo cerrado</dt>
+                <dd>Cualquier conexión continua de ramas que permite el trazo de una trayectoria que sale de un punto en una dirección y regresa al mismo punto desde otra dirección sin abandonar el circuito. El loop de un string, el de un rack y el de un divisor de medida.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Rama</dt>
+                <dd>Parte de un circuito que consta de uno o más elementos en serie. Un módulo, un fusible gPV, un tramo de cable y un dump son ramas; en paralelo (cap. 6) las ramas se parten.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Regla del divisor de voltaje (RDV)</dt>
+                <dd>Método por el cual puede determinarse un voltaje en un circuito en serie sin tener que calcular primero la corriente: \(V_x = E R_x / R_T\). Es el PT resistivo, el tap de un BESS y el dropper de un faro en el rail de 12 V.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Regulación de voltaje (RV)</dt>
+                <dd>Valor, dado en forma de porcentaje, que ofrece una indicación del cambio en el voltaje terminal de una fuente ante el cambio en la demanda de carga: \(\%\mathrm{VR} = (V_{\mathrm{nl}}-V_{\mathrm{fl}})/V_{\mathrm{fl}} \times 100\%\). Un rack LFP 2026 se especifica por debajo del 2 %; el bus de un grid-forming, en milésimas.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Resistencia interna</dt>
+                <dd>Resistencia inherente encontrada al interior de cualquier fuente de energía. Es la \(R_s\) del módulo FV, la Ri de un rack, la del generador hidroeléctrico y la del banco de arranque auxiliar. Fija la caída \(I R_{\mathrm{int}}\) y el \(\%\mathrm{VR}\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Cortocircuito (en serie)</dt>
+                <dd>Rama de resistencia nula que anula al elemento que puentea. El diodo bypass de una celda sombreada, un jumper de precarga y un SPD que conduce son cortos locales: el resto del string sigue en serie.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Circuito abierto (en serie)</dt>
+                <dd>Rama que interrumpe la única trayectoria. Un fusible gPV abierto, un MC4 desconectado o un filamento fundido apagan todo el string. En FV el bypass evita ese destino a nivel de celda; a nivel de string, no.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>String / cadena</dt>
+                <dd>Serie de módulos fotovoltaicos (o de celdas, o de racks) que comparte la misma corriente. En 2026 un string de 1500 Vcc es el ejemplo industrial del capítulo 5: \(R_T\) del cable, \(I_{\mathrm{mp}}\) común, KVL alrededor del lazo inversor.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable convencional</dt>
+                <dd>Hidroeléctrica, geotérmica, biomasa/biogás y, en algunos marcos, CSP. El capítulo 5 las trata como fuentes E en serie con su Ri y su dump o ballast.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>Fotovoltaica TOPCon/HJT/tándem, eólica, océano, hidrógeno verde y BESS. El string, el rack y el rail auxiliar de 12 V son los lazos serie de 2026.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
     </section>
   </main>
 
