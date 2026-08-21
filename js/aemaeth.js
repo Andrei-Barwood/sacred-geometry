@@ -815,6 +815,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initSec8();
   initSec9();
   initSec10();
+  initSec11();
+  initSec12();
   initMiniCalc();
   initChapterFold();
 });
@@ -6431,6 +6433,46 @@ function S() {
         <line x1="${mid + cr}" y1="${y}" x2="${x2}" y2="${y}" stroke="currentColor" stroke-width="2"/>
         <text x="${mid}" y="${y - 22}" text-anchor="middle" font-size="12" fill="#2471a3">${lab || "I"}</text>`);
     },
+    indH(x, y, w, lab, cored) {
+      const n = 4;
+      const start = x + 6, end = x + w - 6;
+      const r = (end - start) / (2 * n);
+      let dpath = `M ${x} ${y} L ${start} ${y}`;
+      for (let i = 0; i < n; i++) {
+        const a = start + i * 2 * r;
+        dpath += ` A ${r} ${r} 0 0 1 ${a + 2 * r} ${y}`;
+      }
+      dpath += ` L ${x + w} ${y}`;
+      let s = `<path d="${dpath}" fill="none" stroke="currentColor" stroke-width="2"/>`;
+      if (cored) {
+        s += `<line x1="${start + 4}" y1="${y + 12}" x2="${end - 4}" y2="${y + 12}" stroke="currentColor" stroke-width="1.6"/>
+          <line x1="${start + 4}" y1="${y + 16}" x2="${end - 4}" y2="${y + 16}" stroke="currentColor" stroke-width="1.6"/>`;
+      }
+      s += `<text x="${x + w / 2}" y="${y - 16}" text-anchor="middle" font-size="11" fill="currentColor">${lab || "L"}</text>`;
+      return push(s);
+    },
+    indV(x, y, h, lab, cored) {
+      const n = 4;
+      const start = y + 6, end = y + h - 6;
+      const r = (end - start) / (2 * n);
+      let dpath = `M ${x} ${y} L ${x} ${start}`;
+      for (let i = 0; i < n; i++) {
+        const a = start + i * 2 * r;
+        dpath += ` A ${r} ${r} 0 0 1 ${x} ${a + 2 * r}`;
+      }
+      dpath += ` L ${x} ${y + h}`;
+      let s = `<path d="${dpath}" fill="none" stroke="currentColor" stroke-width="2"/>`;
+      if (cored) {
+        s += `<line x1="${x + 12}" y1="${start + 4}" x2="${x + 12}" y2="${end - 4}" stroke="currentColor" stroke-width="1.6"/>
+          <line x1="${x + 16}" y1="${start + 4}" x2="${x + 16}" y2="${end - 4}" stroke="currentColor" stroke-width="1.6"/>`;
+      }
+      s += `<text x="${x + 22}" y="${(y + y + h) / 2 + 4}" font-size="11" fill="currentColor">${lab || "L"}</text>`;
+      return push(s);
+    },
+    arrL(x, y, lab) {
+      return push(`<polygon points="${x},${y} ${x + 10},${y - 5} ${x + 10},${y + 5}" fill="#2471a3"/>
+        <text x="${x + 12}" y="${y - 8}" font-size="11" fill="#2471a3">${lab || ""}</text>`);
+    },
     str() { return p.join(""); }
   };
   return api;
@@ -11193,3 +11235,2323 @@ Object.assign(presetsData, {
       desc: "Prob. 56–58 — QBASIC era 1990. La tabla nτ y los solucionadores 10.7–10.14 son el programa de 2026." }
   }
 });
+
+// --- Capítulo 11.0: Circuitos magnéticos (trafo, LCL, DAB, relé) ---
+const MU0 = 4 * Math.PI * 1e-7;
+const LINES_PER_WB = 1e8;
+const G_PER_T = 1e4;
+const LINES_IN2_PER_T = 6.4516e4;
+const IN_M = 0.0254;
+const IN2_M2 = IN_M * IN_M;
+const GILBERT_AT = 10 / (4 * Math.PI);
+
+const BH11 = {
+  sheet: [
+    [0, 0], [20, 0.55], [40, 0.90], [50, 1.00], [70, 1.12], [100, 1.25],
+    [150, 1.38], [200, 1.45], [300, 1.52], [500, 1.58], [800, 1.63],
+    [1500, 1.70], [3000, 1.78], [5000, 1.85]
+  ],
+  steel: [
+    [0, 0], [50, 0.20], [100, 0.42], [150, 0.62], [200, 0.78], [250, 0.90],
+    [300, 1.00], [400, 1.12], [500, 1.22], [700, 1.35], [1000, 1.45],
+    [1500, 1.55], [2000, 1.62], [3000, 1.70], [5000, 1.80]
+  ],
+  iron: [
+    [0, 0], [150, 0.12], [250, 0.20], [400, 0.30], [500, 0.36], [600, 0.42],
+    [800, 0.50], [1000, 0.56], [1300, 0.62], [1600, 0.68], [2000, 0.74],
+    [3000, 0.83], [4000, 0.88], [5000, 0.92]
+  ]
+};
+const BH_NAME = { sheet: "acero laminado (GOES)", steel: "acero fundido", iron: "hierro fundido", air: "aire / entrehierro" };
+
+function lerpXY(pts, x) {
+  if (x <= pts[0][0]) {
+    const d = pts[1][0] - pts[0][0];
+    return d === 0 ? pts[0][1] : pts[0][1] + (pts[1][1] - pts[0][1]) * (x - pts[0][0]) / d;
+  }
+  for (let i = 1; i < pts.length; i++) {
+    if (x <= pts[i][0]) {
+      const x0 = pts[i - 1][0], y0 = pts[i - 1][1], x1 = pts[i][0], y1 = pts[i][1];
+      return y0 + (y1 - y0) * (x - x0) / (x1 - x0);
+    }
+  }
+  const n = pts.length;
+  const x0 = pts[n - 2][0], y0 = pts[n - 2][1], x1 = pts[n - 1][0], y1 = pts[n - 1][1];
+  return y1 + (y1 - y0) * (x - x1) / (x1 - x0);
+}
+
+function BfromH(mat, H) {
+  if (mat === "air") return MU0 * H;
+  return Math.max(0, lerpXY(BH11[mat], H));
+}
+function HfromB(mat, B) {
+  if (mat === "air") return B / MU0;
+  const inv = BH11[mat].map(([h, b]) => [b, h]);
+  return Math.max(0, lerpXY(inv, B));
+}
+
+function magRow(name, phi, A, l, mat) {
+  const B = phi / A;
+  const H = HfromB(mat, B);
+  const mu = H === 0 ? Infinity : B / H;
+  return { name, phi, A, B, H, l, Hl: H * l, mu, mur: mu / MU0, mat };
+}
+
+function magTableText(rows, ni) {
+  let s = "Tabla Ampère (dual de KVL): Φ → B → H(curva) → Hl.\n";
+  rows.forEach((r) => {
+    s += `${r.name} (${BH_NAME[r.mat]}): B = ${formatQty(r.B, "T")}, H = ${formatQty(r.H, "At/m")}, Hl = ${formatQty(r.Hl, "At")}.\n`;
+  });
+  const sum = rows.reduce((a, r) => a + r.Hl, 0);
+  s += `${mj(`\\sum H l = ${texQtyBody(sum, "At")}`)}`;
+  if (ni != null) s += `, ${mj(`NI = ${texQtyBody(ni, "At")}`)}`;
+  s += ".\n";
+  return { s, sum };
+}
+
+function findPhi(A, lSteel, mat, lGap, NI) {
+  let lo = 1e-8, hi = 2.0 * A;
+  for (let i = 0; i < 40; i++) {
+    const mid = 0.5 * (lo + hi);
+    const rS = magRow("acero", mid, A, lSteel, mat);
+    const rG = lGap ? magRow("gap", mid, A, lGap, "air") : { Hl: 0 };
+    if (rS.Hl + rG.Hl > NI) hi = mid; else lo = mid;
+  }
+  return 0.5 * (lo + hi);
+}
+
+const P5_ESM_URL = "https://cdn.jsdelivr.net/npm/p5@1.9.4/+esm";
+let p5Promise11;
+const magSketches = new Map();
+
+function loadP5() {
+  if (!p5Promise11) {
+    p5Promise11 = import(P5_ESM_URL).then((m) => m.default || m);
+  }
+  return p5Promise11;
+}
+
+function magTheme(p) {
+  const dark = document.documentElement.getAttribute("data-theme") === "dark"
+    || document.body.getAttribute("data-theme") === "dark"
+    || !!(window.Alpine && Alpine.store("app") && Alpine.store("app").darkMode);
+  return {
+    dark,
+    bg: dark ? "#1c1b18" : "#f4efe6",
+    ink: dark ? "#ece7dc" : "#2b2924",
+    muted: dark ? "#a39e92" : "#6b665c",
+    core: dark ? "#8d7a55" : "#c9b07a",
+    coreStroke: dark ? "#e2d3b0" : "#6a5428",
+    goes: dark ? "#6d8a62" : "#9cb887",
+    iron: dark ? "#a06a48" : "#c4865a",
+    steel: dark ? "#7d7e8a" : "#b7b6c2",
+    coil: "#d35400",
+    flux: "#2471a3",
+    poleN: "#1e8449",
+    poleS: "#c0392b"
+  };
+}
+
+function magTools(p, th) {
+  const T = {
+    label(x, y, s, col, size) {
+      p.noStroke();
+      p.fill(col || th.ink);
+      p.textAlign(p.LEFT, p.CENTER);
+      p.textSize(size || 13);
+      p.text(s, x, y);
+    },
+    labelC(x, y, s, col, size) {
+      p.noStroke();
+      p.fill(col || th.ink);
+      p.textAlign(p.CENTER, p.CENTER);
+      p.textSize(size || 13);
+      p.text(s, x, y);
+    },
+    core(x, y, w, h, col) {
+      p.fill(col || th.core);
+      p.stroke(th.coreStroke);
+      p.strokeWeight(1.5);
+      p.rect(x, y, w, h, 2);
+    },
+    hatch(x, y, w, h) {
+      p.push();
+      p.drawingContext.save();
+      p.drawingContext.beginPath();
+      p.drawingContext.rect(x, y, w, h);
+      p.drawingContext.clip();
+      const hc = p.color(th.coreStroke);
+      hc.setAlpha(110);
+      p.stroke(hc);
+      p.strokeWeight(1);
+      for (let i = x - h; i < x + w + h; i += 7) p.line(i, y, i + h, y + h);
+      p.drawingContext.restore();
+      p.pop();
+    },
+    ring(cx, cy, R, r, col) {
+      p.fill(col || th.core);
+      p.stroke(th.coreStroke);
+      p.strokeWeight(1.5);
+      p.ellipse(cx, cy, R * 2, R * 2);
+      p.fill(th.bg);
+      p.stroke(th.coreStroke);
+      p.ellipse(cx, cy, r * 2, r * 2);
+    },
+    coilBar(x, y, len, n) {
+      p.noFill();
+      p.stroke(th.coil);
+      p.strokeWeight(2.2);
+      const step = len / n;
+      for (let i = 0; i < n; i++) p.ellipse(x + (i + 0.5) * step, y, step * 0.92, 36);
+    },
+    coilLimb(x, y1, y2, n) {
+      p.noFill();
+      p.stroke(th.coil);
+      p.strokeWeight(2.2);
+      const step = (y2 - y1) / n;
+      for (let i = 0; i < n; i++) p.ellipse(x, y1 + (i + 0.5) * step, 32, Math.abs(step) * 0.88);
+    },
+    coilArc(cx, cy, R, a0, a1, n) {
+      p.noFill();
+      p.stroke(th.coil);
+      p.strokeWeight(2.2);
+      for (let i = 0; i < n; i++) {
+        const a = a0 + (a1 - a0) * (i + 0.5) / n;
+        p.push();
+        p.translate(cx + R * p.cos(a), cy + R * p.sin(a));
+        p.rotate(a + p.HALF_PI);
+        p.ellipse(0, 0, 15, 24);
+        p.pop();
+      }
+    },
+    arrow(x1, y1, x2, y2, col) {
+      p.stroke(col || th.flux);
+      p.fill(col || th.flux);
+      p.strokeWeight(2);
+      p.line(x1, y1, x2, y2);
+      const a = Math.atan2(y2 - y1, x2 - x1);
+      p.push();
+      p.translate(x2, y2);
+      p.rotate(a);
+      p.triangle(0, 0, -10, -4.5, -10, 4.5);
+      p.pop();
+    },
+    flux(pts, closed) {
+      p.noFill();
+      p.stroke(th.flux);
+      p.strokeWeight(1.8);
+      p.drawingContext.setLineDash([7, 5]);
+      p.beginShape();
+      pts.forEach(([x, y]) => p.vertex(x, y));
+      if (closed) p.endShape(p.CLOSE);
+      else p.endShape();
+      p.drawingContext.setLineDash([]);
+    },
+    cCore(x, y, w, h, t, gap, col) {
+      p.fill(col || th.core);
+      p.stroke(th.coreStroke);
+      p.strokeWeight(1.5);
+      p.rect(x, y, w, t, 2);
+      p.rect(x, y + h - t, w, t, 2);
+      p.rect(x, y, t, h, 2);
+      const gy = y + (h - gap) / 2;
+      p.rect(x + w - t, y, t, gy - y, 2);
+      p.rect(x + w - t, gy + gap, t, y + h - (gy + gap), 2);
+    },
+    isoBox(x, y, w, dth, h, col) {
+      const ix = dth * 0.55, iy = dth * 0.32;
+      const c = p.color(col);
+      p.stroke(th.coreStroke);
+      p.strokeWeight(1.2);
+      p.fill(p.lerpColor(c, p.color(255), 0.12));
+      p.quad(x, y - h, x + w, y - h, x + w + ix, y - h - iy, x + ix, y - h - iy);
+      p.fill(p.lerpColor(c, p.color(0), 0.18));
+      p.quad(x + w, y, x + w + ix, y - iy, x + w + ix, y - h - iy, x + w, y - h);
+      p.fill(c);
+      p.quad(x, y, x + w, y, x + w, y - h, x, y - h);
+    },
+    cyl(x, y, len, r, col) {
+      p.fill(col);
+      p.stroke(th.coreStroke);
+      p.rect(x, y - r, len, 2 * r);
+      p.ellipse(x, y, r * 0.55, 2 * r);
+      p.ellipse(x + len, y, r * 0.55, 2 * r);
+    }
+  };
+  p.textFont("Inter, system-ui, sans-serif");
+  return T;
+}
+
+const MAG_DRAW = {
+  57(p, th) {
+    const T = magTools(p, th);
+    T.isoBox(210, 175, 220, 70, 48, th.core);
+    T.coilBar(230, 150, 180, 8);
+    T.arrow(200, 128, 200, 175, th.coil);
+    T.label(175, 118, "I", th.coil);
+    T.arrow(455, 128, 455, 175, th.coil);
+    T.label(460, 118, "I", th.coil);
+    T.labelC(320, 92, "N vueltas", th.coil);
+    T.label(80, 80, "Φ = 4×10⁻⁴ Wb", th.flux);
+    T.label(470, 70, "A = 0.01 m²", th.muted);
+    T.arrow(190, 152, 250, 152, th.flux);
+    T.label(195, 140, "Φ", th.flux);
+    T.labelC(200, 200, "S", th.poleS, 16);
+    T.labelC(450, 200, "N", th.poleN, 16);
+    T.labelC(320, 248, "mano derecha: norte a la derecha", th.muted, 12);
+  },
+  58(p, th) {
+    const T = magTools(p, th);
+    T.isoBox(50, 175, 110, 40, 55, th.iron);
+    T.labelC(105, 210, "(a) 6 × 2 × 1 cm", th.ink, 12);
+    T.cyl(250, 130, 150, 22, th.iron);
+    T.labelC(325, 175, "(b) Ø ½ pulg × 3 pulg", th.ink, 12);
+    T.isoBox(470, 155, 130, 22, 18, th.iron);
+    T.labelC(540, 185, "(c) 0.1 × 0.01 × 0.01 m", th.ink, 12);
+    T.labelC(320, 40, "Misma μ (hierro): gana el mayor l/A", th.muted, 13);
+    T.labelC(320, 248, "(c) es el yugo más largo y flaco", th.muted, 12);
+  },
+  59(p, th) {
+    const T = magTools(p, th);
+    T.ring(340, 130, 95, 58, th.iron);
+    T.coilArc(340, 130, 76, 2.4, 3.9, 9);
+    T.flux([
+      [340, 42], [400, 55], [430, 100], [430, 160], [400, 205], [340, 218],
+      [280, 205], [250, 160], [250, 100], [280, 55]
+    ], true);
+    T.arrow(410, 70, 425, 95, th.flux);
+    T.label(430, 70, "Φ", th.flux);
+    T.label(70, 70, "N = 75", th.coil);
+    T.label(70, 95, "hierro fundido", th.iron);
+    T.label(70, 175, "A = 3×10⁻³ m²", th.muted);
+    T.label(70, 200, "l = 0.2 m", th.muted);
+    T.label(70, 225, "Φ = 10×10⁻⁴ Wb", th.flux);
+  },
+  60(p, th) {
+    const T = magTools(p, th);
+    T.core(180, 55, 130, 150, th.iron);
+    T.core(310, 55, 140, 150, th.goes);
+    T.hatch(310, 55, 140, 150);
+    T.coilLimb(180, 70, 190, 8);
+    T.flux([[200, 70], [430, 70], [430, 190], [200, 190]], true);
+    T.label(70, 80, "N = 100", th.coil);
+    T.labelC(245, 130, "hierro", th.ink, 13);
+    T.labelC(380, 130, "GOES", th.ink, 13);
+    T.label(180, 230, "l = 0.3 m c/u    A = 5×10⁻⁴ m²    Φ = 3×10⁻⁴ Wb", th.muted, 12);
+  },
+  61(p, th) {
+    const T = magTools(p, th);
+    T.ring(330, 130, 95, 58, th.steel);
+    T.coilArc(330, 130, 76, 2.5, 3.8, 8);
+    T.coilArc(330, 130, 76, -0.6, 0.7, 6);
+    T.flux([
+      [330, 42], [390, 55], [420, 100], [420, 160], [390, 205], [330, 218],
+      [270, 205], [240, 160], [240, 100], [270, 55]
+    ], true);
+    T.label(40, 70, "N1  I = 2 A", th.coil);
+    T.label(450, 70, "N2 = 30  I = 1 A", th.coil);
+    T.labelC(330, 248, "acero   A = 0.0012 m²   l = 0.2 m   Φ = 12×10⁻⁴ Wb", th.muted, 12);
+  },
+  62(p, th) {
+    const T = magTools(p, th);
+    T.core(170, 50, 250, 150, th.steel);
+    T.core(360, 50, 70, 150, th.goes);
+    T.hatch(360, 50, 70, 150);
+    T.coilLimb(170, 65, 185, 8);
+    T.label(70, 80, "NI", th.coil);
+    T.labelC(280, 125, "acero", th.ink);
+    T.labelC(395, 90, "GOES", th.ink, 12);
+    T.label(170, 225, "l acero = 5.5 pulg    l GOES = 0.5 pulg    A = 1 pulg²", th.muted, 12);
+  },
+  63(p, th) {
+    const T = magTools(p, th);
+    T.core(180, 45, 280, 70, th.steel);
+    T.core(180, 45, 50, 150, th.steel);
+    T.core(410, 45, 50, 150, th.steel);
+    T.core(180, 155, 280, 45, th.iron);
+    T.coilLimb(205, 55, 145, 6);
+    T.coilLimb(435, 55, 145, 7);
+    T.label(70, 90, "N1 = 20", th.coil);
+    T.label(480, 90, "N2 = 30", th.coil);
+    T.labelC(320, 80, "acero", th.ink);
+    T.labelC(320, 178, "hierro", th.ink);
+    T.labelC(320, 248, "A = 0.25 pulg²   Φ = 0.8×10⁻⁴ Wb   I común", th.muted, 12);
+  },
+  64(p, th) {
+    const T = magTools(p, th);
+    T.cCore(170, 45, 300, 160, 36, 22, th.goes);
+    T.hatch(170, 45, 300, 36);
+    T.hatch(170, 169, 300, 36);
+    T.hatch(170, 45, 36, 160);
+    T.coilLimb(188, 85, 165, 7);
+    T.label(70, 80, "N = 100", th.coil);
+    T.label(70, 105, "GOES", th.goes);
+    T.label(490, 125, "3 mm", th.muted);
+    T.flux([[210, 63], [450, 63], [450, 115]], false);
+    T.flux([[450, 135], [450, 187], [210, 187], [210, 63]], false);
+    T.label(430, 90, "Φ", th.flux);
+    T.labelC(320, 248, "A = 2×10⁻⁴ m²   lab = lef = 0.05 m   laf = lbe = 0.02 m", th.muted, 12);
+  },
+  65(p, th) {
+    const T = magTools(p, th);
+    T.cyl(70, 130, 200, 28, th.steel);
+    T.coilBar(90, 130, 160, 7);
+    p.fill(th.core);
+    p.stroke(th.coreStroke);
+    p.rect(250, 118, 70, 24, 2);
+    T.arrow(255, 100, 310, 100, th.ink);
+    T.label(270, 88, "f", th.ink);
+    T.label(80, 80, "pistón   I = 900 mA   N = 80", th.coil);
+    p.stroke(th.ink);
+    p.strokeWeight(6);
+    p.line(420, 40, 420, 220);
+    p.strokeWeight(2);
+    p.line(400, 220, 500, 220);
+    T.label(435, 120, "carillón", th.ink);
+    T.label(80, 200, "carrera 4 cm", th.muted);
+  },
+  66(p, th) {
+    const T = magTools(p, th);
+    T.ring(330, 130, 100, 62, th.goes);
+    p.fill(th.bg);
+    p.noStroke();
+    p.rect(418, 118, 28, 24);
+    T.coilArc(330, 130, 81, 2.5, 3.9, 9);
+    T.coilArc(330, 130, 81, 0.9, 1.7, 5);
+    T.label(40, 70, "N1 = 200", th.coil);
+    T.label(40, 95, "I1", th.coil);
+    T.label(430, 210, "N2 = 40   I2 = 0.3 A", th.coil);
+    T.label(430, 125, "2 mm", th.muted);
+    T.labelC(330, 248, "GOES   r = 0.3 m   A = 1.3×10⁻⁴ m²   Φ = 2×10⁻⁴ Wb", th.muted, 12);
+  },
+  67(p, th) {
+    const T = magTools(p, th);
+    p.fill(th.steel);
+    p.stroke(th.coreStroke);
+    p.rect(220, 150, 160, 70, 4);
+    T.coilBar(235, 185, 130, 8);
+    p.fill(th.core);
+    p.rect(285, 128, 30, 24);
+    p.rect(200, 70, 240, 16, 2);
+    p.rect(200, 70, 16, 90);
+    T.label(430, 78, "armadura", th.ink);
+    T.label(430, 100, "gap 0.2 cm", th.muted);
+    p.stroke(th.ink);
+    p.strokeWeight(2);
+    let sx = 210, sy = 55;
+    for (let i = 0; i < 8; i++) {
+      p.line(sx, sy, sx + 8, sy - 10);
+      p.line(sx + 8, sy - 10, sx + 16, sy);
+      sx += 16;
+    }
+    T.label(90, 50, "resorte", th.muted);
+    p.fill(th.ink);
+    p.rect(380, 55, 50, 6);
+    p.rect(380, 68, 50, 6);
+    T.label(440, 62, "contactos", th.muted);
+    T.labelC(300, 240, "bobina N = 200    Ø núcleo = 0.01 m", th.muted, 12);
+  },
+  68(p, th) {
+    const T = magTools(p, th);
+    T.core(140, 40, 380, 36, th.goes);
+    T.core(140, 184, 380, 36, th.goes);
+    T.core(140, 40, 40, 180, th.goes);
+    T.core(300, 40, 36, 180, th.goes);
+    T.core(480, 40, 40, 70, th.goes);
+    T.core(480, 150, 40, 70, th.goes);
+    T.hatch(140, 40, 380, 36);
+    T.coilLimb(160, 80, 180, 8);
+    T.label(50, 80, "N = 200", th.coil);
+    T.labelC(238, 130, "1", th.ink, 18);
+    T.labelC(408, 130, "2", th.ink, 18);
+    T.label(530, 125, "2 mm", th.muted);
+    T.flux([[160, 58], [290, 58], [318, 100], [318, 160], [160, 202], [160, 58]], false);
+    T.flux([[336, 58], [500, 58], [500, 108]], false);
+    T.flux([[500, 152], [500, 202], [336, 202], [336, 58]], false);
+    T.labelC(320, 248, "A_bg = 2×10⁻⁴ m²    resto = 5×10⁻⁴ m²    Φg = 2×10⁻⁴ Wb", th.muted, 12);
+  },
+  69(p, th) {
+    const T = magTools(p, th);
+    T.ring(330, 130, 95, 58, th.steel);
+    T.coilArc(330, 130, 76, 2.4, 3.9, 9);
+    T.flux([
+      [330, 42], [395, 55], [425, 100], [425, 160], [395, 205], [330, 218],
+      [265, 205], [235, 160], [235, 100], [265, 55]
+    ], true);
+    T.label(50, 70, "I = 2 A", th.coil);
+    T.label(50, 95, "N = 100", th.coil);
+    T.label(50, 120, "acero", th.steel);
+    T.labelC(330, 248, "r = 0.08 m    A = 0.009 m²", th.muted, 12);
+  },
+  70(p, th) {
+    const T = magTools(p, th);
+    T.cCore(180, 45, 280, 155, 34, 14, th.steel);
+    T.coilLimb(197, 82, 160, 7);
+    T.label(60, 80, "I = 2 A", th.coil);
+    T.label(60, 105, "N = 150", th.coil);
+    T.label(480, 120, "0.8 mm", th.muted);
+    T.flux([[215, 62], [440, 62], [440, 108]], false);
+    T.flux([[440, 130], [440, 182], [215, 182], [215, 62]], false);
+    T.labelC(320, 248, "lcd = 8×10⁻⁴ m    lados 0.2 m    A = 2×10⁻⁴ m²", th.muted, 12);
+  },
+  21(p, th) {
+    drawBHCurves(p, th, null, null, true);
+  }
+};
+
+function drawBHCurves(p, th, markH, markB, fit) {
+  const L = 58, Rgt = 18, Top = 22, Bot = 40;
+  const pw = p.width - L - Rgt, ph = p.height - Top - Bot;
+  const hMax = 3000, bMax = 2;
+  const xOf = (h) => L + (Math.min(h, hMax) / hMax) * pw;
+  const yOf = (b) => Top + ph - (b / bMax) * ph;
+  p.stroke(th.ink);
+  p.strokeWeight(1.3);
+  p.line(L, Top, L, Top + ph);
+  p.line(L, Top + ph, L + pw, Top + ph);
+  p.noStroke();
+  p.fill(th.muted);
+  p.textSize(11);
+  p.textAlign(p.CENTER, p.TOP);
+  p.text("H (At/m)", L + pw / 2, Top + ph + 10);
+  p.push();
+  p.translate(16, Top + ph / 2);
+  p.rotate(-p.HALF_PI);
+  p.text("B (T)", 0, 0);
+  p.pop();
+  const poly = (mat, col, dash) => {
+    p.noFill();
+    p.stroke(col);
+    p.strokeWeight(2.1);
+    if (dash) p.drawingContext.setLineDash(dash);
+    p.beginShape();
+    for (let h = 0; h <= hMax; h += 20) p.vertex(xOf(h), yOf(BfromH(mat, h)));
+    p.endShape();
+    p.drawingContext.setLineDash([]);
+  };
+  if (fit) {
+    poly("steel", th.goes, [6, 4]);
+    p.noFill();
+    p.stroke(th.flux);
+    p.strokeWeight(2.2);
+    p.beginShape();
+    for (let h = 0; h <= hMax; h += 20) {
+      const B = 1.75 * (1 - Math.exp(-h / 420));
+      p.vertex(xOf(h), yOf(B));
+    }
+    p.endShape();
+    p.noStroke();
+    p.fill(th.flux);
+    p.textAlign(p.LEFT, p.CENTER);
+    p.text("ajuste Bs(1 − e^{−H/Hs})", L + 8, Top + 14);
+    p.fill(th.goes);
+    p.text("curva acero", L + 8, Top + 32);
+  } else {
+    poly("sheet", th.goes);
+    poly("steel", th.flux);
+    poly("iron", th.iron);
+    p.noStroke();
+    p.textAlign(p.LEFT, p.CENTER);
+    p.fill(th.goes); p.text("GOES", L + 8, Top + 14);
+    p.fill(th.flux); p.text("acero", L + 70, Top + 14);
+    p.fill(th.iron); p.text("hierro", L + 130, Top + 14);
+  }
+  if (markH != null && markB != null) {
+    p.fill("#c0392b");
+    p.noStroke();
+    p.circle(xOf(markH), yOf(markB), 9);
+  }
+}
+
+async function magPaint(hostId, keyOrFn) {
+  const host = document.getElementById(hostId);
+  if (!host) return;
+  const P5 = await loadP5();
+  const prev = magSketches.get(hostId);
+  if (prev) {
+    try { prev.remove(); } catch (_) { /* already gone */ }
+    magSketches.delete(hostId);
+  }
+  host.replaceChildren();
+  const sketch = new P5((p) => {
+    p.setup = () => {
+      const c = p.createCanvas(640, 270);
+      c.parent(host);
+      p.pixelDensity(Math.min(2, window.devicePixelRatio || 1));
+      p.noLoop();
+    };
+    p.draw = () => {
+      const th = magTheme(p);
+      p.background(th.bg);
+      if (typeof keyOrFn === "function") keyOrFn(p, th);
+      else if (MAG_DRAW[keyOrFn]) MAG_DRAW[keyOrFn](p, th);
+      else {
+        p.fill(th.muted);
+        p.textSize(14);
+        p.text(String(keyOrFn), 40, 40);
+      }
+    };
+  });
+  magSketches.set(hostId, sketch);
+}
+
+function magDrawBH(hostId, markH, markB, fit) {
+  return magPaint(hostId, (p, th) => drawBHCurves(p, th, markH, markB, !!fit));
+}
+
+function bindMagFig(selId, btnId, hostId, outId) {
+  const sel = document.getElementById(selId);
+  const out = document.getElementById(outId);
+  const paint = () => { if (sel) magPaint(hostId, sel.value); };
+  const run = () => {
+    paint();
+    try {
+      const s = FIG11[sel.value] && FIG11[sel.value].solve;
+      if (!s) throw new Error("Figura no implementada.");
+      setMathText(out, s());
+    } catch (e) { setMathText(out, e.message); }
+  };
+  document.getElementById(btnId)?.addEventListener("click", run);
+  sel?.addEventListener("change", paint);
+  paint();
+}
+
+const FIG11 = {};
+
+FIG11["57"] = {
+  draw(d) {
+    d.w(180, 90, 360, 90); d.w(180, 140, 360, 140);
+    d.w(180, 90, 180, 140); d.w(360, 90, 360, 140);
+    for (let i = 0; i < 6; i++) {
+      const x = 210 + i * 22;
+      d.w(x, 70, x, 160);
+    }
+    d.txt(200, 64, "N vueltas  I", "#2471a3");
+    d.txt(80, 110, "Φ = 4×10⁻⁴ Wb", "#2471a3");
+    d.txt(370, 80, "A = 0.01 m²");
+    d.arrR(170, 115, "");
+    d.txt(140, 170, "mano derecha → N a la derecha");
+  },
+  solve() {
+    const B = 4e-4 / 0.01;
+    return `Fig. 11.57 — electroimán / contactor de un dump.\n${mj(`B = \\Phi/A = ${texQtyBody(B, "T")}`)}.\nCorriente hacia abajo en la cara visible: pulgar a la derecha → norte a la derecha, sur a la izquierda.\nLíneas de Φ cerradas por el yugo (no dibujado): salen del N y vuelven al S.`;
+  }
+};
+
+FIG11["58"] = {
+  draw(d) {
+    d.w(40, 80, 140, 80); d.w(40, 140, 140, 140); d.w(40, 80, 40, 140); d.w(140, 80, 140, 140);
+    d.txt(55, 70, "(a) 6×2×1 cm");
+    d.w(200, 100, 340, 100); d.w(200, 130, 340, 130);
+    d.w(200, 100, 200, 130); d.w(340, 100, 340, 130);
+    d.txt(220, 90, "(b) Ø ½ pulg × 3 pulg");
+    d.w(400, 110, 560, 110); d.w(400, 130, 560, 130);
+    d.w(400, 110, 400, 130); d.w(560, 110, 560, 130);
+    d.txt(410, 100, "(c) 0.1 × 0.01 × 0.01 m");
+  },
+  solve() {
+    const a = { l: 0.06, A: 0.02 * 0.01, lab: "(a)" };
+    const b = { l: 3 * IN_M, A: Math.PI * Math.pow(0.25 * IN_M, 2), lab: "(b)" };
+    const c = { l: 0.1, A: 0.01 * 0.01, lab: "(c)" };
+    const rows = [a, b, c].map((x) => ({ ...x, r: x.l / x.A }));
+    rows.sort((u, v) => v.r - u.r);
+    let s = "Fig. 11.58 — mismo hierro, " + mj("\\mathcal{R} \\propto l/A") + " (dimensión larga).\n";
+    [a, b, c].forEach((x) => { s += `${x.lab}: l/A = ${formatQty(x.l / x.A, "1/m")}.\n`; });
+    s += `Mayor reluctancia: ${rows[0].lab}. Es el núcleo más «largo y flaco»: peor yugo, peor inductor sin gap útil.`;
+    return s;
+  }
+};
+
+FIG11["59"] = {
+  draw(d) {
+    d.o(220, 120); d.o(320, 120);
+    d.w(220, 70, 320, 70); d.w(220, 170, 320, 170);
+    d.txt(80, 90, "N = 75");
+    d.txt(80, 110, "hierro");
+    d.txt(200, 50, "A = 3×10⁻³ m²");
+    d.txt(200, 200, "l = 0.2 m   Φ = 10×10⁻⁴ Wb");
+  },
+  solve() {
+    const r = magRow("hierro", 1e-3, 3e-3, 0.2, "iron");
+    const I = r.Hl / 75;
+    magDrawBH("p5-plot-11-8", r.H, r.B);
+    const wrap = document.getElementById("wrap-11-8");
+    if (wrap) wrap.hidden = false;
+    let s = magTableText([r], r.Hl).s;
+    s += `${mj(`I = (\\sum H l)/N = ${texQtyBody(I, "A")}`)}.\nToroide de un sensor de corriente / núcleo de un common-mode.`;
+    return s;
+  }
+};
+FIG11["60"] = {
+  draw(d) {
+    d.w(160, 50, 420, 50); d.w(160, 170, 420, 170);
+    d.w(160, 50, 160, 170); d.w(420, 50, 420, 170);
+    d.w(290, 50, 290, 170);
+    d.txt(170, 110, "hierro"); d.txt(310, 110, "GOES");
+    d.txt(80, 80, "N = 100");
+    d.txt(160, 200, "l = 0.3 m c/u   A = 5×10⁻⁴ m²   Φ = 3×10⁻⁴ Wb");
+  },
+  solve() {
+    const phi = 3e-4, A = 5e-4, l = 0.3;
+    const ri = magRow("hierro", phi, A, l, "iron");
+    const rs = magRow("GOES", phi, A, l, "sheet");
+    const { s: t, sum } = magTableText([ri, rs]);
+    const I = sum / 100;
+    magDrawBH("p5-plot-11-8", ri.H, ri.B);
+    const wrap = document.getElementById("wrap-11-8");
+    if (wrap) wrap.hidden = false;
+    return t + `${mj(`I = ${texQtyBody(I, "A")}`)}.\nEl hierro se come casi toda la fmm: un yugo de fundición en un trafo 2026 es un error de compra.`;
+  }
+};
+FIG11["61"] = {
+  draw(d) {
+    d.txt(40, 70, "N1, I = 2 A");
+    d.txt(380, 70, "N2 = 30, I = 1 A");
+    d.txt(180, 50, "acero   A = 0.0012 m²   l = 0.2 m");
+    d.txt(180, 200, "Φ = 12×10⁻⁴ Wb");
+    d.o(240, 120);
+  },
+  solve() {
+    const r = magRow("acero", 12e-4, 0.0012, 0.2, "steel");
+    const ni2 = 30 * 1;
+    const n1 = (r.Hl - ni2) / 2;
+    magDrawBH("p5-plot-11-8", r.H, r.B);
+    const wrap = document.getElementById("wrap-11-8");
+    if (wrap) wrap.hidden = false;
+    let s = magTableText([r], r.Hl).s;
+    s += `Bobinas a favor (Φ horario). ${mj("2 N_1 + 30 = \\sum Hl")} ⇒ N1 = ${formatQty(n1, "")} vueltas.\n`;
+    s += `${mj(`\\mu = B/H = ${texQtyBody(r.mu, "H/m")}`)}, ${mj(`\\mu_r = ${texQtyBody(r.mur)}`)}.`;
+    return s;
+  }
+};
+FIG11["62"] = {
+  draw(d) {
+    d.w(180, 50, 400, 50); d.w(180, 180, 400, 180);
+    d.w(180, 50, 180, 180); d.w(400, 50, 400, 180);
+    d.w(340, 50, 340, 180);
+    d.txt(200, 110, "acero"); d.txt(345, 90, "GOES");
+    d.txt(40, 80, "NI");
+    d.txt(180, 210, "l_acero = 5.5 pulg  l_GOES = 0.5 pulg  A = 1 pulg²");
+  },
+  solve() {
+    const phi = 80000 / LINES_PER_WB;
+    const A = IN2_M2;
+    const rs = magRow("acero", phi, A, 5.5 * IN_M, "steel");
+    const rl = magRow("GOES", phi, A, 0.5 * IN_M, "sheet");
+    const { s: t, sum } = magTableText([rs, rl]);
+    return t + `${mj(`\\Phi = 80000\\,\\mathrm{líneas} = ${texQtyBody(phi, "Wb")}`)}, B = ${formatQty(rs.B, "T")}.\n` +
+      `${mj(`NI = ${texQtyBody(sum, "At")}`)}.\nμ acero = ${formatQty(rs.mu, "H/m")}, μ GOES = ${formatQty(rl.mu, "H/m")}.`;
+  }
+};
+FIG11["63"] = {
+  draw(d) {
+    d.w(180, 50, 420, 50); d.w(180, 160, 420, 160);
+    d.w(180, 50, 180, 160); d.w(420, 50, 420, 160);
+    d.txt(220, 90, "acero"); d.txt(220, 180, "hierro");
+    d.txt(40, 80, "N1=20"); d.txt(450, 80, "N2=30");
+    d.txt(160, 210, "l_acero=5.5 pulg  l_hierro=2.5 pulg  A=0.25 pulg²  Φ=0.8×10⁻⁴ Wb");
+  },
+  solve() {
+    const phi = 0.8e-4, A = 0.25 * IN2_M2;
+    const rs = magRow("acero", phi, A, 5.5 * IN_M, "steel");
+    const ri = magRow("hierro", phi, A, 2.5 * IN_M, "iron");
+    const { s: t, sum } = magTableText([rs, ri]);
+    const I = sum / (20 + 30);
+    return t + `Ambas fmm a favor (horario). ${mj("I(20+30)=\\sum Hl")} ⇒ I = ${formatQty(I, "A")}.\nDos windings de un contactor / de un trafo de aislamiento.`;
+  }
+};
+
+FIG11["64"] = {
+  draw(d) {
+    d.w(160, 50, 420, 50); d.w(160, 180, 420, 180);
+    d.w(160, 50, 160, 180); d.w(420, 50, 420, 90); d.w(420, 140, 420, 180);
+    d.txt(430, 120, "3 mm");
+    d.txt(80, 80, "N=100 GOES");
+    d.txt(170, 210, "A=2×10⁻⁴ m²  lab=lef=0.05  laf=lbe=0.02  Φ=2.4×10⁻⁴ Wb");
+  },
+  solve() {
+    const phi = 2.4e-4, A = 2e-4, lg = 0.003;
+    const ls = 2 * 0.05 + 2 * 0.02 - lg;
+    const rs = magRow("GOES", phi, A, ls, "sheet");
+    const rg = magRow("gap", phi, A, lg, "air");
+    const { s: t, sum } = magTableText([rs, rg]);
+    const I = sum / 100;
+    let s = t + `${mj(`I = ${texQtyBody(I, "A")}`)}.\n`;
+    s += `Caída en el gap: ${formatQty(100 * rg.Hl / sum, "\\%")} de la fmm. El aire se come el NI; el GOES, casi nada.\nEso es un inductor de boost / el gap de un DAB.`;
+    return s;
+  }
+};
+FIG11["65"] = {
+  draw(d) {
+    d.w(80, 100, 260, 100); d.w(80, 140, 260, 140);
+    d.txt(100, 90, "pistón  N=80  I=900 mA");
+    d.w(340, 40, 340, 200);
+    d.txt(350, 120, "carillón");
+    d.txt(80, 180, "carrera 4 cm");
+  },
+  solve() {
+    const N = 80, I = 0.9, dx = 0.5 * 0.04, dphi = 8e-4 - 0.5e-4;
+    const f = 0.5 * N * I * (dphi / dx);
+    return `Fig. 11.65 — actuador / pitch de pala / relé de un combiner.\n` +
+      `${mj("f = \\tfrac12 N I\\, d\\Phi/dx")}.\n` +
+      `ΔΦ = ${formatQty(dphi, "Wb")} en Δx = 2 cm (¼ a ¾ de 4 cm).\n` +
+      `${mj(`d\\Phi/dx \\approx ${texQtyBody(dphi / dx, "Wb/m")}`)}, ${mj(`f = ${texQtyBody(f, "N")}`)}.`;
+  }
+};
+FIG11["66"] = {
+  draw(d) {
+    d.o(260, 120);
+    d.txt(40, 70, "N1=200");
+    d.txt(200, 200, "N2=40  I2=0.3 A  r=0.3 m  gap=2 mm  A=1.3×10⁻⁴ m²");
+    d.txt(200, 50, "GOES  Φ=2×10⁻⁴ Wb");
+  },
+  solve() {
+    const phi = 2e-4, A = 1.3e-4, lg = 0.002;
+    const ls = 2 * Math.PI * 0.3 - lg;
+    const rs = magRow("GOES", phi, A, ls, "sheet");
+    const rg = magRow("gap", phi, A, lg, "air");
+    const { s: t, sum } = magTableText([rs, rg]);
+    const ni2 = 40 * 0.3;
+    const i1aid = (sum - ni2) / 200;
+    const i1opp = (sum + ni2) / 200;
+    return t + `N2 I2 = ${formatQty(ni2, "At")}.\n` +
+      `Si N2 a favor: I1 = (ΣHl − N2 I2)/200 = ${formatQty(i1aid, "A")}.\n` +
+      `Si N2 en contra (bias de un inductor con winding auxiliar): I1 = ${formatQty(i1opp, "A")}.\n` +
+      `El gap otra vez se lleva la fmm.`;
+  }
+};
+FIG11["67"] = {
+  draw(d) {
+    d.w(200, 140, 360, 140); d.w(200, 80, 360, 80);
+    d.txt(220, 70, "armadura  gap 0.2 cm");
+    d.txt(220, 170, "bobina N=200  Ø núcleo 1 cm");
+    d.txt(80, 120, "resorte");
+  },
+  solve() {
+    const phi = 0.2e-4, d = 0.01, A = Math.PI * (d / 2) ** 2, lg = 0.002, N = 200;
+    const rg = magRow("gap", phi, A, lg, "air");
+    const I = rg.Hl / N;
+    const F = 0.5 * rg.B ** 2 * A / MU0;
+    return `Fig. 11.67 — relé de un combiner / contactor de un dump.\n` +
+      `a. Toda la fmm en el gap (el núcleo se desprecia): B = ${formatQty(rg.B, "T")}, ` +
+      `${mj(`H_g = B/\\mu_0 = ${texQtyBody(rg.H, "At/m")}`)}, I = ${formatQty(I, "A")}.\n` +
+      `b. ${mj("F = B^2 A / (2\\mu_0)") } = ${formatQty(F, "N")}.`;
+  }
+};
+FIG11["68"] = {
+  draw(d) {
+    d.w(140, 50, 480, 50); d.w(140, 190, 480, 190);
+    d.w(140, 50, 140, 190); d.w(310, 50, 310, 190); d.w(480, 50, 480, 80); d.w(480, 120, 480, 190);
+    d.txt(40, 80, "N=200");
+    d.txt(200, 110, "1"); d.txt(380, 110, "2");
+    d.txt(490, 100, "2 mm");
+    d.txt(140, 220, "A_bg=2×10⁻⁴  resto=5×10⁻⁴  Φg=2×10⁻⁴ Wb");
+  },
+  solve() {
+    const phig = 2e-4, Aout = 5e-4, Ac = 2e-4, lg = 0.002;
+    const rg = magRow("gap", phig, Aout, lg, "air");
+    const rcd = magRow("cd", phig, Aout, 0.099, "sheet");
+    const rbc = magRow("bc", phig, Aout, 0.1, "sheet");
+    const mmfPar = rg.Hl + rcd.Hl + rbc.Hl;
+    let lo = 1e-8, hi = 2.2 * Ac;
+    for (let i = 0; i < 40; i++) {
+      const mid = 0.5 * (lo + hi);
+      const rc = magRow("bg", mid, Ac, 0.2, "sheet");
+      if (rc.Hl > mmfPar) hi = mid; else lo = mid;
+    }
+    const phic = 0.5 * (lo + hi);
+    const rc = magRow("bg", phic, Ac, 0.2, "sheet");
+    const phiT = phig + phic;
+    const rab = magRow("ab", phiT, Aout, 0.2, "sheet");
+    const rha = magRow("ha", phiT, Aout, 0.2, "sheet");
+    const NI = rab.Hl + rha.Hl + mmfPar;
+    const I = NI / 200;
+    return `Fig. 11.68 — núcleo EE de un trafo / inductor (rama 2 = gap).\n` +
+      `Rama 2 (Φg): ${magTableText([rbc, rg, rcd]).s}` +
+      `Esa fmm aparece en el centro bg ⇒ Φ_bg = ${formatQty(phic, "Wb")} (B_bg = ${formatQty(rc.B, "T")}).\n` +
+      `Φ_T = Φg + Φ_bg = ${formatQty(phiT, "Wb")}.\n` +
+      `Lazo izquierdo: ${magTableText([rab, rha]).s}` +
+      `${mj(`NI = ${texQtyBody(NI, "At")}`)}, ${mj(`I = ${texQtyBody(I, "A")}`)}.`;
+  }
+};
+
+FIG11["69"] = {
+  draw(d) {
+    d.o(260, 120);
+    d.txt(80, 80, "I=2 A  N=100  acero");
+    d.txt(180, 200, "r=0.08 m  A=0.009 m²");
+  },
+  solve() {
+    const NI = 100 * 2, l = 2 * Math.PI * 0.08, A = 0.009;
+    const H = NI / l;
+    const B = BfromH("steel", H);
+    const phi = B * A;
+    magDrawBH("p5-plot-11-14", H, B);
+    const wrap = document.getElementById("wrap-11-14");
+    if (wrap) wrap.hidden = false;
+    return `Fig. 11.69 — dado NI, se lee B en la curva (no se despeja μ).\n` +
+      `${mj(`H = NI/l = ${texQtyBody(H, "At/m")}`)}, B = ${formatQty(B, "T")}, ` +
+      `${mj(`\\Phi = ${texQtyBody(phi, "Wb")}`)}.`;
+  }
+};
+FIG11["70"] = {
+  draw(d) {
+    d.w(160, 50, 400, 50); d.w(160, 180, 400, 180);
+    d.w(160, 50, 160, 180); d.w(400, 50, 400, 90); d.w(400, 130, 400, 180);
+    d.txt(80, 80, "I=2 A N=150");
+    d.txt(160, 210, "lcd=8×10⁻⁴ m  lados 0.2 m  A=2×10⁻⁴ m²");
+  },
+  solve() {
+    const NI = 150 * 2, A = 2e-4, lg = 8e-4, ls = 4 * 0.2 - lg;
+    const phi = findPhi(A, ls, "steel", lg, NI);
+    const rs = magRow("acero", phi, A, ls, "steel");
+    const rg = magRow("gap", phi, A, lg, "air");
+    const { s: t, sum } = magTableText([rs, rg], NI);
+    return `Fig. 11.70 — búsqueda de Φ tal que ΣHl = NI = 300 At.\n` +
+      t + `${mj(`\\Phi = ${texQtyBody(phi, "Wb")}`)} (B = ${formatQty(rs.B, "T")}).\n` +
+      `Error de cierre: ${formatQty(sum - NI, "At")}. El gap (0.8 mm) otra vez manda.`;
+  }
+};
+FIG11["21"] = {
+  draw(d) { d.txt(40, 80, "B = Bs (1 − e^{−H/Hs})  ·  dual de vC = V(1 − e^{−t/τ})"); },
+  solve() {
+    const Bs = 1.75, Hs = 420;
+    const bOf = (H) => Bs * (1 - Math.exp(-H / Hs));
+    const hOf = (B) => -Hs * Math.log(1 - B / Bs);
+    magDrawBH("p5-plot-11-14", null, null, true);
+    const wrap = document.getElementById("wrap-11-14");
+    if (wrap) wrap.hidden = false;
+    let s = `Prob. 21 — dual del capacitor: ${mj("B = B_s(1-e^{-H/H_s})") } con Bs = 1.75 T, Hs = 420 At/m.\n`;
+    s += `a. ${mj("B = 1.75(1-e^{-H/420})")}.\n`;
+    [900, 1800, 2700].forEach((h) => { s += `b. H = ${h} At/m → B = ${formatQty(bOf(h), "T")} (curva: ${formatQty(BfromH("steel", h), "T")}).\n`; });
+    s += `c. ${mj("H = -H_s \\ln(1-B/B_s)")}.\n`;
+    [1.0, 1.4].forEach((b) => { s += `d. B = ${b} T → H = ${formatQty(hOf(b), "At/m")} (curva: ${formatQty(HfromB("steel", b), "At/m")}).\n`; });
+    s += `e. El ajuste es usable en la zona lineal; cerca de saturación la curva real se aplana antes. En 2026 se usa el dato del fabricante (GOES / ferrita), no una exponencial.`;
+    return s;
+  }
+};
+
+function fluxTable(phi, B, A) {
+  if (phi == null && B != null && A) phi = B * A;
+  if (B == null && phi != null && A) B = phi / A;
+  if (phi == null || B == null) throw new Error("Indica Φ y B, o uno de los dos y A.");
+  return { phi, B };
+}
+
+function initSec11() {
+  bindMagFig("s118-fig", "btn-s118", "p5-s118", "proc-11-8");
+  bindMagFig("s1112-fig", "btn-s1112", "p5-s1112", "proc-11-12");
+  bindMagFig("s1114-fig", "btn-s1114", "p5-s1114", "proc-11-14");
+  magPaint("p5-s113", "57");
+  magPaint("p5-s115", "58");
+
+  document.getElementById("btn-s113")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-11-3");
+    const wrap = document.getElementById("wrap-11-3");
+    const tb = document.querySelector("#table-11-3 tbody");
+    try {
+      let phi = readOptionalNumber("s113-phi");
+      let B = readOptionalNumber("s113-b");
+      const A = readOptionalNumber("s113-a");
+      const t = fluxTable(phi, B, A);
+      phi = t.phi; B = t.B;
+      const rows = [
+        ["SI", `${formatQtyPlain(phi)} Wb`, `${formatQtyPlain(B)} T`],
+        ["CGS", `${formatQtyPlain(phi * LINES_PER_WB)} Mx`, `${formatQtyPlain(B * G_PER_T)} G`],
+        ["Inglés", `${formatQtyPlain(phi * LINES_PER_WB)} líneas`, `${formatQtyPlain(B * LINES_IN2_PER_T)} líneas/pulg²`]
+      ];
+      if (tb) tb.innerHTML = rows.map((r) => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("");
+      if (wrap) wrap.style.display = "block";
+      setMathText(out, `${mj("1\\,\\mathrm{Wb}=10^{8}\\,\\mathrm{Mx}")}, ${mj("1\\,\\mathrm{T}=10^{4}\\,\\mathrm{G}=6.45\\times 10^{4}\\,\\mathrm{líneas/pulg^{2}}")}.\nEl medidor del trafo habla teslas; el millésimo de un gausímetro de taller, gauss.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s113f")?.addEventListener("click", () => {
+    magPaint("p5-s113", "57");
+    setMathText(document.getElementById("proc-11-3f"), FIG11["57"].solve());
+  });
+
+  document.getElementById("btn-s115")?.addEventListener("click", () => {
+    magPaint("p5-s115", "58");
+    setMathText(document.getElementById("proc-11-5"), FIG11["58"].solve());
+  });
+
+  document.getElementById("btn-s115g")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-11-5g");
+    try {
+      const l = readOptionalNumber("s115g-l"), A = readOptionalNumber("s115g-a");
+      const mat = document.getElementById("s115g-mat")?.value || "iron";
+      const B = readOptionalNumber("s115g-b") ?? 0.5;
+      if (!l || !A) throw new Error("Indica l y A.");
+      const mu = mat === "air" ? MU0 : B / HfromB(mat, B);
+      const R = l / (mu * A);
+      setMathText(out, `${BH_NAME[mat]}, B = ${formatQty(B, "T")} → μ = ${formatQty(mu, "H/m")} (μr = ${formatQty(mu / MU0)}).\n${mj(`\\mathcal{R} = l/(\\mu A) = ${texQtyBody(R, "At/Wb")}`)}.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s116")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-11-6");
+    try {
+      let phi = readOptionalNumber("s116-phi"), F = readOptionalNumber("s116-f"), R = readOptionalNumber("s116-r");
+      const n = [phi, F, R].filter((x) => x != null).length;
+      if (n < 2) throw new Error("Indica dos de Φ, fmm, R.");
+      if (R == null) R = F / phi;
+      else if (phi == null) phi = F / R;
+      else if (F == null) F = phi * R;
+      setMathText(out, `${mj("\\Phi = \\mathscr{F}/\\mathcal{R}")}.\nΦ = ${formatQty(phi, "Wb")}, fmm = ${formatQty(F, "At")}, R = ${formatQty(R, "At/Wb")}.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s117")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-11-7");
+    try {
+      let F = readOptionalNumber("s117-f"), l = readOptionalNumber("s117-l");
+      let H = readOptionalNumber("s117-h"), B = readOptionalNumber("s117-b");
+      if (H == null && F != null && l) H = F / l;
+      if (F == null && H != null && l) F = H * l;
+      let proc = `${mj("H = NI/l = \\mathscr{F}/l")}.\n`;
+      if (H != null) proc += `H = ${formatQty(H, "At/m")}.\n`;
+      if (B != null && H) {
+        const mu = B / H;
+        proc += `${mj(`\\mu = B/H = ${texQtyBody(mu, "H/m")}`)}, ${mj(`\\mu_r = ${texQtyBody(mu / MU0)}`)}.\n`;
+        proc += `Al doble de B, mismo H: μ ×2 = ${formatQty(2 * mu, "H/m")} (material distinto, o el mismo más abajo en la curva).`;
+      }
+      setMathText(out, proc);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s1117")?.addEventListener("click", () => {
+    const mat = document.getElementById("s1117-mat")?.value || "steel";
+    magDrawBH("p5-plot-11-17");
+    const tb = document.querySelector("#table-11-17 tbody");
+    const wrap = document.getElementById("wrap-11-17");
+    const Hs = [50, 100, 200, 300, 500, 900, 1800, 2700];
+    if (tb) {
+      tb.innerHTML = Hs.map((h) => {
+        const B = BfromH(mat, h), mu = B / h;
+        return `<tr><td>${h}</td><td>${formatQtyPlain(B)}</td><td>${formatQtyPlain(mu)}</td><td>${formatQtyPlain(mu / MU0)}</td></tr>`;
+      }).join("");
+    }
+    if (wrap) wrap.style.display = "block";
+    setMathText(document.getElementById("proc-11-17"),
+      `Curva ${BH_NAME[mat]} (Boylestad 11.23, leída para planta 2026).\nEl «programa» de los prob. 22–23: interpolar H↔B y repetir ΣHl. QBASIC era 1990.`);
+  });
+
+  const repaintMag = () => {
+    const a = document.getElementById("s118-fig")?.value;
+    const b = document.getElementById("s1112-fig")?.value;
+    const c = document.getElementById("s1114-fig")?.value;
+    if (a) magPaint("p5-s118", a);
+    if (b) magPaint("p5-s1112", b);
+    if (c) magPaint("p5-s1114", c);
+    magPaint("p5-s113", "57");
+    magPaint("p5-s115", "58");
+  };
+  document.querySelectorAll(".dark-mode-toggle").forEach((btn) => {
+    btn.addEventListener("click", () => setTimeout(repaintMag, 80));
+  });
+}
+
+Object.assign(presetsData, {
+  "11-3": {
+    p1: { fields: { "s113-phi": "5e-4", "s113-b": "8e-4", "s113-a": "" }, click: "btn-s113",
+      desc: "Prob. 1 — Φ = 5×10⁻⁴ Wb, B = 8×10⁻⁴ T. CGS: 5.00×10⁴ Mx, 8.00 G. Inglés: 5.00×10⁴ líneas, 51.6 líneas/pulg²." },
+    p2: { fields: { "s113-phi": "6e-4", "s113-b": "", "s113-a": "0.0012903" }, click: "btn-s113",
+      desc: "Prob. 2 — 60 000 Mx = 6.00×10⁻⁴ Wb, A = 2 pulg² = 1.29×10⁻³ m². B = 0.465 T = 4650 G = 3.00×10⁴ líneas/pulg²." },
+    p3: { click: "btn-s113f",
+      desc: "Prob. 3 — B = 0.0400 T. Norte a la derecha (mano derecha). Contactor / electroimán de un dump." }
+  },
+  "11-5": {
+    p4: { click: "btn-s115",
+      desc: "Prob. 4 — l/A: (a) 300, (b) 601, (c) 1000 m⁻¹. Gana (c): el núcleo más largo y flaco." }
+  },
+  "11-6": {
+    p5: { fields: { "s116-phi": "4.2e-4", "s116-f": "400", "s116-r": "" }, click: "btn-s116",
+      desc: "Prob. 5 — R = F/Φ = 9.52×10⁵ At/Wb. Reluctancia de un yugo / de un inductor." },
+    p6: { fields: { "s116-phi": "7.2e-4", "s116-f": "95.49", "s116-r": "" }, click: "btn-s116",
+      desc: "Prob. 6 — 72 000 Mx = 7.20×10⁻⁴ Wb. 120 gilberts = 95.5 At. R = 1.33×10⁵ At/Wb." }
+  },
+  "11-7": {
+    p7: { fields: { "s117-f": "400", "s117-l": "0.1524", "s117-h": "", "s117-b": "" }, click: "btn-s117",
+      desc: "Prob. 7 — l = 6 pulg = 0.152 m. H = 2.62 kAt/m." },
+    p8: { fields: { "s117-f": "", "s117-l": "", "s117-h": "600", "s117-b": "0.12" }, click: "btn-s117",
+      desc: "Prob. 8 — μ = B/H = 2.00×10⁻⁴ H/m (μr = 159). Al doble de B, mismo H: μ = 4.00×10⁻⁴ H/m." }
+  },
+  "11-8": {
+    p9: { selects: { "s118-fig": "59" }, click: "btn-s118",
+      desc: "Prob. 9 — B = 0.333 T en hierro. I ≈ 1.2 A (curva B–H)." },
+    p10: { selects: { "s118-fig": "60" }, click: "btn-s118",
+      desc: "Prob. 10 — B = 0.600 T. El hierro se come casi todo el NI; el GOES, poco." },
+    p11: { selects: { "s118-fig": "61" }, click: "btn-s118",
+      desc: "Prob. 11 — B = 1.00 T, acero. N1 de las dos bobinas a favor; μ = B/H." },
+    p12: { selects: { "s118-fig": "62" }, click: "btn-s118",
+      desc: "Prob. 12 — 80 000 líneas, A = 1 pulg². NI y μ de cada material." },
+    p13: { selects: { "s118-fig": "63" }, click: "btn-s118",
+      desc: "Prob. 13 — dos fmm a favor, I común. I = ΣHl / (N1+N2)." }
+  },
+  "11-12": {
+    p14: { selects: { "s1112-fig": "64" }, click: "btn-s1112",
+      desc: "Prob. 14 — B = 1.20 T, gap 3 mm. El aire se lleva casi toda la fmm." },
+    p15: { selects: { "s1112-fig": "65" }, click: "btn-s1112",
+      desc: "Prob. 15 — f = ½ NI dΦ/dx ≈ 1.35 N. Actuador / pitch / relé." },
+    p16: { selects: { "s1112-fig": "66" }, click: "btn-s1112",
+      desc: "Prob. 16 — toroide GOES + gap 2 mm, dos bobinas. I1 según el signo de N2." },
+    p17: { selects: { "s1112-fig": "67" }, click: "btn-s1112",
+      desc: "Prob. 17 — relé, fmm en el gap. I y F = B²A/(2μ0)." },
+    p18: { selects: { "s1112-fig": "68" }, click: "btn-s1112",
+      desc: "Prob. 18 — núcleo EE: Φg fija la rama 2; el centro se iguala en fmm; I = NI/200." }
+  },
+  "11-14": {
+    p19: { selects: { "s1114-fig": "69" }, click: "btn-s1114",
+      desc: "Prob. 19 — H = NI/l, B de la curva de acero, Φ = B A." },
+    p20: { selects: { "s1114-fig": "70" }, click: "btn-s1114",
+      desc: "Prob. 20 — iterar Φ hasta ΣHl = 300 At (gap 0.8 mm)." },
+    p21: { selects: { "s1114-fig": "21" }, click: "btn-s1114",
+      desc: "Prob. 21 — B = 1.75(1−e^{−H/420}), dual de vC. Probar 900/1800/2700 At/m y B = 1.0 / 1.4 T." }
+  },
+  "11-17": {
+    p22: { selects: { "s1117-mat": "steel" }, click: "btn-s1117",
+      desc: "Prob. 22 — el «programa» del ejemplo 11.3 es tabular B–H e interpolar. Acero fundido." },
+    p23: { selects: { "s1117-mat": "steel" }, click: "btn-s1117",
+      desc: "Prob. 23 — rutina B→H del acero: la misma tabla. QBASIC era 1990; el navegador es 2026." }
+  }
+});
+
+// --- Capítulo 12.0: Inductores (LCL, choke MPPT, DAB, DFIG) ---
+function rlPack(ii, iff, R, L) {
+  const tau = !R ? Infinity : L / R;
+  return {
+    tau, ii, iff, R, L,
+    iL: (t) => iff + (ii - iff) * Math.exp(-t / tau),
+    vL: (t) => R * (iff - ii) * Math.exp(-t / tau),
+    vR: (t) => {
+      const i = iff + (ii - iff) * Math.exp(-t / tau);
+      return i * R;
+    }
+  };
+}
+
+function rlText(p, title) {
+  let s = title ? title + "\n" : "";
+  s += `${mj(`\\tau = L/R = ${texQtyBody(p.tau, "s")}`)}.\n`;
+  s += `${mj(`i_L(t) = I_f + (I_i - I_f) e^{-t/\\tau}`)} con ${mj(`I_i = ${texQtyBody(p.ii, "A")}`)}, ${mj(`I_f = ${texQtyBody(p.iff, "A")}`)}.\n`;
+  s += `${mj(`v_L(t) = R(I_f - I_i) e^{-t/\\tau}`)} = ${mj(`${texQtyBody(p.R * (p.iff - p.ii), "V")} e^{-t/\\tau}`)}.\n`;
+  s += `A \(1\\tau\): i = ${formatQty(p.iL(p.tau), "A")} (63.2 % del salto), vL = ${formatQty(p.vL(p.tau), "V")}.\n`;
+  s += `A \(3\\tau\): i = ${formatQty(p.iL(3 * p.tau), "A")} (95.0 %). A \(5\\tau\): i = ${formatQty(p.iL(5 * p.tau), "A")} (99.3 %, «magnetizado»).\n`;
+  return s;
+}
+
+function tOfI(p, ix) {
+  const num = p.ii - p.iff, den = ix - p.iff;
+  if (num === 0 || den === 0 || num / den <= 0) throw new Error("El umbral no está entre Ii e If.");
+  return p.tau * Math.log(num / den);
+}
+
+function drawRlWave(svgId, wrapId, pack, tMax) {
+  const svg = document.getElementById(svgId);
+  const wrap = wrapId ? document.getElementById(wrapId) : null;
+  if (!svg) return;
+  if (wrap) wrap.hidden = false;
+  const T = tMax || 5 * pack.tau;
+  const W = 640, H = 280, Lft = 58, Rgt = 58, Top = 22, B = 40;
+  const pw = W - Lft - Rgt, ph = H - Top - B;
+  const n = 80;
+  const iMin = Math.min(pack.ii, pack.iff, 0);
+  const iMax = Math.max(pack.ii, pack.iff, 0);
+  const iSpan = (iMax - iMin) || Math.max(Math.abs(pack.iff), Math.abs(pack.ii), 1e-12);
+  const vAbs = Math.max(Math.abs(pack.vL(0)), Math.abs(pack.vL(T)), 1e-18);
+  const yI = (i) => Top + ph - ((i - iMin) / iSpan) * ph;
+  const yV = (v) => Top + ph / 2 - (v / vAbs) * (ph / 2) * 0.85;
+  const iLine = [], vLine = [];
+  for (let k = 0; k <= n; k++) {
+    const t = (k / n) * T;
+    const x = (Lft + (t / T) * pw).toFixed(1);
+    iLine.push(`${x},${yI(pack.iL(t)).toFixed(1)}`);
+    vLine.push(`${x},${yV(pack.vL(t)).toFixed(1)}`);
+  }
+  svg.innerHTML = `
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>
+    <line x1="${Lft}" y1="${Top}" x2="${Lft}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="${Lft}" y1="${Top + ph}" x2="${W - Rgt}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="${Lft}" y1="${yI(0)}" x2="${W - Rgt}" y2="${yI(0)}" stroke="currentColor" opacity="0.2"/>
+    <polyline fill="none" stroke="#1a6b4a" stroke-width="2.3" points="${iLine.join(" ")}"/>
+    <polyline fill="none" stroke="#2471a3" stroke-width="2" stroke-dasharray="5 3" points="${vLine.join(" ")}"/>
+    <text x="${W / 2}" y="${H - 8}" text-anchor="middle" font-size="12" fill="currentColor">t (0 … ${T >= 1 ? T.toPrecision(3) + " s" : (T * 1e3).toPrecision(3) + " ms"})</text>
+    <text x="16" y="${Top + ph / 2}" text-anchor="middle" font-size="12" fill="#1a6b4a" transform="rotate(-90 16 ${Top + ph / 2})">iL</text>
+    <text x="${W - 16}" y="${Top + ph / 2}" text-anchor="middle" font-size="12" fill="#2471a3" transform="rotate(90 ${W - 16} ${Top + ph / 2})">vL</text>
+    <text x="${Lft + 8}" y="${Top + 12}" font-size="11" fill="#1a6b4a">iL</text>
+    <text x="${Lft + 48}" y="${Top + 12}" font-size="11" fill="#2471a3">vL</text>`;
+}
+
+function iToVL(iPts, L) {
+  const vPts = [];
+  for (let i = 0; i < iPts.length - 1; i++) {
+    const [t0, i0] = iPts[i], [t1, i1] = iPts[i + 1];
+    const dt = t1 - t0;
+    const v = dt === 0 ? 0 : L * (i1 - i0) / dt;
+    vPts.push([t0, v], [t1, v]);
+  }
+  return vPts;
+}
+
+function vToIL(vPts, L, i0) {
+  const iPts = [[vPts[0][0], i0]];
+  let i = i0;
+  for (let k = 0; k < vPts.length - 1; k++) {
+    const [t0, v0] = vPts[k], [t1, v1] = vPts[k + 1];
+    const dt = t1 - t0;
+    const vAvg = (v0 + v1) / 2;
+    i += (vAvg * dt) / L;
+    iPts.push([t1, i]);
+  }
+  return iPts;
+}
+
+function figRL(d, opts) {
+  const y1 = 50, y2 = 190;
+  d.batt(40, y1, y2, opts.eLab || "E");
+  d.w(40, y1, 90, y1);
+  if (opts.sw !== false) d.sw(90, y1, opts.swLab || "");
+  const xR = opts.sw === false ? 90 : 130;
+  d.w(opts.sw === false ? 40 : 118, y1, xR, y1);
+  d.rh(xR, y1, 90, opts.rLab || "R");
+  d.w(xR + 90, y1, 300, y1);
+  d.indV(300, y1, y2 - y1, opts.lLab || "L", opts.core);
+  d.w(40, y2, 300, y2);
+  d.txt(318, 40, "+ vL −", "#2471a3");
+  if (opts.iLab) d.arrD(318, y1 + 40, opts.iLab);
+  d.gnd(40, y2);
+}
+
+const FIG12 = {};
+
+FIG12["64"] = {
+  draw(d) {
+    d.box(180, 70, 220, 40, "");
+    d.txt(230, 95, "200 vueltas", "#2471a3");
+    d.w(160, 90, 180, 90); d.w(400, 90, 430, 90);
+    d.o(156, 90); d.o(434, 90);
+    d.txt(240, 130, "núcleo de madera  ·  l = 0.075 m  ·  d = 0.005 m");
+  },
+  solve() {
+    const N = 200, l = 0.075, d = 0.005;
+    const A = Math.PI * (d / 2) ** 2;
+    const L = MU0 * N * N * A / l;
+    return `Fig. 12.64 — solenoide de aire (madera μr ≈ 1). Choke de EMI / busbar.\n` +
+      `${mj(`A = \\pi d^{2}/4 = ${texQtyBody(A, "m^{2}")}`)}.\n` +
+      `${mj(`L = \\mu_0 N^{2} A / l = ${texQtyBody(L, "H")}`)} = ${formatQty(L * 1e6, "\\mu\\mathrm{H}")}.`;
+  }
+};
+FIG12["64b"] = {
+  draw(d) { FIG12["64"].draw(d); d.txt(240, 150, "l = 4 pulg, d = 0.25 pulg"); },
+  solve() {
+    const N = 200, l = 4 * IN_M, d = 0.25 * IN_M;
+    const A = Math.PI * (d / 2) ** 2;
+    const L = MU0 * N * N * A / l;
+    return `Prob. 5 — mismo N, l = 4 pulg, d = 0.25 pulg.\n` +
+      `${mj(`L = ${texQtyBody(L, "H")}`)} = ${formatQty(L * 1e6, "\\mu\\mathrm{H}")}. Sigue siendo aire: no hay μr que salve el volumen.`;
+  }
+};
+FIG12["65"] = {
+  draw(d) {
+    d.txt(40, 40, "toroide, 300 vueltas");
+    d.txt(40, 64, "A = 1.5×10⁻⁴ m², l = 0.1 m");
+    d.txt(40, 88, "núcleo de aire  →  μr = 1");
+  },
+  solve() {
+    const N = 300, A = 1.5e-4, l = 0.1;
+    const L0 = MU0 * N * N * A / l;
+    return `Fig. 12.65.a — toroide de aire (EMI / sensor de un string).\n` +
+      `${mj(`L = \\mu_0 N^{2} A / l = ${texQtyBody(L0, "H")}`)} = ${formatQty(L0 * 1e6, "\\mu\\mathrm{H}")}.`;
+  }
+};
+FIG12["65b"] = {
+  draw(d) { FIG12["65"].draw(d); d.txt(40, 112, "núcleo ferromagnético μr = 2000"); },
+  solve() {
+    const N = 300, A = 1.5e-4, l = 0.1, mur = 2000;
+    const L = mur * MU0 * N * N * A / l;
+    return `Fig. 12.65.b — μr = 2000 (ferrita / nanocrystalline de un DAB).\n` +
+      `${mj(`L = \\mu_r \\mu_0 N^{2} A / l = ${texQtyBody(L, "H")}`)}.\n` +
+      `×2000 respecto al aire: el mismo toroide pasa de choke de EMI a inductor de potencia.`;
+  }
+};
+
+FIG12["66"] = {
+  solve() {
+    const L = 0.2;
+    const iPts = [[0, 0], [0.003, 0], [0.008, 0.04], [0.013, 0], [0.014, 0], [0.015, 0.04], [0.016, 0], [0.018, 0]];
+    const vPts = iToVL(iPts, L);
+    drawPw(document.getElementById("plot-12-6a"), iPts, "iL", "#1a6b4a", "ms");
+    drawPw(document.getElementById("plot-12-6b"), vPts, "vL", "#2471a3", "ms");
+    let s = `Fig. 12.66 — L = 200 mH. Ramp de un boost / LCL (ms).\n`;
+    s += `3–8 ms: di/dt = 8 A/s → vL = ${formatQty(L * 8, "V")}.\n`;
+    s += `8–13 ms: −8 A/s → vL = ${formatQty(-L * 8, "V")}.\n`;
+    s += `14–15 ms: 40 A/s → vL = ${formatQty(L * 40, "V")}. 15–16 ms: −8 V.\n`;
+    s += `Tramo plano: vL = 0 (choke ya magnetizado, di/dt = 0).`;
+    return s;
+  }
+};
+FIG12["67"] = {
+  solve() {
+    const L = 0.2;
+    const u = 1e-6;
+    const iPts = [[0, 0], [3 * u, 50e-6], [8 * u, 50e-6], [9 * u, 66e-6], [12 * u, 0], [14 * u, -44e-6], [16 * u, 0], [17 * u, 0]];
+    const vPts = iToVL(iPts, L);
+    drawPw(document.getElementById("plot-12-6a"), iPts, "iL", "#1a6b4a", "µs");
+    drawPw(document.getElementById("plot-12-6b"), vPts, "vL", "#2471a3", "µs");
+    const v03 = L * (50e-6) / (3e-6);
+    const v89 = L * (16e-6) / 1e-6;
+    const v912 = L * (-66e-6) / 3e-6;
+    const v1214 = L * (-44e-6) / 2e-6;
+    const v1416 = L * (44e-6) / 2e-6;
+    let s = `Fig. 12.67 — L = 0.2 H, escala µs (conmutación SiC).\n`;
+    s += `0–3 µs: vL = ${formatQty(v03, "V")}. 3–8 µs: 0 (meseta).\n`;
+    s += `8–9 µs: ${formatQty(v89, "V")}. 9–12 µs: ${formatQty(v912, "V")}.\n`;
+    s += `12–14 µs: ${formatQty(v1214, "V")}. 14–16 µs: ${formatQty(v1416, "V")}.`;
+    return s;
+  }
+};
+FIG12["68"] = {
+  solve() {
+    const L = 0.01, i0 = 0.004;
+    const u = 1e-6;
+    const vPts = [[0, 0], [5 * u, 0], [5 * u, -24], [10 * u, -24], [10 * u, 60], [12 * u, 60], [12 * u, 0], [16 * u, 0], [16 * u, -5], [24 * u, -5], [24 * u, 0], [26 * u, 0]];
+    const iPts = vToIL(vPts, L, i0);
+    drawPw(document.getElementById("plot-12-6a"), vPts, "vL", "#2471a3", "µs");
+    drawPw(document.getElementById("plot-12-6b"), iPts, "iL", "#1a6b4a", "µs");
+    const di1 = -24 * 5e-6 / L;
+    const di2 = 60 * 2e-6 / L;
+    const di3 = -5 * 8e-6 / L;
+    let s = `Fig. 12.68 — L = 10 mH, i(0) = 4 mA. Pulso de un driver / TVS.\n`;
+    s += `Δi = (1/L)∫v dt.\n`;
+    s += `5–10 µs (−24 V): Δi = ${formatQty(di1, "A")} → i = ${formatQty(i0 + di1, "A")}.\n`;
+    s += `10–12 µs (+60 V): Δi = ${formatQty(di2, "A")} → i = ${formatQty(i0 + di1 + di2, "A")}.\n`;
+    s += `16–24 µs (−5 V): Δi = ${formatQty(di3, "A")} → i = ${formatQty(i0 + di1 + di2 + di3, "A")}.`;
+    return s;
+  }
+};
+
+FIG12["69"] = {
+  draw(d) { figRL(d, { eLab: "40 mV", rLab: "20 kΩ", lLab: "250 mH", iLab: "iL" }); d.txt(140, 36, "+ vR −", "#2471a3"); },
+  solve() {
+    const p = rlPack(0, 0.04 / 20000, 20000, 0.25);
+    drawRlWave("plot-12-7", "wrap-12-7", p);
+    let s = rlText(p, "Fig. 12.69 — shunt 40 mV de un BESS / piranómetro (20 kΩ, 250 mH).");
+    s += `${mj(`v_R(t) = 0.040(1 - e^{-t/\\tau})\\,\\mathrm{V}`)}. En 2026: ramp de un sensor, no de un inversor.`;
+    return s;
+  }
+};
+FIG12["70"] = {
+  draw(d) {
+    d.o(40, 50); d.txt(8, 54, "+12 V");
+    d.w(44, 50, 80, 50); d.rh(80, 50, 80, "2.2 kΩ");
+    d.indH(180, 50, 90, "5 mH");
+    d.w(270, 50, 300, 50); d.w(300, 50, 300, 170);
+    d.sw(300, 170, ""); d.w(40, 198, 328, 198); d.gnd(40, 198);
+    d.w(40, 50, 40, 198);
+    d.txt(90, 78, "+ vR −", "#2471a3");
+    d.txt(200, 78, "+ vL −", "#2471a3");
+    d.arrD(310, 90, "iL");
+  },
+  solve() {
+    const p = rlPack(0, 12 / 2200, 2200, 0.005);
+    drawRlWave("plot-12-7", "wrap-12-7", p);
+    return rlText(p, "Fig. 12.70 — auxiliar 12 V de un rack / gate-drive (2.2 kΩ, 5 mH).");
+  }
+};
+
+FIG12["71"] = {
+  draw(d) {
+    d.isrc(50, 40, 190, "5 mA");
+    d.rv(110, 40, 150, "R1 1.2 kΩ");
+    d.w(50, 40, 180, 40); d.sw(180, 40, "");
+    d.rh(230, 40, 80, "R2 2.2 kΩ");
+    d.indV(340, 40, 150, "2 H", true);
+    d.w(50, 190, 340, 190); d.gnd(50, 190);
+    d.arrD(354, 80, "iL");
+    d.txt(360, 28, "+ vL −", "#2471a3");
+    d.txt(300, 210, "3 mA ↑ (Ii opuesta a iL)", "#2471a3");
+  },
+  solve() {
+    const Rth = 1200 + 2200, eth = 0.005 * 1200, iff = eth / Rth, ii = -0.003;
+    const p = rlPack(ii, iff, Rth, 2);
+    drawRlWave("plot-12-8", "wrap-12-8", p);
+    let s = `Fig. 12.71 — string 5 mA || 1.2 kΩ, choke 2 H con bias de −3 mA (flujo residual).\n`;
+    s += `${mj(`E_{\\mathrm{Th}} = 6.00\\,\\mathrm{V}`)}, ${mj(`R_{\\mathrm{Th}} = 3.40\\,\\mathrm{k}\\Omega`)}.\n`;
+    s += rlText(p, "");
+    s += `Ii negativo: el LCL reengancha con corriente en contra. vL(0⁺) = ${formatQty(p.vL(0), "V")}.`;
+    return s;
+  }
+};
+FIG12["72"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "36 V");
+    d.rh(70, 50, 80, "R1 4.7 kΩ");
+    d.sw(160, 50, "");
+    d.indH(210, 50, 90, "120 mH");
+    d.rh(310, 50, 80, "R2 3.9 kΩ");
+    d.w(40, 50, 70, 50); d.w(390, 50, 390, 190); d.w(40, 190, 390, 190);
+    d.gnd(40, 190);
+    d.arrR(250, 36, "iL 8 mA");
+    d.txt(220, 78, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const R = 4700 + 3900, iff = 36 / R, ii = 0.008;
+    const p = rlPack(ii, iff, R, 0.12);
+    drawRlWave("plot-12-8", "wrap-12-8", p);
+    let s = `Fig. 12.72 — módulo ~36 V (Voc de 60 celdas) a través de un choke con 8 mA de bias.\n`;
+    s += rlText(p, "");
+    s += `Ii > If: la corriente cae. vL(0⁺) negativa (Lenz se opone a la bajada).`;
+    return s;
+  }
+};
+FIG12["73"] = {
+  draw(d) {
+    d.isrc(50, 40, 190, "4 mA");
+    d.rv(110, 40, 150, "R1 2.2 kΩ");
+    d.w(50, 40, 170, 40); d.sw(170, 40, "");
+    d.indH(220, 40, 90, "200 mH");
+    d.arrR(250, 28, "iL 3 mA");
+    d.battH(320, 390, 40, "16 V");
+    d.rv(390, 40, 150, "R2 8.2 kΩ");
+    d.w(50, 190, 390, 190); d.gnd(50, 190);
+  },
+  solve() {
+    const Rth = 2200 + 8200, eth = 0.004 * 2200 - 16, iff = eth / Rth, ii = 0.003;
+    const p = rlPack(ii, iff, Rth, 0.2);
+    drawRlWave("plot-12-8", "wrap-12-8", p);
+    let s = `Fig. 12.73 — string 4 mA contra un rack 16 V, choke 200 mH con 3 mA.\n`;
+    s += `${mj(`E_{\\mathrm{Th}} = 8.8 - 16 = ${texQtyBody(eth, "V")}`)}, ${mj(`R_{\\mathrm{Th}} = 10.4\\,\\mathrm{k}\\Omega`)}.\n`;
+    s += rlText(p, "");
+    s += `If negativa: el rack gana al string. El choke se vacía y se remagnetiza al revés.`;
+    return s;
+  }
+};
+
+function drawTwoPhase(svgId, wrapId, p1, tOpen, p2) {
+  const svg = document.getElementById(svgId);
+  const wrap = wrapId ? document.getElementById(wrapId) : null;
+  if (!svg) return;
+  if (wrap) wrap.hidden = false;
+  const T2 = 5 * p2.tau;
+  const T = tOpen + T2;
+  const W = 640, H = 280, Lft = 58, Rgt = 24, Top = 22, B = 40;
+  const pw = W - Lft - Rgt, ph = H - Top - B;
+  const samples = [];
+  const n = 50;
+  for (let k = 0; k <= n; k++) {
+    const t = (k / n) * tOpen;
+    samples.push([t, p1.iL(t), p1.vL(t)]);
+  }
+  for (let k = 0; k <= n; k++) {
+    const td = (k / n) * T2;
+    samples.push([tOpen + td, p2.iL(td), p2.vL(td)]);
+  }
+  const is = samples.map((s) => s[1]), vs = samples.map((s) => s[2]);
+  let iMin = Math.min(0, ...is), iMax = Math.max(0, ...is);
+  if (iMin === iMax) { iMax += 1e-6; iMin -= 1e-6; }
+  const vAbs = Math.max(...vs.map(Math.abs), 1e-12);
+  const xOf = (t) => Lft + (t / T) * pw;
+  const yI = (i) => Top + ph - ((i - iMin) / (iMax - iMin)) * ph;
+  const yV = (v) => Top + ph / 2 - (v / vAbs) * (ph / 2) * 0.8;
+  const iLine = samples.map((s) => `${xOf(s[0]).toFixed(1)},${yI(s[1]).toFixed(1)}`).join(" ");
+  const vLine = samples.map((s) => `${xOf(s[0]).toFixed(1)},${yV(s[2]).toFixed(1)}`).join(" ");
+  const xSw = xOf(tOpen);
+  svg.innerHTML = `
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>
+    <line x1="${Lft}" y1="${Top}" x2="${Lft}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="${Lft}" y1="${Top + ph}" x2="${W - Rgt}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="${xSw}" y1="${Top}" x2="${xSw}" y2="${Top + ph}" stroke="#c0392b" stroke-dasharray="4 3" opacity="0.7"/>
+    <polyline fill="none" stroke="#1a6b4a" stroke-width="2.3" points="${iLine}"/>
+    <polyline fill="none" stroke="#2471a3" stroke-width="2" stroke-dasharray="5 3" points="${vLine}"/>
+    <text x="${W / 2}" y="${H - 8}" text-anchor="middle" font-size="12" fill="currentColor">t (cierra → abre)</text>
+    <text x="${xSw + 6}" y="${Top + 12}" font-size="11" fill="#c0392b">abre</text>`;
+}
+
+FIG12["74"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "20 V");
+    d.w(40, 50, 90, 50); d.sw(90, 50, "");
+    d.rv(160, 50, 140, "R2 10 kΩ");
+    d.rh(180, 50, 80, "R1 10 kΩ");
+    d.indV(290, 50, 140, "10 mH");
+    d.w(118, 50, 290, 50); d.w(40, 190, 290, 190); d.gnd(40, 190);
+    d.arrD(304, 90, "iL"); d.txt(310, 36, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const p1 = rlPack(0, 20 / 10000, 10000, 0.01);
+    const tOpen = 5 * p1.tau;
+    const p2 = rlPack(p1.iL(tOpen), 0, 20000, 0.01);
+    drawTwoPhase("plot-12-9", "wrap-12-9", p1, tOpen, p2);
+    let s = `Fig. 12.74 — 20 V, LCL de un auxiliar. R2 es el dump / freewheel.\n`;
+    s += `Cerrado: R2 no afecta a L (E ideal). `;
+    s += rlText(p1, "Almacenamiento");
+    s += `Abre a 5τ = ${formatQty(tOpen, "s")}. I0 = ${formatQty(p1.iL(tOpen), "A")}. Lazo L–R1–R2.\n`;
+    s += rlText(p2, "Decaimiento");
+    return s;
+  }
+};
+FIG12["75"] = {
+  draw(d) {
+    d.o(180, 20); d.txt(140, 16, "E = −6 V");
+    d.w(180, 24, 180, 50); d.sw(164, 50, "");
+    d.rv(80, 70, 130, "R2 8.2 kΩ");
+    d.txt(20, 90, "− vR2 +", "#2471a3");
+    d.rh(200, 70, 80, "R1 6.8 kΩ");
+    d.indV(310, 70, 130, "5 mH");
+    d.txt(328, 64, "− vL +", "#2471a3");
+    d.arrD(200, 64, "iL"); d.arrD(324, 160, "iL");
+    d.w(80, 70, 310, 70); d.w(80, 200, 310, 200); d.gnd(80, 200); d.gnd(310, 200);
+  },
+  solve() {
+    const p1 = rlPack(0, -6 / 6800, 6800, 0.005);
+    const tOpen = 5 * p1.tau;
+    const p2 = rlPack(p1.iL(tOpen), 0, 6800 + 8200, 0.005);
+    drawTwoPhase("plot-12-9", "wrap-12-9", p1, tOpen, p2);
+    let s = `Fig. 12.75 — rail −6 V de un pad. Polaridades de vR2 y vL invertidas a propósito.\n`;
+    s += `If de iL (hacia abajo) es negativa: la corriente real sube hacia −6 V.\n`;
+    s += rlText(p1, "Cerrado");
+    s += `vR2,libro = −v_nudo = +6 V (etiqueta invertida).\n`;
+    s += rlText(p2, "Abre a 5τ");
+    s += `vR2 en decay: iL * 8.2 kΩ, con la polaridad de la figura.`;
+    return s;
+  }
+};
+FIG12["76"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "12 V");
+    d.w(40, 50, 90, 50); d.sw(90, 50, "");
+    d.rv(160, 50, 140, "R2 10 kΩ");
+    d.rh(190, 50, 70, "R1 2 kΩ");
+    d.indV(290, 50, 140, "1 mH");
+    d.w(118, 50, 290, 50); d.w(40, 190, 290, 190); d.gnd(40, 190);
+    d.arrD(304, 90, "iL"); d.txt(310, 36, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const p1 = rlPack(0, 12 / 2000, 2000, 0.001);
+    const tOpen = 1e-6;
+    const iOpen = p1.iL(tOpen);
+    const p2 = rlPack(iOpen, 0, 12000, 0.001);
+    drawTwoPhase("plot-12-9", "wrap-12-9", p1, tOpen, p2);
+    let s = `Fig. 12.76 — 12 V auxiliar, abre a 1 µs = ${formatQty(tOpen / p1.tau, "\\tau")} (no espera a 5τ).\n`;
+    s += rlText(p1, "Cerrado");
+    s += `A 1 µs: iL = ${formatQty(iOpen, "A")} (aún no magnetizado del todo).\n`;
+    s += rlText(p2, "Decay por R1+R2");
+    return s;
+  }
+};
+FIG12["76early"] = {
+  draw(d) { FIG12["76"].draw(d); },
+  solve() { return FIG12["76"].solve(); }
+};
+
+FIG12["ex4"] = {
+  solve() {
+    const p = rlPack(0, 40 / 2000, 2000, 0.01);
+    const tI = tOfI(p, 0.01);
+    const tV = p.tau * Math.log(p.vL(0) / 10);
+    let s = `Ejemplo 12.4 — almacenamiento: E = 40 V, R = 2 kΩ, L = 10 mH (choke de un auxiliar 40 V).\n`;
+    s += rlText(p, "");
+    s += `iL = 10 mA: t = ${formatQty(tI, "s")} = ${formatQty(tI / p.tau, "\\tau")}.\n`;
+    s += `vL = 10 V: ${mj(`40 e^{-t/\\tau} = 10`)} → t = ${formatQty(tV, "s")}.`;
+    return s;
+  }
+};
+FIG12["ex5"] = {
+  solve() {
+    const p = rlPack(0.008, 0, 2000, 0.01);
+    const tI = tOfI(p, 0.002);
+    let s = `Ejemplo 12.5 — decay: I0 = 8 mA, R = 2 kΩ, L = 10 mH (dump de un LCL).\n`;
+    s += rlText(p, "");
+    s += `iL = 2 mA: t = ${formatQty(tI, "s")} = ${formatQty(tI / p.tau, "\\tau")}.`;
+    return s;
+  }
+};
+
+FIG12["77"] = {
+  draw(d) {
+    d.isrc(50, 40, 190, "4 mA");
+    d.rv(110, 40, 150, "R1 12 kΩ");
+    d.w(50, 40, 180, 40); d.sw(180, 40, "");
+    d.rh(230, 40, 80, "R2 24 kΩ");
+    d.indV(340, 40, 150, "2 mH");
+    d.w(50, 190, 340, 190); d.gnd(50, 190);
+    d.arrD(354, 80, "iL"); d.txt(360, 28, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const Rth = 12000 + 24000, eth = 0.004 * 12000, iff = eth / Rth;
+    const p = rlPack(0, iff, Rth, 0.002);
+    drawRlWave("plot-12-11", "wrap-12-11", p, 8 * p.tau);
+    const t = 100e-9;
+    let s = `Fig. 12.77 — string 4 mA || 12 kΩ, R2 24 kΩ, L 2 mH (filtro de un sensor).\n`;
+    s += `${mj(`E_{\\mathrm{Th}} = 48.0\\,\\mathrm{V}`)}, ${mj(`R_{\\mathrm{Th}} = 36.0\\,\\mathrm{k}\\Omega`)}.\n`;
+    s += rlText(p, "");
+    s += `t = 100 ns = ${formatQty(t / p.tau, "\\tau")}: iL = ${formatQty(p.iL(t), "A")}, vL = ${formatQty(p.vL(t), "V")}.`;
+    return s;
+  }
+};
+FIG12["78"] = {
+  draw(d) {
+    d.o(160, 20); d.txt(120, 16, "E = +8 V");
+    d.rh(160, 40, 70, "R1 2.2 kΩ");
+    d.w(160, 24, 160, 40); d.w(230, 40, 230, 70); d.sw(214, 70, "");
+    d.rv(200, 100, 110, "R2 4.7 kΩ");
+    d.indV(310, 100, 110, "10 mH");
+    d.w(200, 100, 310, 100); d.w(200, 210, 310, 210);
+    d.gnd(200, 210); d.gnd(310, 210);
+    d.arrD(324, 140, "iL"); d.txt(330, 92, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const r1 = 2200, r2 = 4700, L = 0.01;
+    const iff = 8 / r1;
+    const rth = par(r1, r2);
+    const p = rlPack(0, iff, rth, L);
+    const t = 10e-6;
+    const iOpen = p.iL(t);
+    const p2 = rlPack(iOpen, 0, r2, L);
+    drawRlWave("plot-12-11", "wrap-12-11", p);
+    let s = `Fig. 12.78 — rail +8 V, R2 || L (dump del auxiliar de un pad).\n`;
+    s += `DC: L corto ⇒ R2 no lleva I. If = 8/2.2 kΩ = ${formatQty(iff, "A")}.\n`;
+    s += `${mj(`R_{\\mathrm{Th}} = 2.2\\,\\mathrm{k}\\parallel 4.7\\,\\mathrm{k} = ${texQtyBody(rth, "\\Omega")}`)}.\n`;
+    s += rlText(p, "Cerrado");
+    s += `t = 10 µs ≪ τ: iL = ${formatQty(iOpen, "A")}, vL = ${formatQty(p.vL(t), "V")}.\n`;
+    s += `Abre: RTh = R2, If = 0. τ_dis = ${formatQty(p2.tau, "s")}. iL = ${formatQty(iOpen, "A")} e^{-t/τ}.\n`;
+    s += `Casi no se magnetizó: el freewheel apenas tiene que tragar.`;
+    return s;
+  }
+};
+FIG12["79"] = {
+  draw(d) {
+    d.o(160, 20); d.txt(110, 16, "+20 V");
+    d.rv(160, 24, 70, "R2 4 kΩ");
+    d.rh(40, 94, 70, "R1 12 kΩ"); d.gnd(40, 94);
+    d.rh(40, 150, 70, "R3 3 kΩ"); d.txt(8, 170, "−6 V");
+    d.w(110, 94, 160, 94); d.w(160, 94, 160, 150); d.w(110, 150, 160, 150);
+    d.w(160, 94, 200, 94); d.sw(200, 94, "");
+    d.rh(250, 94, 70, "R4 1.5 kΩ");
+    d.indV(350, 94, 110, "5 mH");
+    d.w(350, 204, 40, 204); d.gnd(350, 204);
+    d.arrD(364, 130, "iL"); d.txt(370, 86, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const g = 1 / 12000 + 1 / 4000 + 1 / 3000;
+    const vn = (20 / 4000 + (-6) / 3000) / g;
+    const rn = 1 / g;
+    const rth = rn + 1500, eth = vn, iff = eth / rth;
+    const p = rlPack(0, iff, rth, 0.005);
+    const t2 = 2 * p.tau;
+    drawRlWave("plot-12-11", "wrap-12-11", p);
+    let s = `Fig. 12.79 — rails +20/−6 V, Thévenin del nudo (combiner / pad).\n`;
+    s += `${mj(`V_{\\mathrm{nudo}} = ${texQtyBody(vn, "V")}`)}, ${mj(`R_{\\mathrm{nudo}} = ${texQtyBody(rn, "\\Omega")}`)}.\n`;
+    s += `${mj(`E_{\\mathrm{Th}} = ${texQtyBody(eth, "V")}`)}, ${mj(`R_{\\mathrm{Th}} = ${texQtyBody(rth, "\\Omega")}`)}.\n`;
+    s += rlText(p, "Cerrado");
+    s += `A 2τ: iL = ${formatQty(p.iL(t2), "A")}, vL = ${formatQty(p.vL(t2), "V")}.\n`;
+    s += `Si abre: R4+L quedan en abierto. iL no puede saltar → arco en el interruptor.\n`;
+    s += `En 2026: nunca se abre un DC con L sin freewheel (boost sin diodo, breaker de BESS). vL → ∞ en el modelo.`;
+    return s;
+  }
+};
+FIG12["80"] = {
+  draw(d) {
+    d.batt(40, 50, 200, "36 V");
+    d.w(40, 50, 90, 50); d.sw(90, 50, "");
+    d.rv(160, 50, 150, "R2 470 Ω");
+    d.rh(190, 50, 70, "R1 100 Ω");
+    d.indV(290, 50, 90, "0.6 H");
+    d.rh(270, 160, 70, "R3 20 Ω");
+    d.w(118, 50, 290, 50); d.w(290, 140, 290, 160);
+    d.w(40, 200, 340, 200); d.w(340, 160, 340, 200);
+    d.gnd(40, 200);
+    d.txt(200, 36, "+ vR1 −", "#2471a3");
+    d.txt(310, 36, "+ vL −", "#2471a3");
+    d.txt(250, 188, "− vR3 +", "#2471a3");
+    d.arrD(304, 80, "iL");
+  },
+  solve() {
+    const R = 100 + 20, p = rlPack(0, 36 / R, R, 0.6);
+    drawRlWave("plot-12-11", "wrap-12-11", p);
+    const t100 = tOfI(p, 0.1);
+    let s = `Fig. 12.80 — 36 V, choke 0.6 H, lastre 20 Ω (feeder + dump).\n`;
+    s += `R2 || fuente: no entra en τ. RTh = 120 Ω, If = 300 mA, τ = 5.00 ms.\n`;
+    s += rlText(p, "");
+    s += `a. t = 25 ms = 5τ: vL = ${formatQty(p.vL(0.025), "V")}.\n`;
+    s += `b. t = 1 ms: vL = ${formatQty(p.vL(0.001), "V")}.\n`;
+    s += `c. t = 1τ: iL = ${formatQty(p.iL(p.tau), "A")}, vR1 = ${formatQty(p.iL(p.tau) * 100, "V")}.\n`;
+    s += `d. iL = 100 mA: t = ${formatQty(t100, "s")}.`;
+    return s;
+  }
+};
+FIG12["81"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "24 V");
+    d.w(40, 50, 90, 50); d.sw(90, 50, "");
+    d.rh(130, 50, 90, "2 MΩ");
+    d.indV(260, 50, 140, "5 H", true);
+    d.w(118, 50, 260, 50); d.w(40, 190, 260, 190); d.gnd(40, 190);
+    d.arrD(274, 90, "iL"); d.txt(280, 36, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const I0 = 24 / 2e6, p = rlPack(I0, 0, 2e6, 5);
+    drawRlWave("plot-12-11", "wrap-12-11", p);
+    let s = `Fig. 12.81 — 24 V, 2 MΩ, 5 H. Cerrado 1 h ⇒ I0 = ${formatQty(I0, "A")} (12.0 µA).\n`;
+    s += `Al abrir el interruptor de serie no hay lazo: iL hace arco (DC breaker sin freewheel).\n`;
+    s += `Si el modelo sustituye E por 0 y deja R (decay clásico del libro):\n`;
+    s += rlText(p, "Decay con R = 2 MΩ");
+    s += `a. iR → 1 mA: I0 = 12 µA < 1 mA. No existe ese instante. (1 µA sí: t = ${formatQty(p.tau * Math.log(12), "s")}).\n`;
+    s += `b. vL(1 ms) ≫ 5τ: vL ≈ 0 en el modelo con R; ∞ en el arco real.\n`;
+    s += `c. No hay R3 en la fig. 12.81. vR(5τ) = ${formatQty(p.vR(5 * p.tau), "V")}.`;
+    return s;
+  }
+};
+FIG12["81d"] = {
+  draw(d) {
+    FIG12["81"].draw(d);
+    d.txt(300, 80, "DMM 10 MΩ", "#2471a3");
+    d.w(290, 70, 360, 70); d.w(290, 160, 360, 160);
+    d.box(360, 70, 50, 90, "10 MΩ");
+  },
+  solve() {
+    const rth = par(2e6, 10e6), iff = 24 / 2e6;
+    const p = rlPack(0, iff, rth, 5);
+    drawRlWave("plot-12-11", "wrap-12-11", p);
+    const t10 = tOfI(p, 10e-6);
+    let s = `Fig. 12.81 + DMM 10 MΩ en paralelo con L (cierra a t = 0).\n`;
+    s += `El voltímetro ES el freewheel. RTh = 2 MΩ || 10 MΩ = ${formatQty(rth, "\\Omega")}.\n`;
+    s += `a. vL(0⁺) = 24 · 10/(2+10) = ${formatQty(24 * 10 / 12, "V")} (L abierto).\n`;
+    s += `b. If = 24/2 MΩ = ${formatQty(iff, "A")} (L corto, el DMM no lleva I).\n`;
+    s += rlText(p, "");
+    s += `c. iL = 10 µA: t = ${formatQty(t10, "s")}.\n`;
+    s += `d. t = 12 µs: vL = ${formatQty(p.vL(12e-6), "V")} (lectura del DMM).`;
+    return s;
+  }
+};
+FIG12["82"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "16 V");
+    d.rh(70, 50, 80, "R1 4.7 kΩ");
+    d.rh(200, 50, 80, "R2 3.3 kΩ");
+    d.indV(320, 50, 140, "2 H", true);
+    d.w(40, 50, 70, 50); d.w(280, 50, 320, 50);
+    d.w(150, 50, 150, 110); d.sw(134, 110, "t=0");
+    d.rv(150, 138, 52, "R3 1 kΩ");
+    d.w(40, 190, 320, 190); d.gnd(40, 190);
+    d.arrD(334, 90, "iL"); d.txt(340, 36, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const ii = 16 / (4700 + 3300);
+    const rn = par(4700, 1000), eth = 16 * 1000 / (4700 + 1000);
+    const rth = 3300 + rn, iff = eth / rth;
+    const p = rlPack(ii, iff, rth, 2);
+    drawRlWave("plot-12-11", "wrap-12-11", p);
+    let s = `Fig. 12.82 — crowbar / dump: R3 a tierra en el nudo R1–R2. Cerrado largo → Ii = ${formatQty(ii, "A")}.\n`;
+    s += `${mj(`E_{\\mathrm{Th}} = ${texQtyBody(eth, "V")}`)}, ${mj(`R_{\\mathrm{Th}} = ${texQtyBody(rth, "\\Omega")}`)}.\n`;
+    s += rlText(p, "Al cerrar el dump");
+    s += `If < Ii: el choke se vacía sobre el 1 kΩ. Es el lastre de un bus 16 V.`;
+    return s;
+  }
+};
+FIG12["83"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "24 V");
+    d.rh(70, 50, 80, "R1 2.2 kΩ");
+    d.rh(180, 50, 80, "R2 4.7 kΩ");
+    d.w(160, 34, 250, 34); d.sw(190, 34, "t=0 abre");
+    d.indV(300, 50, 140, "1.2 H", true);
+    d.w(40, 50, 70, 50); d.w(260, 50, 300, 50);
+    d.w(40, 190, 300, 190); d.gnd(40, 190);
+    d.arrD(314, 90, "iL"); d.txt(320, 36, "+ vL −", "#2471a3");
+  },
+  solve() {
+    const ii = 24 / 2200, iff = 24 / (2200 + 4700);
+    const p = rlPack(ii, iff, 2200 + 4700, 1.2);
+    drawRlWave("plot-12-11", "wrap-12-11", p);
+    let s = `Fig. 12.83 — 24 V, R2 puentada largo tiempo. I0 = ${formatQty(ii, "A")}.\n`;
+    s += `Abre: entra R2, If = ${formatQty(iff, "A")}.\n`;
+    s += rlText(p, "Decay hacia el nuevo If (no a cero: la fuente sigue)");
+    s += `vL(0⁺) = ${formatQty(p.vL(0), "V")}: Lenz se opone a la bajada de corriente.`;
+    return s;
+  }
+};
+FIG12["84"] = {
+  draw(d) {
+    d.rv(50, 50, 140, "R1 1 kΩ");
+    d.isrc(120, 50, 190, "4 mA");
+    d.indH(150, 50, 90, "220 mH");
+    d.arrL(160, 36, "iL");
+    d.txt(170, 78, "+ vL −", "#2471a3");
+    d.w(50, 50, 240, 50);
+    d.w(240, 50, 240, 90); d.sw(240, 90, "t=0");
+    d.rh(260, 50, 70, "R2 1.2 kΩ");
+    d.battH(330, 400, 50, "18 V", false);
+    d.w(50, 190, 400, 190); d.gnd(120, 190);
+  },
+  solve() {
+    const va = (0.004 + 18 / 1200) / (1 / 1000 + 1 / 1200);
+    const iThru = (va - 18) / 1200;
+    const ii = -iThru;
+    const iff = -0.004;
+    const p = rlPack(ii, iff, 1000, 0.22);
+    drawRlWave("plot-12-11", "wrap-12-11", p);
+    let s = `Fig. 12.84 — string 4 mA || 1 kΩ, choke 220 mH, rack 18 V. Switch a tierra en el lado derecho de L.\n`;
+    s += `Abierto (DC): VA = ${formatQty(va, "V")}, i (A→B) = ${formatQty(iThru, "A")}.\n`;
+    s += `iL definida hacia la izquierda ⇒ Ii = ${formatQty(ii, "A")}.\n`;
+    s += `Cerrado: B = 0, RTh = 1 kΩ, If = ${formatQty(iff, "A")} (todo el string por L, hacia abajo).\n`;
+    s += rlText(p, "");
+    s += `Cerrar el switch es un fault / dump a tierra del nudo del choke.`;
+    return s;
+  }
+};
+
+FIG12["85a"] = {
+  draw(d) {
+    d.o(40, 50); d.o(40, 190);
+    d.indH(60, 50, 80, "4 H", true);
+    d.indV(180, 50, 70, "3 H", true);
+    d.indV(240, 50, 70, "6 H", true);
+    d.indH(60, 190, 80, "2 H", true);
+    d.w(40, 50, 60, 50); d.w(140, 50, 180, 50); d.w(180, 50, 240, 50);
+    d.w(180, 120, 240, 120); d.w(210, 120, 210, 190);
+    d.w(40, 190, 60, 190); d.w(140, 190, 210, 190);
+    d.w(240, 50, 280, 50); d.w(280, 50, 280, 190); d.w(210, 190, 280, 190);
+    d.txt(20, 120, "LT");
+  },
+  solve() {
+    const p = par(3, 6), lt = 4 + p + 2;
+    return `Fig. 12.85.a — 4 + (3∥6) + 2.\n3∥6 = ${formatQty(p, "H")}. LT = ${formatQty(lt, "H")}.\nSerie de un LCL: dos chokes y el shunt equivalente.`;
+  }
+};
+FIG12["85b"] = {
+  draw(d) {
+    d.o(40, 50); d.o(40, 200);
+    d.indV(80, 50, 60, "3.6 H", true);
+    d.indV(70, 130, 70, "6 H", true);
+    d.indV(130, 130, 70, "4 H", true);
+    d.indV(200, 50, 150, "12 H", true);
+    d.w(40, 50, 80, 50); d.w(80, 50, 200, 50);
+    d.w(80, 110, 70, 130); d.w(80, 110, 130, 130);
+    d.w(70, 200, 130, 200); d.w(40, 200, 200, 200); d.w(200, 200, 200, 200);
+    d.txt(20, 130, "LT");
+  },
+  solve() {
+    const p = par(6, 4), s = 3.6 + p, lt = par(s, 12);
+    return `Fig. 12.85.b — [3.6+(6∥4)] ∥ 12.\n6∥4 = ${formatQty(p, "H")}. Suma = ${formatQty(s, "H")}. LT = ${formatQty(lt, "H")}.\nParalelo de dos fases de un filtro.`;
+  }
+};
+FIG12["86a"] = {
+  draw(d) {
+    d.o(40, 50); d.o(40, 190);
+    d.indH(70, 40, 80, "14 mH");
+    d.indH(70, 80, 80, "35 mH");
+    d.capV(200, 50, 140, "9 µF");
+    d.capH(240, 50, 70, "10 µF");
+    d.capV(330, 50, 140, "90 µF");
+    d.w(40, 50, 70, 50); d.w(150, 40, 170, 50); d.w(150, 80, 170, 50);
+    d.w(170, 50, 330, 50); d.w(40, 190, 330, 190);
+  },
+  solve() {
+    const l = par(0.014, 0.035);
+    const cs = (10e-6 * 90e-6) / 100e-6;
+    const c = 9e-6 + cs;
+    return `Fig. 12.86.a — menos elementos: L y C.\n14∥35 mH = ${formatQty(l, "H")}.\n10 s 90 = ${formatQty(cs, "F")}; ∥9 µF → ${formatQty(c, "F")}.\nUn ramo LC de un filtro EMI.`;
+  }
+};
+FIG12["86b"] = {
+  draw(d) {
+    d.o(40, 80); d.o(40, 200);
+    d.indH(60, 80, 70, "5 mH");
+    d.capH(160, 50, 70, "12 µF");
+    d.capH(260, 50, 70, "7 µF");
+    d.capH(200, 110, 80, "42 µF");
+    d.indH(160, 180, 90, "20 mH");
+    d.w(40, 80, 60, 80); d.w(130, 80, 160, 50); d.w(230, 50, 260, 50);
+    d.w(330, 50, 360, 80); d.w(360, 80, 360, 180);
+    d.w(40, 200, 160, 200); d.w(250, 180, 360, 180); d.w(160, 200, 160, 180);
+  },
+  solve() {
+    const cY12 = (12e-6 * 42e-6) / (12e-6 + 42e-6 + 7e-6);
+    const cY42 = (12e-6 * 7e-6) / (12e-6 + 42e-6 + 7e-6);
+    const cY7 = (42e-6 * 7e-6) / (12e-6 + 42e-6 + 7e-6);
+    return `Fig. 12.86.b — puente 12 / 42 / 7 µF, 5 mH de entrada, 20 mH de retorno.\n` +
+      `Δ→Y de C: ${formatQty(cY12, "F")}, ${formatQty(cY42, "F")}, ${formatQty(cY7, "F")}.\n` +
+      `Quedan 5 mH, 20 mH y el Y de tres C: cinco elementos, no siete.\n` +
+      `Puente de un filtro EMI / de un DAB.`;
+  }
+};
+FIG12["87"] = {
+  draw(d) {
+    d.batt(40, 50, 200, "20 V"); d.gnd(40, 200);
+    d.indH(70, 50, 70, "4 H", true);
+    d.rh(150, 50, 70, "1 kΩ");
+    d.indV(260, 50, 80, "6 H", true);
+    d.rv(320, 50, 80, "9.1 kΩ");
+    d.indH(250, 50, 70, "1 H", true);
+    d.indV(360, 50, 150, "2 H", true);
+    d.rh(70, 200, 80, "4.7 kΩ");
+    d.w(40, 50, 70, 50); d.w(40, 200, 360, 200);
+  },
+  solve() {
+    const lpar = par(6, 3), reqL = 4 + lpar;
+    const r = 1000 + 4700, i = 20 / r;
+    return `Fig. 12.87 — DC: todo L es corto ⇒ 6 H se come el 9.1 kΩ.\n` +
+      `Quedan 20 V, 1 kΩ, 4.7 kΩ. I = ${formatQty(i, "A")}.\n` +
+      `Transitorio (sin acoplar): 4 H s [6 H ∥ (1+2) H] = 4 + ${formatQty(lpar, "H")} = ${formatQty(reqL, "H")}, más 1 k y 4.7 k y el 9.1 k ∥ 6 H.\n` +
+      `Mínimo útil: 20 V, 4 H, 1 kΩ, (2 H ∥ 9.1 kΩ), 4.7 kΩ.`;
+  }
+};
+FIG12["88"] = {
+  draw(d) {
+    d.o(40, 50); d.txt(8, 54, "20 V");
+    d.rh(50, 50, 70, "R1 5 kΩ");
+    d.rv(120, 50, 140, "R2 20 kΩ");
+    d.w(50, 50, 50, 50); d.w(120, 50, 180, 50); d.sw(180, 50, "");
+    d.indH(230, 50, 80, "L1 5 H", true);
+    d.indV(340, 50, 70, "L2 6 H", true);
+    d.indV(400, 50, 140, "L3 30 H", true);
+    d.w(208, 50, 400, 50); d.w(340, 120, 400, 120);
+    d.w(120, 190, 400, 190); d.gnd(120, 190); d.gnd(400, 190);
+    d.arrD(250, 36, "iL"); d.txt(250, 78, "+ vL −", "#2471a3");
+    d.txt(418, 70, "+ vL3 −", "#2471a3");
+  },
+  solve() {
+    const leq = 5 + par(6, 30), rth = par(5000, 20000), eth = 20 * 20000 / 25000;
+    const p = rlPack(0, eth / rth, rth, leq);
+    drawRlWave("plot-12-12", "wrap-12-12", p);
+    const vpar0 = 5 * (p.iff / p.tau);
+    let s = `Fig. 12.88 — divisor 5 k / 20 k, L1 s (L2 ∥ L3). Cierre del interruptor.\n`;
+    s += `${mj(`E_{\\mathrm{Th}} = 16.0\\,\\mathrm{V}`)}, ${mj(`R_{\\mathrm{Th}} = 4.00\\,\\mathrm{k}\\Omega`)}, ${mj(`L_{eq} = 10.0\\,\\mathrm{H}`)}.\n`;
+    s += rlText(p, "");
+    s += `vL (de Leq) = 16 e^{-t/τ}. L1 y el paralelo se parten 5 H + 5 H: cada uno 8 e^{-t/τ} V.\n`;
+    s += `${mj(`v_{L3}(t) = ${texQtyBody(vpar0, "V")} e^{-t/\\tau}`)} (misma v que L2).\n`;
+    s += `i3 = iL · 6/(6+30) = iL/6. LCL / filtro de un BESS de 20 V.`;
+    return s;
+  }
+};
+
+FIG12["89"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "16 V"); d.gnd(40, 190);
+    d.rh(70, 50, 80, "4 kΩ");
+    d.txt(90, 36, "+ V1 −", "#2471a3");
+    d.indH(170, 50, 80, "2 H", true);
+    d.arrR(200, 36, "I1");
+    d.rv(280, 50, 80, "2 kΩ");
+    d.indV(340, 50, 140, "3 H", true);
+    d.txt(358, 70, "+ V2 −", "#2471a3");
+    d.w(40, 50, 70, 50); d.w(250, 50, 340, 50);
+    d.w(40, 190, 340, 190);
+  },
+  solve() {
+    const i1 = 16 / 4000;
+    return `Fig. 12.89 — DC: L corto. El 3 H se come el 2 kΩ.\n` +
+      `V1 = 16.0 V (todo el bus en el 4 kΩ). V2 = 0 (corto).\n` +
+      `I1 = ${formatQty(i1, "A")}. I_{3H} = I1, I_{2k} = 0.\n` +
+      `Auxiliar 16 V de un pad: el choke deja el lastre paralelo en vacío.`;
+  }
+};
+FIG12["90"] = {
+  draw(d) {
+    d.capV(80, 50, 140, "C 5 µF");
+    d.txt(20, 70, "+ V1 −", "#2471a3");
+    d.rv(140, 50, 60, "4 Ω");
+    d.batt(140, 110, 190, "20 V");
+    d.indH(200, 50, 80, "L 6 H", true);
+    d.arrR(230, 36, "I1");
+    d.rh(300, 50, 70, "6 Ω");
+    d.w(80, 50, 370, 50); d.w(80, 190, 370, 190); d.w(370, 50, 370, 190);
+    d.gnd(140, 190);
+  },
+  solve() {
+    const v1 = 12, i1 = 2;
+    return `Fig. 12.90 — DC: C abierto, L corto.\n` +
+      `Nudo de arriba: (V1−20)/4 + V1/6 = 0 → V1 = ${formatQty(v1, "V")}.\n` +
+      `I1 = V1/6 Ω = ${formatQty(i1, "A")}.\n` +
+      `El 4 Ω ve 20−12 = 8 V. Bus 20 V con choke de 6 Ω de carga.`;
+  }
+};
+FIG12["91"] = {
+  draw(d) {
+    d.batt(40, 50, 200, "50 V"); d.gnd(40, 200);
+    d.rh(70, 50, 70, "20 Ω");
+    d.rv(160, 50, 50, "5 Ω");
+    d.capV(160, 120, 50, "6 µF");
+    d.txt(90, 140, "+ V1 −", "#2471a3");
+    d.indH(70, 200, 70, "0.5 H", true);
+    d.arrL(90, 188, "I1");
+    d.rh(200, 50, 60, "3 Ω");
+    d.rv(280, 50, 50, "3 Ω");
+    d.indV(280, 120, 80, "4 H", true);
+    d.arrD(294, 150, "I2");
+    d.rh(330, 50, 60, "6 Ω");
+    d.w(40, 50, 390, 50); d.w(140, 200, 390, 200); d.w(390, 50, 390, 200);
+  },
+  solve() {
+    const it = 50 / 25, va = 10, vb = 4, i2 = vb / 3, i6 = vb / 6;
+    return `Fig. 12.91 — DC: C abierto (5 Ω no conduce), L cortos.\n` +
+      `Req = 20 + 3 + (3∥6) = 25 Ω. I1 (retorno 0.5 H) = ${formatQty(it, "A")}.\n` +
+      `VA = ${formatQty(va, "V")} = V1 (C abierto).\n` +
+      `VB = ${formatQty(vb, "V")}. I2 (4 H) = ${formatQty(i2, "A")}. I_6Ω = ${formatQty(i6, "A")}.\n` +
+      `Feeder 50 V: el film no lleva DC; los chokes sí.`;
+  }
+};
+
+FIG12["89w"] = {
+  draw(d) { FIG12["89"].draw(d); },
+  solve() {
+    const i = 16 / 4000;
+    const w2 = 0.5 * 2 * i * i, w3 = 0.5 * 3 * i * i;
+    return `Prob. 38 — fig. 12.89. I = ${formatQty(i, "A")} por ambos L (el 2 kΩ está corto).\n` +
+      `W(2 H) = ${formatQty(w2, "J")}. W(3 H) = ${formatQty(w3, "J")}.\n` +
+      `El 3 H guarda 1.5 veces: misma I, L ×1.5.`;
+  }
+};
+FIG12["90w"] = {
+  draw(d) { FIG12["90"].draw(d); },
+  solve() {
+    const wc = 0.5 * 5e-6 * 12 * 12, wl = 0.5 * 6 * 4;
+    return `Prob. 39 — fig. 12.90. V1 = 12 V, I1 = 2 A.\n` +
+      `WC = ½CV² = ${formatQty(wc, "J")}. WL = ½LI² = ${formatQty(wl, "J")}.\n` +
+      `El choke guarda 12 J; el film, 360 µJ. El hazard de abrir es el L, no el C.`;
+  }
+};
+FIG12["91w"] = {
+  draw(d) { FIG12["91"].draw(d); },
+  solve() {
+    const i1 = 2, i2 = 4 / 3;
+    const w05 = 0.5 * 0.5 * i1 * i1, w4 = 0.5 * 4 * i2 * i2;
+    return `Prob. 40 — fig. 12.91. I1 = 2.00 A, I2 = 1.33 A.\n` +
+      `W(0.5 H) = ${formatQty(w05, "J")}. W(4 H) = ${formatQty(w4, "J")}.\n` +
+      `WC (V1 = 10 V) = ${formatQty(0.5 * 6e-6 * 100, "J")} (abierto, no es el hazard).`;
+  }
+};
+
+function drawSolenoidSvg(geo) {
+  const svg = document.getElementById("svg-s124");
+  if (!svg) return;
+  const d = S();
+  if (geo === "sol") FIG12["64"].draw(d);
+  else FIG12["65"].draw(d);
+  setSvgMarkup(svg, d.str());
+}
+
+function initSec12() {
+  bindFig("s127-fig", "btn-s127", "svg-s127", "proc-12-7", FIG12);
+  bindFig("s128-fig", "btn-s128", "svg-s128", "proc-12-8", FIG12);
+  bindFig("s129-fig", "btn-s129", "svg-s129", "proc-12-9", FIG12);
+  bindFig("s1211-fig", "btn-s1211", "svg-s1211", "proc-12-11", FIG12);
+  bindFig("s1212-fig", "btn-s1212", "svg-s1212", "proc-12-12", FIG12);
+  bindFig("s1213-fig", "btn-s1213", "svg-s1213", "proc-12-13", FIG12);
+  bindFig("s1214f-fig", "btn-s1214f", "svg-s1214", "proc-12-14f", FIG12);
+
+  document.getElementById("btn-s122")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-12-2");
+    try {
+      let e = readOptionalNumber("s122-e");
+      let n = readOptionalNumber("s122-n");
+      let df = readOptionalNumber("s122-df");
+      if (e != null) e *= readUnit("s122-e-u");
+      if (df != null) df *= readUnit("s122-df-u");
+      const known = [e, n, df].filter((x) => x != null).length;
+      if (known < 2) throw new Error("Indica dos de e, N, dΦ/dt.");
+      let proc = `${mj("e = N\\,d\\Phi/dt")}. Lenz fija el signo: se opone al cambio.\n`;
+      if (e == null) {
+        e = n * df;
+        writeQtyField("s122-e", "s122-e-u", e);
+        proc += `${mj(`e = ${texQtyBody(e, "V")}`)}. CT / DFIG / pitch.`;
+      } else if (n == null) {
+        n = e / df;
+        setField("s122-n", n);
+        proc += `${mj(`N = e / (d\\Phi/dt) = ${texQtyBody(n)}`)} vueltas.`;
+      } else if (df == null) {
+        df = e / n;
+        writeQtyField("s122-df", "s122-df-u", df);
+        proc += `${mj(`d\\Phi/dt = e/N = ${texQtyBody(df, "Wb/s")}`)}.`;
+      } else {
+        proc += `Comprobación: N dΦ/dt = ${formatQty(n * df, "V")} vs e = ${formatQty(e, "V")}.`;
+      }
+      setMathText(out, proc);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("s124-geo")?.addEventListener("change", () => {
+    drawSolenoidSvg(document.getElementById("s124-geo").value);
+  });
+  drawSolenoidSvg(document.getElementById("s124-geo")?.value || "tor");
+
+  document.getElementById("btn-s124")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-12-4");
+    try {
+      const geo = document.getElementById("s124-geo")?.value || "tor";
+      drawSolenoidSvg(geo);
+      const N = readOptionalNumber("s124-n");
+      const lIn = readOptionalNumber("s124-l");
+      const mur = readOptionalNumber("s124-mur") ?? 1;
+      if (!N || lIn == null) throw new Error("Indica N y l.");
+      const l = lIn * readUnit("s124-l-u");
+      let A;
+      if (geo === "sol") {
+        const dIn = readOptionalNumber("s124-d");
+        if (dIn == null) throw new Error("Solenoide: indica d.");
+        const d = dIn * readUnit("s124-d-u");
+        A = Math.PI * (d / 2) ** 2;
+      } else {
+        A = readOptionalNumber("s124-a");
+        if (A == null) throw new Error("Toroide: indica A.");
+      }
+      const mu = mur * MU0;
+      const L = mu * N * N * A / l;
+      let proc = `${mj("L = \\mu N^{2} A / l")}, ${mj("\\mu_0 = 4\\pi\\times 10^{-7}\\,\\mathrm{H/m}")}.\n`;
+      proc += `${mj(`A = ${texQtyBody(A, "m^{2}")}`)}, ${mj(`\\mu_r = ${texQtyBody(mur)}`)}.\n`;
+      proc += `${mj(`L = ${texQtyBody(L, "H")}`)}.\n`;
+      proc += mur === 1
+        ? "Aire / madera: choke de EMI, no de potencia."
+        : "μr = 2000: ferrita o nanocrystalline de un DAB / LCL.";
+      setMathText(out, proc);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s126")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-12-6");
+    try {
+      let L = readOptionalNumber("s126-l");
+      let di = readOptionalNumber("s126-di");
+      let v = readOptionalNumber("s126-v");
+      if (L != null) L *= readUnit("s126-l-u");
+      if (di != null) di *= readUnit("s126-di-u");
+      if (L == null) throw new Error("Indica L.");
+      let proc = `${mj("v_L = L\\,di/dt")}.\n`;
+      if (v == null && di != null) {
+        v = L * di;
+        setField("s126-v", v);
+        proc += `${mj(`v_L = ${texQtyBody(v, "V")}`)}. Pico de un SiC / f.c.e.m. de un PMSM.`;
+      } else if (di == null && v != null) {
+        di = v / L;
+        writeQtyField("s126-di", "s126-di-u", di);
+        proc += `${mj(`di/dt = ${texQtyBody(di, "A/s")}`)}.`;
+      } else if (v != null && di != null) {
+        proc += `Comprobación: L di/dt = ${formatQty(L * di, "V")} vs v = ${formatQty(v, "V")}.`;
+      } else throw new Error("Indica vL o di/dt.");
+      setMathText(out, proc);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  const run126w = () => {
+    const key = document.getElementById("s126w-fig")?.value;
+    const out = document.getElementById("proc-12-6w");
+    try {
+      const s = FIG12[key] && FIG12[key].solve;
+      if (!s) throw new Error("Figura no implementada.");
+      setMathText(out, s());
+    } catch (err) { setMathText(out, err.message); }
+  };
+  document.getElementById("btn-s126w")?.addEventListener("click", run126w);
+  document.getElementById("s126w-fig")?.addEventListener("change", run126w);
+
+  document.getElementById("btn-s127g")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-12-7g");
+    try {
+      const E = readOptionalNumber("s127g-e"), R = readOptionalNumber("s127g-r"), L = readOptionalNumber("s127g-l");
+      const ii = readOptionalNumber("s127g-i0") ?? 0;
+      if (E == null || !R || !L) throw new Error("Indica E, R y L.");
+      const p = rlPack(ii, E / R, R, L);
+      drawRlWave("plot-12-7", "wrap-12-7", p);
+      setMathText(out, rlText(p, "Magnetizado genérico (LCL / choke / DAB)."));
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s1210")?.addEventListener("click", () => {
+    const key = document.getElementById("s1210-fig")?.value;
+    const out = document.getElementById("proc-12-10");
+    try {
+      const s = FIG12[key] && FIG12[key].solve;
+      if (!s) throw new Error("Caso no implementado.");
+      setMathText(out, s());
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s1210g")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-12-10");
+    try {
+      const ii = readOptionalNumber("s1210g-ii") ?? 0;
+      const iff = readOptionalNumber("s1210g-if");
+      const R = readOptionalNumber("s1210g-r"), L = readOptionalNumber("s1210g-l");
+      const ix = readOptionalNumber("s1210g-ix"), vx = readOptionalNumber("s1210g-vx");
+      if (iff == null || !R || !L) throw new Error("Indica If, R y L.");
+      const p = rlPack(ii, iff, R, L);
+      let proc = rlText(p, "Umbral genérico.");
+      if (ix != null) proc += `i = ${formatQty(ix, "A")}: t = ${formatQty(tOfI(p, ix), "s")}.\n`;
+      if (vx != null) {
+        const v0 = p.vL(0);
+        if (v0 === 0 || vx / v0 <= 0) proc += "v umbral no está en la exponencial de vL.\n";
+        else proc += `vL = ${formatQty(vx, "V")}: t = ${formatQty(p.tau * Math.log(v0 / vx), "s")}.`;
+      }
+      setMathText(out, proc);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s1214")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-12-14");
+    try {
+      let L = readOptionalNumber("s1214-l");
+      let I = readOptionalNumber("s1214-i");
+      let W = readOptionalNumber("s1214-w");
+      if (L != null) L *= readUnit("s1214-l-u");
+      const n = [L, I, W].filter((x) => x != null).length;
+      if (n < 2) throw new Error("Indica dos de L, I, W.");
+      if (W == null) W = 0.5 * L * I * I;
+      else if (L == null) L = 2 * W / (I * I);
+      else if (I == null) I = Math.sign(I || 1) * Math.sqrt(2 * W / L);
+      setMathText(out, `${mj("W = \\tfrac12 L I^{2}")}.\nL = ${formatQty(L, "H")}, I = ${formatQty(I, "A")}, W = ${formatQty(W, "J")}.\nHazard de abrir en DC: esos julios salen en el arco si no hay freewheel.`);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s1216")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-12-16");
+    const wrap = document.getElementById("wrap-12-16");
+    const tb = document.querySelector("#table-12-16 tbody");
+    try {
+      const E = readOptionalNumber("s1216-e"), ii = readOptionalNumber("s1216-i0") ?? 0;
+      const R = readOptionalNumber("s1216-r"), L = readOptionalNumber("s1216-l");
+      if (E == null || !R || !L) throw new Error("Indica E, R y L.");
+      const p = rlPack(ii, E / R, R, L);
+      if (tb) {
+        tb.innerHTML = [0, 1, 2, 3, 4, 5].map((n) => {
+          const t = n * p.tau, i = p.iL(t), v = p.vL(t);
+          const pct = p.iff === p.ii ? 100 : 100 * (i - p.ii) / (p.iff - p.ii);
+          return `<tr><td>${n}</td><td>${formatQtyPlain(t)}</td><td>${formatQtyPlain(i)}</td><td>${formatQtyPlain(pct)}</td><td>${formatQtyPlain(v)}</td></tr>`;
+        }).join("");
+      }
+      if (wrap) wrap.style.display = "block";
+      setMathText(out, `τ = ${formatQty(p.tau, "s")}. VPULSE con PW ≥ 5τ cubre el transitorio; PW = 1 ns es un impulso que el LCL ni ve. QBASIC era 1990.`);
+    } catch (err) { setMathText(out, err.message); }
+  });
+}
+
+Object.assign(presetsData, {
+  "12-2": {
+    p1: { fields: { "s122-e": "", "s122-n": "50", "s122-df": "0.085" }, selects: { "s122-e-u": "1", "s122-df-u": "1" }, click: "btn-s122",
+      desc: "Prob. 1 — 50 vueltas, 0.085 Wb/s. e = N dΦ/dt = 4.25 V. CT de un feeder / f.c.e.m. de un DFIG." },
+    p2: { fields: { "s122-e": "20", "s122-n": "40", "s122-df": "" }, selects: { "s122-e-u": "1" }, click: "btn-s122",
+      desc: "Prob. 2 — 20 V en 40 vueltas. dΦ/dt = e/N = 0.500 Wb/s." },
+    p3: { fields: { "s122-e": "42", "s122-n": "", "s122-df": "0.003" }, selects: { "s122-e-u": "0.001" }, click: "btn-s122",
+      desc: "Prob. 3 — 42 mV, 0.003 Wb/s. N = e/(dΦ/dt) = 14.0 vueltas. Encoder de pitch / sensor de un yaw." }
+  },
+  "12-4": {
+    p4: { fields: { "s124-n": "200", "s124-l": "0.075", "s124-d": "0.005", "s124-a": "", "s124-mur": "1" }, selects: { "s124-geo": "sol", "s124-l-u": "1", "s124-d-u": "1" }, click: "btn-s124",
+      desc: "Prob. 4 — solenoide madera, N = 200, l = 0.075 m, d = 0.005 m. L = 13.2 µH. Choke de EMI, no de potencia." },
+    p5: { fields: { "s124-n": "200", "s124-l": "4", "s124-d": "0.25", "s124-mur": "1" }, selects: { "s124-geo": "sol", "s124-l-u": "0.0254", "s124-d-u": "0.0254" }, click: "btn-s124",
+      desc: "Prob. 5 — l = 4 pulg, d = 0.25 pulg. L = 15.7 µH. Sigue siendo aire." },
+    p6a: { fields: { "s124-n": "300", "s124-l": "0.1", "s124-a": "1.5e-4", "s124-mur": "1" }, selects: { "s124-geo": "tor" }, click: "btn-s124",
+      desc: "Prob. 6.a — toroide de aire. L = 170 µH." },
+    p6b: { fields: { "s124-n": "300", "s124-l": "0.1", "s124-a": "1.5e-4", "s124-mur": "2000" }, selects: { "s124-geo": "tor" }, click: "btn-s124",
+      desc: "Prob. 6.b — μr = 2000. L = 0.339 H. El mismo toroide pasa a inductor de un DAB." }
+  },
+  "12-6": {
+    p7a: { fields: { "s126-l": "5", "s126-di": "0.5", "s126-v": "" }, selects: { "s126-l-u": "1", "s126-di-u": "1" }, click: "btn-s126",
+      desc: "Prob. 7.a — 5 H, 0.5 A/s. vL = 2.50 V. Ramp lento de un LCL de planta." },
+    p7b: { fields: { "s126-l": "5", "s126-di": "60", "s126-v": "" }, selects: { "s126-l-u": "1", "s126-di-u": "1e-3" }, click: "btn-s126",
+      desc: "Prob. 7.b — 5 H, 60 mA/s. vL = 0.300 V." },
+    p7c: { fields: { "s126-l": "5", "s126-di": "0.04", "s126-v": "" }, selects: { "s126-l-u": "1", "s126-di-u": "1000" }, click: "btn-s126",
+      desc: "Prob. 7.c — 5 H, 0.04 A/ms = 40 A/s. vL = 200 V. Pico de un SiC." },
+    p8: { fields: { "s126-l": "50", "s126-di": "0.1", "s126-v": "" }, selects: { "s126-l-u": "1e-3", "s126-di-u": "1000" }, click: "btn-s126",
+      desc: "Prob. 8 — 50 mH, 0.1 mA/µs = 100 A/s. vL = 5.00 V. di/dt de un DAB." },
+    p9: { selects: { "s126w-fig": "66" }, click: "btn-s126w",
+      desc: "Prob. 9 — fig. 12.66, 200 mH. Ramp ±1.6 V; pulso estrecho ±8 V." },
+    p10: { selects: { "s126w-fig": "67" }, click: "btn-s126w",
+      desc: "Prob. 10 — fig. 12.67, 0.2 H, escala µs." },
+    p11: { selects: { "s126w-fig": "68" }, click: "btn-s126w",
+      desc: "Prob. 11 — fig. 12.68, 10 mH, i(0)=4 mA. Δi = (1/L)∫v dt → −8 mA, 4 mA, 0." }
+  },
+  "12-7": {
+    p12: { selects: { "s127-fig": "69" }, click: "btn-s127",
+      desc: "Prob. 12 — fig. 12.69. τ = 12.5 µs, If = 2.00 µA. 1τ: 1.26 µA / 14.7 mV. 5τ: magnetizado." },
+    p13: { selects: { "s127-fig": "70" }, click: "btn-s127",
+      desc: "Prob. 13 — fig. 12.70. τ = 2.27 µs, If = 5.45 mA. Auxiliar 12 V de un rack." }
+  },
+  "12-8": {
+    p14: { selects: { "s128-fig": "71" }, click: "btn-s128",
+      desc: "Prob. 14 — fig. 12.71. Ii = −3 mA, If = 1.76 mA, τ = 0.588 ms. Bias residual de un choke." },
+    p15: { selects: { "s128-fig": "72" }, click: "btn-s128",
+      desc: "Prob. 15 — fig. 12.72. 36 V (módulo), Ii = 8 mA > If = 4.19 mA. vL(0⁺) negativa." },
+    p16: { selects: { "s128-fig": "73" }, click: "btn-s128",
+      desc: "Prob. 16 — fig. 12.73. String 4 mA contra rack 16 V. If = −0.692 mA: el rack gana." }
+  },
+  "12-9": {
+    p17: { selects: { "s129-fig": "74" }, click: "btn-s129",
+      desc: "Prob. 17 — fig. 12.74. Carga τ = 1.00 µs, If = 2.00 mA. Abre a 5τ: decay τ = 0.500 µs por R1+R2 (dump)." },
+    p18: { selects: { "s129-fig": "75" }, click: "btn-s129",
+      desc: "Prob. 18 — fig. 12.75. Rail −6 V, If = −0.882 mA. Polaridades invertidas a propósito." },
+    p19: { selects: { "s129-fig": "76" }, click: "btn-s129",
+      desc: "Prob. 19 — fig. 12.76. Abre a 1 µs = 2τ, iL = 5.19 mA. Decay τ = 83.3 ns." }
+  },
+  "12-10": {
+    p20: { selects: { "s1210-fig": "ex4" }, click: "btn-s1210",
+      desc: "Prob. 20 — ej. 12.4: E = 40 V, R = 2 kΩ, L = 10 mH. t(10 mA) = 6.93 µs. t(vL=10 V) = 13.9 µs." },
+    p21: { selects: { "s1210-fig": "ex5" }, click: "btn-s1210",
+      desc: "Prob. 21 — ej. 12.5: I0 = 8 mA, R = 2 kΩ, L = 10 mH. t(2 mA) = 13.9 µs." }
+  },
+  "12-11": {
+    p22: { selects: { "s1211-fig": "77" }, click: "btn-s1211",
+      desc: "Prob. 22 — fig. 12.77. Eth = 48 V, RTh = 36 kΩ, τ = 55.6 ns. A 100 ns: iL = 1.11 mA, vL = 7.93 V." },
+    p23: { selects: { "s1211-fig": "78" }, click: "btn-s1211",
+      desc: "Prob. 23 — fig. 12.78. If = 3.64 mA, τ = 6.68 ms. A 10 µs casi no magnetizó; al abrir, decay por 4.7 kΩ." },
+    p24: { selects: { "s1211-fig": "79" }, click: "btn-s1211",
+      desc: "Prob. 24 — fig. 12.79. Eth = 4.50 V, RTh = 3.00 kΩ, τ = 1.67 ms. A 2τ: 1.30 mA / 0.609 V. Abrir sin freewheel = arco." },
+    p25: { selects: { "s1211-fig": "80" }, click: "btn-s1211",
+      desc: "Prob. 25 — fig. 12.80. τ = 5.00 ms, If = 300 mA. 25 ms: vL ≈ 0. 1 ms: 29.5 V. 1τ: vR1 = 19.0 V. 100 mA a 2.03 ms." },
+    p26: { selects: { "s1211-fig": "81" }, click: "btn-s1211",
+      desc: "Prob. 26 — fig. 12.81. I0 = 12.0 µA. 1 mA no está en la curva. Abrir el lazo = arco; el modelo con R deja vL(5τ) ≈ 0." },
+    p27: { selects: { "s1211-fig": "81d" }, click: "btn-s1211",
+      desc: "Prob. 27 — DMM 10 MΩ || L. vL(0⁺) = 20.0 V. If = 12.0 µA. 10 µA a 5.38 µs. DMM a 12 µs: 0.366 V." },
+    p28: { selects: { "s1211-fig": "82" }, click: "btn-s1211",
+      desc: "Prob. 28 — fig. 12.82, crowbar. Ii = 2.00 mA, If = 0.680 mA, τ = 0.485 ms." },
+    p29: { selects: { "s1211-fig": "83" }, click: "btn-s1211",
+      desc: "Prob. 29 — fig. 12.83. I0 = 10.9 mA → If = 3.48 mA, τ = 0.174 ms. vL(0⁺) = −51.3 V." },
+    p30: { selects: { "s1211-fig": "84" }, click: "btn-s1211",
+      desc: "Prob. 30 — fig. 12.84. Cerrar el dump a tierra del choke. Ii ≈ 6.36 mA, If = −4.00 mA." }
+  },
+  "12-12": {
+    p31a: { selects: { "s1212-fig": "85a" }, click: "btn-s1212",
+      desc: "Prob. 31.a — LT = 8.00 H. 4+(3∥6)+2." },
+    p31b: { selects: { "s1212-fig": "85b" }, click: "btn-s1212",
+      desc: "Prob. 31.b — LT = 4.00 H. [3.6+(6∥4)]∥12." },
+    p32a: { selects: { "s1212-fig": "86a" }, click: "btn-s1212",
+      desc: "Prob. 32.a — 10.0 mH y 18.0 µF." },
+    p32b: { selects: { "s1212-fig": "86b" }, click: "btn-s1212",
+      desc: "Prob. 32.b — Δ→Y de 12/42/7 µF + 5 mH + 20 mH." },
+    p33: { selects: { "s1212-fig": "87" }, click: "btn-s1212",
+      desc: "Prob. 33 — DC: 20 V, 1 kΩ, 4.7 kΩ (el 6 H se come el 9.1 kΩ). I = 3.51 mA." },
+    p34: { selects: { "s1212-fig": "88" }, click: "btn-s1212",
+      desc: "Prob. 34 — Eth = 16 V, RTh = 4 kΩ, Leq = 10 H, τ = 2.50 ms, If = 4.00 mA. vL3 = 8 e^{−t/τ} V." }
+  },
+  "12-13": {
+    p35: { selects: { "s1213-fig": "89" }, click: "btn-s1213",
+      desc: "Prob. 35 — V1 = 16.0 V, V2 = 0, I1 = 4.00 mA. El 3 H corto se come el 2 kΩ." },
+    p36: { selects: { "s1213-fig": "90" }, click: "btn-s1213",
+      desc: "Prob. 36 — V1 = 12.0 V, I1 = 2.00 A." },
+    p37: { selects: { "s1213-fig": "91" }, click: "btn-s1213",
+      desc: "Prob. 37 — V1 = 10.0 V, I1 = 2.00 A (0.5 H), I2 = 1.33 A (4 H)." }
+  },
+  "12-14": {
+    p38: { selects: { "s1214f-fig": "89w" }, click: "btn-s1214f",
+      desc: "Prob. 38 — W(2 H) = 16.0 µJ, W(3 H) = 24.0 µJ." },
+    p39: { selects: { "s1214f-fig": "90w" }, click: "btn-s1214f",
+      desc: "Prob. 39 — WC = 360 µJ, WL = 12.0 J. El hazard es el choke." },
+    p40: { selects: { "s1214f-fig": "91w" }, click: "btn-s1214f",
+      desc: "Prob. 40 — W(0.5 H) = 1.00 J, W(4 H) = 3.56 J." }
+  },
+  "12-16": {
+    p41: { fields: { "s1216-e": "0.04", "s1216-i0": "0", "s1216-r": "20000", "s1216-l": "0.25" }, click: "btn-s1216",
+      desc: "Prob. 41 — cinco τ de la fig. 12.69 (ej. 12.6). VPULSE con PW = 5τ. El «PSpice» es esta tabla." },
+    p42: { fields: { "s1216-e": "0.04", "s1216-i0": "0", "s1216-r": "20000", "s1216-l": "0.25" }, click: "btn-s1216",
+      desc: "Prob. 42 — ej. 12.3, VPULSE con PW = 1 ns ≪ τ = 12.5 µs. El LCL ni se entera: iL ≈ 0." },
+    p43: { selects: { "s1211-fig": "84" }, click: "btn-s1211",
+      desc: "Prob. 43 — fig. 12.84 con la Ii apropiada (6.36 mA). El solucionador 12.11 es el PSpice de 2026." },
+    p44: { fields: { "s127g-e": "0.04", "s127g-r": "20000", "s127g-l": "0.25", "s127g-i0": "0" }, click: "btn-s127g",
+      desc: "Prob. 44 — programa general de iL, vL, vR: el solucionador 12.7 genérico (fig. 12.69 / 12.14 del libro)." },
+    p45: { selects: { "s129-fig": "74" }, click: "btn-s129",
+      desc: "Prob. 45 — fig. 12.74, carga 5τ y decay. El programa genera ambas fases." },
+    p46: { selects: { "s129-fig": "76" }, click: "btn-s129",
+      desc: "Prob. 46 — abre antes de 5τ (1 µs = 2τ en 12.76). iL y vL al abrir no son los de estado estable." }
+  }
+});
+

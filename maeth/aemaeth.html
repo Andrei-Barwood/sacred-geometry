@@ -8535,6 +8535,1336 @@
         </div>
       </details>
 
+      <details class="chapter-1-fold" id="capitulo-11">
+        <summary class="chapter-1-summary" aria-label="Capítulo 11.0">
+          <span class="chapter-1-title">11.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Circuitos magnéticos: \(\Phi\), \(B=\Phi/A\),
+            reluctancia \(\mathcal{R}=l/(\mu A)\),
+            \(\mathscr{F}=NI=\Phi\mathcal{R}\), \(H=NI/l\)
+            y la curva \(B\)–\(H\).
+            En 2026 el núcleo no es un electroimán de banco:
+            es el GOES del trafo de planta, el entrehierro del
+            inductor LCL / DAB de un BESS, el estator de un
+            generador DFIG, el ferrita o nanocrystalline del
+            SiC a 20–100&nbsp;kHz y el relé del combiner.
+            El entrehierro se come la fmm igual que el bleeder
+            se come el \(RC\): \(\mu_0\) es pequeño a propósito.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(B=\Phi/A\), \(\mathscr{F}=NI=Hl\)
+              y \(\mathcal{R}=l/(\mu A)\) sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-11-3">Sec 11.3</button>
+            <button class="tab-btn" data-target="sec-11-5">Sec 11.5</button>
+            <button class="tab-btn" data-target="sec-11-6">Sec 11.6</button>
+            <button class="tab-btn" data-target="sec-11-7">Sec 11.7</button>
+            <button class="tab-btn" data-target="sec-11-8">Sec 11.8</button>
+            <button class="tab-btn" data-target="sec-11-12">Sec 11.12</button>
+            <button class="tab-btn" data-target="sec-11-14">Sec 11.14</button>
+            <button class="tab-btn" data-target="sec-11-17">Sec 11.17</button>
+          </div>
+
+          <div class="tab-content active" id="sec-11-3">
+            <h2>Sección 11.3: Densidad de flujo</h2>
+            <p class="chapter-discourse">
+              \(B = \Phi / A\). Un tesla es un weber por metro
+              cuadrado. En CGS, \(1\,\mathrm{T}=10^{4}\,\mathrm{G}\)
+              y \(1\,\mathrm{Wb}=10^{8}\) maxwells (líneas).
+              El GOES de un trafo de planta se diseña a
+              \(1{,}5\)–\(1{,}7\,\mathrm{T}\); el ferrita de un
+              SiC, a \(0{,}3\,\mathrm{T}\). Saturation del núcleo
+              = clipping del MPPT / del DAB.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-11-3">Selecciona un problema:</label>
+                <select id="preset-11-3" class="book-preset-select" data-section="11-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: Φ = 5×10⁻⁴ Wb, B = 8×10⁻⁴ T</option>
+                  <option value="p2">Prob 2: 60 000 Mx, A = 2 pulg²</option>
+                  <option value="p3">Prob 3: fig. 11.57, Φ = 4×10⁻⁴ Wb, A = 0.01 m²</option>
+                </select>
+              </div>
+              <div id="desc-preset-11-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Convertidor SI / CGS / inglés</h3>
+              <p class="hint-inline">Indica Φ o B en SI (y A si hace falta para el otro). 1 Wb = 10⁸ líneas; 1 T = 10⁴ G = 6.45×10⁴ líneas/pulg².</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s113-phi">Φ (Wb):</label><input type="text" id="s113-phi" placeholder="5e-4" /></div>
+                <div class="k-input"><label for="s113-b">B (T):</label><input type="text" id="s113-b" placeholder="8e-4" /></div>
+                <div class="k-input"><label for="s113-a">A (m²), opcional:</label><input type="text" id="s113-a" placeholder="" /></div>
+              </div>
+              <button id="btn-s113" class="action-btn mt-1">Convertir Φ, B</button>
+              <div class="data-table-wrap" id="wrap-11-3" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-11-3">
+                  <thead><tr><th></th><th>Φ</th><th>B</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 11.57 — electroimán de un contactor</h3>
+              <div class="input-group">
+                <button id="btn-s113f" class="action-btn">B y polos</button>
+              </div>
+              <div class="p5-host" id="p5-s113" role="img" aria-label="Electroimán 11.57"></div>
+              <p class="caption-fig">Regla de la mano derecha: el pulgar señala el norte del núcleo (contactor de un dump / yaw).</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-3f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-11-5">
+            <h2>Sección 11.5: Reluctancia</h2>
+            <p class="chapter-discourse">
+              \(\mathcal{R} = l /(\mu A)\), en At/Wb (o rels).
+              Análogo de \(R=\rho l/A\). El entrehierro de un
+              inductor de boost tiene \(\mu=\mu_0\): \(\mathcal{R}\)
+              enorme, y por eso se come casi toda la fmm.
+              Misma \(\mu\): gana el mayor \(l/A\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-11-5">Selecciona un problema:</label>
+                <select id="preset-11-5" class="book-preset-select" data-section="11-5">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p4">Prob 4: fig. 11.58, mayor R en la dimensión larga</option>
+                </select>
+              </div>
+              <div id="desc-preset-11-5" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 11.58 — tres núcleos de hierro</h3>
+              <div class="input-group">
+                <button id="btn-s115" class="action-btn">Comparar \(\mathcal{R}\)</button>
+              </div>
+              <div class="p5-host" id="p5-s115" role="img" aria-label="Tres núcleos"></div>
+              <p class="caption-fig">(a) prisma 6×2×1 cm · (b) cilindro 3 pulg × ½ pulg · (c) 0.1×0.01×0.01 m. Misma μ: gana l/A.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-5" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(\mathcal{R} = l/(\mu A)\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s115g-l">l (m):</label><input type="text" id="s115g-l" placeholder="0.1" /></div>
+                <div class="k-input"><label for="s115g-a">A (m²):</label><input type="text" id="s115g-a" placeholder="1e-4" /></div>
+                <div class="k-input">
+                  <label for="s115g-mat">Material:</label>
+                  <select id="s115g-mat">
+                    <option value="air">Aire / entrehierro</option>
+                    <option value="sheet">Acero laminado (GOES)</option>
+                    <option value="steel">Acero fundido</option>
+                    <option value="iron" selected>Hierro fundido</option>
+                  </select>
+                </div>
+                <div class="k-input"><label for="s115g-b">B (T) para μ de la curva:</label><input type="text" id="s115g-b" placeholder="0.5" /></div>
+              </div>
+              <button id="btn-s115g" class="action-btn mt-1">Reluctancia</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-5g" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-11-6">
+            <h2>Sección 11.6: Ley de Ohm para circuitos magnéticos</h2>
+            <p class="chapter-discourse">
+              \(\Phi = \mathscr{F}/\mathcal{R}\), con
+              \(\mathscr{F}=NI\) en ampere-vueltas.
+              Es Hopkinson: el dual de Ohm. El \(NI\) de un
+              inductor de filtro es la «tensión» que empuja
+              \(\Phi\) contra el entrehierro.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-11-6">Selecciona un problema:</label>
+                <select id="preset-11-6" class="book-preset-select" data-section="11-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p5">Prob 5: Φ = 4.2×10⁻⁴ Wb, fmm = 400 At</option>
+                  <option value="p6">Prob 6: 72 000 Mx, 120 gilberts</option>
+                </select>
+              </div>
+              <div id="desc-preset-11-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(\Phi = \mathscr{F}/\mathcal{R}\)</h3>
+              <p class="hint-inline">Deja vacío exactamente uno de Φ, fmm, \(\mathcal{R}\).</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s116-phi">Φ (Wb):</label><input type="text" id="s116-phi" placeholder="4.2e-4" /></div>
+                <div class="k-input"><label for="s116-f">fmm (At):</label><input type="text" id="s116-f" placeholder="400" /></div>
+                <div class="k-input"><label for="s116-r">\(\mathcal{R}\) (At/Wb):</label><input type="text" id="s116-r" placeholder="" /></div>
+              </div>
+              <button id="btn-s116" class="action-btn mt-1">Ohm magnética</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-11-7">
+            <h2>Sección 11.7: Fuerza magnetizante</h2>
+            <p class="chapter-discourse">
+              \(H = NI / l = \mathscr{F}/l\), en At/m.
+              \(B=\mu H\). En el entrehierro \(\mu=\mu_0\);
+              en el GOES, \(\mu_r\) de miles hasta que satura.
+              Un DAB de rack se diseña al \(H\) del polvo o de
+              la ferrita, no al del hierro de un yugo de 1910.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-11-7">Selecciona un problema:</label>
+                <select id="preset-11-7" class="book-preset-select" data-section="11-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p7">Prob 7: H del prob. 5, l = 6 pulg</option>
+                  <option value="p8">Prob 8: H = 600 At/m, B = 0.12 T, μ al doble de B</option>
+                </select>
+              </div>
+              <div id="desc-preset-11-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(H = NI/l\), \(\mu = B/H\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s117-f">fmm (At):</label><input type="text" id="s117-f" placeholder="400" /></div>
+                <div class="k-input"><label for="s117-l">l (m):</label><input type="text" id="s117-l" placeholder="0.1524" /></div>
+                <div class="k-input"><label for="s117-h">H (At/m):</label><input type="text" id="s117-h" placeholder="" /></div>
+                <div class="k-input"><label for="s117-b">B (T):</label><input type="text" id="s117-b" placeholder="" /></div>
+              </div>
+              <button id="btn-s117" class="action-btn mt-1">H y μ</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-11-8">
+            <h2>Sección 11.8: Histéresis y circuitos en serie</h2>
+            <p class="chapter-discourse">
+              La curva \(B\)–\(H\) no es una recta: el GOES,
+              el acero fundido y el hierro fundido saturan.
+              Histéresis = pérdidas en vacío del trafo de
+              planta (Steinmetz). En serie,
+              \(\sum NI = \sum H l\). Se mira \(B=\Phi/A\),
+              se lee \(H\) en la curva, se suma.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-11-8">Selecciona un problema:</label>
+                <select id="preset-11-8" class="book-preset-select" data-section="11-8">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p9">Prob 9: fig. 11.59, toroide de hierro</option>
+                  <option value="p10">Prob 10: fig. 11.60, hierro + acero laminado</option>
+                  <option value="p11">Prob 11: fig. 11.61, dos bobinas, acero</option>
+                  <option value="p12">Prob 12: fig. 11.62, 80 000 líneas</option>
+                  <option value="p13">Prob 13: fig. 11.63, dos fmm, I común</option>
+                </select>
+              </div>
+              <div id="desc-preset-11-8" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 11.59–11.63</h3>
+              <div class="input-group">
+                <label for="s118-fig">Figura:</label>
+                <select id="s118-fig">
+                  <option value="59">11.59 — toroide hierro, 75 vueltas</option>
+                  <option value="60">11.60 — hierro + GOES, 100 vueltas</option>
+                  <option value="61">11.61 — acero, N1 y N2=30</option>
+                  <option value="62">11.62 — acero + GOES, 1 pulg²</option>
+                  <option value="63">11.63 — dos fmm, acero + hierro</option>
+                </select>
+                <button id="btn-s118" class="action-btn">Serie B–H</button>
+              </div>
+              <div class="p5-host" id="p5-s118" role="img" aria-label="Circuito magnético en serie"></div>
+              <p class="caption-fig">Núcleo de un trafo / yugo de un generador. La curva B–H sustituye a μ constante.</p>
+              <div class="plot-wrap" id="wrap-11-8" hidden>
+                <div class="p5-host" id="p5-plot-11-8" role="img" aria-label="Curvas B-H"></div>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-8" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-11-12">
+            <h2>Sección 11.12: Brechas de aire</h2>
+            <p class="chapter-discourse">
+              En el entrehierro \(H_g = B_g/\mu_0 \approx 7{,}96\times 10^{5}\,B\).
+              Un milímetro de aire se come más fmm que un metro
+              de GOES. Por eso el inductor de un boost / DAB
+              lleva gap: linealiza \(L\) y aguanta el bias de DC
+              del rack. El relé del combiner y el contactor del
+              dump son el mismo entrehierro, ahora móvil.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-11-12">Selecciona un problema:</label>
+                <select id="preset-11-12" class="book-preset-select" data-section="11-12">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p14">Prob 14: fig. 11.64, Φ = 2.4×10⁻⁴ Wb</option>
+                  <option value="p15">Prob 15: pistón del timbre, fig. 11.65</option>
+                  <option value="p16">Prob 16: fig. 11.66, toroide con gap</option>
+                  <option value="p17">Prob 17: relé fig. 11.67, Φ = 0.2×10⁻⁴ Wb</option>
+                  <option value="p18">Prob 18: fig. 11.68, serie-paralelo, Φg = 2×10⁻⁴ Wb</option>
+                </select>
+              </div>
+              <div id="desc-preset-11-12" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 11.64–11.68</h3>
+              <div class="input-group">
+                <label for="s1112-fig">Figura:</label>
+                <select id="s1112-fig">
+                  <option value="64">11.64 — GOES con gap 3 mm</option>
+                  <option value="65">11.65 — pistón / timbre 80 vueltas</option>
+                  <option value="66">11.66 — toroide GOES, gap 2 mm, dos bobinas</option>
+                  <option value="67">11.67 — relé, gap 0.2 cm, Ø 1 cm</option>
+                  <option value="68">11.68 — serie-paralelo, Φg = 2×10⁻⁴ Wb</option>
+                </select>
+                <button id="btn-s1112" class="action-btn">Entrehierro</button>
+              </div>
+              <div class="p5-host" id="p5-s1112" role="img" aria-label="Entrehierro"></div>
+              <p class="caption-fig">El gap es el «R grande» del circuito magnético: LCL, DAB, relé, contactor.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-12" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-11-14">
+            <h2>Sección 11.14: Determinación de \(\Phi\)</h2>
+            <p class="chapter-discourse">
+              Ahora se conoce \(NI\) y se busca \(\Phi\): hay que
+              iterar porque \(\mu=\mu(B)\). Se prueba un \(B\),
+              se suma \(\sum Hl\) y se compara con \(NI\).
+              El dual de «despejar \(I\) en un no lineal».
+              En 2026 lo hace el FEM del inductor; aquí, una
+              búsqueda sobre la curva \(B\)–\(H\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-11-14">Selecciona un problema:</label>
+                <select id="preset-11-14" class="book-preset-select" data-section="11-14">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p19">Prob 19: fig. 11.69, I = 2 A, N = 100</option>
+                  <option value="p20">Prob 20: fig. 11.70, I = 2 A, N = 150, gap</option>
+                  <option value="p21">Prob 21: B = f(H) tipo carga de un C</option>
+                </select>
+              </div>
+              <div id="desc-preset-11-14" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 11.69–11.70 y ajuste \(B(H)\)</h3>
+              <div class="input-group">
+                <label for="s1114-fig">Figura:</label>
+                <select id="s1114-fig">
+                  <option value="69">11.69 — toroide de acero, 2 A</option>
+                  <option value="70">11.70 — acero + gap 0.8 mm</option>
+                  <option value="21">11.21 — B = Bs(1 − e^{−H/Hs})</option>
+                </select>
+                <button id="btn-s1114" class="action-btn">Buscar Φ</button>
+              </div>
+              <div class="p5-host" id="p5-s1114" role="img" aria-label="Determinación de flujo"></div>
+              <div class="plot-wrap" id="wrap-11-14" hidden>
+                <div class="p5-host" id="p5-plot-11-14" role="img" aria-label="B(H) ajuste"></div>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-14" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-11-17">
+            <h2>Sección 11.17: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              C++ / QBASIC del libro se sustituyen por estos
+              solucionadores: curvas \(B\)–\(H\), serie, entrehierro
+              e iteración de \(\Phi\). El «print» de \(H\) a
+              900 / 1800 / 2700&nbsp;At/m es el ajuste de 11.14.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-11-17">Selecciona un problema:</label>
+                <select id="preset-11-17" class="book-preset-select" data-section="11-17">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p22">Prob 22: programa del ejemplo 11.3</option>
+                  <option value="p23">Prob 23: rutina B→H del acero</option>
+                </select>
+              </div>
+              <div id="desc-preset-11-17" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Tabla \(B\)–\(H\) (el «print»)</h3>
+              <div class="input-group">
+                <label for="s1117-mat">Material:</label>
+                <select id="s1117-mat">
+                  <option value="sheet">Acero laminado (GOES)</option>
+                  <option value="steel" selected>Acero fundido</option>
+                  <option value="iron">Hierro fundido</option>
+                </select>
+                <button id="btn-s1117" class="action-btn">Tabular curva</button>
+              </div>
+              <div class="plot-wrap">
+                <div class="p5-host" id="p5-plot-11-17" role="img" aria-label="Curva B-H"></div>
+              </div>
+              <div class="data-table-wrap" id="wrap-11-17" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-11-17">
+                  <thead><tr><th>H (At/m)</th><th>B (T)</th><th>μ (H/m)</th><th>μr</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-11-17" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-11-0" aria-labelledby="glossary-11-heading">
+            <h2 id="glossary-11-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de flujo, reluctancia, fmm, histéresis y
+              entrehierro del capítulo 11, reescritos para
+              renovables 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Densidad de flujo (\(B\))</dt>
+                <dd>\(\Phi/A\), en teslas. 1.5–1.7 T en el GOES de un trafo de planta; 0.3 T en ferrita de un SiC. Saturation = el DAB ya no sube \(L\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Dominio</dt>
+                <dd>Grupo de átomos alineados. En el GOES se orientan de fábrica (grano orientado); por eso el trafo 50/60 Hz pierde poco en vacío.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Electromagnetismo</dt>
+                <dd>Efectos magnéticos de \(I\) o de \(\Phi\) variable. El estator de un DFIG, el inductor del LCL y el relé del combiner.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuerza magnetizante (\(H\))</dt>
+                <dd>\(NI/l\), en At/m. Lo que «empuja» al núcleo. En el entrehierro \(H=B/\mu_0\), miles de veces el del GOES.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuerza magnetomotriz (fmm, \(\mathscr{F}\))</dt>
+                <dd>\(NI\), en ampere-vueltas. La «tensión» del circuito magnético. El dual de \(E\) en el winding de un inductor de BESS.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Histéresis</dt>
+                <dd>Retraso \(B\) vs \(H\). Pérdidas en vacío del trafo, Steinmetz \(P_h = k_h f B^n\). Un pad-mounted 2026 se compra por W/kg de núcleo, no por «hierro».</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Imán permanente</dt>
+                <dd>NdFeB / ferrita de un PMSM de aerogenerador o de un yaw. Retentividad alta; no hace falta \(NI\) continuo.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ley de circuitos de Ampère</dt>
+                <dd>\(\sum NI = \sum H l\) en un lazo cerrado. KVL magnética del yugo, del toroide y del núcleo EE con gap.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Líneas de flujo magnético</dt>
+                <dd>Dibujo de \(\Phi\): cerradas, sin polos libres. Salen del norte de la bobina (mano derecha) y vuelven por el yugo.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Materiales diamagnéticos</dt>
+                <dd>\(\mu_r\) un poco menor que 1 (cobre del winding, aluminio del busbar). No sirven de núcleo; sí de pantalla.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Materiales ferromagnéticos</dt>
+                <dd>\(\mu_r\) de cientos a miles: GOES, acero fundido, hierro, ferrita, nanocrystalline. El núcleo 2026.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Materiales paramagnéticos</dt>
+                <dd>\(\mu_r\) un poco mayor que 1. No saturan de forma útil; no se usan de núcleo de trafo.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Permeabilidad (\(\mu\))</dt>
+                <dd>\(B/H\), en H/m o Wb/A·m. \(\mu_0 = 4\pi\times 10^{-7}\). El gap tiene \(\mu_0\); el GOES, \(\mu_r\mu_0\) hasta saturar.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Permeabilidad relativa (\(\mu_r\))</dt>
+                <dd>\(\mu/\mu_0\). GOES: 4 000–9 000 en la zona lineal; ferrita: 2 000; aire: 1. Fija si el trafo es un ladrillo o un sobre.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Reluctancia (\(\mathcal{R}\))</dt>
+                <dd>\(l/(\mu A)\), en At/Wb. Dual de \(R\). El gap de un inductor de boost es la \(\mathcal{R}\) que linealiza \(L\) frente al bias de DC.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>FV, eólica, océano, H<sub>2</sub>, BESS. El trafo, el LCL, el DAB y el relé del combiner son los circuitos magnéticos de 2026.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
+      <details class="chapter-1-fold" id="capitulo-12">
+        <summary class="chapter-1-summary" aria-label="Capítulo 12.0">
+          <span class="chapter-1-title">12.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Inductores: Faraday \(e = N\,d\Phi/dt\),
+            \(L = N\Phi/i = \mu N^2 A/l\),
+            \(v_L = L\,di/dt\), transitorios
+            \(i_L = I_f + (I_i-I_f)e^{-t/\tau}\) con
+            \(\tau = L/R_{\mathrm{Th}}\), serie-paralelo y
+            \(\tfrac12 L I^2\).
+            En 2026 el inductor no es una bobina de banco:
+            es el LCL del inversor SiC, el choke del boost
+            de un MPPT, el DAB de un rack LFP, el estator
+            de un DFIG y el filtro de un electrolizador.
+            Magnetizar es el ramp del LCL; abrir sin rueda
+            libre es el arco del DC breaker. Lenz es el
+            diodo de freewheel y el snubber del MOSFET.
+            \(\tau = L/R_{\mathrm{Th}}\) es el tiempo que
+            tarda un string, un dump o un DMM de 10&nbsp;MΩ
+            en enterarse de que la corriente cambió.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(v_L = L\,di/dt\),
+              \(i_L = I_f+(I_i-I_f)e^{-t/\tau}\) y
+              \(W=\tfrac12 L I^2\) sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-12-2">Sec 12.2</button>
+            <button class="tab-btn" data-target="sec-12-4">Sec 12.4</button>
+            <button class="tab-btn" data-target="sec-12-6">Sec 12.6</button>
+            <button class="tab-btn" data-target="sec-12-7">Sec 12.7</button>
+            <button class="tab-btn" data-target="sec-12-8">Sec 12.8</button>
+            <button class="tab-btn" data-target="sec-12-9">Sec 12.9</button>
+            <button class="tab-btn" data-target="sec-12-10">Sec 12.10</button>
+            <button class="tab-btn" data-target="sec-12-11">Sec 12.11</button>
+            <button class="tab-btn" data-target="sec-12-12">Sec 12.12</button>
+            <button class="tab-btn" data-target="sec-12-13">Sec 12.13</button>
+            <button class="tab-btn" data-target="sec-12-14">Sec 12.14</button>
+            <button class="tab-btn" data-target="sec-12-16">Sec 12.16</button>
+          </div>
+
+          <div class="tab-content active" id="sec-12-2">
+            <h2>Sección 12.2: Ley de Faraday</h2>
+            <p class="chapter-discourse">
+              \(e = N\,d\Phi/dt\). El signo lo pone Lenz:
+              el voltaje se opone al cambio de flujo.
+              En 2026 es el CT de un feeder 1500&nbsp;V<sub>cc</sub>,
+              el encoder del pitch, el rotor de un DFIG y
+              la f.c.e.m. de un PMSM. Un weber por segundo
+              en una vuelta es un voltio.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-2">Selecciona un problema:</label>
+                <select id="preset-12-2" class="book-preset-select" data-section="12-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: 50 vueltas, 0.085 Wb/s</option>
+                  <option value="p2">Prob 2: 20 V, 40 vueltas</option>
+                  <option value="p3">Prob 3: 42 mV, 0.003 Wb/s</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(e = N\,d\Phi/dt\)</h3>
+              <p class="hint-inline">Deja vacío exactamente uno de \(e\), \(N\), \(d\Phi/dt\). CT, DFIG, pitch.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s122-e">\(e\):</label>
+                  <input type="text" id="s122-e" placeholder="" />
+                  <select id="s122-e-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s122-n">\(N\) (vueltas):</label>
+                  <input type="text" id="s122-n" placeholder="50" />
+                </div>
+                <div class="k-input">
+                  <label for="s122-df">\(d\Phi/dt\):</label>
+                  <input type="text" id="s122-df" placeholder="0.085" />
+                  <select id="s122-df-u">
+                    <option value="1" selected>Wb/s</option>
+                    <option value="1e-3">mWb/s</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s122" class="action-btn mt-1">Faraday</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-4">
+            <h2>Sección 12.4: Autoinductancia</h2>
+            <p class="chapter-discourse">
+              \(L = N\Phi/i = \mu N^2 A/l\). Un solenoide de
+              aire es el choke de EMI; un toroide con
+              \(\mu_r=2000\) es el nanocrystalline del DAB
+              a 20–100&nbsp;kHz. El núcleo de madera
+              (\(\mu_r\approx 1\)) es el mismo aire: no
+              multiplica \(L\). Subir \(N\) pesa al cuadrado.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-4">Selecciona un problema:</label>
+                <select id="preset-12-4" class="book-preset-select" data-section="12-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p4">Prob 4: solenoide fig. 12.64</option>
+                  <option value="p5">Prob 5: l = 4 pulg, d = 0.25 pulg</option>
+                  <option value="p6a">Prob 6.a: toroide de aire fig. 12.65</option>
+                  <option value="p6b">Prob 6.b: μr = 2000</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Solenoide / toroide — \(L = \mu N^2 A/l\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s124-geo">Geometría:</label>
+                  <select id="s124-geo">
+                    <option value="sol">Solenoide (A = πd²/4)</option>
+                    <option value="tor" selected>Toroide (A dada)</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s124-n">\(N\):</label>
+                  <input type="text" id="s124-n" placeholder="300" />
+                </div>
+                <div class="k-input">
+                  <label for="s124-l">\(l\):</label>
+                  <input type="text" id="s124-l" placeholder="0.1" />
+                  <select id="s124-l-u">
+                    <option value="1" selected>m</option>
+                    <option value="0.0254">pulg</option>
+                    <option value="0.01">cm</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s124-d">\(d\) (solenoide):</label>
+                  <input type="text" id="s124-d" placeholder="0.005" />
+                  <select id="s124-d-u">
+                    <option value="1" selected>m</option>
+                    <option value="0.0254">pulg</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s124-a">\(A\) (toroide, m²):</label>
+                  <input type="text" id="s124-a" placeholder="1.5e-4" />
+                </div>
+                <div class="k-input">
+                  <label for="s124-mur">\(\mu_r\):</label>
+                  <input type="text" id="s124-mur" placeholder="1" />
+                </div>
+              </div>
+              <button id="btn-s124" class="action-btn mt-1">L = μ N² A / l</button>
+              <svg class="circuit-svg" id="svg-s124" viewBox="0 0 640 180" role="img" aria-label="Solenoide o toroide"></svg>
+              <p class="caption-fig">Aire \(\mu_r=1\): choke de EMI. Ferrita / nanocrystalline \(\mu_r\sim 2000\): DAB de un BESS.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-6">
+            <h2>Sección 12.6: Voltaje inducido</h2>
+            <p class="chapter-discourse">
+              \(v_L = L\,di/dt\). En tramos lineales de \(i\),
+              \(v\) es un escalón. Al revés,
+              \(\Delta i = (1/L)\int v\,dt\): el área bajo \(v\)
+              es el cambio de corriente. Un MPPT que rampa
+              8&nbsp;A/s en el choke y un SiC que conmuta
+              40&nbsp;A/ms se leen así, sin fasores.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-6">Selecciona un problema:</label>
+                <select id="preset-12-6" class="book-preset-select" data-section="12-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p7a">Prob 7.a: 5 H, 0.5 A/s</option>
+                  <option value="p7b">Prob 7.b: 5 H, 60 mA/s</option>
+                  <option value="p7c">Prob 7.c: 5 H, 0.04 A/ms</option>
+                  <option value="p8">Prob 8: 50 mH, 0.1 mA/µs</option>
+                  <option value="p9">Prob 9: vL de i, fig. 12.66, 200 mH</option>
+                  <option value="p10">Prob 10: vL de i, fig. 12.67, 0.2 H</option>
+                  <option value="p11">Prob 11: iL de v, fig. 12.68, 10 mH, 4 mA</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(v_L = L\,di/dt\)</h3>
+              <p class="hint-inline">Deja vacío \(v_L\) o \(di/dt\).</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s126-l">\(L\):</label>
+                  <input type="text" id="s126-l" placeholder="5" />
+                  <select id="s126-l-u">
+                    <option value="1" selected>H</option>
+                    <option value="1e-3">mH</option>
+                    <option value="1e-6">µH</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s126-di">\(di/dt\):</label>
+                  <input type="text" id="s126-di" placeholder="0.5" />
+                  <select id="s126-di-u">
+                    <option value="1" selected>A/s</option>
+                    <option value="1e-3">mA/s</option>
+                    <option value="1000">A/ms</option>
+                    <option value="1e6">A/µs</option>
+                    <option value="1000">mA/µs</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s126-v">\(v_L\) (V):</label>
+                  <input type="text" id="s126-v" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s126" class="action-btn mt-1">v = L di/dt</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 12.66–12.68 — formas de onda</h3>
+              <div class="input-group">
+                <label for="s126w-fig">Figura:</label>
+                <select id="s126w-fig">
+                  <option value="66">12.66 — iL → vL, 200 mH (rampa de un boost)</option>
+                  <option value="67">12.67 — iL → vL, 0.2 H (µs, SiC)</option>
+                  <option value="68">12.68 — vL → iL, 10 mH, i(0)=4 mA</option>
+                </select>
+                <button id="btn-s126w" class="action-btn">Transformar</button>
+              </div>
+              <div class="plot-wrap">
+                <svg id="plot-12-6a" class="coulomb-plot" viewBox="0 0 640 240" role="img" aria-label="onda origen"></svg>
+              </div>
+              <div class="plot-wrap" style="margin-top:0.75rem;">
+                <svg id="plot-12-6b" class="coulomb-plot" viewBox="0 0 640 240" role="img" aria-label="onda resultado"></svg>
+              </div>
+              <p class="caption-fig">Arriba la onda dada; abajo la transformada por \(L\). Área de \(v\) = \(\Delta i\).</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-6w" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-7">
+            <h2>Sección 12.7: Transitorios \(R\)-\(L\): almacenamiento</h2>
+            <p class="chapter-discourse">
+              Al cerrar, \(i_L\) no salta: parte de \(I_i\)
+              (casi siempre 0) y sube a \(I_f=E/R\) con
+              \(\tau=L/R\). \(v_L\) arranca en \(E\) y muere.
+              A \(1\tau\) va el 63.2 % del salto; a \(5\tau\)
+              se da por magnetizado (99.3 %). Es el ramp
+              del LCL, el pre-magnetizado de un DAB y el
+              cierre de un contactor sobre un feeder.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-7">Selecciona un problema:</label>
+                <select id="preset-12-7" class="book-preset-select" data-section="12-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p12">Prob 12: fig. 12.69, 40 mV, 20 kΩ, 250 mH</option>
+                  <option value="p13">Prob 13: fig. 12.70, 12 V, 2.2 kΩ, 5 mH</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 12.69–12.70</h3>
+              <div class="input-group">
+                <label for="s127-fig">Figura:</label>
+                <select id="s127-fig">
+                  <option value="69">12.69 — shunt 40 mV, 20 kΩ, 250 mH</option>
+                  <option value="70">12.70 — auxiliar 12 V, 2.2 kΩ, 5 mH</option>
+                </select>
+                <button id="btn-s127" class="action-btn">Magnetizar</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s127" viewBox="0 0 640 220" role="img" aria-label="RL almacenamiento"></svg>
+              <div class="plot-wrap" id="wrap-12-7" hidden>
+                <svg id="plot-12-7" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="iL y vL"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Almacenamiento genérico</h3>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s127g-e">E (V):</label><input type="text" id="s127g-e" placeholder="12" /></div>
+                <div class="k-input"><label for="s127g-r">R (Ω):</label><input type="text" id="s127g-r" placeholder="2200" /></div>
+                <div class="k-input"><label for="s127g-l">L (H):</label><input type="text" id="s127g-l" placeholder="0.005" /></div>
+                <div class="k-input"><label for="s127g-i0">Ii (A), opcional:</label><input type="text" id="s127g-i0" placeholder="0" /></div>
+              </div>
+              <button id="btn-s127g" class="action-btn mt-1">τ y ondas</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-7g" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-8">
+            <h2>Sección 12.8: Valores iniciales</h2>
+            <p class="chapter-discourse">
+              \(i_L(0^+)=i_L(0^-)\): el inductor no olvida
+              la corriente. Un choke de boost con 3&nbsp;mA
+              de bias, un LCL a medio ramp, un DFIG que
+              reengancha: \(I_i\) no es cero. \(I_f\) lo
+              fija el Thévenin de 2026 (string, rack, red).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-8">Selecciona un problema:</label>
+                <select id="preset-12-8" class="book-preset-select" data-section="12-8">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p14">Prob 14: fig. 12.71, 3 mA iniciales</option>
+                  <option value="p15">Prob 15: fig. 12.72, 8 mA, módulo 36 V</option>
+                  <option value="p16">Prob 16: fig. 12.73, 3 mA, string + rack</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-8" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 12.71–12.73</h3>
+              <div class="input-group">
+                <label for="s128-fig">Figura:</label>
+                <select id="s128-fig">
+                  <option value="71">12.71 — 5 mA, 1.2 k / 2.2 k, 2 H, Ii = −3 mA</option>
+                  <option value="72">12.72 — 36 V, 4.7 k / 3.9 k, 120 mH, 8 mA</option>
+                  <option value="73">12.73 — 4 mA + 16 V, 2.2 k / 8.2 k, 200 mH</option>
+                </select>
+                <button id="btn-s128" class="action-btn">Con Ii</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s128" viewBox="0 0 640 240" role="img" aria-label="RL con corriente inicial"></svg>
+              <div class="plot-wrap" id="wrap-12-8" hidden>
+                <svg id="plot-12-8" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="iL y vL"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-8" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-9">
+            <h2>Sección 12.9: Transitorios \(R\)-\(L\): decaimiento</h2>
+            <p class="chapter-discourse">
+              Al abrir, \(I_f=0\) si hay camino de rueda
+              libre; si no, el arco. \(i_L = I_0 e^{-t/\tau}\)
+              con el \(R\) que queda en el lazo (dump,
+              snubber, bleeder inductivo). Abrir a \(5\tau\)
+              de carga es abrir ya magnetizado: toda
+              \(\tfrac12 L I^2\) tiene que salir.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-9">Selecciona un problema:</label>
+                <select id="preset-12-9" class="book-preset-select" data-section="12-9">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p17">Prob 17: fig. 12.74, abre a 5τ</option>
+                  <option value="p18">Prob 18: fig. 12.75, −6 V, polaridades</option>
+                  <option value="p19">Prob 19: fig. 12.76, abre a 1 µs</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-9" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 12.74–12.76</h3>
+              <div class="input-group">
+                <label for="s129-fig">Figura:</label>
+                <select id="s129-fig">
+                  <option value="74">12.74 — 20 V, 10 k / 10 k, 10 mH, 5τ</option>
+                  <option value="75">12.75 — −6 V, 6.8 k / 8.2 k, 5 mH</option>
+                  <option value="76">12.76 — 12 V, 2 k / 10 k, 1 mH, abre a 1 µs</option>
+                </select>
+                <button id="btn-s129" class="action-btn">Carga + decay</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s129" viewBox="0 0 640 240" role="img" aria-label="RL decaimiento"></svg>
+              <div class="plot-wrap" id="wrap-12-9" hidden>
+                <svg id="plot-12-9" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="carga y decay"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-9" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-10">
+            <h2>Sección 12.10: Valores instantáneos</h2>
+            <p class="chapter-discourse">
+              Invertir \(i_L(t)\) o \(v_L(t)\) da el instante:
+              \(t = \tau\ln\bigl((I_i-I_f)/(i-I_f)\bigr)\).
+              Es el tiempo a 10&nbsp;mA de un LCL, el umbral
+              de un relé de overcurrent y el instante en
+              que \(v_L\) baja de 10&nbsp;V (el SiC ya no
+              ve el pico de conmutación).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-10">Selecciona un problema:</label>
+                <select id="preset-12-10" class="book-preset-select" data-section="12-10">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p20">Prob 20: ejemplo 12.4, 10 mA y 10 V</option>
+                  <option value="p21">Prob 21: ejemplo 12.5, iL = 2 mA</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-10" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Tiempo a un umbral</h3>
+              <p class="hint-inline">Ej. 12.4: E = 40 V, R = 2 kΩ, L = 10 mH (almacenamiento). Ej. 12.5: I0 = 8 mA, R = 2 kΩ, L = 10 mH (decay).</p>
+              <div class="input-group">
+                <label for="s1210-fig">Caso:</label>
+                <select id="s1210-fig">
+                  <option value="ex4">Ej. 12.4 — almacenamiento, i = 10 mA y v = 10 V</option>
+                  <option value="ex5">Ej. 12.5 — decay, i = 2 mA</option>
+                </select>
+                <button id="btn-s1210" class="action-btn">Instante</button>
+              </div>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s1210g-ii">Ii (A):</label><input type="text" id="s1210g-ii" placeholder="0" /></div>
+                <div class="k-input"><label for="s1210g-if">If (A):</label><input type="text" id="s1210g-if" placeholder="0.02" /></div>
+                <div class="k-input"><label for="s1210g-r">R (Ω):</label><input type="text" id="s1210g-r" placeholder="2000" /></div>
+                <div class="k-input"><label for="s1210g-l">L (H):</label><input type="text" id="s1210g-l" placeholder="0.01" /></div>
+                <div class="k-input"><label for="s1210g-ix">i umbral (A):</label><input type="text" id="s1210g-ix" placeholder="0.01" /></div>
+                <div class="k-input"><label for="s1210g-vx">v umbral (V), opc.:</label><input type="text" id="s1210g-vx" placeholder="10" /></div>
+              </div>
+              <button id="btn-s1210g" class="action-btn mt-1">Despejar t</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-10" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-11">
+            <h2>Sección 12.11: Equivalente de Thévenin \(\tau = L/R_{\mathrm{Th}}\)</h2>
+            <p class="chapter-discourse">
+              Lo que ve \(L\) es \(E_{\mathrm{Th}}\) y
+              \(R_{\mathrm{Th}}\). El DMM de 10&nbsp;MΩ, el
+              divisor del bus, el string \(I_{\mathrm{sc}}\)
+              y el rack se reducen a eso.
+              \(\tau = L/R_{\mathrm{Th}}\), \(I_f = E_{\mathrm{Th}}/R_{\mathrm{Th}}\)
+              (L corto en DC). Abrir el lazo sin freewheel
+              es \(R_{\mathrm{Th}}\to\infty\): \(v_L\to\infty\),
+              el arco del DC.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-11">Selecciona un problema:</label>
+                <select id="preset-12-11" class="book-preset-select" data-section="12-11">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p22">Prob 22: fig. 12.77, t = 100 ns</option>
+                  <option value="p23">Prob 23: fig. 12.78, t = 10 µs y abre</option>
+                  <option value="p24">Prob 24: fig. 12.79, 2τ y abre</option>
+                  <option value="p25">Prob 25: fig. 12.80, 25 ms / 1 ms / 100 mA</option>
+                  <option value="p26">Prob 26: fig. 12.81, abre a t = 0</option>
+                  <option value="p27">Prob 27: fig. 12.81 + DMM 10 MΩ</option>
+                  <option value="p28">Prob 28: fig. 12.82, cierra a t = 0</option>
+                  <option value="p29">Prob 29: fig. 12.83, abre a t = 0</option>
+                  <option value="p30">Prob 30: fig. 12.84, cierra a t = 0</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-11" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 12.77–12.84</h3>
+              <div class="input-group">
+                <label for="s1211-fig">Figura:</label>
+                <select id="s1211-fig">
+                  <option value="77">12.77 — 4 mA, 12 k / 24 k, 2 mH</option>
+                  <option value="78">12.78 — +8 V, 2.2 k / 4.7 k, 10 mH</option>
+                  <option value="79">12.79 — +20 / −6 V, 5 mH</option>
+                  <option value="80">12.80 — 36 V, 100 / 470 / 20 Ω, 0.6 H</option>
+                  <option value="81">12.81 — 24 V, 2 MΩ, 5 H (abre)</option>
+                  <option value="81d">12.81 + DMM 10 MΩ (cierra)</option>
+                  <option value="82">12.82 — 16 V, crowbar 1 kΩ, 2 H</option>
+                  <option value="83">12.83 — 24 V, 2.2 k / 4.7 k, 1.2 H (abre)</option>
+                  <option value="84">12.84 — 4 mA + 18 V, 220 mH (cierra)</option>
+                </select>
+                <button id="btn-s1211" class="action-btn">Thévenin + L</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1211" viewBox="0 0 640 250" role="img" aria-label="Thévenin RL"></svg>
+              <p class="caption-fig">El DMM, el divisor y el string se reducen a \(E_{\mathrm{Th}}\), \(R_{\mathrm{Th}}\).</p>
+              <div class="plot-wrap" id="wrap-12-11" hidden>
+                <svg id="plot-12-11" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="iL Thévenin"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-11" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-12">
+            <h2>Sección 12.12: Inductores en serie y en paralelo</h2>
+            <p class="chapter-discourse">
+              Serie: \(L_T=\sum L_k\), misma \(i\),
+              \(v_k = L_k\,di/dt\).
+              Paralelo: \(1/L_T=\sum 1/L_k\), misma \(v\),
+              \(i_k\) al revés de \(L_k\).
+              Un LCL es serie (filtro) con un paralelo de
+              dos fases. Sin acoplamiento: se suman como
+              \(R\). Con acoplamiento (DAB, trafo) no.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-12">Selecciona un problema:</label>
+                <select id="preset-12-12" class="book-preset-select" data-section="12-12">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p31a">Prob 31.a: LT fig. 12.85.a</option>
+                  <option value="p31b">Prob 31.b: LT fig. 12.85.b</option>
+                  <option value="p32a">Prob 32.a: fig. 12.86.a</option>
+                  <option value="p32b">Prob 32.b: fig. 12.86.b</option>
+                  <option value="p33">Prob 33: fig. 12.87, menos componentes</option>
+                  <option value="p34">Prob 34: fig. 12.88, vL, iL, vL3</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-12" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 12.85–12.88</h3>
+              <div class="input-group">
+                <label for="s1212-fig">Figura:</label>
+                <select id="s1212-fig">
+                  <option value="85a">12.85.a — 4 + (3∥6) + 2 H</option>
+                  <option value="85b">12.85.b — [3.6+(6∥4)] ∥ 12 H</option>
+                  <option value="86a">12.86.a — 14∥35 mH y 9∥(10 s 90) µF</option>
+                  <option value="86b">12.86.b — puente 5 mH / 12-42-7 µF / 20 mH</option>
+                  <option value="87">12.87 — 20 V, 4 H, 1 k, 6 H∥9.1 k, 1 H, 2 H</option>
+                  <option value="88">12.88 — 20 V, 5 k / 20 k, 5 H + (6∥30) H</option>
+                </select>
+                <button id="btn-s1212" class="action-btn">Red L</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1212" viewBox="0 0 640 260" role="img" aria-label="Inductores serie-paralelo"></svg>
+              <p class="caption-fig">LCL / DAB: serie para filtrar, paralelo para partir corriente.</p>
+              <div class="plot-wrap" id="wrap-12-12" hidden>
+                <svg id="plot-12-12" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="vL fig 12.88"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-12" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-13">
+            <h2>Sección 12.13: Circuitos \(R\)-\(L\) y \(R\)-\(L\)-\(C\) en DC</h2>
+            <p class="chapter-discourse">
+              En estado estable de CD el inductor es un
+              corto y el capacitor un abierto. El LCL se
+              come la \(R\) en paralelo; el film del DC-link
+              no lleva corriente continua. Es el bus de
+              1500&nbsp;V<sub>cc</sub> después del precharge,
+              el rack LFP en reposo, el auxiliar 16&nbsp;V
+              de un pad.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-13">Selecciona un problema:</label>
+                <select id="preset-12-13" class="book-preset-select" data-section="12-13">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p35">Prob 35: fig. 12.89, V1, V2, I1</option>
+                  <option value="p36">Prob 36: fig. 12.90, I1 y V1</option>
+                  <option value="p37">Prob 37: fig. 12.91, V1 e I de cada L</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-13" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 12.89–12.91 — DC estable</h3>
+              <div class="input-group">
+                <label for="s1213-fig">Figura:</label>
+                <select id="s1213-fig">
+                  <option value="89">12.89 — 16 V, 4 kΩ, 2 H, 2 kΩ ∥ 3 H</option>
+                  <option value="90">12.90 — 5 µF, 4 Ω, 20 V, 6 H, 6 Ω</option>
+                  <option value="91">12.91 — 50 V, 20 Ω, 5 Ω, 6 µF, 0.5 H, 4 H</option>
+                </select>
+                <button id="btn-s1213" class="action-btn">DC: L corto, C abierto</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1213" viewBox="0 0 640 260" role="img" aria-label="RLC en DC"></svg>
+              <p class="caption-fig">El 3 H se come el 2 kΩ; el film no conduce. Así se lee un bus en reposo.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-13" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-14">
+            <h2>Sección 12.14: Energía almacenada</h2>
+            <p class="chapter-discourse">
+              \(W=\tfrac12 L I^2\). Es el hazard de abrir
+              un DC con \(L\): 6&nbsp;H a 2&nbsp;A son 12&nbsp;J,
+              un arco de categoría. El freewheel, el
+              snubber y el DC breaker con rampa se
+              dimensionan con esos julios, no con «abrir
+              despacio». Recargar la corriente es el
+              ramp \(t\sim 5\tau\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-14">Selecciona un problema:</label>
+                <select id="preset-12-14" class="book-preset-select" data-section="12-14">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p38">Prob 38: W de cada L, fig. 12.89</option>
+                  <option value="p39">Prob 39: W de C y L, fig. 12.90</option>
+                  <option value="p40">Prob 40: W de cada L, fig. 12.91</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-14" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(W = \tfrac12 L I^2\)</h3>
+              <p class="hint-inline">Deja vacío exactamente uno de W, L, I.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s1214-l">\(L\):</label>
+                  <input type="text" id="s1214-l" placeholder="6" />
+                  <select id="s1214-l-u">
+                    <option value="1" selected>H</option>
+                    <option value="1e-3">mH</option>
+                    <option value="1e-6">µH</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s1214-i">\(I\) (A):</label>
+                  <input type="text" id="s1214-i" placeholder="2" />
+                </div>
+                <div class="k-input">
+                  <label for="s1214-w">\(W\) (J):</label>
+                  <input type="text" id="s1214-w" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s1214" class="action-btn mt-1">Energía</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-14" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Energía de las figuras 12.89–12.91</h3>
+              <div class="input-group">
+                <label for="s1214f-fig">Figura:</label>
+                <select id="s1214f-fig">
+                  <option value="89w">12.89 — W de 2 H y 3 H</option>
+                  <option value="90w">12.90 — W del 5 µF y del 6 H</option>
+                  <option value="91w">12.91 — W de 0.5 H y 4 H</option>
+                </select>
+                <button id="btn-s1214f" class="action-btn">W del banco</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1214" viewBox="0 0 640 260" role="img" aria-label="Energía RL"></svg>
+              <p class="caption-fig">En DC, \(W_L\) vive de la \(I\) del corto; \(W_C\) de la \(V\) del abierto.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-14f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-12-16">
+            <h2>Sección 12.16: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              PSpice / Electronics Workbench del libro se
+              sustituyen por estos solucionadores: \(RL\)
+              de magnetizado y decay, Thévenin+\(L\),
+              \(v=L\,di/dt\) y la red serie-paralelo.
+              VPULSE con \(PW=5\tau\) es un escalón que
+              cubre el transitorio; \(PW=1\,\mathrm{ns}\)
+              es un impulso que el LCL ni ve.
+              QBASIC era 1990; el navegador es 2026.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-12-16">Selecciona un problema:</label>
+                <select id="preset-12-16" class="book-preset-select" data-section="12-16">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p41">Prob 41: cinco τ (ej. 12.6 / fig. 12.69)</option>
+                  <option value="p42">Prob 42: VPULSE, PW = 1 ns (ej. 12.3)</option>
+                  <option value="p43">Prob 43: fig. 12.84 con Ii</option>
+                  <option value="p44">Prob 44: programa general, fig. 12.69</option>
+                  <option value="p45">Prob 45: carga y decay, fig. 12.74, 5τ</option>
+                  <option value="p46">Prob 46: fig. 12.74, abre antes de 5τ</option>
+                </select>
+              </div>
+              <div id="desc-preset-12-16" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Barrido de \(n\tau\)</h3>
+              <p class="hint-inline">Tabula \(i_L\) y \(v_L\) a \(0,1,2,3,4,5\,\tau\). El «print» del libro. VPULSE con PW ≥ 5τ.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s1216-e">If·R = E (V):</label><input type="text" id="s1216-e" placeholder="0.04" /></div>
+                <div class="k-input"><label for="s1216-i0">Ii (A):</label><input type="text" id="s1216-i0" placeholder="0" /></div>
+                <div class="k-input"><label for="s1216-r">R (Ω):</label><input type="text" id="s1216-r" placeholder="20000" /></div>
+                <div class="k-input"><label for="s1216-l">L (H):</label><input type="text" id="s1216-l" placeholder="0.25" /></div>
+              </div>
+              <button id="btn-s1216" class="action-btn mt-1">Tabular nτ</button>
+              <div class="data-table-wrap" id="wrap-12-16" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-12-16">
+                  <thead><tr><th>n</th><th>t</th><th>iL</th><th>% de If</th><th>vL</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-12-16" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-12-0" aria-labelledby="glossary-12-heading">
+            <h2 id="glossary-12-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de Faraday, autoinductancia, transitorios
+              \(RL\) y energía del capítulo 12, reescritos para
+              renovables 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Autoinductancia (\(L\))</dt>
+                <dd>Capacidad de una bobina de oponerse a cualquier cambio de corriente y de guardar \(\tfrac12 L I^2\) en el campo. El henry del LCL, del choke de boost y del DAB. \(L = N\Phi/i = \mu N^2 A/l\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Choke</dt>
+                <dd>Inductor usado para resistir un cambio de corriente: EMI de un inversor SiC, DC-link de un rectificador, filtro de un electrolizador. En 2026 se compra por \(A^2 s\) (I²t) y por saturación con bias de DC, no por «bobina».</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Inductor</dt>
+                <dd>Vueltas sobre un núcleo (aire, ferrita, nanocrystalline, GOES). Almacena corriente; no deja que \(i\) salte. Dual del capacitor, que no deja que \(v\) salte.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ley de Faraday</dt>
+                <dd>\(e = N\,d\Phi/dt\). El voltaje inducido es vueltas por la rapidez con que el flujo cambia. CT, DFIG, PMSM, encoder de pitch. Un Wb/s en una vuelta es un voltio.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ley de Lenz</dt>
+                <dd>El efecto inducido se opone a la causa que lo produce. Es el signo menos de Faraday y, en 2026, el diodo de rueda libre, el snubber y el TVS del MOSFET: la corriente del choke no se interrumpe, se desvía.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Constante de tiempo \(\tau\)</dt>
+                <dd>\(\tau = L/R_{\mathrm{Th}}\). Ramp del LCL, decay del dump, DMM colgado de la bobina. A \(5\tau\) el transitorio se da por cerrado (99.3 %).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Rueda libre (freewheel)</dt>
+                <dd>Camino que deja continuar \(i_L\) al abrir el interruptor. Sin él, \(v_L\to\infty\) y hay arco: el DC breaker de un BESS, el boost sin diodo, el contactor de un feeder.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Voltaje inducido</dt>
+                <dd>\(v_L = L\,di/dt\). Pico de conmutación del SiC, f.c.e.m. de un PMSM, spike al abrir un DC. El área bajo \(v\) es \(\Delta i\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Energía almacenada</dt>
+                <dd>\(W=\tfrac12 L I^2\). Hazard del LOTO inductivo: esos julios salen en el arco si no hay freewheel. Dual de \(\tfrac12 C V^2\) del DC-link.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>FV, eólica, océano, H<sub>2</sub>, BESS. El LCL, el choke de MPPT, el DAB y el estator del DFIG son los \(L\) de 2026; \(\tfrac12 L I^2\) es el hazard de abrir en DC.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
     </section>
   </main>
 
