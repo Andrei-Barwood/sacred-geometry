@@ -813,6 +813,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSec6();
   initSec7();
   initSec8();
+  initSec9();
   initMiniCalc();
   initChapterFold();
 });
@@ -6307,6 +6308,51 @@ function S() {
         <text x="${x - 20}" y="${minusY}" font-size="12" fill="#c0392b">−</text>
         <text x="${x - 52}" y="${mid + 4}" font-size="12" fill="currentColor">${lab || "E"}</text>`);
     },
+    battH(x1, x2, y, lab, plusLeft) {
+      const mid = (x1 + x2) / 2;
+      const plusOnLeft = plusLeft !== false;
+      const px = plusOnLeft ? mid - 8 : mid + 8;
+      const mx = plusOnLeft ? mid + 8 : mid - 8;
+      return push(`<line x1="${x1}" y1="${y}" x2="${mid - 12}" y2="${y}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${px}" y1="${y - 16}" x2="${px}" y2="${y + 16}" stroke="currentColor" stroke-width="2.4"/>
+        <line x1="${mx}" y1="${y - 10}" x2="${mx}" y2="${y + 10}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${mid + 12}" y1="${y}" x2="${x2}" y2="${y}" stroke="currentColor" stroke-width="2"/>
+        <text x="${px}" y="${y - 22}" text-anchor="middle" font-size="12" fill="#1e8449">+</text>
+        <text x="${mid}" y="${y + 28}" text-anchor="middle" font-size="12" fill="currentColor">${lab || "E"}</text>`);
+    },
+    potV(x, y1, y2, wy, lab) {
+      api.rv(x, y1, y2 - y1, lab);
+      return push(`<line x1="${x}" y1="${wy}" x2="${x + 36}" y2="${wy}" stroke="#2471a3" stroke-width="2"/>
+        <polygon points="${x + 8},${wy} ${x + 18},${wy - 6} ${x + 18},${wy + 6}" fill="#2471a3"/>
+        <circle cx="${x + 36}" cy="${wy}" r="4" fill="none" stroke="currentColor" stroke-width="2"/>`);
+    },
+    npn(cx, cy) {
+      return push(`<circle cx="${cx}" cy="${cy}" r="22" fill="none" stroke="currentColor" stroke-width="2"/>
+        <line x1="${cx - 8}" y1="${cy - 14}" x2="${cx - 8}" y2="${cy + 14}" stroke="currentColor" stroke-width="2.4"/>
+        <line x1="${cx - 22}" y1="${cy}" x2="${cx - 8}" y2="${cy}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${cx - 8}" y1="${cy - 8}" x2="${cx + 16}" y2="${cy - 18}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${cx - 8}" y1="${cy + 8}" x2="${cx + 16}" y2="${cy + 18}" stroke="currentColor" stroke-width="2"/>
+        <polygon points="${cx + 10},${cy + 14} ${cx + 2},${cy + 18} ${cx + 12},${cy + 22}" fill="currentColor"/>
+        <text x="${cx - 36}" y="${cy + 4}" font-size="12">B</text>
+        <text x="${cx + 20}" y="${cy - 20}" font-size="12">C</text>
+        <text x="${cx + 20}" y="${cy + 28}" font-size="12">E</text>`);
+    },
+    zig(x1, y1, x2, y2, lab) {
+      const mx = (x1 + x2) / 2, my = (y1 + y2) / 2;
+      const dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1;
+      const ux = dx / len, uy = dy / len, px = -uy * 7, py = ux * 7;
+      const t0 = 0.22, t1 = 0.78;
+      const ax = x1 + ux * len * t0, ay = y1 + uy * len * t0;
+      const bx = x1 + ux * len * t1, by = y1 + uy * len * t1;
+      return push(`<line x1="${x1}" y1="${y1}" x2="${ax}" y2="${ay}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${ax}" y1="${ay}" x2="${ax + px}" y2="${ay + py}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${ax + px}" y1="${ay + py}" x2="${mx - px}" y2="${my - py}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${mx - px}" y1="${my - py}" x2="${mx + px}" y2="${my + py}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${mx + px}" y1="${my + py}" x2="${bx - px}" y2="${by - py}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${bx - px}" y1="${by - py}" x2="${bx}" y2="${by}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${bx}" y1="${by}" x2="${x2}" y2="${y2}" stroke="currentColor" stroke-width="2"/>
+        <text x="${mx + px * 2.2}" y="${my}" font-size="11" fill="currentColor">${lab || ""}</text>`);
+    },
     gnd(x, y) {
       return push(`<line x1="${x}" y1="${y}" x2="${x}" y2="${y + 8}" stroke="currentColor" stroke-width="2"/>
         <line x1="${x - 12}" y1="${y + 8}" x2="${x + 12}" y2="${y + 8}" stroke="currentColor" stroke-width="2"/>
@@ -8784,5 +8830,1029 @@ Object.assign(presetsData, {
       desc: "Prob. 48.a — puente 2/2/1/3/4 Ω a 20 V. Δ→Y en 2-1-3 y se lee I del feeder." },
     p48b: { selects: { "s812-fig": "122b" }, click: "btn-s812",
       desc: "Prob. 48.b — 8 V, 4.7/1.1/6.8 kΩ. Δ→Y y I del bleeder ISO." }
+  }
+});
+function vAt(V, n) {
+  if (n === 0 || n === "0" || n === "gnd" || n == null) return 0;
+  return V[n] || 0;
+}
+
+function theveninAB({ resistors, vSources, iSources }, nA, nB) {
+  const voc = mnaSolve({ resistors, vSources, iSources });
+  const eth = vAt(voc.V, nA) - vAt(voc.V, nB);
+  const shorts = (vSources || []).map(([p, m]) => [p, m, 1e-9]);
+  const rthNet = mnaSolve({
+    resistors: [...(resistors || []), ...shorts],
+    iSources: [[nB, nA, 1]]
+  });
+  const rth = vAt(rthNet.V, nA) - vAt(rthNet.V, nB);
+  return { eth, rth };
+}
+
+function thText(th, loads) {
+  const iN = th.rth !== 0 ? th.eth / th.rth : Infinity;
+  let p = `${mj(`E_{\\mathrm{Th}} = ${texQtyBody(th.eth, "V")}`)}, ${mj(`R_{\\mathrm{Th}} = ${texQtyBody(th.rth, "\\Omega")}`)}.\n`;
+  p += `Norton: ${mj(`I_N = ${texQtyBody(iN, "A")}`)}, ${mj(`R_N = R_{\\mathrm{Th}}`)}.\n`;
+  (loads || []).forEach((R) => {
+    const i = th.eth / (th.rth + R);
+    p += `Con ${formatOhmLabel(R)}: ${mj(`I = ${texQtyBody(i, "A")}`)}, ${mj(`P = ${texQtyBody(i * i * R, "W")}`)}.\n`;
+  });
+  return p;
+}
+
+function pmaxText(th) {
+  const r = th.rth, pmax = th.eth * th.eth / (4 * r);
+  return `${mj(`R_L = R_{\\mathrm{Th}} = ${texQtyBody(r, "\\Omega")}`)} (MPPT / lastre). ${mj(`P_{\\mathrm{máx}} = E_{\\mathrm{Th}}^2/(4 R_{\\mathrm{Th}}) = ${texQtyBody(pmax, "W")}`)}.`;
+}
+
+const FIG9 = {};
+
+FIG9["123"] = {
+  draw(d) {
+    d.batt(60, 36, 176, "E1 10 V");
+    d.w(60, 36, 110, 36).rh(110, 36, 100, "R1 12 Ω");
+    d.dot(230, 36).w(230, 36, 280, 36);
+    d.rv(230, 36, 120, "R2 6 Ω");
+    d.w(230, 156, 230, 176);
+    d.rv(280, 36, 55, "R3 6 Ω");
+    d.batt(280, 91, 176, "E2 5 V");
+    d.w(60, 176, 280, 176).gnd(160, 176).dot(280, 36);
+  },
+  solve() {
+    const net = { resistors: [["e1", "n", 12], ["n", 0, 6], ["n", "e2", 6]], vSources: [["e1", 0, 10, "E1"], ["e2", 0, 5, "E2"]] };
+    const full = mnaSolve(net);
+    const only1 = mnaSolve({ resistors: net.resistors, vSources: [["e1", 0, 10, "E1"], ["e2", 0, 0, "E2"]] });
+    const only2 = mnaSolve({ resistors: net.resistors, vSources: [["e1", 0, 0, "E1"], ["e2", 0, 5, "E2"]] });
+    const iR1 = (s) => iR(s.V, "e1", "n", 12);
+    const i1 = iR1(full), i11 = iR1(only1), i12 = iR1(only2);
+    const p1 = i11 * i11 * 12, p2 = i12 * i12 * 12, pt = i1 * i1 * 12;
+    let p = `Fig. 9.123 — rack 10 V y auxiliar 5 V, dump 6 Ω (bus híbrido).\n`;
+    p += `a) Solo E1 (E2 en corto): ${mj(`I_{R1}' = ${texQtyBody(i11, "A")}`)}. Solo E2: ${mj(`I_{R1}'' = ${texQtyBody(i12, "A")}`)}.\n`;
+    p += `Suma: ${mj(`I_{R1} = ${texQtyBody(i1, "A")}`)}. I_R2=${formatQty(iR(full.V, "n", 0, 6), "A")}, I_R3=${formatQty(iR(full.V, "n", "e2", 6), "A")}.\n`;
+    p += `b) P en R1 por E1: ${formatQty(p1, "W")}; por E2: ${formatQty(p2, "W")}.\n`;
+    p += `c) Con I total: ${mj(`P = I^2 R = ${texQtyBody(pt, "W")}`)} ≠ ${formatQty(p1 + p2, "W")}.\n`;
+    p += `d) NO: la potencia no es lineal. Falta el cruzado ${mj("2 I' I'' R")}. El MPPT se calcula con I total, no sumando P.`;
+    return p;
+  }
+};
+FIG9["124a"] = {
+  draw(d) {
+    d.isrc(70, 32, 176, "9 A", true);
+    d.w(70, 32, 310, 32).w(70, 176, 310, 176).gnd(70, 176);
+    d.dot(160, 32).rv(160, 32, 144, "R1 10 Ω").arrD(176, 70, "I").dot(160, 176);
+    d.dot(250, 32).rv(250, 32, 70, "R2 8 Ω");
+    d.batt(250, 102, 176, "E 18 V").dot(250, 176);
+  },
+  solve() {
+    const net = { resistors: [["t", 0, 10], ["t", "e", 8]], vSources: [["e", 0, 18, "E"]], iSources: [["0", "t", 9]] };
+    const full = mnaSolve(net);
+    const i = iR(full.V, "t", 0, 10);
+    const onlyI = mnaSolve({ resistors: net.resistors, vSources: [["e", 0, 0, "E"]], iSources: net.iSources });
+    const onlyE = mnaSolve({ resistors: net.resistors, vSources: net.vSources });
+    let p = `Fig. 9.124.a — string 9 A y rack 18 V, bleeder 10 Ω.\n`;
+    p += `Solo I: ${mj(`I' = ${texQtyBody(iR(onlyI.V, "t", 0, 10), "A")}`)}. Solo E: ${mj(`I'' = ${texQtyBody(iR(onlyE.V, "t", 0, 10), "A")}`)}.\n`;
+    p += `Suma ${mj(`I = ${texQtyBody(i, "A")}`)} por los 10 Ω.`;
+    return p;
+  }
+};
+FIG9["124b"] = {
+  draw(d) {
+    d.o(160, 18).txt(172, 14, "E1 = +42 V");
+    d.w(160, 22, 160, 40).rv(160, 40, 50, "R1 18 Ω");
+    d.dot(160, 90).rv(160, 90, 70, "R2 9 Ω");
+    d.w(160, 160, 160, 176).gnd(160, 176);
+    d.w(160, 90, 200, 90);
+    d.battH(200, 280, 90, "E2 24 V", true);
+    d.dot(280, 90).w(280, 90, 340, 90);
+    d.rv(280, 90, 70, "R3 15 Ω");
+    d.w(280, 160, 280, 176).gnd(280, 176);
+    d.rv(340, 90, 70, "R4 10 Ω").arrD(356, 110, "I");
+    d.w(340, 160, 340, 176).gnd(340, 176);
+  },
+  solve() {
+    const net = {
+      resistors: [["e1", "n", 18], ["n", 0, 9], ["m", 0, 15], ["m", 0, 10], ["n", "e2p", 0.001]],
+      vSources: [["e1", 0, 42, "E1"], ["e2p", "m", 24, "E2"]]
+    };
+    const full = mnaSolve(net);
+    const i = iR(full.V, "m", 0, 10);
+    let p = `Fig. 9.124.b — rail +42 V y rack 24 V, dump 10 Ω.\n`;
+    p += `${mj(`I = ${texQtyBody(i, "A")}`)} por los 10 Ω (suma de E1 y E2 apagando uno cada vez).`;
+    return p;
+  }
+};
+FIG9["125a"] = {
+  draw(d) {
+    d.isrc(60, 32, 176, "5 mA", true).gnd(60, 176);
+    d.w(60, 32, 400, 32).w(60, 176, 400, 176);
+    d.dot(150, 32).rv(150, 32, 144, "R1 2.2 kΩ").arrD(132, 80, "IR1").dot(150, 176);
+    d.rh(170, 32, 100, "R2 3.3 kΩ");
+    d.dot(280, 32).batt(280, 32, 176, "8 V");
+    d.dot(370, 32).rv(370, 32, 144, "R3 4.7 kΩ").dot(370, 176);
+  },
+  solve() {
+    const net = {
+      resistors: [["t", 0, 2200], ["t", "e", 3300], ["e", 0, 4700]],
+      vSources: [["e", 0, 8, "E"]],
+      iSources: [["0", "t", 0.005]]
+    };
+    const i = iR(mnaSolve(net).V, "t", 0, 2200);
+    let p = `Fig. 9.125.a — logger 5 mA y rail 8 V, bleeder 2.2 kΩ.\n`;
+    p += `${mj(`I_{R1} = ${texQtyBody(i, "A")}`)} (superposición del 5 mA y del 8 V).`;
+    return p;
+  }
+};
+FIG9["125b"] = {
+  draw(d) {
+    d.w(70, 40, 400, 40).w(70, 176, 400, 176).gnd(230, 176);
+    d.rh(200, 24, 80, "R5 4 Ω");
+    d.w(200, 24, 200, 40).w(280, 24, 280, 40);
+    d.isrcH(190, 290, 52, "6 A", false);
+    d.dot(90, 40).rv(90, 40, 136, "R3 30 Ω").dot(90, 176);
+    d.dot(180, 40).rv(180, 40, 55, "R1 6 Ω").arrD(196, 70, "IR1");
+    d.batt(180, 95, 176, "E1 12 V");
+    d.dot(280, 40).rv(280, 40, 55, "R4 12 Ω");
+    d.w(280, 95, 280, 176);
+    d.dot(370, 40).rv(370, 40, 55, "R2 4 Ω");
+    d.batt(370, 95, 176, "E2 8 V");
+  },
+  solve() {
+    const net = {
+      resistors: [["a", 0, 30], ["a", "e1", 6], ["b", "e2", 12], ["b", "e2b", 4], ["a", "b", 4]],
+      vSources: [["e1", 0, 12, "E1"], ["e2", 0, 8, "E2"], ["e2b", 0, 8, "E2b"]],
+      iSources: [["b", "a", 6]]
+    };
+    const i = iR(mnaSolve(net).V, "a", "e1", 6);
+    let p = `Fig. 9.125.b — 6 A entre buses, racks 12 V y 8 V.\n`;
+    p += `${mj(`I_{R1} = ${texQtyBody(i, "A")}`)} por los 6 Ω. Tres fuentes: se apaga una cada vez.`;
+    return p;
+  }
+};
+FIG9["126"] = {
+  draw(d) {
+    d.o(180, 16).txt(192, 12, "E = 36 V");
+    d.w(180, 20, 180, 40).rv(180, 40, 55, "R1 12 kΩ");
+    d.dot(180, 95).w(180, 95, 280, 95);
+    d.rv(180, 95, 65, "R2 6.8 kΩ");
+    d.txt(118, 140, "+ V2 −", "#2471a3");
+    d.w(180, 160, 180, 176).gnd(180, 176);
+    d.isrc(280, 95, 176, "9 mA", true).gnd(280, 176);
+  },
+  solve() {
+    const net = { resistors: [["e", "n", 12000], ["n", 0, 6800]], vSources: [["e", 0, 36, "E"]], iSources: [["0", "n", 0.009]] };
+    const full = mnaSolve(net);
+    const onlyE = mnaSolve({ resistors: net.resistors, vSources: net.vSources });
+    const onlyI = mnaSolve({ resistors: net.resistors, vSources: [["e", 0, 0, "E"]], iSources: net.iSources });
+    const v2 = vAt(full.V, "n"), vE = vAt(onlyE.V, "n"), vI = vAt(onlyI.V, "n");
+    let p = `Fig. 9.126 — rail 36 V (bleeder 12 k) y logger 9 mA en el tap.\n`;
+    p += `Solo E: ${mj(`V_2' = ${texQtyBody(vE, "V")}`)}. Solo I: ${mj(`V_2'' = ${texQtyBody(vI, "V")}`)}.\n`;
+    p += `Suma ${mj(`V_2 = ${texQtyBody(v2, "V")}`)}. (Prob. 37: estos son los «componentes» de PSpice.)`;
+    return p;
+  }
+};
+
+function figTh(drawFn, net, nA, nB, loads, lead) {
+  return {
+    draw: drawFn,
+    solve() {
+      const th = theveninAB(net, nA, nB);
+      return lead + thText(th, loads) + pmaxText(th);
+    }
+  };
+}
+
+FIG9["127"] = figTh(
+  (d) => {
+    d.batt(50, 36, 176, "E 18 V");
+    d.w(50, 36, 90, 36).rh(90, 36, 80, "R1 6 Ω");
+    d.dot(190, 36).rv(190, 36, 140, "R2 3 Ω").dot(190, 176);
+    d.rh(200, 36, 80, "R3 4 Ω");
+    d.o(300, 36).o(300, 176);
+    d.rv(300, 36, 140, "R").w(50, 176, 300, 176);
+  },
+  { resistors: [["e", "n", 6], ["n", 0, 3], ["n", "a", 4]], vSources: [["e", 0, 18, "E"]] },
+  "a", 0, [2, 30, 100],
+  "Fig. 9.127 — bus 18 V, dump variable R (2 / 30 / 100 Ω).\nRTh = 4+(6∥3)=6 Ω, Eth = V del divisor en vacío.\n"
+);
+
+FIG9["128I"] = figTh(
+  (d) => {
+    d.o(46, 36).o(46, 176).rv(46, 36, 140, "R");
+    d.w(50, 36, 90, 36).rh(90, 36, 80, "R1 2 Ω");
+    d.dot(190, 36).rv(190, 36, 140, "R2 12 Ω").dot(190, 176);
+    d.isrc(280, 36, 176, "3 A", false);
+    d.w(190, 36, 280, 36).w(46, 176, 280, 176);
+  },
+  { resistors: [["a", "n", 2], ["n", 0, 12]], iSources: [["n", 0, 3]] },
+  "a", 0, [2, 100],
+  "Fig. 9.128.I — string 3 A y Ri 12 Ω; R es el dump a la izquierda.\n"
+);
+
+FIG9["128II"] = figTh(
+  (d) => {
+    d.batt(50, 36, 176, "E 20 V");
+    d.w(50, 36, 140, 36).rv(140, 36, 55, "R1 5 Ω");
+    d.dot(140, 91).rv(140, 91, 85, "R2 5 Ω").dot(140, 176);
+    d.w(140, 91, 180, 91).rh(180, 91, 80, "R3 5 Ω");
+    d.o(280, 91).o(280, 176).rv(280, 91, 85, "R");
+    d.w(50, 176, 280, 176);
+  },
+  { resistors: [["e", "n", 5], ["n", 0, 5], ["n", "a", 5]], vSources: [["e", 0, 20, "E"]] },
+  "a", 0, [2, 100],
+  "Fig. 9.128.II — divisor 20 V de un auxiliar, R el logger.\n"
+);
+
+FIG9["129a"] = figTh(
+  (d) => {
+    d.o(50, 36).o(50, 80).rv(50, 36, 44, "R");
+    d.batt(50, 80, 176, "E1 72 V");
+    d.w(50, 36, 160, 36).rv(160, 36, 140, "6 Ω").dot(160, 176);
+    d.battH(160, 250, 90, "E2 18 V", true);
+    d.rh(160, 150, 90, "3 Ω");
+    d.w(50, 176, 250, 176).gnd(160, 176).w(250, 90, 250, 176);
+  },
+  { resistors: [["a", "n", 0.001], ["n", 0, 6], ["n", "e2", 3]], vSources: [["a", 0, 72, "E1"], ["e2", 0, 18, "E2"]] },
+  "a", "n", [2, 100],
+  "Fig. 9.129.a — 72 V y 18 V; R en el feeder de 72 V.\n"
+);
+
+FIG9["129b"] = figTh(
+  (d) => {
+    d.w(70, 36, 360, 36).w(70, 176, 360, 176).gnd(220, 176);
+    d.dot(90, 36).rv(90, 36, 140, "5.6 kΩ").dot(90, 176);
+    d.o(150, 50).o(150, 110).rv(150, 50, 60, "R");
+    d.w(90, 36, 150, 50).w(90, 176, 150, 110);
+    d.dot(230, 36).isrc(230, 36, 176, "8 mA", false);
+    d.dot(320, 36).rv(320, 36, 60, "2.2 kΩ");
+    d.batt(320, 96, 176, "16 V");
+  },
+  { resistors: [["t", 0, 5600], ["t", "e", 2200]], vSources: [["e", 0, 16, "E"]], iSources: [["t", 0, 0.008]] },
+  "t", 0, [],
+  "Fig. 9.129.b — logger 8 mA y rail 16 V; R en paralelo con el bleeder 5.6 kΩ.\n"
+);
+
+FIG9["130a"] = figTh(
+  (d) => {
+    d.o(50, 36).w(50, 40, 50, 80).batt(50, 80, 176, "20 V");
+    d.w(50, 36, 90, 36).rv(70, 36, 50, "R");
+    d.w(70, 86, 70, 176);
+    d.w(50, 36, 360, 36).w(50, 176, 360, 176).gnd(50, 176);
+    d.dot(150, 36).isrc(150, 36, 176, "3 A", true);
+    d.dot(230, 36).rv(230, 36, 140, "25 Ω").dot(230, 176);
+    d.rh(250, 36, 80, "10 Ω");
+    d.dot(350, 36).rv(350, 36, 140, "6 Ω").dot(350, 176);
+  },
+  { resistors: [["t", 0, 25], ["t", "n", 10], ["n", 0, 6]], vSources: [["t", 0, 20, "E"]], iSources: [["0", "t", 3]] },
+  "t", 0, [],
+  "Fig. 9.130.a — rail 20 V, string 3 A; R en el bus.\n"
+);
+
+FIG9["130b"] = figTh(
+  (d) => {
+    d.batt(40, 40, 180, "72 V").gnd(40, 180);
+    d.w(40, 40, 140, 40);
+    const L = [140, 70], R = [300, 70], T = [220, 28], B = [220, 160];
+    d.w(40, 40, T[0], T[1]);
+    d.zig(T[0], T[1], L[0], L[1], "6 Ω");
+    d.zig(T[0], T[1], R[0], R[1], "R");
+    d.zig(L[0], L[1], R[0], R[1], "2 Ω");
+    d.zig(L[0], L[1], B[0], B[1], "3 Ω");
+    d.zig(R[0], R[1], B[0], B[1], "4 Ω");
+    d.dot(L[0], L[1]).dot(R[0], R[1]).dot(T[0], T[1]).dot(B[0], B[1]);
+    d.w(B[0], B[1], 40, 180);
+    d.o(R[0] + 8, R[1] - 14).o(T[0] + 20, T[1] + 4);
+  },
+  { resistors: [["t", "l", 6], ["t", "r", 0.001], ["l", "r", 2], ["l", 0, 3], ["r", 0, 4]], vSources: [["t", 0, 72, "E"]] },
+  "t", "r", [],
+  "Fig. 9.130.b — puente 72 V; R en la rama superior derecha (filtro / malla PE).\n"
+);
+
+FIG9["131I"] = figTh(
+  (d) => {
+    d.batt(50, 40, 176, "15 V");
+    d.w(50, 40, 90, 40).rh(90, 40, 80, "60 Ω");
+    d.dot(190, 40).rv(190, 40, 136, "30 Ω").dot(190, 176);
+    d.battH(200, 290, 40, "10 V", true);
+    d.rh(290, 40, 80, "25 Ω");
+    d.o(390, 40).txt(400, 36, "a");
+    d.o(390, 176).txt(400, 190, "b");
+    d.w(50, 176, 390, 176);
+    d.batt(390, 40, 176, "10 V");
+  },
+  { resistors: [["e", "n", 60], ["n", 0, 30], ["n", "a", 25]], vSources: [["e", 0, 15, "E1"], ["a", 0, 10, "E2"]] },
+  "a", 0, [],
+  "Fig. 9.131.I — bornes a–b con 10 V ya en b (otro rack). Thévenin externo a a–b.\n"
+);
+
+FIG9["131II"] = figTh(
+  (d) => {
+    d.w(70, 36, 400, 36).w(70, 176, 400, 176).gnd(70, 176);
+    d.dot(90, 36).rv(90, 36, 140, "R1 2.7 kΩ").dot(90, 176);
+    d.o(150, 50).txt(160, 46, "a");
+    d.rv(150, 50, 40, "47 kΩ");
+    d.batt(150, 90, 155, "180 V");
+    d.o(150, 155).txt(160, 174, "b");
+    d.w(90, 36, 150, 50).w(90, 176, 150, 155);
+    d.rh(180, 36, 90, "R2 4.7 kΩ");
+    d.dot(290, 36).isrc(290, 36, 176, "18 mA", true);
+    d.dot(370, 36).rv(370, 36, 140, "R3 3.9 kΩ").dot(370, 176);
+  },
+  { resistors: [["t", 0, 2700], ["t", "n", 4700], ["n", 0, 3900]], iSources: [["0", "n", 0.018]] },
+  "t", 0, [],
+  "Fig. 9.131.II — 18 mA y bleeders kΩ; la rama 47 kΩ+180 V es la carga (a–b).\n"
+);
+
+FIG9["132a"] = figTh(
+  (d) => {
+    d.batt(40, 36, 176, "E 20 V").gnd(40, 176);
+    d.w(40, 36, 70, 36).rh(70, 36, 70, "R1 20 Ω");
+    d.dot(160, 36).rv(160, 36, 140, "R2 5 Ω").dot(160, 176);
+    d.rh(170, 36, 70, "R3 12 Ω");
+    d.dot(260, 36).rv(260, 36, 140, "R4 16 Ω").dot(260, 176);
+    d.rh(270, 36, 60, "R5 2 Ω");
+    d.o(350, 36).o(350, 176).rv(350, 36, 140, "R");
+    d.w(40, 176, 350, 176);
+  },
+  { resistors: [["e", "n1", 20], ["n1", 0, 5], ["n1", "n2", 12], ["n2", 0, 16], ["n2", "a", 2]], vSources: [["e", 0, 20, "E"]] },
+  "a", 0, [],
+  "Fig. 9.132.a — escalera 20 V (bleeder + dump R al final).\n"
+);
+
+FIG9["132b"] = figTh(
+  (d) => {
+    d.o(40, 80).txt(8, 76, "+12 V");
+    d.w(44, 80, 70, 80).rh(70, 80, 80, "R1 1.1 kΩ");
+    d.dot(170, 80);
+    d.gnd(170, 28);
+    d.w(170, 46, 170, 80);
+    d.rv(170, 28, 52, "R2 2.2 kΩ");
+    d.w(170, 80, 200, 80).rh(200, 80, 80, "R3 3.3 kΩ");
+    d.o(300, 80).txt(310, 76, "R");
+    d.rv(300, 80, 70, "4.7 kΩ");
+    d.o(300, 160).txt(310, 174, "E2 = −4 V");
+  },
+  { resistors: [["e1", "n", 1100], ["n", 0, 2200], ["n", "a", 3300]], vSources: [["e1", 0, 12, "E1"], ["a", 0, -4, "E2"]] },
+  "a", 0, [],
+  "Fig. 9.132.b — rails +12 V y −4 V de un auxiliar; R=4.7 kΩ es el logger.\n"
+);
+
+FIG9["133"] = figTh(
+  (d) => {
+    d.o(80, 16).txt(92, 12, "+22 V");
+    d.w(80, 20, 80, 36).rv(80, 36, 50, "2.2 kΩ");
+    d.dot(80, 86).rv(80, 86, 70, "5.6 kΩ");
+    d.o(80, 166).txt(20, 180, "−12 V");
+    d.w(80, 86, 110, 86).rh(110, 86, 80, "3.3 kΩ");
+    d.dot(210, 86).rv(210, 86, 70, "6.8 kΩ");
+    d.o(210, 166).txt(220, 180, "+6 V");
+    d.w(210, 86, 240, 86).rh(240, 86, 80, "1.2 kΩ");
+    d.o(340, 86).txt(350, 82, "RL");
+    d.w(340, 90, 340, 166).gnd(340, 166);
+  },
+  { resistors: [["p22", "n1", 2200], ["n1", "m12", 5600], ["n1", "n2", 3300], ["n2", "p6", 6800], ["n2", "a", 1200]],
+    vSources: [["p22", 0, 22, "E22"], ["m12", 0, -12, "E12"], ["p6", 0, 6, "E6"]] },
+  "a", 0, [],
+  "Fig. 9.133 — auxiliar +22/−12/+6 V; RL a PE (carga de un RTU).\n"
+);
+
+FIG9["134"] = {
+  draw(d) {
+    d.o(70, 16).txt(82, 12, "20 V");
+    d.w(70, 20, 70, 36).rv(70, 36, 50, "R1 51 kΩ");
+    d.dot(70, 86).rv(70, 86, 70, "R2 10 kΩ");
+    d.w(70, 156, 70, 176).gnd(70, 176);
+    d.w(70, 86, 150, 86).arrR(130, 86, "IB");
+    d.npn(190, 100);
+    d.o(340, 16).txt(352, 12, "20 V");
+    d.w(340, 20, 340, 40).arrD(340, 50, "IC");
+    d.rh(250, 40, 90, "RC 2.2 kΩ");
+    d.w(340, 40, 206, 82);
+    d.txt(250, 70, "VCE = 8 V", "#2471a3");
+    d.w(206, 118, 206, 140);
+    d.rv(206, 140, 40, "RE 0.5 kΩ").arrD(222, 160, "IE");
+    d.gnd(206, 180);
+  },
+  solve() {
+    const eth = 20 * 10 / 61, rth = par(51000, 10000);
+    const ic = 12 / 2700, ie = ic, ve = ie * 500, vb = ve + 0.7, vc = ve + 8;
+    const ib = (eth - vb) / rth;
+    let p = `Fig. 9.134 — driver BJT/IGBT. Thévenin a la izquierda de B (divisor 51k/10k a 20 V).\n`;
+    p += `a) ${mj(`E_{Th} = 20\\cdot 10/61 = ${texQtyBody(eth, "V")}`)}, ${mj(`R_{Th} = 51k\\parallel 10k = ${texQtyBody(rth, "\\Omega")}`)}.\n`;
+    p += `b) ${mj("I_C=I_E")}, ${mj("V_{CE}=8")}: ${mj(`I_E = 12/2.7k = ${texQtyBody(ie, "A")}`)}.\n`;
+    p += `c) ${mj(`V_B = V_E+0.7 = ${texQtyBody(vb, "V")}`)}, ${mj(`I_B = (E_{Th}-V_B)/R_{Th} = ${texQtyBody(ib, "A")}`)}.\n`;
+    p += `d) ${mj(`V_C = ${texQtyBody(vc, "V")}`)}.`;
+    return p;
+  }
+};
+
+FIG9["135a"] = figTh(
+  (d) => {
+    d.batt(50, 36, 176, "12 V").gnd(50, 176);
+    d.w(50, 36, 90, 36);
+    d.rh(70, 20, 80, "6 Ω");
+    d.w(70, 20, 70, 36).w(150, 20, 150, 36);
+    d.rh(70, 52, 80, "12 Ω");
+    d.w(70, 52, 70, 36).w(150, 52, 150, 36);
+    d.dot(170, 36);
+    d.o(170, 70).txt(90, 100, "a");
+    d.rv(170, 70, 40, "100 Ω");
+    d.batt(170, 110, 176, "72 V");
+    d.txt(185, 160, "b");
+    d.rv(250, 36, 140, "12 Ω").dot(250, 176);
+    d.isrc(340, 36, 176, "2 A", true);
+    d.w(170, 36, 340, 36).w(50, 176, 340, 176);
+  },
+  { resistors: [["e", "t", 6], ["e", "t", 12], ["t", 0, 12]], vSources: [["e", 0, 12, "E"]], iSources: [["0", "t", 2]] },
+  "t", 0, [],
+  "Fig. 9.135.a — 12 V y 2 A; rama a–b (100 Ω + 72 V) es la carga.\n"
+);
+
+FIG9["135b"] = figTh(
+  (d) => {
+    d.batt(40, 40, 180, "6 V").gnd(40, 180);
+    d.w(40, 40, 100, 40).rv(100, 40, 140, "4 Ω").dot(100, 180);
+    const T = [180, 36], L = [140, 90], R = [280, 90], B = [180, 150];
+    d.w(100, 40, T[0], T[1]);
+    d.zig(T[0], T[1], L[0], L[1], "2 Ω");
+    d.zig(T[0], T[1], R[0], R[1], "R 300 Ω");
+    d.zig(L[0], L[1], R[0], R[1], "4 Ω");
+    d.zig(L[0], L[1], B[0], B[1], "4 Ω");
+    d.battH(R[0], R[0] + 70, R[1] + 40, "2 V", true);
+    d.w(R[0], R[1], R[0], R[1] + 40);
+    d.w(R[0] + 70, R[1] + 40, B[0], B[1]);
+    d.dot(T[0], T[1]).dot(L[0], L[1]).dot(R[0], R[1]).dot(B[0], B[1]);
+    d.o(R[0] + 10, R[1] - 16).txt(R[0] + 18, R[1] - 20, "a");
+    d.o(R[0] + 10, R[1] + 16).txt(R[0] + 18, R[1] + 28, "b");
+    d.w(B[0], B[1], 40, 180);
+  },
+  { resistors: [["e", "t", 4], ["t", "l", 2], ["l", "r", 4], ["l", 0, 4], ["r", "e2", 0.001]], vSources: [["e", 0, 6, "E"], ["e2", 0, 2, "E2"]] },
+  "t", "r", [],
+  "Fig. 9.135.b — puente 6 V con 2 V en un brazo; R=300 Ω entre a y b.\n"
+);
+
+FIG9["136"] = {
+  draw(d) {
+    d.batt(50, 36, 176, "E 24 V").gnd(50, 176);
+    d.w(50, 36, 100, 36).rv(100, 36, 140, "R1 4 Ω").dot(100, 176);
+    d.dot(180, 36).isrc(180, 36, 176, "5 A", true);
+    d.dot(260, 36).rv(260, 36, 140, "R2 4 Ω").dot(260, 176);
+    d.o(350, 36).o(350, 176).rv(350, 36, 140, "R");
+    d.w(100, 36, 350, 36).w(50, 176, 350, 176);
+  },
+  solve() {
+    const th = theveninAB(
+      { resistors: [["e", "t", 4], ["t", 0, 4]], vSources: [["e", 0, 24, "E"]], iSources: [["0", "t", 5]] },
+      "t", 0
+    );
+    let p = `Fig. 9.136 — rail 24 V, string 5 A, dump R.\n`;
+    p += thText(th, []) + pmaxText(th) + "\n";
+    p += `Curva P(R) a ¼, ½, 1, 2 × RTh: ver tabla (MPPT 2026).`;
+    const wrap = document.getElementById("wrap-9-5");
+    const tb = document.querySelector("#table-9-5 tbody");
+    if (tb) {
+      const ks = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2];
+      tb.innerHTML = ks.map((k) => {
+        const R = k * th.rth, i = th.eth / (th.rth + R), P = i * i * R;
+        return `<tr><td>${k}</td><td>${Number(R.toPrecision(4))}</td><td>${Number(P.toPrecision(4))}</td></tr>`;
+      }).join("");
+    }
+    if (wrap) wrap.style.display = "block";
+    return p;
+  }
+};
+FIG9["137"] = {
+  draw(d) {
+    d.batt(50, 36, 176, "100 V").gnd(50, 176);
+    d.w(50, 36, 90, 36).rh(90, 36, 80, "R1");
+    d.dot(190, 36).rv(190, 36, 140, "R2 50 Ω").dot(190, 176);
+    d.rh(200, 36, 80, "R3 50 Ω");
+    d.dot(300, 36).rv(300, 36, 140, "R4 50 Ω").dot(300, 176);
+    d.w(50, 176, 300, 176);
+  },
+  solve() {
+    let p = `Fig. 9.137 — ¿qué R1 hace máxima la P en R4=50 Ω?\n`;
+    p += `RTh vista por R4 = R3 + (R2 ∥ R1) = 50 + (50∥R1), con E en corto.\n`;
+    p += `Para acoplar, RTh=50 Ω ⇒ 50∥R1 = 0 ⇒ ${mj("R_1 = 0")} (busbar).\n`;
+    p += `En 2026: para entregar el máximo al dump de 50 Ω, el feeder no debe añadir R.`;
+    return p;
+  }
+};
+FIG9["138"] = {
+  draw(d) {
+    d.batt(50, 36, 176, "E 100 V").gnd(50, 176);
+    d.w(50, 36, 90, 36).rh(90, 36, 80, "R1 25 Ω");
+    d.dot(190, 36).o(190, 70).o(190, 140);
+    d.rv(190, 36, 140, "R2").dot(190, 176);
+    d.rh(200, 36, 80, "R3 25 Ω");
+    d.dot(300, 36).rv(300, 36, 140, "R4").dot(300, 176);
+    d.w(50, 176, 300, 176);
+  },
+  solve() {
+    let p = `Fig. 9.138 — R2 (tap) para Pmáx en R4.\n`;
+    p += `Eth = 100·R2/(25+R2), RTh = 25 + (25∥R2).\n`;
+    p += `Si R4 es fija, se elige R2 que maximice Eth² R4 / (RTh+R4)².\n`;
+    p += `Si R4 se puede elegir, R4=RTh y además R2 grande sube Eth (menos drop en R1).\n`;
+    p += `Caso límite tipo 9.137: R2→∞ (tap abierto) no alimenta; el óptimo es un compromiso, o R1=0 como en el 23.`;
+    return p;
+  }
+};
+FIG9["139"] = {
+  draw(d) {
+    d.batt(50, 36, 176, "12 V").gnd(50, 176);
+    d.w(50, 36, 160, 36);
+    d.potV(160, 36, 160, 100, "Pot. 500 Ω");
+    d.txt(118, 90, "R", "#2471a3");
+    d.w(196, 100, 250, 100).rv(250, 100, 76, "RL 100 Ω");
+    d.gnd(250, 176).w(50, 176, 250, 176);
+  },
+  solve() {
+    const disc = 250000 - 200000, rA = (500 + Math.sqrt(disc)) / 2, rB = (500 - Math.sqrt(disc)) / 2;
+    const rth = par(rA, 500 - rA);
+    let p = `Fig. 9.139 — potenciómetro 500 Ω (consigna de un VFD / SoC), RL=100 Ω.\n`;
+    p += `RTh (wiper–PE) = R ∥ (500−R). Acoplar a 100 Ω:\n`;
+    p += `${mj("R(500-R)/500 = 100")} ⇒ R = ${formatOhmLabel(rA)} o ${formatOhmLabel(rB)}.\n`;
+    p += `Ambos dan ${mj(`R_{\\mathrm{Th}} = ${texQtyBody(rth, "\\Omega")}`)} = RL.`;
+    return p;
+  }
+};
+
+function millman(branches, rl) {
+  let num = 0, den = rl ? 1 / rl : 0;
+  branches.forEach(([e, r]) => { num += e / r; den += 1 / r; });
+  const v = num / den, i = rl ? v / rl : 0;
+  return { v, i };
+}
+
+FIG9["140"] = {
+  draw(d) {
+    d.w(70, 36, 340, 36).w(70, 176, 340, 176).gnd(70, 176);
+    d.rv(70, 36, 50, "R1 10 Ω");
+    d.batt(70, 86, 176, "E1 40 V");
+    d.rv(180, 36, 50, "R2 6 Ω");
+    d.batt(180, 86, 176, "E2 42 V");
+    d.o(300, 36).o(300, 176).rv(300, 36, 140, "RL 3 Ω");
+  },
+  solve() {
+    const { v, i } = millman([[40, 10], [42, 6]], 3);
+    let p = `Fig. 9.140 — dos racks 40 V / 10 Ω y 42 V / 6 Ω, dump 3 Ω.\n`;
+    p += `Millman: ${mj("V = (E_1/R_1+E_2/R_2)/(1/R_1+1/R_2+1/R_L)")}.\n`;
+    p += `${mj(`V_{R_L} = ${texQtyBody(v, "V")}`)}, ${mj(`I_{R_L} = ${texQtyBody(i, "A")}`)}.`;
+    return p;
+  }
+};
+FIG9["141"] = {
+  draw(d) {
+    d.w(80, 36, 340, 36).w(80, 176, 340, 176).gnd(80, 176);
+    d.batt(80, 36, 90, "E1 5 V");
+    d.txt(30, 70, "− +");
+    d.rv(80, 90, 86, "R1 2.2 kΩ");
+    d.rv(180, 36, 70, "R2 8.2 kΩ");
+    d.batt(180, 106, 176, "E2 20 V");
+    d.o(300, 36).o(300, 176).rv(300, 36, 140, "RL 5.6 kΩ");
+  },
+  solve() {
+    const { v, i } = millman([[-5, 2200], [20, 8200]], 5600);
+    let p = `Fig. 9.141 — rails 5 V (invertido) y 20 V, kΩ, RL=5.6 kΩ.\n`;
+    p += `${mj(`V_{R_L} = ${texQtyBody(v, "V")}`)}, ${mj(`I = ${texQtyBody(i, "A")}`)}.`;
+    return p;
+  }
+};
+FIG9["142"] = {
+  draw(d) {
+    d.o(46, 36).o(46, 176).rv(46, 36, 140, "RL 200 Ω");
+    d.w(50, 36, 400, 36).w(50, 176, 400, 176).gnd(200, 176);
+    d.dot(140, 36).rv(140, 36, 70, "R1 200 Ω");
+    d.batt(140, 106, 176, "E1 400 V");
+    d.battH(200, 280, 36, "E2 20 V", false);
+    d.rv(240, 50, 70, "R2 100 Ω");
+    d.w(240, 120, 240, 176);
+    d.rh(280, 36, 80, "R3 10 kΩ");
+    d.batt(380, 36, 176, "E3 10 V");
+  },
+  solve() {
+    const { v, i } = millman([[-400, 200], [20, 100], [10, 10000]], 200);
+    let p = `Fig. 9.142 — bus 400 V (invertido), 20 V y 10 V; RL=200 Ω.\n`;
+    p += `Millman con tres rails. ${mj(`V_{R_L} = ${texQtyBody(v, "V")}`)}, ${mj(`I = ${texQtyBody(i, "A")}`)}.`;
+    return p;
+  }
+};
+FIG9["143"] = {
+  draw(d) {
+    d.w(40, 70, 40, 160).w(40, 160, 400, 160).w(40, 70, 70, 70);
+    d.isrcH(70, 160, 70, "I1 4 A", true);
+    d.rh(80, 110, 70, "R1 4.7 Ω");
+    d.w(70, 110, 70, 70).w(150, 110, 150, 70);
+    d.w(160, 70, 190, 70);
+    d.isrcH(190, 280, 70, "I2 1.6 A", true);
+    d.rh(200, 110, 70, "R2 3.3 Ω");
+    d.w(190, 110, 190, 70).w(270, 110, 270, 70);
+    d.w(280, 70, 340, 70);
+    d.o(340, 70).o(340, 160).rv(340, 70, 90, "RL 2.7 Ω");
+  },
+  solve() {
+    const e1 = 4 * 4.7, e2 = 1.6 * 3.3, r = 4.7 + 3.3 + 2.7, i = (e1 + e2) / r, v = i * 2.7;
+    let p = `Fig. 9.143 — dual de Millman: dos strings 4 A y 1.6 A en cascada, dump 2.7 Ω.\n`;
+    p += `Cada Norton → Thévenin: ${formatQty(e1, "V")} y ${formatQty(e2, "V")}.\n`;
+    p += `${mj(`I = (E_1+E_2)/(R_1+R_2+R_L) = ${texQtyBody(i, "A")}`)}, ${mj(`V_{R_L} = ${texQtyBody(v, "V")}`)}.`;
+    return p;
+  }
+};
+FIG9["144"] = {
+  draw(d) {
+    d.isrc(60, 36, 176, "10 mA", true).gnd(60, 176);
+    d.w(60, 36, 430, 36).w(60, 176, 430, 176);
+    d.dot(140, 36).rv(140, 36, 140, "R1 2 kΩ").dot(140, 176);
+    d.isrcH(170, 280, 36, "8 mA I2", false);
+    d.rh(180, 70, 80, "R2 4.7 Ω");
+    d.w(180, 70, 180, 36).w(260, 70, 260, 36);
+    d.o(230, 20).txt(150, 16, "RL 6.8 kΩ", "#2471a3");
+    d.w(220, 20, 260, 36);
+    d.dot(340, 36).isrc(340, 36, 176, "4 mA", true);
+    d.dot(410, 36).rv(410, 36, 140, "R3 8.2 kΩ").dot(410, 176);
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["a", 0, 2000], ["a", "b", 4.7], ["b", 0, 8200]],
+      iSources: [["0", "a", 0.01], ["b", "a", 0.008], ["0", "b", 0.004]]
+    });
+    const th = theveninAB(
+      { resistors: [["a", 0, 2000], ["a", "b", 4.7], ["b", 0, 8200]], iSources: [["0", "a", 0.01], ["b", "a", 0.008], ["0", "b", 0.004]] },
+      "a", "b"
+    );
+    const iL = th.eth / (th.rth + 6800), vL = iL * 6800;
+    let p = `Fig. 9.144 — tres corrientes (10 / 8 / 4 mA), RL=6.8 kΩ entre los nudos.\n`;
+    p += `Dual / Thévenin a–b: ${thText(th, [6800])}`;
+    p += `${mj(`V_{R_L} = ${texQtyBody(vL, "V")}`)}.`;
+    return p;
+  }
+};
+
+FIG9["145"] = {
+  draw(d) {
+    d.batt(50, 36, 176, "E 60 V").gnd(50, 176);
+    d.w(50, 36, 90, 36).rh(90, 36, 80, "2.5 kΩ");
+    d.dot(190, 36).txt(198, 32, "a");
+    d.rh(200, 36, 80, "8 kΩ");
+    d.dot(300, 36).rv(300, 36, 140, "7 kΩ").dot(300, 176);
+    d.o(190, 70).o(190, 150).rv(190, 36, 140, "15 kΩ");
+    d.txt(120, 120, "a–b", "#2471a3");
+    d.w(50, 176, 300, 176).txt(198, 190, "b");
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["e", "a", 2500], ["a", "n", 8000], ["n", 0, 7000], ["a", 0, 15000]],
+      vSources: [["e", 0, 60, "E"]]
+    });
+    const vab = vAt(net.V, "a"), i = vab / 15000;
+    let p = `Fig. 9.145 — rama a–b = 15 kΩ (un logger en el tap).\n`;
+    p += `${mj(`V_{ab} = ${texQtyBody(vab, "V")}`)}, ${mj(`I = ${texQtyBody(i, "A")}`)}.\n`;
+    p += `Sustitutos: (1) fuente ${formatQty(vab, "V")} en a–b; (2) fuente ${formatQty(i, "A")}; (3) Thévenin de la rama ${formatOhmLabel(15000)}. El bus no cambia.`;
+    return p;
+  }
+};
+FIG9["146"] = {
+  draw(d) {
+    d.isrc(60, 36, 176, "4 mA", true).gnd(60, 176);
+    d.w(60, 36, 400, 36).w(60, 176, 400, 176);
+    d.dot(150, 36).rv(150, 36, 140, "R1 2 kΩ").dot(150, 176);
+    d.txt(210, 28, "a", "#2471a3");
+    d.rh(200, 36, 80, "R2 0.51 kΩ");
+    d.battH(290, 370, 36, "E 10 V", true);
+    d.txt(380, 28, "b", "#2471a3");
+    d.dot(400, 36).rv(400, 36, 140, "1.5 kΩ").dot(400, 176);
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["t", 0, 2000], ["t", "e", 510], ["e", 0, 1500]],
+      vSources: [["e", 0, 10, "E"]],
+      iSources: [["0", "t", 0.004]]
+    });
+    const vab = vAt(net.V, "t") - 10, i = iR(net.V, "t", "e", 510);
+    let p = `Fig. 9.146 — rama a–b = 0.51 kΩ + 10 V.\n`;
+    p += `${mj(`V_{ab} = ${texQtyBody(vab, "V")}`)}, ${mj(`I = ${texQtyBody(i, "A")}`)}.\n`;
+    p += `Tres equivalentes de a–b (E, I, Thévenin). El string 4 mA no se entera.`;
+    return p;
+  }
+};
+FIG9["147"] = {
+  draw(d) {
+    d.batt(50, 36, 176, "E1 20 V").gnd(50, 176);
+    d.w(50, 36, 90, 36).rh(90, 36, 80, "R1 4 Ω");
+    d.dot(190, 36).txt(198, 32, "a");
+    d.rv(190, 36, 140, "R2 12 Ω").dot(190, 176);
+    d.o(210, 70).o(210, 150);
+    d.rh(200, 36, 80, "R3 8 Ω");
+    d.batt(300, 36, 176, "E2 40 V");
+    d.w(50, 176, 300, 176).txt(198, 190, "b");
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["e1", "a", 4], ["a", 0, 12], ["a", "e2", 8]],
+      vSources: [["e1", 0, 20, "E1"], ["e2", 0, 40, "E2"]]
+    });
+    const vab = vAt(net.V, "a"), i = vab / 12;
+    let p = `Fig. 9.147 — 20 V y 40 V; rama a–b = 12 Ω. ¡Cuidado con las polaridades!\n`;
+    p += `${mj(`V_{ab} = ${texQtyBody(vab, "V")}`)}, ${mj(`I = ${texQtyBody(i, "A")}`)}.\n`;
+    p += `Sustituir 12 Ω por E=Vab o por I no cambia las otras ramas.`;
+    return p;
+  }
+};
+
+FIG9["148a"] = {
+  draw(d) {
+    d.batt(50, 36, 176, "E 24 V");
+    d.w(50, 36, 90, 36).rh(90, 36, 80, "8 kΩ");
+    d.dot(190, 36).rv(190, 36, 140, "24 kΩ").dot(190, 176);
+    d.rh(200, 36, 80, "4 kΩ");
+    d.dot(300, 36).rv(300, 36, 140, "20 kΩ").dot(300, 176);
+    d.zig(190, 36, 300, 176, "24 kΩ");
+    d.arrD(260, 90, "I");
+    d.w(50, 176, 300, 176);
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["e", "n", 8000], ["n", 0, 24000], ["n", "p", 4000], ["n", "q", 24000], ["p", 0, 20000]],
+      vSources: [["e", 0, 24, "E"]]
+    });
+    const i = iR(net.V, "n", "q", 24000);
+    let p = `Fig. 9.148.a — E=24 V a la izquierda, I en la diagonal 24 kΩ.\n`;
+    p += `${mj(`I = ${texQtyBody(i, "A")}`)}. Comparar con (b): reciprocidad.`;
+    return p;
+  }
+};
+FIG9["148b"] = {
+  draw(d) {
+    d.w(50, 36, 90, 36).rh(90, 36, 80, "8 kΩ");
+    d.dot(190, 36).rv(190, 36, 140, "24 kΩ").dot(190, 176);
+    d.rh(200, 36, 80, "4 kΩ");
+    d.dot(300, 36).rv(300, 36, 140, "20 kΩ").dot(300, 176);
+    d.zig(190, 90, 300, 176, "24 kΩ");
+    d.battH(200, 280, 80, "E 24 V", true);
+    d.w(190, 36, 190, 90);
+    d.w(50, 36, 50, 176).w(50, 176, 300, 176);
+    d.arrD(50, 90, "I");
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["n", 0, 8000], ["n", 0, 24000], ["n", "p", 4000], ["p", "q", 24000], ["p", 0, 20000]],
+      vSources: [["n", "q", 24, "E"]]
+    });
+    const i = iR(net.V, 0, "n", 8000);
+    const iA = iR(mnaSolve({
+      resistors: [["e", "n", 8000], ["n", 0, 24000], ["n", "p", 4000], ["n", "q", 24000], ["p", 0, 20000]],
+      vSources: [["e", 0, 24, "E"]]
+    }).V, "n", "q", 24000);
+    let p = `Fig. 9.148.b — E movida a la diagonal; I en el 8 kΩ.\n`;
+    p += `${mj(`I = ${texQtyBody(i, "A")}`)}. En (a) era ${formatQty(iA, "A")}. `;
+    p += Math.abs(Math.abs(i) - Math.abs(iA)) / Math.max(Math.abs(iA), 1e-12) < 0.05
+      ? "Se cumple la reciprocidad (ensayo PCC ↔ string)."
+      : "Revisa el lazo (polaridad).";
+    return p;
+  }
+};
+FIG9["149a"] = {
+  draw(d) {
+    const T = [200, 36], L = [120, 100], R = [280, 100], B = [200, 164];
+    d.zig(T[0], T[1], L[0], L[1], "4 kΩ");
+    d.zig(T[0], T[1], R[0], R[1], "4 kΩ");
+    d.battH(L[0], R[0], 100, "E 10 V", true);
+    d.zig(L[0], L[1], B[0], B[1], "4 kΩ");
+    d.zig(R[0], R[1], B[0], B[1], "8 kΩ");
+    d.dot(T[0], T[1]).dot(L[0], L[1]).dot(R[0], R[1]).dot(B[0], B[1]);
+    d.w(R[0], R[1], 340, 100).w(340, 100, 340, 164).w(340, 164, B[0], B[1]);
+    d.arrD(340, 140, "I");
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["l", "t", 4000], ["t", "r", 4000], ["l", "b", 4000], ["r", "b", 8000]],
+      vSources: [["l", "r", 10, "E"]]
+    });
+    let p = `Fig. 9.149.a — E=10 V en el puente; I en el lazo derecho.\n`;
+    p += `I de retorno ${formatQty(net.Ivs.E, "A")} (referencia). Comparar con (b).`;
+    return p;
+  }
+};
+FIG9["149b"] = {
+  draw(d) {
+    const T = [200, 36], L = [120, 100], R = [280, 100], B = [200, 164];
+    d.zig(T[0], T[1], L[0], L[1], "4 kΩ");
+    d.zig(T[0], T[1], R[0], R[1], "4 kΩ");
+    d.zig(L[0], L[1], R[0], R[1], "");
+    d.arrR(200, 100, "I");
+    d.zig(L[0], L[1], B[0], B[1], "4 kΩ");
+    d.zig(R[0], R[1], B[0], B[1], "8 kΩ");
+    d.dot(T[0], T[1]).dot(L[0], L[1]).dot(R[0], R[1]).dot(B[0], B[1]);
+    d.w(R[0], R[1], 340, 100);
+    d.batt(340, 100, 180, "E 10 V");
+    d.w(340, 180, B[0], B[1]);
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["l", "t", 4000], ["t", "r", 4000], ["l", "b", 4000], ["r", "b", 8000], ["t", "e", 0.001]],
+      vSources: [["e", "b", 10, "E"]]
+    });
+    const i = iR(net.V, "l", "r", 1e12);
+    let p = `Fig. 9.149.b — E a la derecha; I en la diagonal del puente.\n`;
+    p += `Reciprocidad: misma |I| que en (a) si la red es lineal. I diagonal ~ ${formatQty(iR(net.V, "t", "r", 4000) - iR(net.V, "r", "b", 8000), "A")}.`;
+    return p;
+  }
+};
+FIG9["150a"] = {
+  draw(d) {
+    d.isrc(60, 36, 176, "6 A", true);
+    d.w(60, 36, 300, 36).w(60, 176, 300, 176);
+    d.dot(140, 36).rv(140, 36, 140, "R1 3 Ω").dot(140, 176);
+    d.rh(160, 36, 80, "R2 2 Ω");
+    d.txt(175, 22, "+ V −", "#2471a3");
+    d.dot(260, 36).rv(260, 36, 140, "R3 4 Ω").dot(260, 176);
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["t", 0, 3], ["t", "n", 2], ["n", 0, 4]],
+      iSources: [["0", "t", 6]]
+    });
+    const v = iR(net.V, "t", "n", 2) * 2;
+    let p = `Fig. 9.150.a — string 6 A; V en R2=2 Ω.\n`;
+    p += `${mj(`V = ${texQtyBody(v, "V")}`)}. El dual (b) pone 6 A en paralelo con R2 y lee V en los bornes de R1.`;
+    return p;
+  }
+};
+FIG9["150b"] = {
+  draw(d) {
+    d.o(50, 70).o(50, 176).txt(8, 120, "+ V −", "#2471a3");
+    d.w(54, 70, 100, 70).w(54, 176, 300, 176);
+    d.rv(100, 70, 106, "R1 3 Ω").dot(100, 176);
+    d.w(100, 70, 300, 70);
+    d.isrcH(140, 240, 36, "6 A", false);
+    d.rh(150, 70, 80, "R2 2 Ω");
+    d.dot(260, 70).rv(260, 70, 106, "R3 4 Ω").dot(260, 176);
+  },
+  solve() {
+    const net = mnaSolve({
+      resistors: [["t", 0, 3], ["t", "n", 2], ["n", 0, 4]],
+      iSources: [["n", "t", 6]]
+    });
+    const v = vAt(net.V, "t");
+    const vA = iR(mnaSolve({
+      resistors: [["t", 0, 3], ["t", "n", 2], ["n", 0, 4]],
+      iSources: [["0", "t", 6]]
+    }).V, "t", "n", 2) * 2;
+    let p = `Fig. 9.150.b — dual: 6 A en R2, V en los bornes de la izquierda.\n`;
+    p += `${mj(`V = ${texQtyBody(v, "V")}`)} vs V de (a) ${formatQty(vA, "V")}. `;
+    p += Math.abs(Math.abs(v) - Math.abs(vA)) / Math.max(Math.abs(vA), 1e-9) < 0.08
+      ? "Se cumple el dual de reciprocidad."
+      : "Polaridad: comparar valores absolutos.";
+    return p;
+  }
+};
+
+function initSec9() {
+  bindFig("s92-fig", "btn-s92", "svg-s92", "proc-9-2", FIG9);
+  bindFig("s93-fig", "btn-s93", "svg-s93", "proc-9-3", FIG9);
+  bindFig("s94-fig", "btn-s94", "svg-s94", "proc-9-4", FIG9);
+  bindFig("s95-fig", "btn-s95", "svg-s95", "proc-9-5", FIG9);
+  bindFig("s96-fig", "btn-s96", "svg-s96", "proc-9-6", FIG9);
+  bindFig("s97-fig", "btn-s97", "svg-s97", "proc-9-7", FIG9);
+  bindFig("s98-fig", "btn-s98", "svg-s98", "proc-9-8", FIG9);
+
+  document.getElementById("btn-s96g")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-9-6g");
+    try {
+      const e1 = readOptionalNumber("s96g-e1"), r1 = readOptionalNumber("s96g-r1");
+      const e2 = readOptionalNumber("s96g-e2"), r2 = readOptionalNumber("s96g-r2");
+      const rl = readOptionalNumber("s96g-rl");
+      if (e1 == null || r1 == null || e2 == null || r2 == null || !rl) throw new Error("Indica E1, R1, E2, R2 y RL.");
+      const { v, i } = millman([[e1, r1], [e2, r2]], rl);
+      setMathText(out, `Millman (rails en paralelo):\n${mj(`V = ${texQtyBody(v, "V")}`)}, ${mj(`I_{R_L} = ${texQtyBody(i, "A")}`)}.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s910")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-9-10");
+    const wrap = document.getElementById("wrap-9-10");
+    const tb = document.querySelector("#table-9-10 tbody");
+    try {
+      const eth = readOptionalNumber("s910-eth"), rth = readOptionalNumber("s910-rth");
+      if (eth == null || !rth) throw new Error("Indica Eth y RTh.");
+      const pmax = eth * eth / (4 * rth);
+      const ks = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+      if (tb) {
+        tb.innerHTML = ks.map((k) => {
+          const R = k * rth, i = eth / (rth + R), P = i * i * R;
+          return `<tr><td>${k}</td><td>${Number(R.toPrecision(4))}</td><td>${Number(i.toPrecision(4))}</td><td>${Number(P.toPrecision(4))}</td><td>${Number((P / pmax).toPrecision(3))}</td></tr>`;
+        }).join("");
+      }
+      if (wrap) wrap.style.display = "block";
+      setMathText(out, `Pmáx = ${formatQty(pmax, "W")} en R=RTh=${formatOhmLabel(rth)}. Es la curva MPPT / dump: a ¼ y a 2× la P baja al 64 %.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+}
+
+Object.assign(presetsData, {
+  "9-2": {
+    p1: { selects: { "s92-fig": "123" }, click: "btn-s92",
+      desc: "Prob. 1 — 10 V y 5 V (fig. 9.123). I y V se superponen; P en R1 no: falta 2 I' I'' R." },
+    p2a: { selects: { "s92-fig": "124a" }, click: "btn-s92",
+      desc: "Prob. 2.a — 9 A y 18 V, I en 10 Ω." },
+    p2b: { selects: { "s92-fig": "124b" }, click: "btn-s92",
+      desc: "Prob. 2.b — +42 V y 24 V, I en 10 Ω." },
+    p3a: { selects: { "s92-fig": "125a" }, click: "btn-s92",
+      desc: "Prob. 3.a — 5 mA y 8 V, IR1 en 2.2 kΩ." },
+    p3b: { selects: { "s92-fig": "125b" }, click: "btn-s92",
+      desc: "Prob. 3.b — 6 A, 12 V y 8 V." },
+    p4: { selects: { "s92-fig": "126" }, click: "btn-s92",
+      desc: "Prob. 4 — 36 V y 9 mA, V2 por superposición (también prob. 37)." }
+  },
+  "9-3": {
+    p5: { selects: { "s93-fig": "127" }, click: "btn-s93",
+      desc: "Prob. 5 — 18 V. RTh=6 Ω, Eth=6 V. I(2 Ω)=0.75 A; I(30)=0.167 A; I(100)=0.0566 A." },
+    p6i: { selects: { "s93-fig": "128I" }, click: "btn-s93",
+      desc: "Prob. 6.I — 3 A. Eth=36 V, RTh=14 Ω. P(2 Ω) y P(100 Ω) al calcular." },
+    p6ii: { selects: { "s93-fig": "128II" }, click: "btn-s93",
+      desc: "Prob. 6.II — divisor 20 V. Eth=10 V, RTh=7.5 Ω." },
+    p7a: { selects: { "s93-fig": "129a" }, click: "btn-s93",
+      desc: "Prob. 7.a — 72 V y 18 V, R en el feeder." },
+    p7b: { selects: { "s93-fig": "129b" }, click: "btn-s93",
+      desc: "Prob. 7.b — 8 mA y 16 V." },
+    p8a: { selects: { "s93-fig": "130a" }, click: "btn-s93",
+      desc: "Prob. 8.a — 20 V y 3 A, R en el bus." },
+    p8b: { selects: { "s93-fig": "130b" }, click: "btn-s93",
+      desc: "Prob. 8.b — puente 72 V, R en la rama superior." },
+    p9i: { selects: { "s93-fig": "131I" }, click: "btn-s93",
+      desc: "Prob. 9.I — Thévenin a–b." },
+    p9ii: { selects: { "s93-fig": "131II" }, click: "btn-s93",
+      desc: "Prob. 9.II — 18 mA, rama 47 k+180 V." },
+    p10a: { selects: { "s93-fig": "132a" }, click: "btn-s93",
+      desc: "Prob. 10.a — escalera 20 V." },
+    p10b: { selects: { "s93-fig": "132b" }, click: "btn-s93",
+      desc: "Prob. 10.b — +12 V y −4 V." },
+    p11: { selects: { "s93-fig": "133" }, click: "btn-s93",
+      desc: "Prob. 11 — auxiliar +22/−12/+6 V, RL a PE." },
+    p12: { selects: { "s93-fig": "134" }, click: "btn-s93",
+      desc: "Prob. 12 — Thévenin de la base del driver (51k/10k), IE y IB con VBE=0.7 V, VCE=8 V." }
+  },
+  "9-4": {
+    p13: { selects: { "s94-fig": "128I" }, click: "btn-s94",
+      desc: "Prob. 13 — Norton de 9.128: IN=Eth/RTh, RN=RTh." },
+    p14: { selects: { "s94-fig": "129a" }, click: "btn-s94",
+      desc: "Prob. 14 — Norton de 9.129 y comparación con Eth, RTh." },
+    p15: { selects: { "s94-fig": "130a" }, click: "btn-s94",
+      desc: "Prob. 15 — Norton de 9.130." },
+    p16: { selects: { "s94-fig": "131I" }, click: "btn-s94",
+      desc: "Prob. 16 — Norton de 9.131." },
+    p17: { selects: { "s94-fig": "132a" }, click: "btn-s94",
+      desc: "Prob. 17 — Norton de 9.132." },
+    p18: { selects: { "s94-fig": "135a" }, click: "btn-s94",
+      desc: "Prob. 18 — Norton a–b de 9.135." }
+  },
+  "9-5": {
+    p19: { selects: { "s95-fig": "128I" }, click: "btn-s95",
+      desc: "Prob. 19 — Pmáx en 9.128: RL=RTh, P=Eth²/4RTh." },
+    p20: { selects: { "s95-fig": "128I" }, click: "btn-s95",
+      desc: "Prob. 20 — Pmáx en 9.129 (mismo método)." },
+    p21: { selects: { "s95-fig": "130a" }, click: "btn-s95",
+      desc: "Prob. 21 — Pmáx en 9.130." },
+    p22: { selects: { "s95-fig": "136" }, click: "btn-s95",
+      desc: "Prob. 22 — 24 V y 5 A. Curva P(R) a ¼…2× RTh (tabla). RTh=2 Ω, Eth=22 V, Pmáx=60.5 W." },
+    p23: { selects: { "s95-fig": "137" }, click: "btn-s95",
+      desc: "Prob. 23 — R1=0 para Pmáx en R4 (el feeder no debe añadir R)." },
+    p24: { selects: { "s95-fig": "138" }, click: "btn-s95",
+      desc: "Prob. 24 — R2 del tap para Pmáx en R4. Mismo planteamiento: acoplar RTh a R4." },
+    p25: { selects: { "s95-fig": "139" }, click: "btn-s95",
+      desc: "Prob. 25 — pot. 500 Ω, RL=100 Ω. R ≈ 362 Ω o 138 Ω (ambos dan RTh=100 Ω)." }
+  },
+  "9-6": {
+    p26: { selects: { "s96-fig": "140" }, click: "btn-s96",
+      desc: "Prob. 26 — Millman 40 V/10 Ω y 42 V/6 Ω, RL=3 Ω. V=18.3 V, I=6.11 A." },
+    p27: { selects: { "s96-fig": "141" }, click: "btn-s96",
+      desc: "Prob. 27 — 5 V invertido y 20 V, kΩ." },
+    p28: { selects: { "s96-fig": "142" }, click: "btn-s96",
+      desc: "Prob. 28 — 400 V, 20 V y 10 V." },
+    p29: { selects: { "s96-fig": "143" }, click: "btn-s96",
+      desc: "Prob. 29 — dual: 4 A y 1.6 A en cascada, RL=2.7 Ω." },
+    p30: { selects: { "s96-fig": "144" }, click: "btn-s96",
+      desc: "Prob. 30 — 10/8/4 mA, RL=6.8 kΩ." }
+  },
+  "9-7": {
+    p31: { selects: { "s97-fig": "145" }, click: "btn-s97",
+      desc: "Prob. 31 — rama a–b 15 kΩ: tres equivalentes (E, I, Thévenin)." },
+    p32: { selects: { "s97-fig": "146" }, click: "btn-s97",
+      desc: "Prob. 32 — 0.51 kΩ + 10 V." },
+    p33: { selects: { "s97-fig": "147" }, click: "btn-s97",
+      desc: "Prob. 33 — 20 V y 40 V, 12 Ω. Cuidado con polaridades." }
+  },
+  "9-8": {
+    p34: { selects: { "s98-fig": "148a" }, click: "btn-s98",
+      desc: "Prob. 34 — 24 V a la izquierda vs en la diagonal. Misma |I|: reciprocidad." },
+    p35: { selects: { "s98-fig": "149a" }, click: "btn-s98",
+      desc: "Prob. 35 — puente 10 V. Comparar (a) y (b)." },
+    p36: { selects: { "s98-fig": "150a" }, click: "btn-s98",
+      desc: "Prob. 36 — dual 6 A. V en R2 vs V en bornes." }
+  },
+  "9-10": {
+    p37: { selects: { "s92-fig": "126" }, click: "btn-s92",
+      desc: "Prob. 37 — V2 y sus componentes: solucionador 9.2 / fig. 9.126 (el «PSpice»)." },
+    p41: { selects: { "s92-fig": "124a" }, click: "btn-s92",
+      desc: "Prob. 41 — I de 10 Ω en 9.124: el mismo Superponer." }
   }
 });

@@ -7058,6 +7058,522 @@
         </div>
       </details>
 
+      <details class="chapter-1-fold" id="capitulo-9">
+        <summary class="chapter-1-summary" aria-label="Capítulo 9.0">
+          <span class="chapter-1-title">9.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Teoremas de redes: superposición, Thévenin, Norton,
+            máxima transferencia de potencia, Millman, sustitución
+            y reciprocidad.
+            En 2026 un bus híbrido tiene a la vez un string
+            (\(I_{\mathrm{sc}}\)), un rack LFP (\(E\)) y la red
+            (grid-forming). Se apaga uno y se mira el otro: eso es
+            superposición. Thévenin es lo que ve un dump, un MPPT
+            o un electrolizador al pinzarse al bus.
+            \(R_L = R_{\mathrm{Th}}\) es el MPPT y el dimensionado
+            del lastre. La potencia no se superpone:
+            \(P = I^2 R\) no es lineal.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(E_{\mathrm{Th}}\), \(R_{\mathrm{Th}}\),
+              \(P_{\mathrm{máx}} = E_{\mathrm{Th}}^2 / (4 R_{\mathrm{Th}})\)
+              y Millman sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-9-2">Sec 9.2</button>
+            <button class="tab-btn" data-target="sec-9-3">Sec 9.3</button>
+            <button class="tab-btn" data-target="sec-9-4">Sec 9.4</button>
+            <button class="tab-btn" data-target="sec-9-5">Sec 9.5</button>
+            <button class="tab-btn" data-target="sec-9-6">Sec 9.6</button>
+            <button class="tab-btn" data-target="sec-9-7">Sec 9.7</button>
+            <button class="tab-btn" data-target="sec-9-8">Sec 9.8</button>
+            <button class="tab-btn" data-target="sec-9-10">Sec 9.10</button>
+          </div>
+
+          <div class="tab-content active" id="sec-9-2">
+            <h2>Sección 9.2: Teorema de superposición</h2>
+            <p class="chapter-discourse">
+              En una red lineal, \(I\) y \(V\) son la suma de lo que
+              aporta cada fuente, con las demás apagadas:
+              un \(E\) se sustituye por un corto (busbar), un \(I\)
+              por un abierto (seccionador).
+              Un string + un rack + la red se leen uno a uno.
+              La potencia <em>no</em>: \(P = I^2 R\) mezcla los
+              términos cruzados \(2 I_1 I_2 R\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-9-2">Selecciona un problema:</label>
+                <select id="preset-9-2" class="book-preset-select" data-section="9-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: 10 V y 5 V (fig. 9.123)</option>
+                  <option value="p2a">Prob 2.a: 9 A y 18 V (fig. 9.124.a)</option>
+                  <option value="p2b">Prob 2.b: +42 V y 24 V (fig. 9.124.b)</option>
+                  <option value="p3a">Prob 3.a: 5 mA y 8 V (fig. 9.125.a)</option>
+                  <option value="p3b">Prob 3.b: 6 A, 12 V y 8 V (fig. 9.125.b)</option>
+                  <option value="p4">Prob 4: 36 V y 9 mA (fig. 9.126)</option>
+                </select>
+              </div>
+              <div id="desc-preset-9-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 9.123–9.126 — Superposición</h3>
+              <div class="input-group">
+                <label for="s92-fig">Figura:</label>
+                <select id="s92-fig">
+                  <option value="123">9.123 — 10 V y 5 V</option>
+                  <option value="124a">9.124.a — 9 A y 18 V</option>
+                  <option value="124b">9.124.b — 42 V y 24 V</option>
+                  <option value="125a">9.125.a — 5 mA y 8 V</option>
+                  <option value="125b">9.125.b — 6 A, 12 V, 8 V</option>
+                  <option value="126">9.126 — 36 V y 9 mA</option>
+                </select>
+                <button id="btn-s92" class="action-btn">Superponer</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s92" viewBox="0 0 640 250" role="img" aria-label="Superposición"></svg>
+              <p class="caption-fig">Figuras 9.123–9.126 — String + rack. I y V se suman; P no.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-9-3">
+            <h2>Sección 9.3: Teorema de Thévenin</h2>
+            <p class="chapter-discourse">
+              Lo que ve una carga al pinzarse a dos bornes es
+              \(E_{\mathrm{Th}}\) (vacío) en serie con
+              \(R_{\mathrm{Th}}\) (fuentes apagadas).
+              Un dump, un MPPT, un electrolizador o la \(R_L\) de
+              un logger solo necesitan ese par.
+              \(I_L = E_{\mathrm{Th}} / (R_{\mathrm{Th}} + R_L)\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-9-3">Selecciona un problema:</label>
+                <select id="preset-9-3" class="book-preset-select" data-section="9-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p5">Prob 5: 18 V, R = 2/30/100 Ω (fig. 9.127)</option>
+                  <option value="p6i">Prob 6.I: 3 A y 2+12 Ω (fig. 9.128.I)</option>
+                  <option value="p6ii">Prob 6.II: divisor 20 V (fig. 9.128.II)</option>
+                  <option value="p7a">Prob 7.a: 72 V y 18 V (fig. 9.129.a)</option>
+                  <option value="p7b">Prob 7.b: 8 mA y 16 V (fig. 9.129.b)</option>
+                  <option value="p8a">Prob 8.a: 20 V y 3 A (fig. 9.130.a)</option>
+                  <option value="p8b">Prob 8.b: puente 72 V (fig. 9.130.b)</option>
+                  <option value="p9i">Prob 9.I: bornes a–b (fig. 9.131.I)</option>
+                  <option value="p9ii">Prob 9.II: 180 V y 18 mA (fig. 9.131.II)</option>
+                  <option value="p10a">Prob 10.a: escalera 20 V (fig. 9.132.a)</option>
+                  <option value="p10b">Prob 10.b: +12 V y −4 V (fig. 9.132.b)</option>
+                  <option value="p11">Prob 11: RL de un auxiliar (fig. 9.133)</option>
+                  <option value="p12">Prob 12: Thévenin de base BJT (fig. 9.134)</option>
+                </select>
+              </div>
+              <div id="desc-preset-9-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 9.127–9.134 — Thévenin</h3>
+              <div class="input-group">
+                <label for="s93-fig">Figura:</label>
+                <select id="s93-fig">
+                  <option value="127">9.127 — 18 V, R variable</option>
+                  <option value="128I">9.128.I — 3 A</option>
+                  <option value="128II">9.128.II — 20 V, 5 Ω</option>
+                  <option value="129a">9.129.a — 72 V y 18 V</option>
+                  <option value="129b">9.129.b — 8 mA y 16 V</option>
+                  <option value="130a">9.130.a — 20 V y 3 A</option>
+                  <option value="130b">9.130.b — puente 72 V</option>
+                  <option value="131I">9.131.I — a–b</option>
+                  <option value="131II">9.131.II — 180 V / 18 mA</option>
+                  <option value="132a">9.132.a — escalera 20 V</option>
+                  <option value="132b">9.132.b — +12 / −4 V</option>
+                  <option value="133">9.133 — RL auxiliar</option>
+                  <option value="134">9.134 — base del driver</option>
+                </select>
+                <button id="btn-s93" class="action-btn">Thévenin</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s93" viewBox="0 0 640 250" role="img" aria-label="Equivalente de Thévenin"></svg>
+              <p class="caption-fig">Figuras 9.127–9.134 — Lo que ve el dump / MPPT / electrolizador al pinzarse al bus.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-9-4">
+            <h2>Sección 9.4: Teorema de Norton</h2>
+            <p class="chapter-discourse">
+              Dual de Thévenin: \(I_N = E_{\mathrm{Th}} / R_{\mathrm{Th}}\),
+              misma \(R_N = R_{\mathrm{Th}}\) en paralelo.
+              Es el modelo de un string (\(I_{\mathrm{sc}}\), \(R_s\))
+              o de un inversor en modo corriente. Convertir
+              Thévenin ↔ Norton no cambia lo que ve \(R_L\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-9-4">Selecciona un problema:</label>
+                <select id="preset-9-4" class="book-preset-select" data-section="9-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p13">Prob 13: Norton de la fig. 9.128</option>
+                  <option value="p14">Prob 14: Norton de la fig. 9.129</option>
+                  <option value="p15">Prob 15: Norton de la fig. 9.130</option>
+                  <option value="p16">Prob 16: Norton de la fig. 9.131</option>
+                  <option value="p17">Prob 17: Norton de la fig. 9.132</option>
+                  <option value="p18">Prob 18: Norton a–b (fig. 9.135)</option>
+                </select>
+              </div>
+              <div id="desc-preset-9-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 9.128–9.135 — Norton</h3>
+              <div class="input-group">
+                <label for="s94-fig">Figura:</label>
+                <select id="s94-fig">
+                  <option value="128I">9.128.I</option>
+                  <option value="128II">9.128.II</option>
+                  <option value="129a">9.129.a</option>
+                  <option value="129b">9.129.b</option>
+                  <option value="130a">9.130.a</option>
+                  <option value="130b">9.130.b</option>
+                  <option value="131I">9.131.I</option>
+                  <option value="131II">9.131.II</option>
+                  <option value="132a">9.132.a</option>
+                  <option value="132b">9.132.b</option>
+                  <option value="135a">9.135.a — 12 V y 2 A</option>
+                  <option value="135b">9.135.b — puente 6 V</option>
+                </select>
+                <button id="btn-s94" class="action-btn">Norton</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s94" viewBox="0 0 640 250" role="img" aria-label="Equivalente de Norton"></svg>
+              <p class="caption-fig">Norton = string / grid-following. \(I_N = E_{\mathrm{Th}}/R_{\mathrm{Th}}\).</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-9-5">
+            <h2>Sección 9.5: Máxima transferencia de potencia</h2>
+            <p class="chapter-discourse">
+              \(R_L = R_{\mathrm{Th}}\) entrega
+              \(P_{\mathrm{máx}} = E_{\mathrm{Th}}^2 / (4 R_{\mathrm{Th}})\).
+              Es el MPPT de un string, el lastre de un dump y el
+              acople de un electrolizador. Fuera de ese punto
+              (¼, ½, 2×) la P cae: la curva \(P(R)\) del problema 22.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-9-5">Selecciona un problema:</label>
+                <select id="preset-9-5" class="book-preset-select" data-section="9-5">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p19">Prob 19: Pmáx fig. 9.128</option>
+                  <option value="p20">Prob 20: Pmáx fig. 9.129</option>
+                  <option value="p21">Prob 21: Pmáx fig. 9.130</option>
+                  <option value="p22">Prob 22: curva P(R) (fig. 9.136)</option>
+                  <option value="p23">Prob 23: R1 para Pmáx en R4 (fig. 9.137)</option>
+                  <option value="p24">Prob 24: R2 para Pmáx en R4 (fig. 9.138)</option>
+                  <option value="p25">Prob 25: potenciómetro 500 Ω (fig. 9.139)</option>
+                </select>
+              </div>
+              <div id="desc-preset-9-5" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 9.136–9.139 — \(P_{\mathrm{máx}}\)</h3>
+              <div class="input-group">
+                <label for="s95-fig">Figura:</label>
+                <select id="s95-fig">
+                  <option value="128I">9.128.I</option>
+                  <option value="130a">9.130.a</option>
+                  <option value="136">9.136 — 24 V, 5 A, curva P(R)</option>
+                  <option value="137">9.137 — R1 para Pmáx en R4</option>
+                  <option value="138">9.138 — R2 para Pmáx en R4</option>
+                  <option value="139">9.139 — pot. 500 Ω, RL 100 Ω</option>
+                </select>
+                <button id="btn-s95" class="action-btn">Pmáx</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s95" viewBox="0 0 640 250" role="img" aria-label="Máxima transferencia de potencia"></svg>
+              <p class="caption-fig">MPPT / dump: \(R_L = R_{\mathrm{Th}}\). Fuera de ahí la curva cae.</p>
+              <div class="data-table-wrap" id="wrap-9-5" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-9-5">
+                  <thead><tr><th>R / RTh</th><th>R (Ω)</th><th>P (W)</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-5" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-9-6">
+            <h2>Sección 9.6: Teorema de Millman</h2>
+            <p class="chapter-discourse">
+              Varias \(E_k\) con \(R_k\) en paralelo:
+              \(V = \sum (E_k / R_k) / \sum (1/R_k)\).
+              Es el bus de racks e inversores grid-forming en
+              paralelo (mismo firmware, \(R_i\) distintas).
+              El dual (fuentes \(I\) en serie) es varios strings
+              en cascada con su \(R_s\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-9-6">Selecciona un problema:</label>
+                <select id="preset-9-6" class="book-preset-select" data-section="9-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p26">Prob 26: 40 V y 42 V (fig. 9.140)</option>
+                  <option value="p27">Prob 27: 5 V y 20 V (fig. 9.141)</option>
+                  <option value="p28">Prob 28: 400 V, 20 V, 10 V (fig. 9.142)</option>
+                  <option value="p29">Prob 29: dual 4 A y 1.6 A (fig. 9.143)</option>
+                  <option value="p30">Prob 30: tres I (fig. 9.144)</option>
+                </select>
+              </div>
+              <div id="desc-preset-9-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 9.140–9.144 — Millman</h3>
+              <div class="input-group">
+                <label for="s96-fig">Figura:</label>
+                <select id="s96-fig">
+                  <option value="140">9.140 — 40 V y 42 V</option>
+                  <option value="141">9.141 — 5 V y 20 V</option>
+                  <option value="142">9.142 — 400 V, 20 V, 10 V</option>
+                  <option value="143">9.143 — dual 4 A y 1.6 A</option>
+                  <option value="144">9.144 — 10 mA, 8 mA, 4 mA</option>
+                </select>
+                <button id="btn-s96" class="action-btn">Millman</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s96" viewBox="0 0 640 250" role="img" aria-label="Teorema de Millman"></svg>
+              <p class="caption-fig">Racks en paralelo (Millman) o strings en cascada (dual).</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Millman genérico (hasta 4 rails)</h3>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s96g-e1">E1 (V):</label><input type="text" id="s96g-e1" placeholder="40" /></div>
+                <div class="k-input"><label for="s96g-r1">R1 (Ω):</label><input type="text" id="s96g-r1" placeholder="10" /></div>
+                <div class="k-input"><label for="s96g-e2">E2 (V):</label><input type="text" id="s96g-e2" placeholder="42" /></div>
+                <div class="k-input"><label for="s96g-r2">R2 (Ω):</label><input type="text" id="s96g-r2" placeholder="6" /></div>
+                <div class="k-input"><label for="s96g-rl">RL (Ω):</label><input type="text" id="s96g-rl" placeholder="3" /></div>
+              </div>
+              <button id="btn-s96g" class="action-btn mt-1">V e I en RL</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-6g" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-9-7">
+            <h2>Sección 9.7: Teorema de sustitución</h2>
+            <p class="chapter-discourse">
+              Una rama \(a\)–\(b\) con \(V_{ab}\) e \(I\) se puede
+              sustituir por un \(E = V_{ab}\), un \(I\) igual, o un
+              Thévenin/Norton de esa rama. El resto de la red no
+              se entera. En 2026: modelar un string, un dump o un
+              inversor por su par \((V,I)\) medido en bornes.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-9-7">Selecciona un problema:</label>
+                <select id="preset-9-7" class="book-preset-select" data-section="9-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p31">Prob 31: rama a–b 15 kΩ (fig. 9.145)</option>
+                  <option value="p32">Prob 32: 4 mA y 10 V (fig. 9.146)</option>
+                  <option value="p33">Prob 33: 20 V y 40 V (fig. 9.147)</option>
+                </select>
+              </div>
+              <div id="desc-preset-9-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 9.145–9.147</h3>
+              <div class="input-group">
+                <label for="s97-fig">Figura:</label>
+                <select id="s97-fig">
+                  <option value="145">9.145 — 60 V, 15 kΩ</option>
+                  <option value="146">9.146 — 4 mA y 10 V</option>
+                  <option value="147">9.147 — 20 V y 40 V</option>
+                </select>
+                <button id="btn-s97" class="action-btn">Sustituir a–b</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s97" viewBox="0 0 640 250" role="img" aria-label="Teorema de sustitución"></svg>
+              <p class="caption-fig">La rama a–b se cambia por E, por I o por Thévenin: el bus no cambia.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-9-8">
+            <h2>Sección 9.8: Teorema de reciprocidad</h2>
+            <p class="chapter-discourse">
+              En una red lineal: la \(I\) en la rama \(B\) debida a
+              un \(E\) en la rama \(A\) es la misma que la \(I\) en
+              \(A\) si \(E\) se mueve a \(B\).
+              Dual: \(V\) intercambiada con una fuente \(I\).
+              En 2026: un pulso de ensayo en el PCC y la lectura
+              en un string, o al revés, dan el mismo transfer.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-9-8">Selecciona un problema:</label>
+                <select id="preset-9-8" class="book-preset-select" data-section="9-8">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p34">Prob 34: 24 V intercambiada (fig. 9.148)</option>
+                  <option value="p35">Prob 35: puente 10 V (fig. 9.149)</option>
+                  <option value="p36">Prob 36: dual 6 A (fig. 9.150)</option>
+                </select>
+              </div>
+              <div id="desc-preset-9-8" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 9.148–9.150</h3>
+              <div class="input-group">
+                <label for="s98-fig">Figura:</label>
+                <select id="s98-fig">
+                  <option value="148a">9.148.a — E en la izquierda</option>
+                  <option value="148b">9.148.b — E en la diagonal</option>
+                  <option value="149a">9.149.a — E en el puente</option>
+                  <option value="149b">9.149.b — E a la derecha</option>
+                  <option value="150a">9.150.a — I y V en R2</option>
+                  <option value="150b">9.150.b — I en R2 y V en bornes</option>
+                </select>
+                <button id="btn-s98" class="action-btn">Reciprocidad</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s98" viewBox="0 0 640 250" role="img" aria-label="Teorema de reciprocidad"></svg>
+              <p class="caption-fig">Mismo transfer: un pulso en el PCC o en el string.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-8" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-9-10">
+            <h2>Sección 9.10: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              PSpice / Electronics Workbench del libro se sustituyen
+              por estos solucionadores: superposición, Thévenin,
+              Norton y la curva \(P(R)\). El «print» de \(V_2\) y
+              sus componentes (prob. 37) es el botón Superponer
+              de la fig. 9.126.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-9-10">Selecciona un problema:</label>
+                <select id="preset-9-10" class="book-preset-select" data-section="9-10">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p37">Prob 37: V2 y componentes (fig. 9.126)</option>
+                  <option value="p41">Prob 41: I de 10 Ω (fig. 9.124)</option>
+                </select>
+              </div>
+              <div id="desc-preset-9-10" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Barrido \(P(R)\) de un dump / MPPT</h3>
+              <p class="hint-inline">Introduce \(E_{\mathrm{Th}}\) y \(R_{\mathrm{Th}}\) (o pulsa Pmáx en 9.136). Tabula P a ¼, ½, 1, 2 × RTh.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s910-eth">Eth (V):</label><input type="text" id="s910-eth" placeholder="22" /></div>
+                <div class="k-input"><label for="s910-rth">RTh (Ω):</label><input type="text" id="s910-rth" placeholder="2" /></div>
+              </div>
+              <button id="btn-s910" class="action-btn mt-1">Tabular P(R)</button>
+              <div class="data-table-wrap" id="wrap-9-10" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-9-10">
+                  <thead><tr><th>k = R/RTh</th><th>R (Ω)</th><th>I (A)</th><th>P (W)</th><th>P/Pmáx</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-9-10" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-9-0" aria-labelledby="glossary-9-heading">
+            <h2 id="glossary-9-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de superposición, Thévenin, Norton, máxima
+              potencia, Millman, sustitución y reciprocidad del
+              capítulo 9, reescritos para renovables 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Superposición</dt>
+                <dd>En una red lineal, \(I\) y \(V\) son la suma de cada fuente con las demás apagadas (\(E\to\) corto, \(I\to\) abierto). Un string + un rack + la red. No vale para \(P = I^2 R\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Teorema de Thévenin</dt>
+                <dd>Dos bornes ≡ \(E_{\mathrm{Th}}\) en serie con \(R_{\mathrm{Th}}\). Lo que ve un dump, un MPPT o un electrolizador. \(E_{\mathrm{Th}} = V_{\mathrm{ab}}\) en vacío; \(R_{\mathrm{Th}}\) con fuentes apagadas.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Teorema de Norton</dt>
+                <dd>Dual: \(I_N\) en paralelo con \(R_N = R_{\mathrm{Th}}\), \(I_N = E_{\mathrm{Th}}/R_{\mathrm{Th}}\). Modelo de un string (\(I_{\mathrm{sc}}\)) o de un grid-following.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Máxima transferencia de potencia</dt>
+                <dd>\(R_L = R_{\mathrm{Th}}\) da \(P_{\mathrm{máx}} = E_{\mathrm{Th}}^2/(4 R_{\mathrm{Th}})\). MPPT, lastre, acople de un electrolizador. Fuera de \(R_{\mathrm{Th}}\) la curva cae.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Teorema de Millman</dt>
+                <dd>\(V = \sum E_k/R_k \,/\, \sum 1/R_k\). Racks / inversores grid-forming en paralelo. El dual suma \(I_k R_k\) en serie (strings en cascada).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Teorema de sustitución</dt>
+                <dd>Una rama con \(V\) e \(I\) conocidos se cambia por un \(E\), un \(I\) o un Thévenin: el resto no cambia. Modelo de bornes de un string o de un inversor.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Teorema de reciprocidad</dt>
+                <dd>La \(I\) en B debida a \(E\) en A es la \(I\) en A si \(E\) pasa a B. Dual con \(I\) y \(V\). Ensayo en el PCC o en el string: el mismo transfer.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>FV, eólica, océano, H<sub>2</sub>, BESS. Superposición de \(I_{\mathrm{sc}}\) y \(E_{\mathrm{rack}}\); Thévenin del bus; MPPT = máxima potencia.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
     </section>
   </main>
 
