@@ -814,6 +814,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSec7();
   initSec8();
   initSec9();
+  initSec10();
   initMiniCalc();
   initChapterFold();
 });
@@ -2599,7 +2600,7 @@ function initPresets() {
           document.getElementById('m2-t-u').value = data.tu;
           document.getElementById('btn-meter-2-7').click();
         }
-      } else if (String(section).startsWith('3-') || String(section).startsWith('4-') || String(section).startsWith('5-') || String(section).startsWith('6-')) {
+      } else {
         applyPresetFields(data);
       }
     });
@@ -6380,6 +6381,32 @@ function S() {
       return push(`<circle cx="${x}" cy="${y}" r="16" class="meter-face"/>
         <text x="${x}" y="${y + 4}" text-anchor="middle" font-size="13" fill="#2471a3">${lab || "Ω"}</text>`);
     },
+    capH(x, y, w, lab) {
+      const cx = x + w / 2;
+      return push(`<line x1="${x}" y1="${y}" x2="${cx - 6}" y2="${y}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${cx - 5}" y1="${y - 14}" x2="${cx - 5}" y2="${y + 14}" stroke="currentColor" stroke-width="2.4"/>
+        <line x1="${cx + 5}" y1="${y - 14}" x2="${cx + 5}" y2="${y + 14}" stroke="currentColor" stroke-width="2.4"/>
+        <line x1="${cx + 6}" y1="${y}" x2="${x + w}" y2="${y}" stroke="currentColor" stroke-width="2"/>
+        <text x="${cx}" y="${y - 20}" text-anchor="middle" font-size="11" fill="currentColor">${lab || "C"}</text>`);
+    },
+    capV(x, y, h, lab) {
+      const cy = y + h / 2;
+      return push(`<line x1="${x}" y1="${y}" x2="${x}" y2="${cy - 6}" stroke="currentColor" stroke-width="2"/>
+        <line x1="${x - 14}" y1="${cy - 5}" x2="${x + 14}" y2="${cy - 5}" stroke="currentColor" stroke-width="2.4"/>
+        <line x1="${x - 14}" y1="${cy + 5}" x2="${x + 14}" y2="${cy + 5}" stroke="currentColor" stroke-width="2.4"/>
+        <line x1="${x}" y1="${cy + 6}" x2="${x}" y2="${y + h}" stroke="currentColor" stroke-width="2"/>
+        <text x="${x + 18}" y="${cy + 4}" font-size="11" fill="currentColor">${lab || "C"}</text>`);
+    },
+    sw(x, y, lab) {
+      return push(`<circle cx="${x}" cy="${y}" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+        <circle cx="${x + 28}" cy="${y}" r="4" fill="none" stroke="currentColor" stroke-width="2"/>
+        <line x1="${x + 3}" y1="${y - 2}" x2="${x + 22}" y2="${y - 16}" stroke="currentColor" stroke-width="2"/>
+        <text x="${x + 8}" y="${y - 20}" font-size="11" fill="#2471a3">${lab || ""}</text>`);
+    },
+    box(x, y, w, h, lab) {
+      return push(`<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="none" stroke="currentColor" stroke-width="2"/>
+        <text x="${x + w / 2}" y="${y + h / 2 + 4}" text-anchor="middle" font-size="11" fill="currentColor">${lab || ""}</text>`);
+    },
     isrc(x, y1, y2, lab, up) {
       const mid = (y1 + y2) / 2;
       const cr = 16;
@@ -9854,5 +9881,1315 @@ Object.assign(presetsData, {
       desc: "Prob. 37 — V2 y sus componentes: solucionador 9.2 / fig. 9.126 (el «PSpice»)." },
     p41: { selects: { "s92-fig": "124a" }, click: "btn-s92",
       desc: "Prob. 41 — I de 10 Ω en 9.124: el mismo Superponer." }
+  }
+});
+
+// --- Capítulo 10.0: Capacitores (DC-link, bleeder, precharge, film PP) ---
+const EPS0 = 8.85e-12;
+const MIL_M = 2.54e-5;
+const DIE10 = {
+  air: { k: 1.0006, evmil: 80, name: "aire" },
+  paraffin: { k: 2.5, evmil: 250, name: "parafina" },
+  oil: { k: 4, evmil: 400, name: "aceite / éster" },
+  mica: { k: 5, evmil: 2000, name: "mica" },
+  bakelite: { k: 7, evmil: 400, name: "baquelita" },
+  pp: { k: 2.2, evmil: 1500, name: "PP film DC-link" },
+  xlpe: { k: 2.3, evmil: 500, name: "XLPE" },
+  custom: { k: 1, evmil: 80, name: "k personalizada" }
+};
+
+function rcPack(vi, vf, R, C) {
+  const tau = R * C;
+  const i0 = R === 0 ? Infinity : (vf - vi) / R;
+  return {
+    tau, i0, vi, vf, R, C,
+    vc: (t) => vf + (vi - vf) * Math.exp(-t / tau),
+    ic: (t) => i0 * Math.exp(-t / tau)
+  };
+}
+
+function rcText(p, title) {
+  let s = title ? title + "\n" : "";
+  s += `${mj(`\\tau = R C = ${texQtyBody(p.tau, "s")}`)}.\n`;
+  s += `${mj(`v_C(t) = V_f + (V_i - V_f) e^{-t/\\tau}`)} con ${mj(`V_i = ${texQtyBody(p.vi, "V")}`)}, ${mj(`V_f = ${texQtyBody(p.vf, "V")}`)}.\n`;
+  s += `A \(1\\tau\): ${formatQty(p.vc(p.tau), "V")} (63.2 % del salto). A \(3\\tau\): ${formatQty(p.vc(3 * p.tau), "V")} (95.0 %). A \(5\\tau\): ${formatQty(p.vc(5 * p.tau), "V")} (99.3 %, «cargado»).\n`;
+  s += `${mj(`i_C(0^+) = (V_f - V_i)/R = ${texQtyBody(p.i0, "A")}`)}, ${mj(`i_C(t) = i_C(0^+) e^{-t/\\tau}`)}.\n`;
+  return s;
+}
+
+function tOfV(p, vx) {
+  const num = p.vi - p.vf, den = vx - p.vf;
+  if (num === 0 || den === 0 || num / den <= 0) throw new Error("El umbral no está entre Vi y Vf.");
+  return p.tau * Math.log(num / den);
+}
+
+function drawRcWave(svgId, wrapId, pack, tMax) {
+  const svg = document.getElementById(svgId);
+  const wrap = wrapId ? document.getElementById(wrapId) : null;
+  if (!svg) return;
+  if (wrap) wrap.hidden = false;
+  const T = tMax || 5 * pack.tau;
+  const W = 640, H = 280, L = 58, Rgt = 58, Top = 22, B = 40;
+  const pw = W - L - Rgt, ph = H - Top - B;
+  const n = 80;
+  const iAbs = Math.max(Math.abs(pack.i0), 1e-18);
+  const vMin = Math.min(pack.vi, pack.vf, 0);
+  const vMax = Math.max(pack.vi, pack.vf, 0);
+  const span = (vMax - vMin) || Math.max(Math.abs(pack.vf), Math.abs(pack.vi), 1);
+  const yV = (v) => Top + ph - ((v - vMin) / span) * ph;
+  const yI = (i) => Top + ph / 2 - (i / iAbs) * (ph / 2) * 0.9;
+  const vLine = [], iLine = [];
+  for (let k = 0; k <= n; k++) {
+    const t = (k / n) * T;
+    const x = (L + (t / T) * pw).toFixed(1);
+    vLine.push(`${x},${yV(pack.vc(t)).toFixed(1)}`);
+    iLine.push(`${x},${yI(pack.ic(t)).toFixed(1)}`);
+  }
+  svg.innerHTML = `
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>
+    <line x1="${L}" y1="${Top}" x2="${L}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="${L}" y1="${Top + ph}" x2="${W - Rgt}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="${L}" y1="${yV(0)}" x2="${W - Rgt}" y2="${yV(0)}" stroke="currentColor" opacity="0.2"/>
+    <polyline fill="none" stroke="#1a6b4a" stroke-width="2.3" points="${vLine.join(" ")}"/>
+    <polyline fill="none" stroke="#2471a3" stroke-width="2" stroke-dasharray="5 3" points="${iLine.join(" ")}"/>
+    <text x="${W / 2}" y="${H - 8}" text-anchor="middle" font-size="12" fill="currentColor">t (0 … ${T >= 1 ? T.toPrecision(3) + " s" : (T * 1e3).toPrecision(3) + " ms"})</text>
+    <text x="16" y="${Top + ph / 2}" text-anchor="middle" font-size="12" fill="#1a6b4a" transform="rotate(-90 16 ${Top + ph / 2})">vC</text>
+    <text x="${W - 16}" y="${Top + ph / 2}" text-anchor="middle" font-size="12" fill="#2471a3" transform="rotate(90 ${W - 16} ${Top + ph / 2})">iC</text>
+    <text x="${L + 8}" y="${Top + 12}" font-size="11" fill="#1a6b4a">vC</text>
+    <text x="${L + 48}" y="${Top + 12}" font-size="11" fill="#2471a3">iC</text>`;
+}
+
+function drawPw(svg, pts, ylab, color, tUnit) {
+  if (!svg || !pts || pts.length < 2) return;
+  const W = 640, H = 240, L = 58, Rgt = 18, Top = 18, B = 36;
+  const pw = W - L - Rgt, ph = H - Top - B;
+  const t0 = pts[0][0], t1 = pts[pts.length - 1][0];
+  const ys = pts.map((p) => p[1]);
+  let yMin = Math.min(0, ...ys), yMax = Math.max(0, ...ys);
+  if (yMin === yMax) { yMax += 1; yMin -= 1; }
+  const pad = 0.08 * (yMax - yMin);
+  yMin -= pad; yMax += pad;
+  const xOf = (t) => L + ((t - t0) / (t1 - t0 || 1)) * pw;
+  const yOf = (y) => Top + ph - ((y - yMin) / (yMax - yMin)) * ph;
+  const poly = pts.map((p) => `${xOf(p[0]).toFixed(1)},${yOf(p[1]).toFixed(1)}`).join(" ");
+  const y0 = yOf(0);
+  svg.innerHTML = `
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>
+    <line x1="${L}" y1="${Top}" x2="${L}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="${L}" y1="${Top + ph}" x2="${W - Rgt}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.3"/>
+    <line x1="${L}" y1="${y0}" x2="${W - Rgt}" y2="${y0}" stroke="currentColor" opacity="0.25"/>
+    <polyline fill="none" stroke="${color || "#1a6b4a"}" stroke-width="2.3" points="${poly}"/>
+    <text x="${W / 2}" y="${H - 6}" text-anchor="middle" font-size="12" fill="currentColor">t (${tUnit || "s"})</text>
+    <text x="16" y="${Top + ph / 2}" text-anchor="middle" font-size="12" fill="currentColor" transform="rotate(-90 16 ${Top + ph / 2})">${ylab || "y"}</text>`;
+}
+
+function vToI(vPts, C) {
+  const iPts = [];
+  for (let i = 0; i < vPts.length - 1; i++) {
+    const [t0, v0] = vPts[i], [t1, v1] = vPts[i + 1];
+    const dt = t1 - t0;
+    const iC = dt === 0 ? 0 : C * (v1 - v0) / dt;
+    iPts.push([t0, iC], [t1, iC]);
+  }
+  return iPts;
+}
+
+function iToV(iPts, C, v0) {
+  const vPts = [[iPts[0][0], v0]];
+  let v = v0;
+  for (let i = 0; i < iPts.length - 1; i++) {
+    const [t0, i0] = iPts[i], [t1, i1] = iPts[i + 1];
+    const dt = t1 - t0;
+    const iAvg = (i0 + i1) / 2;
+    v += (iAvg * dt) / C;
+    vPts.push([t1, v]);
+  }
+  return vPts;
+}
+
+const FIG10 = {};
+
+function figRC(d, opts) {
+  const y1 = 50, y2 = 190;
+  d.batt(40, y1, y2, opts.eLab || "E");
+  d.w(40, y1, 90, y1);
+  if (opts.sw !== false) d.sw(90, y1, opts.swLab || "");
+  const xR = opts.sw === false ? 90 : 130;
+  d.w(opts.sw === false ? 40 : 118, y1, xR, y1);
+  d.rh(xR, y1, 90, opts.rLab || "R");
+  d.w(xR + 90, y1, 320, y1);
+  d.capV(320, y1, y2 - y1, opts.cLab || "C");
+  d.w(40, y2, 320, y2);
+  d.txt(300, 40, "+ vC −", "#2471a3");
+  if (opts.iLab) d.arrD(340, y1 + 36, opts.iLab);
+}
+
+FIG10["81"] = {
+  draw(d) {
+    figRC(d, { eLab: "20 V", rLab: "100 kΩ", cLab: "5 µF", iLab: "iC" });
+    d.txt(140, 36, "+ vR −", "#2471a3");
+  },
+  solve() {
+    const p = rcPack(0, 20, 1e5, 5e-6);
+    drawRcWave("plot-10-7", "wrap-10-7", p);
+    let s = rcText(p, "Fig. 10.81 — precharge de un pad auxiliar 20 V (100 kΩ, 5 µF).");
+    s += `${mj(`v_R(t) = 20 e^{-t/0.5}\\,\\mathrm{V}`)}. En 2026: NTC o relé de precharge del DC-link.`;
+    return s;
+  }
+};
+FIG10["81b"] = {
+  draw(d) {
+    figRC(d, { eLab: "20 V", rLab: "1 MΩ", cLab: "5 µF", iLab: "iC" });
+  },
+  solve() {
+    const p = rcPack(0, 20, 1e6, 5e-6);
+    drawRcWave("plot-10-7", "wrap-10-7", p);
+    return rcText(p, "Prob. 18 — misma 20 V y 5 µF con R = 1 MΩ (bleeder de un logger). τ ×10, I0 ÷10.");
+  }
+};
+FIG10["82"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "100 V");
+    d.w(40, 50, 90, 50); d.sw(90, 50, "");
+    d.rh(130, 50, 90, "R1 2.2 kΩ");
+    d.w(220, 50, 300, 50);
+    d.capV(300, 50, 140, "1 µF");
+    d.w(40, 190, 380, 190);
+    d.dot(380, 50); d.rv(380, 50, 140, "R2 3.3 kΩ"); d.dot(380, 190);
+    d.w(300, 50, 380, 50);
+    d.txt(360, 36, "+ vR −", "#2471a3");
+    d.arrD(318, 86, "iC");
+  },
+  solve() {
+    const R = 2200 + 3300;
+    const p = rcPack(0, 100, R, 1e-6);
+    drawRcWave("plot-10-7", "wrap-10-7", p);
+    let s = rcText(p, "Fig. 10.82 — R1+R2 en serie con el film (feeder + lastre).");
+    s += `${mj(`v_{R2}(t) = i_C \\cdot 3.3\\,\\mathrm{k}\\Omega`)}. Precharge de un auxiliar 100 V.`;
+    return s;
+  }
+};
+FIG10["83"] = {
+  draw(d) {
+    d.o(40, 40); d.txt(8, 44, "+15 V");
+    d.w(44, 40, 90, 40); d.sw(90, 40, "t = 0");
+    d.rv(140, 40, 90, "56 kΩ");
+    d.w(140, 40, 140, 40);
+    d.w(118, 40, 140, 40);
+    d.w(140, 130, 140, 150);
+    d.capV(140, 150, 50, "0.1 µF");
+    d.w(140, 200, 140, 220);
+    d.o(140, 224); d.txt(150, 228, "−10 V");
+    d.txt(160, 170, "+ vC −", "#2471a3");
+    d.arrD(160, 165, "iC");
+  },
+  solve() {
+    const p = rcPack(0, 25, 56e3, 0.1e-6);
+    drawRcWave("plot-10-7", "wrap-10-7", p);
+    let s = "Fig. 10.83 — rails +15 / −10 V (auxiliar bipolar de un inversor).\n";
+    s += `${mj("V_f = 15 - (-10) = 25\\,\\mathrm{V}")}.\n`;
+    s += rcText(p, "");
+    return s;
+  }
+};
+
+FIG10["84"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "50 V");
+    d.rh(70, 50, 80, "R1 3 kΩ");
+    d.w(40, 50, 70, 50);
+    d.txt(165, 36, "1"); d.o(190, 50); d.txt(205, 36, "2"); d.o(230, 50); d.txt(248, 70, "3");
+    d.w(150, 50, 185, 50);
+    d.sw(190, 50, "");
+    d.capH(250, 50, 80, "2 µF");
+    d.w(330, 50, 400, 50);
+    d.rv(400, 50, 140, "R2 2 kΩ");
+    d.w(40, 190, 400, 190);
+    d.txt(270, 36, "+ vC −", "#2471a3");
+    d.arrD(360, 70, "iC");
+  },
+  solve() {
+    const C = 2e-6;
+    const ch = rcPack(0, 50, 5000, C);
+    const t1 = 0.1, t2 = 0.2, t3 = 0.3;
+    const vHold = ch.vc(t1);
+    const dis = rcPack(vHold, 0, 2000, C);
+    drawRcWave("plot-10-8", "wrap-10-8", ch, t3);
+    let s = `Fig. 10.84 — pos. 1 carga (precharge), pos. 2 hold, pos. 3 bleeder.\n`;
+    s += rcText(ch, "Pos. 1: R = R1+R2 = 5 kΩ.");
+    s += `A t = 100 ms (pos. 2, abierto): ${mj(`v_C = ${texQtyBody(vHold, "V")}`)}, ${mj("i_C = 0")} (el film retiene Q).\n`;
+    s += `Pos. 3 en t = 200 ms, τ_dis = R2 C = ${formatQty(dis.tau, "s")}.\n`;
+    s += `${mj(`v_C(t) = ${texQtyBody(vHold, "V")} e^{-(t-0.2)/\\tau_{\\mathrm{dis}}}`)}.\n`;
+    s += `A t = 300 ms: ${formatQty(dis.vc(0.1), "V")}. LOTO del DC-link: hold y luego bleeder.`;
+    return s;
+  }
+};
+FIG10["84b"] = {
+  draw(d) { FIG10["84"].draw(d); d.txt(250, 80, "20 µF", "#c0392b"); },
+  solve() {
+    const C = 20e-6;
+    const ch = rcPack(0, 50, 5000, C);
+    const vHold = ch.vc(0.1);
+    const dis = rcPack(vHold, 0, 2000, C);
+    drawRcWave("plot-10-8", "wrap-10-8", ch, 0.3);
+    let s = rcText(ch, "Prob. 22 — C ×10: τ_carga = 100 ms. A t = 100 ms aún no está en 5τ.");
+    s += `Pos. 2 a 100 ms: ${formatQty(vHold, "V")}, i = 0.\n`;
+    s += `Pos. 3: τ_dis = ${formatQty(dis.tau, "s")}. Más C, más julios, bleeder más lento.`;
+    return s;
+  }
+};
+FIG10["85"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "80 V");
+    d.txt(70, 36, "1"); d.o(100, 50); d.txt(118, 36, "2");
+    d.w(40, 50, 96, 50); d.sw(100, 50, "");
+    d.w(128, 50, 160, 50);
+    d.capV(160, 50, 80, "10 pF");
+    d.rv(160, 130, 60, "R1 100 kΩ");
+    d.w(40, 190, 360, 190);
+    d.w(160, 50, 360, 50);
+    d.rv(360, 50, 140, "R2 390 kΩ");
+    d.txt(178, 90, "+ vC", "#2471a3");
+    d.arrD(178, 80, "iC");
+  },
+  solve() {
+    const C = 10e-12;
+    const ch = rcPack(0, 80, 1e5, C);
+    const tSw = 5 * ch.tau;
+    const dis = rcPack(ch.vc(tSw), 0, 390e3, C);
+    drawRcWave("plot-10-8", "wrap-10-8", ch, 30e-6);
+    let s = rcText(ch, "Fig. 10.85 — snubber 10 pF de un SiC, carga por 100 kΩ.");
+    s += `A 5τ = ${formatQty(tSw, "s")} se pasa a pos. 2: vC ≈ ${formatQty(ch.vc(tSw), "V")}.\n`;
+    s += `Descarga por 390 kΩ: τ = ${formatQty(dis.tau, "s")}. Ventana 0–30 µs.`;
+    return s;
+  }
+};
+FIG10["86"] = {
+  draw(d) {
+    d.capH(40, 80, 100, "2000 µF");
+    d.txt(40, 64, "+ 40 V −", "#2471a3");
+    d.w(140, 80, 180, 80); d.sw(180, 80, "");
+    d.rh(220, 80, 90, "2.2 kΩ");
+    d.gnd(330, 80);
+    d.txt(60, 120, "+ vC −", "#2471a3");
+    d.arrD(90, 70, "iC");
+    d.txt(250, 64, "− vR +", "#2471a3");
+  },
+  solve() {
+    const p = rcPack(40, 0, 2200, 2000e-6);
+    drawRcWave("plot-10-8", "wrap-10-8", p);
+    let s = rcText(p, "Fig. 10.86 — bleeder de un banco 40 V, 2000 µF (auxiliar de BESS).");
+    s += `${mj(`v_R = -v_C`)} (caída en el lastre). τ = 4.4 s: no es un LOTO de 10 s holgado.`;
+    return s;
+  }
+};
+FIG10["87"] = {
+  draw(d) {
+    d.capH(180, 70, 120, "1000 µF");
+    d.txt(200, 54, "+ 6 V −", "#2471a3");
+    d.o(180, 70); d.o(300, 70);
+    d.w(180, 70, 160, 70); d.w(160, 70, 160, 160);
+    d.w(300, 70, 320, 70); d.w(320, 70, 320, 160);
+    d.w(160, 160, 320, 160);
+    d.txt(190, 180, "0.002 Ω (cable)", "#c0392b");
+  },
+  solve() {
+    const p = rcPack(6, 0, 0.002, 1e-3);
+    drawRcWave("plot-10-8", "wrap-10-8", p, 10e-6);
+    let s = rcText(p, "Fig. 10.87 — cortocircuitar 1000 µF a 6 V con 2 mΩ (MC4 / busbar).");
+    s += `5τ ≈ ${formatQty(5 * p.tau, "s")}. I pico = ${formatQty(p.i0, "A")}.\n`;
+    s += `Sí hay chispa: 3 kA en un µs es un arco, no un descargo. El LOTO se hace con bleeder, no con un destornillador.`;
+    return s;
+  }
+};
+
+FIG10["88"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "10 V");
+    d.w(40, 50, 90, 50); d.sw(90, 50, "");
+    d.rh(130, 50, 90, "4.7 kΩ");
+    d.w(220, 50, 300, 50);
+    d.capV(300, 50, 140, "10 µF");
+    d.txt(318, 130, "3 V", "#c0392b");
+    d.w(40, 190, 300, 190);
+    d.gnd(40, 190);
+    d.arrD(318, 86, "iC");
+    d.txt(250, 40, "+ vC −", "#2471a3");
+  },
+  solve() {
+    const p = rcPack(-3, 10, 4700, 10e-6);
+    drawRcWave("plot-10-9", "wrap-10-9", p);
+    return rcText(p, "Fig. 10.88 — pad a −3 V residual, se cierra a 10 V (polaridad invertida). El film no salta: parte de −3 V.");
+  }
+};
+FIG10["89"] = {
+  draw(d) {
+    d.o(20, 80); d.txt(0, 70, "40 V");
+    d.rh(40, 80, 70, "10 kΩ");
+    d.w(20, 80, 40, 80);
+    d.sw(120, 80, "");
+    d.rh(160, 80, 70, "8.2 kΩ");
+    d.capH(250, 80, 80, "6.8 µF");
+    d.o(360, 80); d.txt(368, 84, "−12 V");
+    d.w(330, 80, 356, 80);
+    d.txt(250, 64, "+ vC −", "#2471a3");
+    d.txt(250, 120, "+ 12 V −", "#c0392b");
+    d.arrD(290, 70, "iC");
+  },
+  solve() {
+    const R = 10000 + 8200;
+    const p = rcPack(12, 52, R, 6.8e-6);
+    drawRcWave("plot-10-9", "wrap-10-9", p);
+    let s = "Fig. 10.89 — rails +40 / −12 V (auxiliar bipolar).\n";
+    s += `${mj("V_f = 40 - (-12) = 52\\,\\mathrm{V}")}, Vi = 12 V (misma polaridad).\n`;
+    s += rcText(p, "");
+    return s;
+  }
+};
+
+FIG10["28"] = {
+  draw(d) { d.txt(40, 80, "vC = 8 (1 − e^{−t / 20 µs})"); d.txt(40, 110, "τ = 20 µs, Vf = 8 V, Vi = 0"); },
+  solve() {
+    const p = rcPack(0, 8, 1, 20e-6);
+    p.R = 1; p.tau = 20e-6; p.i0 = 0;
+    p.vc = (t) => 8 * (1 - Math.exp(-t / 20e-6));
+    p.ic = () => 0;
+    let s = `Prob. 28 — ${mj("v_C = 8(1 - e^{-t/(20\\times 10^{-6})})")}.\n`;
+    s += `a. 5τ: ${formatQty(p.vc(100e-6), "V")}.\n`;
+    s += `b. 10τ: ${formatQty(p.vc(200e-6), "V")} (ya en Vf a efectos de planta).\n`;
+    s += `c. t = 5 µs = 0.25τ: ${formatQty(p.vc(5e-6), "V")}. Pulso de un snubber / gate.`;
+    return s;
+  }
+};
+FIG10["87t"] = {
+  draw(d) { FIG10["87"].draw(d); },
+  solve() {
+    const tau = 0.002 * 1e-3;
+    const t = tau * Math.LN2;
+    return `Prob. 29 — i = I0 e^{−t/τ} = I0/2 ⇒ t = τ ln 2 = ${formatQty(t, "s")} (${formatQty(t * 1e6, "\\mu s")}). El arco del MC4 aún no se apagó: sigue en kA.`;
+  }
+};
+FIG10["90"] = {
+  draw(d) {
+    d.batt(40, 40, 200, "12 V");
+    d.w(40, 40, 90, 40); d.sw(90, 40, "t = 0");
+    d.w(118, 40, 180, 40); d.w(180, 40, 180, 70);
+    d.rv(180, 70, 60, "33 kΩ");
+    d.w(180, 130, 180, 150);
+    d.dot(180, 150);
+    d.capV(180, 150, 50, "20 µF");
+    d.w(40, 200, 180, 200);
+    d.gnd(40, 200);
+    d.w(180, 150, 280, 150);
+    d.box(280, 130, 90, 50, "Sistema");
+    d.txt(280, 196, "R = ∞  VL", "#2471a3");
+  },
+  solve() {
+    const p = rcPack(0, 12, 33e3, 20e-6);
+    const t = tOfV(p, 8);
+    let s = rcText(p, "Fig. 10.90 — auxiliar 12 V; el sistema cierra a VL = 8 V.");
+    s += `${mj("8 = 12(1 - e^{-t/\\tau})") } ⇒ t = ${formatQty(t, "s")}. Contactor de un electrolizador / dump.`;
+    return s;
+  }
+};
+FIG10["91"] = {
+  draw(d) {
+    d.batt(40, 40, 200, "20 V");
+    d.w(40, 40, 90, 40); d.sw(90, 40, "t = 0");
+    d.w(118, 40, 180, 40); d.w(180, 40, 180, 70);
+    d.rv(180, 70, 50, "R");
+    d.dot(180, 140);
+    d.capV(180, 140, 60, "200 µF");
+    d.w(40, 200, 180, 200); d.gnd(40, 200);
+    d.w(180, 140, 270, 140);
+    d.box(270, 120, 140, 50, "VL = 12 V ON");
+  },
+  solve() {
+    const C = 200e-6, t = 10, vf = 20, vx = 12;
+    const tau = t / Math.log((0 - vf) / (vx - vf));
+    const R = tau / C;
+    return `Fig. 10.91 — diseñar R para ON a 10 s (VL = 12 V, 20 V, 200 µF).\n${mj("12 = 20(1 - e^{-10/\\tau})") } ⇒ τ = ${formatQty(tau, "s")}, R = τ/C = ${formatQty(R, "\\Omega")}.\nTemporizador de un tracker / yaw o de un dump térmico.`;
+  }
+};
+FIG10["92"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "80 V");
+    d.w(40, 50, 90, 50); d.sw(90, 50, "");
+    d.rh(130, 50, 80, "8 kΩ");
+    d.w(210, 50, 300, 50);
+    d.capV(300, 50, 140, "6 µF");
+    d.w(40, 190, 380, 190);
+    d.rh(210, 190, 80, "12 kΩ");
+    d.w(130, 190, 210, 190);
+    d.arrD(318, 86, "iC");
+    d.txt(250, 40, "+ vC −", "#2471a3");
+  },
+  solve() {
+    const p = rcPack(0, 80, 20000, 6e-6);
+    const t60 = tOfV(p, 60);
+    const i60 = (80 - 60) / 20000;
+    const i2 = p.ic(2 * p.tau);
+    const psrc = 80 * i2;
+    let s = rcText(p, "Fig. 10.92 — precharge 80 V, R = 8 k+12 k.");
+    s += `a. vC = 60 V → t = ${formatQty(t60, "s")}.\n`;
+    s += `b. iC(v=60 V) = (80−60)/20 kΩ = ${formatQty(i60, "A")}.\n`;
+    s += `c. A 2τ, P_fuente = E i = ${formatQty(psrc, "W")}.`;
+    return s;
+  }
+};
+FIG10["93"] = {
+  draw(d) {
+    d.batt(40, 50, 200, "60 V");
+    d.txt(85, 36, "1"); d.o(110, 50); d.txt(130, 70, "2");
+    d.w(40, 50, 106, 50); d.sw(110, 50, "");
+    d.rh(150, 50, 90, "R1 1 MΩ");
+    d.w(240, 50, 340, 50);
+    d.capV(340, 50, 150, "0.2 µF");
+    d.w(40, 200, 340, 200);
+    d.rv(160, 90, 110, "R2 4 MΩ");
+    d.w(110, 90, 160, 90);
+    d.w(160, 200, 160, 200);
+    d.arrD(358, 86, "iC");
+    d.txt(250, 40, "+ vC −", "#2471a3");
+  },
+  solve() {
+    const ch = rcPack(0, 60, 1e6, 0.2e-6);
+    const v05 = ch.vc(0.5), i05 = ch.ic(0.5);
+    const v1 = ch.vc(1), i1 = ch.ic(1);
+    const dis = rcPack(60, 0, 4e6, 0.2e-6);
+    const t8 = dis.tau * Math.log(Math.abs(dis.i0) / 8e-6);
+    const t10 = tOfV(dis, 10);
+    let s = rcText(ch, "Fig. 10.93 — pos. 1 carga por 1 MΩ (ISO / bleeder de medida).");
+    s += `a. 0.5 s: vC = ${formatQty(v05, "V")}, iC = ${formatQty(i05, "A")}, vR1 = ${formatQty(i05 * 1e6, "V")}.\n`;
+    s += `    1 s: vC = ${formatQty(v1, "V")}, iC = ${formatQty(i1, "A")}, vR1 = ${formatQty(i1 * 1e6, "V")}.\n`;
+    s += `b. 10 min ≫ 5τ ⇒ vC = 60 V. Pos. 2: τ = ${formatQty(dis.tau, "s")}.\n`;
+    s += `iC = 8 µA a t = ${formatQty(t8, "s")}. vC = 10 V a t = ${formatQty(t10, "s")}. Δt = ${formatQty(t10 - t8, "s")}.`;
+    return s;
+  }
+};
+FIG10["94"] = {
+  draw(d) {
+    d.batt(40, 60, 180, "60 V");
+    d.w(40, 60, 90, 60); d.sw(90, 60, "");
+    d.capH(140, 60, 80, "0.2 µF");
+    d.w(220, 60, 280, 60);
+    d.box(280, 40, 70, 50, "DMM");
+    d.w(40, 180, 315, 180);
+    d.w(315, 90, 315, 180);
+    d.txt(140, 100, "10 MΩ", "#2471a3");
+  },
+  solve() {
+    const p = rcPack(0, 60, 10e6, 0.2e-6);
+    const t50 = tOfV(p, 50);
+    let s = rcText(p, "Fig. 10.94 — el DMM de 10 MΩ ES R. Mide el DC-link y lo carga.");
+    s += `a. A 1τ el voltímetro lee ${formatQty(p.vc(p.tau), "V")}.\n`;
+    s += `b. A 2τ, iC = ${formatQty(p.ic(2 * p.tau), "A")}.\n`;
+    s += `c. vC = 50 V → t = ${formatQty(t50, "s")}.`;
+    return s;
+  }
+};
+
+FIG10["95"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "24 V");
+    d.w(40, 50, 90, 50); d.sw(90, 50, "");
+    d.rh(130, 50, 90, "2 MΩ");
+    d.w(220, 50, 300, 50);
+    d.capV(300, 50, 140, "1 µF");
+    d.w(40, 190, 380, 190);
+    d.box(360, 30, 60, 40, "DMM");
+    d.w(300, 50, 390, 50); d.w(390, 70, 390, 190);
+  },
+  solve() {
+    const Rth = par(2e6, 10e6);
+    const vf = 24 * 10e6 / (2e6 + 10e6);
+    const p = rcPack(0, vf, Rth, 1e-6);
+    drawRcWave("plot-10-11", "wrap-10-11", p);
+    const t3 = p.tau * Math.log(Math.abs(p.i0) / 3e-6);
+    const t10 = tOfV(p, 10);
+    let s = `Fig. 10.95 — DMM 10 MΩ // film. ${mj(`E_{\\mathrm{Th}} = 24 \\cdot 10/12 = ${texQtyBody(vf, "V")}`)}, ${mj(`R_{\\mathrm{Th}} = 2\\,\\|\\,10 = ${texQtyBody(Rth, "\\Omega")}`)}.\n`;
+    s += rcText(p, "");
+    s += `a. A 4τ el medidor lee ${formatQty(p.vc(4 * p.tau), "V")}.\n`;
+    s += `b. iC = 3 µA → t = ${formatQty(t3, "s")}.\n`;
+    s += `c. 10 V en el DMM → t = ${formatQty(t10, "s")}. El 10 MΩ baja Vf de 24 a 20 V.`;
+    return s;
+  }
+};
+FIG10["96"] = {
+  draw(d) {
+    d.batt(40, 50, 200, "20 V");
+    d.rh(70, 50, 70, "8 kΩ");
+    d.w(40, 50, 70, 50);
+    d.dot(160, 50);
+    d.rv(160, 50, 150, "24 kΩ");
+    d.w(40, 200, 160, 200);
+    d.sw(180, 50, "");
+    d.capH(230, 50, 70, "15 µF");
+    d.w(300, 50, 360, 50);
+    d.rv(360, 50, 150, "4 kΩ");
+    d.w(160, 200, 360, 200);
+    d.arrD(268, 40, "iC");
+    d.txt(230, 36, "+ vC −", "#2471a3");
+  },
+  solve() {
+    const eth = 20 * 24 / 32;
+    const rth = par(8000, 24000) + 4000;
+    const p = rcPack(0, eth, rth, 15e-6);
+    drawRcWave("plot-10-11", "wrap-10-11", p);
+    let s = `Fig. 10.96 — divisor de un rack 20 V. ${mj(`E_{\\mathrm{Th}} = ${texQtyBody(eth, "V")}`)}, ${mj(`R_{\\mathrm{Th}} = (8\\,\\|\\,24)+4 = ${texQtyBody(rth, "\\Omega")}`)}.\n`;
+    return s + rcText(p, "");
+  }
+};
+FIG10["97"] = {
+  draw(d) {
+    d.isrc(60, 40, 140, "5 mA", true);
+    d.rv(100, 40, 100, "0.56 kΩ");
+    d.w(60, 40, 160, 40); d.w(60, 140, 60, 160);
+    d.gnd(60, 160);
+    d.rh(160, 40, 80, "3.9 kΩ");
+    d.dot(260, 40);
+    d.capV(260, 40, 90, "20 µF");
+    d.w(260, 130, 260, 150); d.sw(248, 160, ""); d.gnd(260, 180);
+    d.rh(270, 40, 80, "6.8 kΩ");
+    d.o(380, 40); d.txt(388, 44, "+4 V");
+    d.txt(278, 90, "+ vC −", "#2471a3");
+    d.arrD(278, 70, "iC");
+  },
+  solve() {
+    const rL = 560 + 3900;
+    const eL = 0.005 * 560;
+    const gL = 1 / rL, gR = 1 / 6800;
+    const eth = (eL * gL + 4 * gR) / (gL + gR);
+    const rth = 1 / (gL + gR);
+    const p = rcPack(0, eth, rth, 20e-6);
+    drawRcWave("plot-10-11", "wrap-10-11", p);
+    let s = `Fig. 10.97 — string 5 mA + rail +4 V. Thévenin en el nudo del C.\n`;
+    s += `${mj(`E_{\\mathrm{Th}} = ${texQtyBody(eth, "V")}`)}, ${mj(`R_{\\mathrm{Th}} = ${texQtyBody(rth, "\\Omega")}`)}.\n`;
+    return s + rcText(p, "");
+  }
+};
+FIG10["98"] = {
+  draw(d) {
+    d.batt(160, 50, 200, "36 V");
+    d.rv(80, 50, 150, "1.8 kΩ");
+    d.w(80, 50, 240, 50);
+    d.rh(240, 50, 80, "3.9 kΩ");
+    d.w(80, 200, 360, 200);
+    d.gnd(160, 200);
+    d.sw(140, 80, "");
+    d.capV(360, 50, 150, "20 µF");
+    d.txt(378, 140, "4 V", "#c0392b");
+    d.txt(300, 40, "+ vC −", "#2471a3");
+    d.arrD(378, 86, "iC");
+  },
+  solve() {
+    const p = rcPack(-4, 36, 3900, 20e-6);
+    drawRcWave("plot-10-11", "wrap-10-11", p);
+    return rcText(p, "Fig. 10.98 — 1.8 kΩ es bleeder del 36 V (no entra en RTh). C a −4 V residual. RTh = 3.9 kΩ.");
+  }
+};
+FIG10["99"] = {
+  draw(d) {
+    d.isrc(60, 40, 200, "4 mA", true);
+    d.rv(120, 40, 160, "6.8 kΩ");
+    d.w(60, 40, 200, 40); d.w(60, 200, 360, 200);
+    d.gnd(60, 200);
+    d.rh(200, 40, 80, "1.5 kΩ");
+    d.sw(290, 40, "");
+    d.capV(360, 40, 160, "2.2 µF");
+    d.txt(378, 140, "2 V", "#c0392b");
+    d.txt(300, 28, "+ vC −", "#2471a3");
+    d.arrD(378, 80, "iC");
+  },
+  solve() {
+    const eth = 0.004 * 6800;
+    const rth = 6800 + 1500;
+    const p = rcPack(-2, eth, rth, 2.2e-6);
+    drawRcWave("plot-10-11", "wrap-10-11", p);
+    let s = `Fig. 10.99 — Norton 4 mA ∥ 6.8 kΩ → Eth = ${formatQty(eth, "V")}, RTh = ${formatQty(rth, "\\Omega")}. Vi = −2 V.\n`;
+    return s + rcText(p, "");
+  }
+};
+FIG10["100"] = {
+  draw(d) {
+    d.o(20, 80); d.txt(0, 70, "+10 V");
+    d.rh(40, 80, 60, "2 kΩ");
+    d.gnd(120, 80);
+    d.rh(140, 80, 70, "6.8 kΩ");
+    d.sw(220, 80, "");
+    d.capH(260, 80, 80, "39 µF");
+    d.o(380, 80); d.txt(388, 84, "−20 V");
+    d.w(340, 80, 376, 80);
+    d.txt(260, 64, "+ vC −", "#2471a3");
+    d.txt(260, 120, "+ 3 V −", "#c0392b");
+    d.arrD(300, 70, "iC");
+  },
+  solve() {
+    const p = rcPack(3, 20, 6800, 39e-6);
+    drawRcWave("plot-10-11", "wrap-10-11", p);
+    let s = "Fig. 10.100 — 2 kΩ lastrea el rail +10 V (no entra en RTh). El C ve tierra por 6.8 kΩ y el rail −20 V.\n";
+    s += `${mj("V_f = 0 - (-20) = 20\\,\\mathrm{V}")}, Vi = 3 V.\n`;
+    return s + rcText(p, "");
+  }
+};
+
+const PW101 = [[0, 0], [0.004, 12], [0.006, 40], [0.007, 100], [0.010, 100], [0.012, 0], [0.013, -50], [0.015, 0]];
+const PW102 = [[0, 0], [2e-6, 3], [3e-6, 0], [4e-6, -3], [5e-6, 0], [6e-6, 0], [8e-6, 2], [10e-6, 1], [15e-6, 1], [16e-6, 0]];
+const PW103 = [[0, 0], [0.004, 0], [0.004, -0.08], [0.006, -0.08], [0.006, 0.04], [0.016, 0.04], [0.016, 0], [0.018, 0], [0.018, -0.12], [0.020, -0.12], [0.020, 0], [0.025, 0]];
+
+FIG10["101"] = {
+  draw() {},
+  solve() {
+    const C = 0.06e-6;
+    const iPts = vToI(PW101, C);
+    drawPw(document.getElementById("plot-10-12a"), PW101, "v (V)", "#1a6b4a", "ms");
+    drawPw(document.getElementById("plot-10-12b"), iPts, "i (A)", "#2471a3", "ms");
+    let s = `Fig. 10.101 — ${mj("i = C \\, dv/dt")}, C = 0.06 µF. Tramos lineales ⇒ i constante.\n`;
+    const segs = [["0–4 ms", 12, 0.004], ["4–6 ms", 28, 0.002], ["6–7 ms", 60, 0.001], ["7–10 ms", 0, 0.003], ["10–12 ms", -100, 0.002], ["12–13 ms", -50, 0.001], ["13–15 ms", 50, 0.002]];
+    segs.forEach(([lab, dv, dt]) => {
+      s += `${lab}: dv/dt = ${formatQty(dv / dt, "V/s")}, i = ${formatQty(C * dv / dt, "A")}.\n`;
+    });
+    s += "MPPT / rampas del bus: el film ve escalones de i, no senos.";
+    return s;
+  }
+};
+FIG10["102"] = {
+  draw() {},
+  solve() {
+    const C = 0.06e-6;
+    const iPts = vToI(PW102, C);
+    drawPw(document.getElementById("plot-10-12a"), PW102, "v (V)", "#1a6b4a", "µs");
+    drawPw(document.getElementById("plot-10-12b"), iPts, "i (A)", "#2471a3", "µs");
+    let s = `Fig. 10.102 — misma C = 0.06 µF, escala µs (switching SiC).\n`;
+    const segs = [["0–2 µs", 3, 2e-6], ["2–3 µs", -3, 1e-6], ["3–4 µs", -3, 1e-6], ["4–5 µs", 3, 1e-6], ["5–6 µs", 0, 1e-6], ["6–8 µs", 2, 2e-6], ["8–10 µs", -1, 2e-6], ["10–15 µs", 0, 5e-6], ["15–16 µs", -1, 1e-6]];
+    segs.forEach(([lab, dv, dt]) => {
+      s += `${lab}: i = ${formatQty(C * dv / dt, "A")}.\n`;
+    });
+    return s;
+  }
+};
+FIG10["103"] = {
+  draw() {},
+  solve() {
+    const C = 20e-6;
+    const vPts = iToV(PW103, C, 0);
+    drawPw(document.getElementById("plot-10-12a"), PW103, "i (A)", "#2471a3", "ms");
+    drawPw(document.getElementById("plot-10-12b"), vPts, "v (V)", "#1a6b4a", "ms");
+    let s = `Fig. 10.103 — ${mj("\\Delta v = (1/C)\\int i\\,dt")}, C = 20 µF, v(0) = 0.\n`;
+    s += `4–6 ms (−80 mA): Δv = ${formatQty(-0.08 * 0.002 / C, "V")} → v = −8 V.\n`;
+    s += `6–16 ms (+40 mA): Δv = ${formatQty(0.04 * 0.010 / C, "V")} → v = +12 V.\n`;
+    s += `16–18 ms: hold 12 V. 18–20 ms (−120 mA): Δv = ${formatQty(-0.12 * 0.002 / C, "V")} → v = 0.\n`;
+    s += "Chopper / DAB inyectando pulsos al film: el área de i es la carga.";
+    return s;
+  }
+};
+
+FIG10["104a"] = {
+  draw(d) {
+    d.o(30, 80); d.txt(18, 70, "a");
+    d.capH(50, 80, 70, "0.2 µF");
+    d.dot(140, 80);
+    d.capH(160, 50, 70, "3 µF");
+    d.capH(250, 50, 70, "6 µF");
+    d.capH(160, 110, 160, "7 µF");
+    d.w(140, 80, 160, 50); d.w(140, 80, 160, 110);
+    d.w(320, 50, 360, 80); d.w(320, 110, 360, 80);
+    d.w(360, 80, 360, 160); d.w(30, 160, 360, 160);
+    d.o(30, 160); d.txt(18, 174, "b");
+    d.arrR(50, 120, "CT");
+  },
+  solve() {
+    const c36 = (3e-6 * 6e-6) / (9e-6);
+    const par7 = c36 + 7e-6;
+    const ct = (0.2e-6 * par7) / (0.2e-6 + par7);
+    let s = `Fig. 10.104.a — 0.2 µF en serie con [(3 s 6) ∥ 7].\n`;
+    s += `3 s 6 = ${formatQty(c36, "F")}. ∥ 7 µF = ${formatQty(par7, "F")}.\n`;
+    s += `${mj(`C_T = ${texQtyBody(ct, "F")}`)}. El 0.2 µF (snubber) domina: es el cuello de serie.`;
+    return s;
+  }
+};
+FIG10["104b"] = {
+  draw(d) {
+    d.o(30, 50); d.txt(18, 40, "a"); d.o(30, 180); d.txt(18, 194, "b");
+    d.capV(80, 50, 130, "20 pF");
+    d.w(30, 50, 200, 50); d.w(30, 180, 280, 180);
+    d.capH(90, 50, 80, "60 pF");
+    d.dot(190, 50);
+    d.capV(190, 50, 130, "10 pF");
+    d.capV(260, 50, 130, "30 pF");
+    d.w(190, 50, 260, 50);
+    d.arrR(50, 110, "CT");
+  },
+  solve() {
+    const p1030 = 10e-12 + 30e-12;
+    const s60 = (60e-12 * p1030) / (60e-12 + p1030);
+    const ct = 20e-12 + s60;
+    return `Fig. 10.104.b — 20 pF ∥ [60 s (10∥30)].\n10∥30 = ${formatQty(p1030, "F")}. 60 s 40 pF = ${formatQty(s60, "F")}. ${mj(`C_T = ${texQtyBody(ct, "F")}`)}.\nParásitos de un driver + un snubber de 60 pF.`;
+  }
+};
+FIG10["105a"] = {
+  draw(d) {
+    d.batt(40, 40, 180, "10 V");
+    d.w(40, 40, 220, 40); d.w(40, 180, 220, 180); d.gnd(40, 180);
+    d.capV(120, 40, 60, "C2 6 µF");
+    d.capV(120, 110, 70, "C3 12 µF");
+    d.capV(200, 40, 140, "C1 6 µF");
+  },
+  solve() {
+    const c23 = (6e-6 * 12e-6) / 18e-6;
+    const ct = c23 + 6e-6;
+    const q1 = 6e-6 * 10, q23 = c23 * 10;
+    return `Fig. 10.105.a — C1 ∥ (C2 s C3), 10 V (banco auxiliar).\nC2 s C3 = ${formatQty(c23, "F")}. CT = ${formatQty(ct, "F")}.\nC1: V=10 V, Q=${formatQty(q1, "C")}.\nC2–C3: Q=${formatQty(q23, "C")}; VC2=${formatQty(q23 / 6e-6, "V")}, VC3=${formatQty(q23 / 12e-6, "V")}.`;
+  }
+};
+FIG10["105b"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "40 V");
+    d.gnd(40, 190);
+    d.capH(80, 50, 70, "C1 1200 pF");
+    d.capH(170, 30, 70, "C2 200 pF");
+    d.capH(170, 70, 70, "C3 400 pF");
+    d.w(150, 50, 170, 30); d.w(150, 50, 170, 70);
+    d.w(240, 30, 260, 50); d.w(240, 70, 260, 50);
+    d.capH(260, 50, 70, "C4 600 pF");
+    d.w(40, 50, 80, 50); d.w(330, 50, 330, 190); d.w(40, 190, 330, 190);
+  },
+  solve() {
+    const c23 = 200e-12 + 400e-12;
+    const ct = 1 / (1 / 1200e-12 + 1 / c23 + 1 / 600e-12);
+    const Q = ct * 40;
+    return `Fig. 10.105.b — 1200 s (200∥400) s 600 pF a 40 V (cadena de snubbers).\n200∥400 = ${formatQty(c23, "F")}. CT = ${formatQty(ct, "F")}. Q (serie) = ${formatQty(Q, "C")}.\nVC1 = ${formatQty(Q / 1200e-12, "V")}. V(200∥400) = ${formatQty(Q / c23, "V")} → Q2=${formatQty(200e-12 * Q / c23, "C")}, Q3=${formatQty(400e-12 * Q / c23, "C")}.\nVC4 = ${formatQty(Q / 600e-12, "V")}.`;
+  }
+};
+FIG10["106a"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "24 V"); d.gnd(40, 190);
+    d.w(40, 50, 100, 50); d.capH(100, 50, 70, "C1 9 µF");
+    d.dot(190, 50);
+    d.capV(190, 50, 140, "C2 10 µF");
+    d.w(190, 50, 280, 50);
+    d.capV(280, 50, 70, "C3 9 µF");
+    d.capV(280, 120, 70, "C4 72 µF");
+    d.w(40, 190, 280, 190);
+  },
+  solve() {
+    const c34 = (9e-6 * 72e-6) / 81e-6;
+    const mid = c34 + 10e-6;
+    const ct = (9e-6 * mid) / (9e-6 + mid);
+    const Q = ct * 24;
+    return `Fig. 10.106.a — 9 s (10 ∥ (9 s 72)), 24 V.\n9 s 72 = ${formatQty(c34, "F")}. ∥10 = ${formatQty(mid, "F")}. CT = ${formatQty(ct, "F")}. Q=${formatQty(Q, "C")}.\nVC1=${formatQty(Q / 9e-6, "V")}. Vmid=${formatQty(Q / mid, "V")}.\nQC2=${formatQty(10e-6 * Q / mid, "C")}. Q34=${formatQty(c34 * Q / mid, "C")}; VC3=${formatQty((c34 * Q / mid) / 9e-6, "V")}, VC4=${formatQty((c34 * Q / mid) / 72e-6, "V")}.`;
+  }
+};
+FIG10["106b"] = {
+  draw(d) {
+    d.batt(40, 50, 190, "16 V"); d.gnd(40, 190);
+    d.w(40, 50, 80, 50);
+    d.capH(80, 50, 60, "7 µF");
+    d.capH(160, 50, 60, "42 µF");
+    d.dot(240, 50);
+    d.capV(240, 50, 140, "C3 2 µF");
+    d.w(240, 50, 320, 50);
+    d.capV(320, 50, 70, "14 µF");
+    d.capV(320, 120, 70, "35 µF");
+    d.w(40, 190, 320, 190);
+  },
+  solve() {
+    const c45 = (14e-6 * 35e-6) / 49e-6;
+    const right = c45 + 2e-6;
+    const c12 = (7e-6 * 42e-6) / 49e-6;
+    const ct = (c12 * right) / (c12 + right);
+    const Q = ct * 16;
+    return `Fig. 10.106.b — (7 s 42) s (2 ∥ (14 s 35)), 16 V.\n14 s 35 = ${formatQty(c45, "F")}. ∥2 = ${formatQty(right, "F")}. 7 s 42 = ${formatQty(c12, "F")}. CT = ${formatQty(ct, "F")}.\nQ=${formatQty(Q, "C")}. VC1=${formatQty(Q / 7e-6, "V")}, VC2=${formatQty(Q / 42e-6, "V")}, Vright=${formatQty(Q / right, "V")}.\nQC3=${formatQty(2e-6 * Q / right, "C")}. Q45=${formatQty(c45 * Q / right, "C")}; VC4=${formatQty((c45 * Q / right) / 14e-6, "V")}, VC5=${formatQty((c45 * Q / right) / 35e-6, "V")}.`;
+  }
+};
+FIG10["107"] = {
+  draw(d) {
+    d.batt(40, 50, 200, "100 V");
+    d.txt(80, 36, "1"); d.o(110, 50); d.txt(130, 70, "2");
+    d.w(40, 50, 106, 50); d.sw(110, 50, "");
+    d.txt(150, 36, "d");
+    d.rh(170, 50, 80, "R1 20 kΩ");
+    d.txt(270, 36, "a");
+    d.capV(280, 50, 70, "C1 8 µF");
+    d.txt(300, 90, "c");
+    d.capV(250, 130, 70, "C2 12 µF");
+    d.capV(330, 130, 70, "C3 12 µF");
+    d.w(280, 120, 250, 130); d.w(280, 120, 330, 130);
+    d.w(250, 200, 330, 200); d.w(40, 200, 330, 200);
+    d.txt(350, 210, "b");
+    d.rv(140, 90, 110, "R2 40 kΩ");
+  },
+  solve() {
+    const ceq = (8e-6 * 24e-6) / 32e-6;
+    const p = rcPack(0, 100, 20e3, ceq);
+    const t = 0.1;
+    const vab = p.vc(t);
+    const Q = ceq * vab;
+    const vac = Q / 8e-6, vcb = Q / 24e-6;
+    const i = (100 - vab) / 20e3;
+    const vda = i * 20e3;
+    const dis = rcPack(100, 0, 40e3, ceq);
+    const t20 = tOfV(dis, 20);
+    let s = `Fig. 10.107 — Ceq = 8 s (12∥12) = ${formatQty(ceq, "F")}. τ1 = ${formatQty(p.tau, "s")}.\n`;
+    s += `A 100 ms: ${mj(`V_{ab} = ${texQtyBody(vab, "V")}`)}, ${mj(`V_{ac} = ${texQtyBody(vac, "V")}`)}, ${mj(`V_{cb} = ${texQtyBody(vcb, "V")}`)}, ${mj(`V_{da} = ${texQtyBody(vda, "V")}`)}.\n`;
+    s += `Tras 1 h, Vab = 100 V. Pos. 2, τ2 = ${formatQty(dis.tau, "s")}. vR2 = 20 V → t = ${formatQty(t20, "s")}.`;
+    return s;
+  }
+};
+FIG10["108a"] = {
+  draw(d) {
+    d.batt(40, 50, 170, "48 V");
+    d.capV(120, 50, 120, "C1 0.04 µF");
+    d.rh(140, 50, 70, "2 kΩ");
+    d.capV(240, 50, 120, "C2 0.08 µF");
+    d.rv(300, 50, 120, "4 kΩ");
+    d.w(40, 50, 300, 50); d.w(40, 170, 300, 170);
+  },
+  solve() {
+    const vc2 = 48 * 4 / 6, vc1 = 48;
+    return `Fig. 10.108.a — en DC los C son abiertos. Divisor 2 k + 4 k.\nVC1 = 48 V (todo el bus), Q1 = ${formatQty(0.04e-6 * vc1, "C")}.\nVC2 = ${formatQty(vc2, "V")} (sobre el 4 kΩ), Q2 = ${formatQty(0.08e-6 * vc2, "C")}.\nFiltro de un rail 48 V: el film de entrada ve el bus; el de salida, el tap.`;
+  }
+};
+FIG10["108b"] = {
+  draw(d) {
+    d.batt(180, 80, 190, "80 V");
+    d.capH(60, 50, 70, "C1 40 µF");
+    d.rv(80, 80, 110, "5 kΩ");
+    d.rh(200, 50, 70, "6 kΩ");
+    d.capH(200, 20, 70, "C2 60 µF");
+    d.rv(320, 50, 140, "4 kΩ");
+    d.w(40, 190, 320, 190);
+  },
+  solve() {
+    const vc2 = 80 * 6 / 10, vc1 = 80;
+    return `Fig. 10.108.b — DC: C abiertos. 5 kΩ lastrea el 80 V (no fija V de C1: C1 ve el bus).\nVC1 = 80 V, Q1 = ${formatQty(40e-6 * 80, "C")}.\n6 k y 4 k en serie: VC2 = ${formatQty(vc2, "V")}, Q2 = ${formatQty(60e-6 * vc2, "C")}.\nBanco de un auxiliar 80 V con tap 48 V.`;
+  }
+};
+
+FIG10["109"] = {
+  draw(d) {
+    d.batt(40, 50, 180, "24 V"); d.gnd(40, 180);
+    d.rh(70, 50, 70, "6 kΩ");
+    d.rv(160, 50, 130, "3 kΩ");
+    d.rh(180, 50, 70, "4 kΩ");
+    d.capV(280, 50, 130, "6 µF");
+    d.capV(340, 50, 130, "12 µF");
+    d.w(40, 50, 70, 50); d.w(250, 50, 340, 50);
+    d.w(40, 180, 340, 180);
+  },
+  solve() {
+    const v = 24 * 3 / 9;
+    const w6 = 0.5 * 6e-6 * v * v, w12 = 0.5 * 12e-6 * v * v;
+    return `Fig. 10.109 — DC: C abiertos. El 4 kΩ no lleva I ⇒ ambos C al nudo del divisor 6 k / 3 k.\nV = ${formatQty(v, "V")}.\na. W6 = ${formatQty(w6, "J")}, W12 = ${formatQty(w12, "J")}.\nEl 12 µF guarda el doble: misma V, C ×2.`;
+  }
+};
+FIG10["109s"] = {
+  draw(d) { FIG10["109"].draw(d); },
+  solve() {
+    const v = 8;
+    const ceq = (6e-6 * 12e-6) / 18e-6;
+    const Q = ceq * v;
+    const v6 = Q / 6e-6, v12 = Q / 12e-6;
+    return `Prob. 52.b — 6 µF s 12 µF al mismo nudo de 8 V.\nCeq = ${formatQty(ceq, "F")}, Q = ${formatQty(Q, "C")}.\nV6 = ${formatQty(v6, "V")}, W6 = ${formatQty(0.5 * 6e-6 * v6 * v6, "J")}.\nV12 = ${formatQty(v12, "V")}, W12 = ${formatQty(0.5 * 12e-6 * v12 * v12, "J")}.\nSerie: el menor C se come más V (y más W relativo).`;
+  }
+};
+FIG10["51"] = {
+  draw(d) {
+    d.capH(200, 80, 100, "1000 µF");
+    d.txt(210, 64, "100 V", "#2471a3");
+    d.txt(160, 140, "flash 1/2000 s  ·  recarga 10 mA", "#2471a3");
+  },
+  solve() {
+    const C = 1e-3, V = 100;
+    const W = 0.5 * C * V * V, Q = C * V;
+    const dt = 1 / 2000, iAvg = Q / dt, pAvg = W / dt, tCh = Q / 0.01;
+    let s = `Prob. 51 — flash / pulso de un electrolizador de corta duración.\n`;
+    s += `a. W = ½CV² = ${formatQty(W, "J")}.\n`;
+    s += `b. Q = CV = ${formatQty(Q, "C")}.\n`;
+    s += `c. Iprom = Q/Δt = ${formatQty(iAvg, "A")} en ${formatQty(dt, "s")}.\n`;
+    s += `d. Pprom = W/Δt = ${formatQty(pAvg, "W")}.\n`;
+    s += `e. Recarga a 10 mA: t = Q/I = ${formatQty(tCh, "s")}.`;
+    return s;
+  }
+};
+
+function initSec10() {
+  bindFig("s107-fig", "btn-s107", "svg-s107", "proc-10-7", FIG10);
+  bindFig("s108-fig", "btn-s108", "svg-s108", "proc-10-8", FIG10);
+  bindFig("s109-fig", "btn-s109", "svg-s109", "proc-10-9", FIG10);
+  bindFig("s1010-fig", "btn-s1010", "svg-s1010", "proc-10-10", FIG10);
+  bindFig("s1011-fig", "btn-s1011", "svg-s1011", "proc-10-11", FIG10);
+  bindFig("s1013-fig", "btn-s1013", "svg-s1013", "proc-10-13", FIG10);
+  bindFig("s1014f-fig", "btn-s1014f", "svg-s1014", "proc-10-14f", FIG10);
+
+  const run1012 = () => {
+    const key = document.getElementById("s1012-fig")?.value;
+    const out = document.getElementById("proc-10-12");
+    try {
+      const s = FIG10[key] && FIG10[key].solve;
+      if (!s) throw new Error("Figura no implementada.");
+      setMathText(out, s());
+    } catch (e) { setMathText(out, e.message); }
+  };
+  document.getElementById("btn-s1012")?.addEventListener("click", run1012);
+  document.getElementById("s1012-fig")?.addEventListener("change", run1012);
+
+  document.getElementById("btn-s102")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-2");
+    try {
+      const q = readOptionalNumber("s102-q");
+      const rIn = readOptionalNumber("s102-r");
+      const eIn = readOptionalNumber("s102-e");
+      if (q == null) throw new Error("Indica Q.");
+      const Q = q * readUnit("s102-q-u");
+      const r = rIn == null ? null : rIn * readUnit("s102-r-u");
+      let proc = `${mj("E = k Q / r^{2}")}, ${mj("k = 8.99\\times 10^{9}")}.\n`;
+      proc += `${mj(`Q = ${texQtyBody(Q, "C")}`)}.\n`;
+      if (r != null && eIn == null) {
+        if (!r) throw new Error("r no puede ser 0.");
+        const E = K_COULOMB * Math.abs(Q) / (r * r);
+        proc += `${mj(`E = ${texQtyBody(E, "N/C")} = ${texQtyBody(E, "V/m")}`)}. ESD / corona a ${formatQty(r, "m")} de un pad.`;
+      } else if (eIn != null && r == null) {
+        const rr = Math.sqrt(K_COULOMB * Math.abs(Q) / Math.abs(eIn));
+        proc += `${mj(`r = \\sqrt{kQ/E} = ${texQtyBody(rr, "m")}`)}.`;
+        setField("s102-r", rr);
+        document.getElementById("s102-r-u").value = "1";
+      } else throw new Error("Deja vacío E o r.");
+      setMathText(out, proc);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s102p")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-2p");
+    try {
+      const v = readOptionalNumber("s102p-v");
+      const dIn = readOptionalNumber("s102p-d");
+      if (v == null || dIn == null) throw new Error("Indica V y d.");
+      const V = v * readUnit("s102p-v-u");
+      const d = dIn * readUnit("s102p-d-u");
+      if (!d) throw new Error("d no puede ser 0.");
+      const E = V / d;
+      setMathText(out, `${mj("E = V/d")} = ${formatQty(E, "V/m")} = ${formatQty(E, "N/C")}.\nEsfuerzo en el dieléctrico de un film / busbar.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("s103-mat")?.addEventListener("change", () => {
+    const m = DIE10[document.getElementById("s103-mat").value];
+    if (m && document.getElementById("s103-mat").value !== "custom") setField("s103-k", m.k);
+  });
+
+  document.getElementById("btn-s103qv")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-3qv");
+    try {
+      let C = readOptionalNumber("s103-c");
+      let Q = readOptionalNumber("s103-q");
+      let V = readOptionalNumber("s103-v");
+      if (C != null) C *= readUnit("s103-c-u");
+      if (Q != null) Q *= readUnit("s103-q-u");
+      if (V != null) V *= readUnit("s103-v-u");
+      const n = [C, Q, V].filter((x) => x != null).length;
+      if (n < 2) throw new Error("Indica dos de C, Q, V.");
+      let proc = `${mj("C = Q/V")}.\n`;
+      if (C == null) {
+        C = Q / V;
+        writeQtyField("s103-c", "s103-c-u", C);
+        proc += `${mj(`C = ${texQtyBody(C, "F")}`)}.`;
+      } else if (Q == null) {
+        Q = C * V;
+        writeQtyField("s103-q", "s103-q-u", Q);
+        proc += `${mj(`Q = C V = ${texQtyBody(Q, "C")}`)}.`;
+      } else if (V == null) {
+        V = Q / C;
+        writeQtyField("s103-v", "s103-v-u", V);
+        proc += `${mj(`V = Q/C = ${texQtyBody(V, "V")}`)}.`;
+      } else {
+        proc += `Comprobación: C V = ${formatQty(C * V, "C")} vs Q = ${formatQty(Q, "C")}.`;
+      }
+      setMathText(out, proc);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s103")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-3");
+    try {
+      const matKey = document.getElementById("s103-mat")?.value || "air";
+      const mat = DIE10[matKey] || DIE10.air;
+      let k = readOptionalNumber("s103-k");
+      if (k == null) k = mat.k;
+      const A = readOptionalNumber("s103-a");
+      const dIn = readOptionalNumber("s103-d");
+      const d = dIn == null ? null : dIn * readUnit("s103-d-u");
+      const V = readOptionalNumber("s103-vp");
+      let Cwant = readOptionalNumber("s103-ct");
+      if (Cwant != null) Cwant *= readUnit("s103-ct-u");
+      let proc = `${mj("C = k \\varepsilon_0 A / d")}, ${mj("\\varepsilon_0 = 8.85\\times 10^{-12}\\,\\mathrm{F/m}")}, ${mj(`k = ${texQtyBody(k)}`)} (${mat.name}).\n`;
+      if (Cwant != null && A != null && !d) {
+        const dd = k * EPS0 * A / Cwant;
+        proc += `${mj(`d = k\\varepsilon_0 A / C = ${texQtyBody(dd, "m")} = ${texQtyBody(dd / MIL_M, "mil")}`)}.`;
+      } else if (A != null && d) {
+        const C = k * EPS0 * A / d;
+        proc += `${mj(`C = ${texQtyBody(C, "F")}`)}.\n`;
+        if (V != null) {
+          const Q = C * V, E = V / d;
+          proc += `${mj(`E = V/d = ${texQtyBody(E, "V/m")}`)}, ${mj(`Q = C V = ${texQtyBody(Q, "C")}`)}.`;
+        }
+      } else if (V != null && d) {
+        proc += `${mj(`E = V/d = ${texQtyBody(V / d, "V/m")}`)}.`;
+      } else throw new Error("Indica A y d (C), o C y A (d), o V y d (E).");
+      setMathText(out, proc);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s104")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-4");
+    try {
+      const mat = DIE10[document.getElementById("s104-mat")?.value] || DIE10.mica;
+      const dIn = readOptionalNumber("s104-d");
+      const vIn = readOptionalNumber("s104-v");
+      const A = readOptionalNumber("s104-a");
+      const C = readOptionalNumber("s104-c");
+      const ebd = mat.evmil / MIL_M;
+      let proc = `${mat.name}: ${mj(`\\mathcal{E}_{\\mathrm{bd}} = ${mat.evmil}\\,\\mathrm{V/mil} = ${texQtyBody(ebd, "V/m")}`)}.\n`;
+      let d = dIn == null ? null : dIn * readUnit("s104-d-u");
+      if (d == null && A != null && C != null) {
+        d = mat.k * EPS0 * A / (C * 1e-6);
+        proc += `d desde C = kε0 A/d: ${formatQty(d, "m")}.\n`;
+      }
+      if (d != null && vIn == null) {
+        const V = mat.evmil * (d / MIL_M);
+        proc += `${mj(`V_{\\mathrm{rup}} = ${texQtyBody(V, "V")}`)}. Tensión de trabajo ≪ este techo.`;
+      } else if (vIn != null && d == null) {
+        const dd = vIn / ebd;
+        proc += `${mj(`d = V / \\mathcal{E}_{\\mathrm{bd}} = ${texQtyBody(dd, "m")} = ${texQtyBody(dd / 1e-3, "mm")} = ${texQtyBody(dd / MIL_M, "mil")}`)}.`;
+      } else if (d != null && vIn != null) {
+        proc += `Vrup calc = ${formatQty(mat.evmil * (d / MIL_M), "V")} vs ${formatQty(vIn, "V")}.`;
+      } else throw new Error("Indica d, o Vmáx, o C y A.");
+      setMathText(out, proc);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s107g")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-7g");
+    try {
+      const E = readOptionalNumber("s107g-e"), R = readOptionalNumber("s107g-r"), C = readOptionalNumber("s107g-c");
+      const v0 = readOptionalNumber("s107g-v0") ?? 0;
+      if (E == null || !R || !C) throw new Error("Indica E, R y C.");
+      const p = rcPack(v0, E, R, C);
+      drawRcWave("plot-10-7", "wrap-10-7", p);
+      setMathText(out, rcText(p, "Precharge genérico."));
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s1010g")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-10g");
+    try {
+      const vi = readOptionalNumber("s1010g-vi") ?? 0;
+      const vf = readOptionalNumber("s1010g-vf");
+      const vx = readOptionalNumber("s1010g-vx");
+      const R = readOptionalNumber("s1010g-r");
+      const C = readOptionalNumber("s1010g-c");
+      const tIn = readOptionalNumber("s1010g-t");
+      if (vf == null || vx == null || !C) throw new Error("Indica Vf, v umbral y C.");
+      if (R && tIn == null) {
+        const p = rcPack(vi, vf, R, C);
+        const t = tOfV(p, vx);
+        setMathText(out, `τ = ${formatQty(p.tau, "s")}. t(v=${formatQty(vx, "V")}) = ${formatQty(t, "s")}.`);
+      } else if (tIn != null && !R) {
+        const tau = tIn / Math.log((vi - vf) / (vx - vf));
+        const RR = tau / C;
+        setMathText(out, `τ = ${formatQty(tau, "s")}, R = τ/C = ${formatQty(RR, "\\Omega")}.`);
+      } else throw new Error("Indica R (despeja t) o t (despeja R), no ambos.");
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s1014")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-14");
+    try {
+      let C = readOptionalNumber("s1014-c");
+      let V = readOptionalNumber("s1014-v");
+      let Q = readOptionalNumber("s1014-q");
+      let W = readOptionalNumber("s1014-w");
+      if (C != null) C *= readUnit("s1014-c-u");
+      const known = [C, V, Q, W].filter((x) => x != null).length;
+      if (known < 2) throw new Error("Indica dos de C, V, Q, W.");
+      if (C != null && V != null && W == null) W = 0.5 * C * V * V;
+      if (C != null && V != null && Q == null) Q = C * V;
+      if (Q != null && V != null && C == null) C = Q / V;
+      if (Q != null && C != null && V == null) V = Q / C;
+      if (W != null && C != null && V == null) V = Math.sqrt(2 * W / C);
+      if (W != null && V != null && C == null) C = 2 * W / (V * V);
+      if (W != null && C != null && Q == null) Q = Math.sqrt(2 * C * W);
+      if (Q != null && C != null && W == null) W = (Q * Q) / (2 * C);
+      setMathText(out, `${mj("W = \\tfrac12 C V^2 = Q^2/(2C) = \\tfrac12 Q V")}.\nC = ${formatQty(C, "F")}, V = ${formatQty(V, "V")}, Q = ${formatQty(Q, "C")}, W = ${formatQty(W, "J")}.\nHazard del DC-link: esos julios salen en un arco si no hay bleeder.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s1017")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-10-17");
+    const wrap = document.getElementById("wrap-10-17");
+    const tb = document.querySelector("#table-10-17 tbody");
+    try {
+      const vf = readOptionalNumber("s1017-e"), vi = readOptionalNumber("s1017-v0") ?? 0;
+      const R = readOptionalNumber("s1017-r"), C = readOptionalNumber("s1017-c");
+      if (vf == null || !R || !C) throw new Error("Indica Vf, R y C.");
+      const p = rcPack(vi, vf, R, C);
+      if (tb) {
+        tb.innerHTML = [0, 1, 2, 3, 4, 5].map((n) => {
+          const t = n * p.tau, v = p.vc(t), i = p.ic(t);
+          const pct = vf === vi ? 100 : 100 * (v - vi) / (vf - vi);
+          return `<tr><td>${n}</td><td>${formatQtyPlain(t)}</td><td>${formatQtyPlain(v)}</td><td>${formatQtyPlain(pct)}</td><td>${formatQtyPlain(i)}</td></tr>`;
+        }).join("");
+      }
+      if (wrap) wrap.style.display = "block";
+      setMathText(out, `τ = ${formatQty(p.tau, "s")}. El «print» a cinco constantes: a 5τ queda el 99.3 % del salto. Es el criterio de precharge / bleeder.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+}
+
+Object.assign(presetsData, {
+  "10-2": {
+    p1: { fields: { "s102-q": "4", "s102-r": "2", "s102-e": "" }, selects: { "s102-q-u": "1e-6", "s102-r-u": "1" }, click: "btn-s102",
+      desc: "Prob. 1 — E a 2 m de 4 µC (carga de un pad / ESD).\nE = kQ/r² = 8.99e3 N/C = 8.99 kV/m." },
+    p2: { fields: { "s102-q": "0.064", "s102-r": "", "s102-e": "36" }, selects: { "s102-q-u": "1e-6" }, click: "btn-s102",
+      desc: "Prob. 2 — E = 36 N/C, Q = 0.064 µC → r = 4.00 m." }
+  },
+  "10-3": {
+    p3: { fields: { "s103-c": "", "s103-q": "1400", "s103-v": "20" }, selects: { "s103-q-u": "1e-6", "s103-v-u": "1" }, click: "btn-s103qv",
+      desc: "Prob. 3 — 1400 µC a 20 V (banco auxiliar). C = Q/V = 70.0 µF." },
+    p4: { fields: { "s103-c": "0.05", "s103-q": "", "s103-v": "45" }, selects: { "s103-c-u": "1e-6" }, click: "btn-s103qv",
+      desc: "Prob. 4 — 0.05 µF a 45 V. Q = CV = 2.25 µC. Snubber de un SiC." },
+    p5: { fields: { "s103-k": "1", "s103-a": "", "s103-d": "2", "s103-vp": "0.1", "s103-ct": "" }, selects: { "s103-mat": "air", "s103-d-u": "0.001" }, click: "btn-s103",
+      desc: "Prob. 5 — 100 mV, d = 2 mm. E = V/d = 50.0 V/m. Offset de un sensor entre placas." },
+    p6: { fields: { "s103-k": "1", "s103-a": "", "s103-d": "4", "s103-vp": "0.1", "s103-ct": "" }, selects: { "s103-mat": "air", "s103-d-u": "2.54e-5" }, click: "btn-s103",
+      desc: "Prob. 6 — 100 mV, d = 4 mils. E = 984 V/m. El mismo V a menor d sube E." },
+    p7: { fields: { "s103-c": "4", "s103-q": "160", "s103-v": "" }, selects: { "s103-c-u": "1e-6", "s103-q-u": "1e-6" }, click: "btn-s103qv",
+      desc: "Prob. 7 — 4 µF, 160 µC, d = 5 mm. V = Q/C = 40.0 V. E = V/d = 8.00 kV/m." },
+    p8: { fields: { "s103-k": "1", "s103-a": "0.075", "s103-d": "1.77", "s103-vp": "", "s103-ct": "" }, selects: { "s103-mat": "air", "s103-d-u": "0.001" }, click: "btn-s103",
+      desc: "Prob. 8 — aire, A = 0.075 m², d = 1.77 mm. C = 375 pF. Busbar / aire de un combiner." },
+    p9: { fields: { "s103-k": "2.5", "s103-a": "0.075", "s103-d": "1.77" }, selects: { "s103-mat": "paraffin", "s103-d-u": "0.001" }, click: "btn-s103",
+      desc: "Prob. 9 — parafina k = 2.5. C = 937 pF (×k respecto al aire)." },
+    p10: { fields: { "s103-k": "4", "s103-a": "0.09", "s103-d": "", "s103-ct": "2" }, selects: { "s103-mat": "oil", "s103-ct-u": "1e-6" }, click: "btn-s103",
+      desc: "Prob. 10 — 2 µF, A = 0.09 m², aceite k = 4. d = 1.59 µm = 0.0627 mil. Impracticable: 2 µF a esa A exige un film, no un entrehierro." },
+    p11: {
+      desc: "Prob. 11 — Caire = 1200 pF → 0.006 µF = 6000 pF.\nk = C/C0 = 6000/1200 = 5.00 → mica.\nSnubber clásico; en 2026 el equivalente es C0G o film PP."
+    },
+    p12: { fields: { "s103-k": "1", "s103-a": "0.08", "s103-d": "0.2", "s103-vp": "200" }, selects: { "s103-mat": "air", "s103-d-u": "0.001" }, click: "btn-s103",
+      desc: "Prob. 12 — aire, A = 0.08 m², d = 0.2 mm, 200 V.\nC = 3.54 nF. E = 1.00 MV/m. Q = 708 nC." },
+    p13: { fields: { "s103-k": "7", "s103-a": "0.08", "s103-d": "0.2", "s103-vp": "200" }, selects: { "s103-mat": "bakelite", "s103-d-u": "0.001" }, click: "btn-s103",
+      desc: "Prob. 13 — baquelita k = 7, mismo V y d.\nE = V/d = 1.00 MV/m (no cambia). C = 24.8 nF. Q = 4.96 µC." }
+  },
+  "10-4": {
+    p14: { fields: { "s104-d": "0.2", "s104-v": "", "s104-a": "", "s104-c": "" }, selects: { "s104-mat": "air", "s104-d-u": "0.001" }, click: "btn-s104",
+      desc: "Prob. 14 — d = 0.2 mm = 7.87 mils.\nAire 80 V/mil → Vrup = 630 V.\nBaquelita 400 V/mil → Vrup = 3.15 kV.\nEl aire del busbar aguanta menos que la carcasa." },
+    p15: { fields: { "s104-d": "", "s104-v": "", "s104-a": "0.02", "s104-c": "0.006" }, selects: { "s104-mat": "mica" }, click: "btn-s104",
+      desc: "Prob. 15 — 0.006 µF, A = 0.02 m², mica k = 5.\nd = 0.148 mm = 5.81 mils. Vrup = 2000·5.81 = 11.6 kV." },
+    p16: { fields: { "s104-d": "", "s104-v": "1250", "s104-a": "", "s104-c": "" }, selects: { "s104-mat": "mica" }, click: "btn-s104",
+      desc: "Prob. 16 — Vmáx = 1250 V, mica 2000 V/mil.\nd = 0.625 mil = 0.0159 mm. Mica de un snubber de SiC 1200 V." }
+  },
+  "10-7": {
+    p17: { selects: { "s107-fig": "81" }, click: "btn-s107",
+      desc: "Prob. 17 — fig. 10.81. τ = 0.500 s. vC = 20(1−e^{−t/0.5}). 1τ=12.6 V, 3τ=19.0 V, 5τ=19.9 V. I0 = 200 µA." },
+    p18: { selects: { "s107-fig": "81b" }, click: "btn-s107",
+      desc: "Prob. 18 — R = 1 MΩ. τ = 5.00 s, I0 = 20.0 µA. Diez veces más lento: bleeder de un logger, no precharge de un inversor." },
+    p19: { selects: { "s107-fig": "82" }, click: "btn-s107",
+      desc: "Prob. 19 — R = 5.5 kΩ, τ = 5.50 ms, Vf = 100 V. I0 = 18.2 mA. vR2 = iC·3.3 kΩ." },
+    p20: { selects: { "s107-fig": "83" }, click: "btn-s107",
+      desc: "Prob. 20 — rails +15/−10 V. Vf = 25 V, τ = 5.60 ms, I0 = 446 µA." }
+  },
+  "10-8": {
+    p21: { selects: { "s108-fig": "84" }, click: "btn-s108",
+      desc: "Prob. 21 — pos. 1 τ = 10.0 ms, Vf = 50 V. Pos. 2 a 100 ms: hold, i=0. Pos. 3 τ_dis = 4.00 ms." },
+    p22: { selects: { "s108-fig": "84b" }, click: "btn-s108",
+      desc: "Prob. 22 — C = 20 µF. τ_carga = 100 ms: a t = 100 ms vC ≈ 31.6 V (aún no 5τ)." },
+    p23: { selects: { "s108-fig": "85" }, click: "btn-s108",
+      desc: "Prob. 23 — τ_carga = 1.00 µs. A 5τ se descarga por 390 kΩ, τ = 3.90 µs. Snubber 10 pF." },
+    p24: { selects: { "s108-fig": "86" }, click: "btn-s108",
+      desc: "Prob. 24 — 40 V, 2000 µF, 2.2 kΩ. τ = 4.40 s. vC = 40 e^{−t/4.4}. I0 = 18.2 mA." },
+    p25: { selects: { "s108-fig": "87" }, click: "btn-s108",
+      desc: "Prob. 25 — 6 V, 1000 µF, 2 mΩ. τ = 2.00 µs, Ipico = 3.00 kA. Hay chispa. LOTO ≠ destornillador." }
+  },
+  "10-9": {
+    p26: { selects: { "s109-fig": "88" }, click: "btn-s109",
+      desc: "Prob. 26 — Vi = −3 V, Vf = 10 V, τ = 47.0 ms. vC = 10 − 13 e^{−t/τ}. I0 = 2.77 mA." },
+    p27: { selects: { "s109-fig": "89" }, click: "btn-s109",
+      desc: "Prob. 27 — Vf = 52 V, Vi = 12 V, R = 18.2 kΩ, τ = 124 ms." }
+  },
+  "10-10": {
+    p28: { selects: { "s1010-fig": "28" }, click: "btn-s1010",
+      desc: "Prob. 28 — 5τ → 7.95 V. 10τ → 8.00 V. t = 5 µs → 1.77 V." },
+    p29: { selects: { "s1010-fig": "87t" }, click: "btn-s1010",
+      desc: "Prob. 29 — t½ = τ ln 2 = 1.39 µs. El arco del 10.87 aún está en kA." },
+    p30: { selects: { "s1010-fig": "90" }, click: "btn-s1010",
+      desc: "Prob. 30 — τ = 0.660 s. VL = 8 V → t = 0.725 s." },
+    p31: { selects: { "s1010-fig": "91" }, click: "btn-s1010",
+      desc: "Prob. 31 — ON a 10 s, 12 V de 20 V, 200 µF. R = 54.6 kΩ." },
+    p32: { selects: { "s1010-fig": "92" }, click: "btn-s1010",
+      desc: "Prob. 32 — τ = 0.120 s. t(60 V) = 0.166 s. i(60 V) = 1.00 mA. P(2τ) = 43.3 mW." },
+    p33: { selects: { "s1010-fig": "93" }, click: "btn-s1010",
+      desc: "Prob. 33 — pos. 1 τ = 0.200 s. Pos. 2 τ = 0.800 s. i = 8 µA a 0.503 s; vC = 10 V a 1.43 s." },
+    p34: { selects: { "s1010-fig": "94" }, click: "btn-s1010",
+      desc: "Prob. 34 — el DMM es R = 10 MΩ. τ = 2.00 s. 1τ → 37.9 V. i(2τ) = 0.812 µA. 50 V a 3.58 s." }
+  },
+  "10-11": {
+    p35: { selects: { "s1011-fig": "95" }, click: "btn-s1011",
+      desc: "Prob. 35 — Eth = 20 V, RTh = 1.67 MΩ, τ = 1.67 s. 4τ → 19.6 V. i=3 µA a 2.31 s. 10 V a 1.16 s." },
+    p36: { selects: { "s1011-fig": "96" }, click: "btn-s1011",
+      desc: "Prob. 36 — Eth = 15.0 V, RTh = 10.0 kΩ, τ = 0.150 s. I0 = 1.50 mA." },
+    p37: { selects: { "s1011-fig": "97" }, click: "btn-s1011",
+      desc: "Prob. 37 — string 5 mA + rail +4 V. Eth ≈ 3.28 V, RTh ≈ 2.69 kΩ, τ ≈ 53.9 ms." },
+    p38: { selects: { "s1011-fig": "98" }, click: "btn-s1011",
+      desc: "Prob. 38 — Vi = −4 V, Vf = 36 V, RTh = 3.9 kΩ, τ = 78.0 ms. I0 = 10.3 mA." },
+    p39: { selects: { "s1011-fig": "99" }, click: "btn-s1011",
+      desc: "Prob. 39 — Eth = 27.2 V, RTh = 8.30 kΩ, Vi = −2 V, τ = 18.3 ms." },
+    p40: { selects: { "s1011-fig": "100" }, click: "btn-s1011",
+      desc: "Prob. 40 — Vf = 20 V, Vi = 3 V, RTh = 6.8 kΩ, τ = 265 ms." }
+  },
+  "10-12": {
+    p41: { selects: { "s1012-fig": "101" }, click: "btn-s1012",
+      desc: "Prob. 41 — i = C dv/dt, C = 0.06 µF, fig. 10.101 (rampa de bus)." },
+    p42: { selects: { "s1012-fig": "102" }, click: "btn-s1012",
+      desc: "Prob. 42 — misma C, fig. 10.102 (µs, switching)." },
+    p43: { selects: { "s1012-fig": "103" }, click: "btn-s1012",
+      desc: "Prob. 43 — 20 µF, i en pulsos. v: 0 → −8 → +12 → 0 V." }
+  },
+  "10-13": {
+    p44a: { selects: { "s1013-fig": "104a" }, click: "btn-s1013",
+      desc: "Prob. 44.a — CT ≈ 0.196 µF. El 0.2 µF de serie domina." },
+    p44b: { selects: { "s1013-fig": "104b" }, click: "btn-s1013",
+      desc: "Prob. 44.b — CT = 44.0 pF." },
+    p45a: { selects: { "s1013-fig": "105a" }, click: "btn-s1013",
+      desc: "Prob. 45.a — C1: 10 V, 60 µC. C2: 6.67 V, 40 µC. C3: 3.33 V, 40 µC." },
+    p45b: { selects: { "s1013-fig": "105b" }, click: "btn-s1013",
+      desc: "Prob. 45.b — CT = 240 pF, Q = 9.60 nC. VC1 = 8.00 V; V23 = VC4 = 16.0 V." },
+    p46a: { selects: { "s1013-fig": "106a" }, click: "btn-s1013",
+      desc: "Prob. 46.a — CT = 6.00 µF, Q = 144 µC. VC1 = 16.0 V." },
+    p46b: { selects: { "s1013-fig": "106b" }, click: "btn-s1013",
+      desc: "Prob. 46.b — CT = 4.00 µF, Q = 64.0 µC." },
+    p47: { selects: { "s1013-fig": "107" }, click: "btn-s1013",
+      desc: "Prob. 47 — Ceq = 6.00 µF, τ = 0.120 s. A 100 ms: Vab = 56.5 V, Vac = 42.4 V, Vcb = 14.1 V, Vda = 43.5 V. vR2 = 20 V a 0.386 s." },
+    p48a: { selects: { "s1013-fig": "108a" }, click: "btn-s1013",
+      desc: "Prob. 48.a — DC: VC1 = 48 V, Q1 = 1.92 µC; VC2 = 32 V, Q2 = 2.56 µC." },
+    p48b: { selects: { "s1013-fig": "108b" }, click: "btn-s1013",
+      desc: "Prob. 48.b — VC1 = 80 V, Q1 = 3.20 mC; VC2 = 48 V, Q2 = 2.88 mC." }
+  },
+  "10-14": {
+    p49: { fields: { "s1014-c": "120", "s1014-v": "12", "s1014-q": "", "s1014-w": "" }, selects: { "s1014-c-u": "1e-12" }, click: "btn-s1014",
+      desc: "Prob. 49 — 120 pF a 12 V (parásito de un gate). W = 8.64 nJ." },
+    p50: { fields: { "s1014-c": "6", "s1014-v": "", "s1014-q": "", "s1014-w": "1200" }, selects: { "s1014-c-u": "1e-6" }, click: "btn-s1014",
+      desc: "Prob. 50 — 1200 J en 6 µF. Q = √(2CW) = 0.120 C. Banco de DC-link de un inversor de MW, no un pad." },
+    p51: { selects: { "s1014f-fig": "51" }, click: "btn-s1014f",
+      desc: "Prob. 51 — 1000 µF a 100 V. W = 5.00 J, Q = 0.100 C, Iprom = 200 A, P = 10.0 kW, recarga 10 s a 10 mA." },
+    p52: { selects: { "s1014f-fig": "109" }, click: "btn-s1014f",
+      desc: "Prob. 52 — V = 8.00 V. W6 = 192 µJ, W12 = 384 µJ. En serie: W6 = 85.3 µJ, W12 = 42.7 µJ." }
+  },
+  "10-17": {
+    p53: { fields: { "s1017-e": "20", "s1017-v0": "0", "s1017-r": "1e5", "s1017-c": "5e-6" }, click: "btn-s1017",
+      desc: "Prob. 53 — cinco τ de la fig. 10.81. El «PSpice» es esta tabla." },
+    p54: { selects: { "s108-fig": "84" }, click: "btn-s108",
+      desc: "Prob. 54 — captura de vC e iC de la fig. 10.84 (carga / hold / bleeder)." },
+    p55: { selects: { "s1011-fig": "97" }, click: "btn-s1011",
+      desc: "Prob. 55 — verificar fig. 10.97 con el Thévenin+C (el «IC» del libro)." },
+    p56: { fields: { "s1017-e": "20", "s1017-v0": "0", "s1017-r": "1e5", "s1017-c": "5e-6" }, click: "btn-s1017",
+      desc: "Prob. 56–58 — QBASIC era 1990. La tabla nτ y los solucionadores 10.7–10.14 son el programa de 2026." }
   }
 });

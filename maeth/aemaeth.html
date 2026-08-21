@@ -7574,6 +7574,967 @@
         </div>
       </details>
 
+      <details class="chapter-1-fold" id="capitulo-10">
+        <summary class="chapter-1-summary" aria-label="Capítulo 10.0">
+          <span class="chapter-1-title">10.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Capacitores: campo, \(C = Q/V = k\varepsilon_0 A/d\),
+            rigidez, transitorios \(RC\), serie-paralelo y
+            \(\tfrac12 C V^2\).
+            En 2026 el capacitor no es un componente de banco:
+            es el DC-link del inversor SiC (1500&nbsp;V<sub>cc</sub>),
+            el snubber del MOSFET, el film PP del DAB de un rack
+            LFP, el Y/X de EMI y el supercapacitor que cubre un
+            hueco LVRT. Cargar es el precharge; descargar es el
+            bleeder que deja el bus bajo 60&nbsp;V antes del LOTO.
+            \(\tau = R_{\mathrm{Th}} C\) es el tiempo que tarda
+            un string, un dump o un DMM de 10&nbsp;MΩ en
+            enterarse de que el bus cambió.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(v_C = V_f + (V_i-V_f)e^{-t/\tau}\),
+              \(C = k\varepsilon_0 A/d\) y \(W = \tfrac12 C V^2\)
+              sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-10-2">Sec 10.2</button>
+            <button class="tab-btn" data-target="sec-10-3">Sec 10.3</button>
+            <button class="tab-btn" data-target="sec-10-4">Sec 10.4</button>
+            <button class="tab-btn" data-target="sec-10-7">Sec 10.7</button>
+            <button class="tab-btn" data-target="sec-10-8">Sec 10.8</button>
+            <button class="tab-btn" data-target="sec-10-9">Sec 10.9</button>
+            <button class="tab-btn" data-target="sec-10-10">Sec 10.10</button>
+            <button class="tab-btn" data-target="sec-10-11">Sec 10.11</button>
+            <button class="tab-btn" data-target="sec-10-12">Sec 10.12</button>
+            <button class="tab-btn" data-target="sec-10-13">Sec 10.13</button>
+            <button class="tab-btn" data-target="sec-10-14">Sec 10.14</button>
+            <button class="tab-btn" data-target="sec-10-17">Sec 10.17</button>
+          </div>
+
+          <div class="tab-content active" id="sec-10-2">
+            <h2>Sección 10.2: El campo eléctrico</h2>
+            <p class="chapter-discourse">
+              \(E = k Q / r^2\) (punto) y \(E = V/d\) (placas).
+              En 2026 \(E\) es el esfuerzo sobre el XLPE de un
+              feeder 1500&nbsp;V<sub>cc</sub>, el campo en el
+              encapsulado de un módulo SiC y el ESD que mata
+              el driver de compuerta. \(1\,\mathrm{N/C} = 1\,\mathrm{V/m}\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-2">Selecciona un problema:</label>
+                <select id="preset-10-2" class="book-preset-select" data-section="10-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: E a 2 m de 4 µC</option>
+                  <option value="p2">Prob 2: r si E = 36 N/C, Q = 0.064 µC</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Campo de una carga puntual — \(E = kQ/r^2\)</h3>
+              <p class="hint-inline">Deja vacío \(E\) o \(r\). Una carga de prueba en el aire de un combiner o junto a un pad de BESS.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s102-q">\(Q\):</label>
+                  <input type="text" id="s102-q" placeholder="4" />
+                  <select id="s102-q-u">
+                    <option value="1">C</option>
+                    <option value="1e-3">mC</option>
+                    <option value="1e-6" selected>µC</option>
+                    <option value="1e-9">nC</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s102-r">\(r\):</label>
+                  <input type="text" id="s102-r" placeholder="2" />
+                  <select id="s102-r-u">
+                    <option value="1" selected>m</option>
+                    <option value="0.01">cm</option>
+                    <option value="0.001">mm</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s102-e">\(E\) (N/C = V/m):</label>
+                  <input type="text" id="s102-e" placeholder="vacío para calcular E" />
+                </div>
+              </div>
+              <button id="btn-s102" class="action-btn mt-1">Campo puntual</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Campo entre placas — \(E = V/d\)</h3>
+              <p class="hint-inline">El mismo \(E\) que ve el dieléctrico de un film DC-link o el aire de un busbar.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s102p-v">\(V\):</label>
+                  <input type="text" id="s102p-v" placeholder="0.1" />
+                  <select id="s102p-v-u">
+                    <option value="1">V</option>
+                    <option value="0.001" selected>mV</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s102p-d">\(d\):</label>
+                  <input type="text" id="s102p-d" placeholder="2" />
+                  <select id="s102p-d-u">
+                    <option value="1">m</option>
+                    <option value="0.001" selected>mm</option>
+                    <option value="2.54e-5">mil</option>
+                    <option value="0.0254">in</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s102p" class="action-btn mt-1">E = V/d</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-2p" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-3">
+            <h2>Sección 10.3: Capacitancia</h2>
+            <p class="chapter-discourse">
+              \(C = Q/V\). En placas,
+              \(C = k\varepsilon_0 A/d\) con
+              \(\varepsilon_0 = 8{,}85\times 10^{-12}\,\mathrm{F/m}\).
+              Un film PP de DC-link es \(k \approx 2{,}2\); el aire
+              de un busbar, \(k \approx 1\); la mica de un snubber
+              clásico, \(k = 5\). Subir \(k\) o \(A\), bajar \(d\):
+              más julios en el mismo volumen, más \(E = V/d\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-3">Selecciona un problema:</label>
+                <select id="preset-10-3" class="book-preset-select" data-section="10-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p3">Prob 3: C si Q = 1400 µC, V = 20 V</option>
+                  <option value="p4">Prob 4: Q de 0.05 µF a 45 V</option>
+                  <option value="p5">Prob 5: E, 100 mV, d = 2 mm</option>
+                  <option value="p6">Prob 6: E, 100 mV, d = 4 mils</option>
+                  <option value="p7">Prob 7: E, 4 µF, 160 µC, d = 5 mm</option>
+                  <option value="p8">Prob 8: C placas, aire, A = 0.075 m², d = 1.77 mm</option>
+                  <option value="p9">Prob 9: igual, parafina</option>
+                  <option value="p10">Prob 10: d en mils, 2 µF, aceite, A = 0.09 m²</option>
+                  <option value="p11">Prob 11: material si C0 = 1200 pF → 0.006 µF</option>
+                  <option value="p12">Prob 12: aire, A = 0.08 m², d = 0.2 mm, 200 V</option>
+                  <option value="p13">Prob 13: baquelita en el hueco del 12</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(C = Q/V\)</h3>
+              <p class="hint-inline">Deja vacío exactamente uno de C, Q, V.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s103-c">\(C\):</label>
+                  <input type="text" id="s103-c" placeholder="" />
+                  <select id="s103-c-u">
+                    <option value="1">F</option>
+                    <option value="1e-3">mF</option>
+                    <option value="1e-6" selected>µF</option>
+                    <option value="1e-9">nF</option>
+                    <option value="1e-12">pF</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s103-q">\(Q\):</label>
+                  <input type="text" id="s103-q" placeholder="" />
+                  <select id="s103-q-u">
+                    <option value="1">C</option>
+                    <option value="1e-3">mC</option>
+                    <option value="1e-6" selected>µC</option>
+                    <option value="1e-9">nC</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s103-v">\(V\):</label>
+                  <input type="text" id="s103-v" placeholder="" />
+                  <select id="s103-v-u">
+                    <option value="1" selected>V</option>
+                    <option value="0.001">mV</option>
+                    <option value="1000">kV</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s103qv" class="action-btn mt-1">C = Q/V</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-3qv" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Placas en paralelo — \(C = k\varepsilon_0 A/d\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s103-mat">Dieléctrico:</label>
+                  <select id="s103-mat">
+                    <option value="air">Aire / vacío (k ≈ 1)</option>
+                    <option value="paraffin">Parafina (k = 2.5)</option>
+                    <option value="oil">Aceite / éster (k = 4)</option>
+                    <option value="mica">Mica (k = 5)</option>
+                    <option value="bakelite">Baquelita (k = 7)</option>
+                    <option value="pp">PP film DC-link (k = 2.2)</option>
+                    <option value="xlpe">XLPE cable HV (k = 2.3)</option>
+                    <option value="custom">k personalizada</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s103-k">\(k\):</label>
+                  <input type="text" id="s103-k" placeholder="auto" />
+                </div>
+                <div class="k-input">
+                  <label for="s103-a">\(A\) (m²):</label>
+                  <input type="text" id="s103-a" placeholder="0.075" />
+                </div>
+                <div class="k-input">
+                  <label for="s103-d">\(d\):</label>
+                  <input type="text" id="s103-d" placeholder="1.77" />
+                  <select id="s103-d-u">
+                    <option value="1">m</option>
+                    <option value="0.001" selected>mm</option>
+                    <option value="2.54e-5">mil</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s103-vp">\(V\) (opcional):</label>
+                  <input type="text" id="s103-vp" placeholder="200" />
+                </div>
+                <div class="k-input">
+                  <label for="s103-ct">\(C\) a despejar \(d\):</label>
+                  <input type="text" id="s103-ct" placeholder="" />
+                  <select id="s103-ct-u">
+                    <option value="1e-6" selected>µF</option>
+                    <option value="1e-9">nF</option>
+                    <option value="1e-12">pF</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s103" class="action-btn mt-1">Placas</button>
+              <div class="data-table-wrap" style="margin-top:1rem;">
+                <table class="data-table" id="table-10-3">
+                  <thead>
+                    <tr><th>Material 2026</th><th>\(k\)</th><th>Uso</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td>Aire / busbar</td><td>1.0006</td><td>Aislamiento de barras 1500 V<sub>cc</sub></td></tr>
+                    <tr><td>PP film</td><td>2.2</td><td>DC-link SiC, DAB de rack</td></tr>
+                    <tr><td>XLPE</td><td>2.3</td><td>Cable HV DC, string</td></tr>
+                    <tr><td>Parafina</td><td>2.5</td><td>Papel impregnado clásico</td></tr>
+                    <tr><td>Aceite / éster</td><td>4</td><td>Trafo de planta, CST</td></tr>
+                    <tr><td>Mica</td><td>5</td><td>Snubber, alta \(E\)</td></tr>
+                    <tr><td>Baquelita</td><td>7</td><td>Carcasa, pasamuros</td></tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-4">
+            <h2>Sección 10.4: Rigidez dieléctrica</h2>
+            <p class="chapter-discourse">
+              \(V_{\mathrm{rup}} = \mathcal{E}_{\mathrm{bd}} \cdot d\).
+              Lineal con el espesor en el modelo del libro.
+              En 2026 es el \(V_{\mathrm{dc,max}}\) del film, el
+              creepage del PCB del driver y la tensión de ensayo
+              del cable PV (IEC 62930 / EN 50618). El aire aguanta
+              poco (\(\approx 80\,\mathrm{V/mil}\)); la mica y el
+              PP film, mil veces más por milímetro. Un bus de
+              1500&nbsp;V<sub>cc</sub> no se dimensiona a ojo.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-4">Selecciona un problema:</label>
+                <select id="preset-10-4" class="book-preset-select" data-section="10-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p14">Prob 14: Vmáx de los capacitores 12 y 13</option>
+                  <option value="p15">Prob 15: 0.006 µF, A = 0.02 m², mica</option>
+                  <option value="p16">Prob 16: d si Vmáx = 1250 V, mica</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(V_{\mathrm{rup}} = \mathcal{E}_{\mathrm{bd}} \cdot d\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s104-mat">Material:</label>
+                  <select id="s104-mat">
+                    <option value="air">Aire (80 V/mil)</option>
+                    <option value="bakelite">Baquelita (400 V/mil)</option>
+                    <option value="mica" selected>Mica (2000 V/mil)</option>
+                    <option value="oil">Aceite / éster (400 V/mil)</option>
+                    <option value="pp">PP film (1500 V/mil)</option>
+                    <option value="xlpe">XLPE (500 V/mil)</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s104-d">\(d\):</label>
+                  <input type="text" id="s104-d" placeholder="0.2" />
+                  <select id="s104-d-u">
+                    <option value="0.001" selected>mm</option>
+                    <option value="2.54e-5">mil</option>
+                    <option value="1">m</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s104-v">\(V_{\mathrm{máx}}\) (V), vacío para calcularlo:</label>
+                  <input type="text" id="s104-v" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s104-a">\(A\) (m²), opcional:</label>
+                  <input type="text" id="s104-a" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s104-c">\(C\) (µF), opcional:</label>
+                  <input type="text" id="s104-c" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s104" class="action-btn mt-1">Rigidez</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-7">
+            <h2>Sección 10.7: Transitorios — fase de carga</h2>
+            <p class="chapter-discourse">
+              \(\tau = RC\). \(v_C = E(1-e^{-t/\tau})\),
+              \(i_C = (E/R)e^{-t/\tau}\), \(v_R = E e^{-t/\tau}\).
+              A \(1\tau\): 63.2&nbsp;%; a \(3\tau\): 95.0&nbsp;%;
+              a \(5\tau\): 99.3&nbsp;% — se toma como «cargado».
+              Es el precharge del DC-link: un NTC o un relé + \(R\)
+              evitan que el film vea \(I = C\,dV/dt\) de kiloamperios
+              al cerrar el seccionador.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-7">Selecciona un problema:</label>
+                <select id="preset-10-7" class="book-preset-select" data-section="10-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p17">Prob 17: fig. 10.81, R = 100 kΩ, 5 µF, 20 V</option>
+                  <option value="p18">Prob 18: igual, R = 1 MΩ</option>
+                  <option value="p19">Prob 19: fig. 10.82, 2.2 k + 3.3 k, 1 µF, 100 V</option>
+                  <option value="p20">Prob 20: fig. 10.83, +15 / −10 V, 56 kΩ, 0.1 µF</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 10.81–10.83 — precharge</h3>
+              <div class="input-group">
+                <label for="s107-fig">Figura:</label>
+                <select id="s107-fig">
+                  <option value="81">10.81 — 20 V, 100 kΩ, 5 µF</option>
+                  <option value="81b">10.81 con 1 MΩ (prob. 18)</option>
+                  <option value="82">10.82 — 100 V, 2.2 k + 3.3 k, 1 µF</option>
+                  <option value="83">10.83 — +15 / −10 V, 56 kΩ, 0.1 µF</option>
+                </select>
+                <button id="btn-s107" class="action-btn">Cargar</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s107" viewBox="0 0 640 250" role="img" aria-label="RC de carga"></svg>
+              <p class="caption-fig">Figuras 10.81–10.83 — Precharge de un pad de BESS / DC-link auxiliar.</p>
+              <div class="plot-wrap" id="wrap-10-7" hidden>
+                <svg id="plot-10-7" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="vC e iC"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Precharge genérico</h3>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s107g-e">E (V):</label><input type="text" id="s107g-e" placeholder="20" /></div>
+                <div class="k-input"><label for="s107g-r">R (Ω):</label><input type="text" id="s107g-r" placeholder="100e3" /></div>
+                <div class="k-input"><label for="s107g-c">C (F):</label><input type="text" id="s107g-c" placeholder="5e-6" /></div>
+                <div class="k-input"><label for="s107g-v0">v<sub>C</sub>(0) (V):</label><input type="text" id="s107g-v0" placeholder="0" /></div>
+              </div>
+              <button id="btn-s107g" class="action-btn mt-1">τ, 1/3/5 τ</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-7g" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-8">
+            <h2>Sección 10.8: Fase de descarga</h2>
+            <p class="chapter-discourse">
+              Fuente fuera, \(C\) se ve con \(R\):
+              \(v_C = V_0 e^{-t/\tau}\), \(i_C = -(V_0/R)e^{-t/\tau}\).
+              Es el bleeder del DC-link (IEC 62109 / UL 1741):
+              bajar de 1500&nbsp;V a menos de 60&nbsp;V (o 50&nbsp;µC)
+              en segundos, no en horas. Un cable de 2&nbsp;mΩ
+              sobre 1000&nbsp;µF a 6&nbsp;V es un arco, no un
+              «descargo suave».
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-8">Selecciona un problema:</label>
+                <select id="preset-10-8" class="book-preset-select" data-section="10-8">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p21">Prob 21: fig. 10.84, 2 µF, pos. 1-2-3</option>
+                  <option value="p22">Prob 22: igual, 20 µF</option>
+                  <option value="p23">Prob 23: fig. 10.85, 10 pF, 80 V</option>
+                  <option value="p24">Prob 24: fig. 10.86, 2000 µF a 40 V</option>
+                  <option value="p25">Prob 25: 1000 µF a 6 V, 0.002 Ω</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-8" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 10.84–10.87 — bleeder / LOTO</h3>
+              <div class="input-group">
+                <label for="s108-fig">Figura:</label>
+                <select id="s108-fig">
+                  <option value="84">10.84 — 50 V, 3 k + 2 k, 2 µF</option>
+                  <option value="84b">10.84 con 20 µF (prob. 22)</option>
+                  <option value="85">10.85 — 80 V, 10 pF, 100 k / 390 k</option>
+                  <option value="86">10.86 — 40 V, 2000 µF, 2.2 kΩ</option>
+                  <option value="87">10.87 — 6 V, 1000 µF, 0.002 Ω</option>
+                </select>
+                <button id="btn-s108" class="action-btn">Descargar</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s108" viewBox="0 0 640 250" role="img" aria-label="RC de descarga"></svg>
+              <p class="caption-fig">Carga (pos. 1), hold (pos. 2), bleeder (pos. 3). El DC-link de un inversor hace lo mismo.</p>
+              <div class="plot-wrap" id="wrap-10-8" hidden>
+                <svg id="plot-10-8" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="vC e iC descarga"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-8" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-9">
+            <h2>Sección 10.9: Valores iniciales</h2>
+            <p class="chapter-discourse">
+              \(v_C(0^+) = v_C(0^-)\): el capacitor no salta de
+              voltaje. Si el bus ya tenía 3&nbsp;V residual y se
+              cierra a 10&nbsp;V, la exponencial parte de 3, no
+              de 0. Un rack LFP «vacío» que aún marca 3&nbsp;V
+              de SoC bajo es exactamente eso.
+              \(v_C(t) = V_f + (V_i - V_f)e^{-t/\tau}\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-9">Selecciona un problema:</label>
+                <select id="preset-10-9" class="book-preset-select" data-section="10-9">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p26">Prob 26: fig. 10.88, 10 V, C a −3 V</option>
+                  <option value="p27">Prob 27: fig. 10.89, +40 / −12 V, C a 12 V</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-9" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 10.88–10.89</h3>
+              <div class="input-group">
+                <label for="s109-fig">Figura:</label>
+                <select id="s109-fig">
+                  <option value="88">10.88 — 10 V, 4.7 kΩ, 10 µF a −3 V</option>
+                  <option value="89">10.89 — +40 / −12 V, 10 k + 8.2 k, 6.8 µF</option>
+                </select>
+                <button id="btn-s109" class="action-btn">Inicial</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s109" viewBox="0 0 640 250" role="img" aria-label="Valores iniciales"></svg>
+              <p class="caption-fig">El DC-link residual no es cero: la exponencial arranca de \(V_i\).</p>
+              <div class="plot-wrap" id="wrap-10-9" hidden>
+                <svg id="plot-10-9" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="vC inicial"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-9" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-10">
+            <h2>Sección 10.10: Valores instantáneos</h2>
+            <p class="chapter-discourse">
+              Dada \(v_C(t)\), leer un instante, o despejar \(t\)
+              para un umbral. Un relé de precharge abre a 90&nbsp;%
+              del bus; un contactor de un electrolizador cierra
+              cuando \(V_L\) llega a consigna; el SoC de un pad
+              se estima por \(v_C\). Invertir
+              \(v = V_f + (V_i-V_f)e^{-t/\tau}\) da
+              \(t = \tau \ln\bigl((V_i-V_f)/(v-V_f)\bigr)\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-10">Selecciona un problema:</label>
+                <select id="preset-10-10" class="book-preset-select" data-section="10-10">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p28">Prob 28: vC = 8(1 − e^{−t/20µs})</option>
+                  <option value="p29">Prob 29: i de descarga a la mitad (prob. 25)</option>
+                  <option value="p30">Prob 30: fig. 10.90, VL = 8 V</option>
+                  <option value="p31">Prob 31: fig. 10.91, encender a 10 s</option>
+                  <option value="p32">Prob 32: fig. 10.92, 80 V, 8 k + 12 k, 6 µF</option>
+                  <option value="p33">Prob 33: fig. 10.93, 60 V, 1 M / 4 M, 0.2 µF</option>
+                  <option value="p34">Prob 34: fig. 10.94, DMM 10 MΩ</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-10" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 10.90–10.94</h3>
+              <div class="input-group">
+                <label for="s1010-fig">Figura:</label>
+                <select id="s1010-fig">
+                  <option value="28">10.10 — vC = 8(1−e^{−t/20µs})</option>
+                  <option value="87t">10.87 — t a I/2</option>
+                  <option value="90">10.90 — 12 V, 33 kΩ, 20 µF, umbral 8 V</option>
+                  <option value="91">10.91 — diseñar R, 20 V, 200 µF, 12 V @ 10 s</option>
+                  <option value="92">10.92 — 80 V, 8 k + 12 k, 6 µF</option>
+                  <option value="93">10.93 — 60 V, 1 M / 4 M, 0.2 µF</option>
+                  <option value="94">10.94 — 60 V, 0.2 µF, DMM 10 MΩ</option>
+                </select>
+                <button id="btn-s1010" class="action-btn">Instante</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1010" viewBox="0 0 640 250" role="img" aria-label="Valores instantáneos"></svg>
+              <p class="caption-fig">Umbral de un auxiliar, de un electrolizador o de un DMM colgado del DC-link.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-10" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Despejar \(t\) o \(R\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s1010g-vi">Vi (V):</label><input type="text" id="s1010g-vi" placeholder="0" /></div>
+                <div class="k-input"><label for="s1010g-vf">Vf (V):</label><input type="text" id="s1010g-vf" placeholder="12" /></div>
+                <div class="k-input"><label for="s1010g-vx">v umbral (V):</label><input type="text" id="s1010g-vx" placeholder="8" /></div>
+                <div class="k-input"><label for="s1010g-r">R (Ω):</label><input type="text" id="s1010g-r" placeholder="33000" /></div>
+                <div class="k-input"><label for="s1010g-c">C (F):</label><input type="text" id="s1010g-c" placeholder="20e-6" /></div>
+                <div class="k-input"><label for="s1010g-t">t (s), vacío para despejarlo:</label><input type="text" id="s1010g-t" placeholder="" /></div>
+              </div>
+              <button id="btn-s1010g" class="action-btn mt-1">t o R</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-10g" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-11">
+            <h2>Sección 10.11: Equivalente de Thévenin — \(\tau = R_{\mathrm{Th}} C\)</h2>
+            <p class="chapter-discourse">
+              Lo que ve \(C\) son dos bornes:
+              \(E_{\mathrm{Th}}\) y \(R_{\mathrm{Th}}\).
+              Un DMM de 10&nbsp;MΩ en paralelo con el film
+              <em>es</em> parte de \(R_{\mathrm{Th}}\) y baja
+              \(V_f\). El divisor de un rack, el Norton de un
+              string y el 4&nbsp;V residual de un pad se reducen
+              al mismo \(RC\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-11">Selecciona un problema:</label>
+                <select id="preset-10-11" class="book-preset-select" data-section="10-11">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p35">Prob 35: fig. 10.95, 24 V, 2 MΩ, DMM 10 MΩ</option>
+                  <option value="p36">Prob 36: fig. 10.96, divisor 20 V, 15 µF</option>
+                  <option value="p37">Prob 37: fig. 10.97, 5 mA y +4 V, 20 µF</option>
+                  <option value="p38">Prob 38: fig. 10.98, 36 V, C a −4 V</option>
+                  <option value="p39">Prob 39: fig. 10.99, 4 mA, C a −2 V</option>
+                  <option value="p40">Prob 40: fig. 10.100, +10 / −20 V, 39 µF</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-11" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 10.95–10.100</h3>
+              <div class="input-group">
+                <label for="s1011-fig">Figura:</label>
+                <select id="s1011-fig">
+                  <option value="95">10.95 — 24 V, 2 MΩ, DMM 10 MΩ, 1 µF</option>
+                  <option value="96">10.96 — divisor 8 k / 24 k, 15 µF, 4 kΩ</option>
+                  <option value="97">10.97 — 5 mA, 0.56 / 3.9 / 6.8 kΩ, 20 µF</option>
+                  <option value="98">10.98 — 36 V, 1.8 k / 3.9 k, 20 µF a −4 V</option>
+                  <option value="99">10.99 — 4 mA, 6.8 k / 1.5 k, 2.2 µF</option>
+                  <option value="100">10.100 — +10 / −20 V, 6.8 kΩ, 39 µF</option>
+                </select>
+                <button id="btn-s1011" class="action-btn">Thévenin + C</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1011" viewBox="0 0 640 250" role="img" aria-label="Thévenin RC"></svg>
+              <p class="caption-fig">El DMM, el divisor y el string se reducen a \(E_{\mathrm{Th}}\), \(R_{\mathrm{Th}}\).</p>
+              <div class="plot-wrap" id="wrap-10-11" hidden>
+                <svg id="plot-10-11" class="coulomb-plot" viewBox="0 0 640 280" role="img" aria-label="vC Thévenin"></svg>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-11" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-12">
+            <h2>Sección 10.12: La corriente \(i_C\)</h2>
+            <p class="chapter-discourse">
+              \(i_C = C\,dv_C/dt\). En tramos lineales de \(v\),
+              \(i\) es un escalón. Al revés,
+              \(\Delta v = (1/C)\int i\,dt\): el área bajo \(i\)
+              es la carga. Un MPPT que sube el bus a 20&nbsp;V/ms
+              y un chopper que inyecta ±40&nbsp;mA al film del
+              DAB se leen así, sin fasores.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-12">Selecciona un problema:</label>
+                <select id="preset-10-12" class="book-preset-select" data-section="10-12">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p41">Prob 41: i promedio, C = 0.06 µF (fig. 10.101)</option>
+                  <option value="p42">Prob 42: igual, fig. 10.102</option>
+                  <option value="p43">Prob 43: vC de i (fig. 10.103), 20 µF</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-12" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 10.101–10.103</h3>
+              <div class="input-group">
+                <label for="s1012-fig">Figura:</label>
+                <select id="s1012-fig">
+                  <option value="101">10.101 — v(t) → i, 0.06 µF</option>
+                  <option value="102">10.102 — v(t) → i, 0.06 µF</option>
+                  <option value="103">10.103 — i(t) → v, 20 µF</option>
+                </select>
+                <button id="btn-s1012" class="action-btn">i = C dv/dt</button>
+              </div>
+              <div class="plot-wrap">
+                <svg id="plot-10-12a" class="coulomb-plot" viewBox="0 0 640 240" role="img" aria-label="forma de onda origen"></svg>
+              </div>
+              <div class="plot-wrap" style="margin-top:0.75rem;">
+                <svg id="plot-10-12b" class="coulomb-plot" viewBox="0 0 640 240" role="img" aria-label="forma de onda resultado"></svg>
+              </div>
+              <p class="caption-fig">Arriba la onda dada; abajo la transformada por \(C\).</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-12" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-13">
+            <h2>Sección 10.13: Capacitores en serie y en paralelo</h2>
+            <p class="chapter-discourse">
+              Paralelo: \(C_T = \sum C_k\), mismo \(V\), \(Q_k = C_k V\).
+              Serie: \(1/C_T = \sum 1/C_k\), mismo \(Q\), \(V_k = Q/C_k\).
+              Un banco de DC-link es paralelo (corriente) con
+              series de 2–3 para 1500&nbsp;V (tensión). Sin
+              resistencias de balance, el \(k\) desigual se come
+              el margen de \(V_{\mathrm{rup}}\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-13">Selecciona un problema:</label>
+                <select id="preset-10-13" class="book-preset-select" data-section="10-13">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p44a">Prob 44.a: CT fig. 10.104.a</option>
+                  <option value="p44b">Prob 44.b: CT fig. 10.104.b</option>
+                  <option value="p45a">Prob 45.a: V y Q fig. 10.105.a</option>
+                  <option value="p45b">Prob 45.b: V y Q fig. 10.105.b</option>
+                  <option value="p46a">Prob 46.a: fig. 10.106.a</option>
+                  <option value="p46b">Prob 46.b: fig. 10.106.b</option>
+                  <option value="p47">Prob 47: fig. 10.107, 100 ms</option>
+                  <option value="p48a">Prob 48.a: fig. 10.108.a, DC</option>
+                  <option value="p48b">Prob 48.b: fig. 10.108.b, DC</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-13" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 10.104–10.108</h3>
+              <div class="input-group">
+                <label for="s1013-fig">Figura:</label>
+                <select id="s1013-fig">
+                  <option value="104a">10.104.a — 0.2 µF + (3 s 6) ∥ 7</option>
+                  <option value="104b">10.104.b — 20 pF ∥ (60 s (10∥30))</option>
+                  <option value="105a">10.105.a — 10 V, 6 ∥ (6 s 12)</option>
+                  <option value="105b">10.105.b — 40 V, 1200 s (200∥400) s 600 pF</option>
+                  <option value="106a">10.106.a — 24 V, 9 s (10 ∥ (9 s 72))</option>
+                  <option value="106b">10.106.b — 16 V, 7 s 42 s (2 ∥ (14 s 35))</option>
+                  <option value="107">10.107 — 100 V, 8 µF s (12∥12), 20 kΩ</option>
+                  <option value="108a">10.108.a — 48 V, 0.04 / 0.08 µF + 2 k / 4 k</option>
+                  <option value="108b">10.108.b — 80 V, 40 / 60 µF + 5 k / 6 k / 4 k</option>
+                </select>
+                <button id="btn-s1013" class="action-btn">Red C</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1013" viewBox="0 0 640 260" role="img" aria-label="Capacitores serie-paralelo"></svg>
+              <p class="caption-fig">Banco de DC-link: paralelo para I, serie para V. Balance o \(k\) desigual.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-13" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-14">
+            <h2>Sección 10.14: Energía almacenada</h2>
+            <p class="chapter-discourse">
+              \(W = \tfrac12 C V^2 = Q^2 / (2C) = \tfrac12 Q V\).
+              Es el hazard del DC-link: 1000&nbsp;µF a 1000&nbsp;V
+              son 500&nbsp;J, un arco de categoría. El flash de
+              una cámara es el mismo \(\tfrac12 C V^2\) descargado
+              en 0.5&nbsp;ms; el de un inversor, en el IGBT que
+              no abrió. Recargar a 10&nbsp;mA es \(t = Q/I\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-14">Selecciona un problema:</label>
+                <select id="preset-10-14" class="book-preset-select" data-section="10-14">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p49">Prob 49: 120 pF a 12 V</option>
+                  <option value="p50">Prob 50: 1200 J en 6 µF, hallar Q</option>
+                  <option value="p51">Prob 51: flash 1000 µF a 100 V</option>
+                  <option value="p52">Prob 52: fig. 10.109, W de cada C</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-14" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(W = \tfrac12 C V^2\)</h3>
+              <p class="hint-inline">Deja vacío exactamente uno de W, C, V, Q.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s1014-c">\(C\):</label>
+                  <input type="text" id="s1014-c" placeholder="120" />
+                  <select id="s1014-c-u">
+                    <option value="1">F</option>
+                    <option value="1e-3">mF</option>
+                    <option value="1e-6">µF</option>
+                    <option value="1e-12" selected>pF</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s1014-v">\(V\):</label>
+                  <input type="text" id="s1014-v" placeholder="12" />
+                </div>
+                <div class="k-input">
+                  <label for="s1014-q">\(Q\) (C):</label>
+                  <input type="text" id="s1014-q" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s1014-w">\(W\) (J):</label>
+                  <input type="text" id="s1014-w" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s1014" class="action-btn mt-1">Energía</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-14" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figura 10.109 — banco en estado estable</h3>
+              <div class="input-group">
+                <label for="s1014f-fig">Figura:</label>
+                <select id="s1014f-fig">
+                  <option value="109">10.109 — 24 V, 6 µF ∥ 12 µF</option>
+                  <option value="109s">10.109 en serie</option>
+                  <option value="51">10.51 — flash 1000 µF, 100 V, 1/2000 s, 10 mA</option>
+                </select>
+                <button id="btn-s1014f" class="action-btn">W del banco</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1014" viewBox="0 0 640 220" role="img" aria-label="Energía del banco"></svg>
+              <p class="caption-fig">En DC los C son abiertos: \(V\) lo fijan las \(R\); \(W\) lo guarda el film.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-14f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-10-17">
+            <h2>Sección 10.17: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              PSpice / Electronics Workbench del libro se sustituyen
+              por estos solucionadores: \(RC\) de carga y descarga,
+              Thévenin+\(C\), \(i = C\,dv/dt\) y el banco
+              serie-paralelo. El «print» a cinco constantes de
+              tiempo es la tabla de abajo. QBASIC era 1990; el
+              navegador es 2026.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-10-17">Selecciona un problema:</label>
+                <select id="preset-10-17" class="book-preset-select" data-section="10-17">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p53">Prob 53: vC e iC, cinco τ (fig. 10.81)</option>
+                  <option value="p54">Prob 54: captura de fig. 10.84</option>
+                  <option value="p55">Prob 55: verificar fig. 10.97</option>
+                  <option value="p56">Prob 56: tabla de cinco τ</option>
+                </select>
+              </div>
+              <div id="desc-preset-10-17" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Barrido de \(n\tau\)</h3>
+              <p class="hint-inline">Tabula \(v_C\) e \(i_C\) a \(0, 1, 2, 3, 4, 5\,\tau\). El «print» del libro.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s1017-e">Vf (V):</label><input type="text" id="s1017-e" placeholder="20" /></div>
+                <div class="k-input"><label for="s1017-v0">Vi (V):</label><input type="text" id="s1017-v0" placeholder="0" /></div>
+                <div class="k-input"><label for="s1017-r">R (Ω):</label><input type="text" id="s1017-r" placeholder="1e5" /></div>
+                <div class="k-input"><label for="s1017-c">C (F):</label><input type="text" id="s1017-c" placeholder="5e-6" /></div>
+              </div>
+              <button id="btn-s1017" class="action-btn mt-1">Tabular nτ</button>
+              <div class="data-table-wrap" id="wrap-10-17" style="display:none; margin-top:1rem;">
+                <table class="data-table" id="table-10-17">
+                  <thead><tr><th>n</th><th>t</th><th>vC (V)</th><th>% de Vf</th><th>iC</th></tr></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-10-17" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-10-0" aria-labelledby="glossary-10-heading">
+            <h2 id="glossary-10-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de campo, capacitancia, dieléctrico,
+              transitorios \(RC\) y energía del capítulo 10,
+              reescritos para renovables 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Capacitancia</dt>
+                <dd>\(C = Q/V = k\varepsilon_0 A/d\), en farads. El farad del DC-link, del snubber y del supercapacitor de LVRT. Un µF de film a 1500 V<sub>cc</sub> no es el mismo µF de un electrolítico de 48 V.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Capacitancia parásita</dt>
+                <dd>La que no se pidió: pistas del driver SiC, hilos del string, busbars. Oscila con \(L\) del lazo y dispara \(dv/dt\) falsos. En 2026 se recorta con layout Kelvin y anillos de guarda.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Capacitor</dt>
+                <dd>Dos placas y un dieléctrico. Film PP del inversor, cerámica C0G del gate, Y/X de EMI, super-C de hueco de red. Almacena \(Q\) y \(\tfrac12 C V^2\), no las deja saltar.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Constante dieléctrica (\(k\))</dt>
+                <dd>Permitividad relativa \(\varepsilon_r\). Aire ≈ 1, PP ≈ 2.2, XLPE ≈ 2.3, mica = 5, baquelita = 7. Sube \(C\) al mismo \(d\); no sube la rigidez por sí sola.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Corriente de fuga</dt>
+                <dd>La que vacía un C «abierto». En un BESS es el self-discharge del pad; en un film, µA de aislamiento. Un DMM de 10 MΩ es una fuga deliberada.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Deformación del campo</dt>
+                <dd>Líneas de \(E\) que se tuercen en bordes, tornillos y voids del XLPE. Ahí nace el corona de un feeder 1500 V<sub>cc</sub> y el treeing del cable.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Dieléctrico</dt>
+                <dd>Aislante entre placas: aire, PP, mica, XLPE, éster de un trafo. Fija \(k\) y \(\mathcal{E}_{\mathrm{bd}}\). El agua destilada tiene \(k \approx 80\) y no sirve de aislamiento de planta.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Intensidad del campo eléctrico</dt>
+                <dd>\(E = kQ/r^2 = V/d\), en N/C = V/m. Esfuerzo sobre el dieléctrico, ESD del driver, corona del busbar. El diseño 2026 se hace en kV/mm, no en «aire suficiente».</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ley de Coulomb</dt>
+                <dd>\(F = k |Q_1 Q_2|/r^2\). La misma que en el cap. 2: fuerza entre cargas, origen de \(E = F/q\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Líneas de flujo eléctrico</dt>
+                <dd>Dibujo de \(E\): salen de \(+\) y mueren en \(-\). En un string, del polo positivo del módulo al negativo; en un film, de placa a placa.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Permitividad</dt>
+                <dd>\(\varepsilon = k\varepsilon_0\). Qué tan bien deja el dieléctrico establecer flujo. \(\varepsilon_0 = 8{,}85\times 10^{-12}\,\mathrm{F/m}\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Permitividad relativa</dt>
+                <dd>Otro nombre de \(k\). Aire ≈ 1; PP film 2.2; mica 5. El \(k\) del PP es el que permite µF en un sobre de inversor de 1500 V.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Rigidez dieléctrica</dt>
+                <dd>\(\mathcal{E}_{\mathrm{bd}}\) en V/mil o kV/mm. Tensión por espesor a la que el aislante conduce. Aire 80 V/mil; mica 2000; PP film ~1500. Fija el \(V_{\mathrm{dc,max}}\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Voltaje de ruptura</dt>
+                <dd>\(V_{\mathrm{rup}} = \mathcal{E}_{\mathrm{bd}} \cdot d\). El techo del film, del cable PV y del encapsulado SiC. Por encima hay arco, no hay «un poco más de margen».</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Voltaje de trabajo</dt>
+                <dd>El que se aplica de forma continua: 1500 V<sub>cc</sub> de string, 1100 V de DC-link, 48 V de rack. Siempre por debajo de \(V_{\mathrm{rup}}\) y del derating térmico / altitud.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Voltaje pico</dt>
+                <dd>El máximo de un transitorio corto: switching del SiC, rayo inducido, LVRT. El film lo aguanta un pulso; el electrolítico, no.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Constante de tiempo \(\tau\)</dt>
+                <dd>\(\tau = R_{\mathrm{Th}} C\). Precharge, bleeder, DMM colgado del bus. A \(5\tau\) el transitorio se da por cerrado (99.3 %).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>FV, eólica, océano, H<sub>2</sub>, BESS. El DC-link, el snubber y el bleeder son los \(C\) de 2026; \(\tfrac12 C V^2\) es el hazard del LOTO.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
     </section>
   </main>
 
