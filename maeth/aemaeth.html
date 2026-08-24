@@ -9865,6 +9865,1794 @@
         </div>
       </details>
 
+      <details class="chapter-1-fold" id="capitulo-13">
+        <summary class="chapter-1-summary" aria-label="Capítulo 13.0">
+          <span class="chapter-1-title">13.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Formas de onda senoidales: \(T=1/f\),
+            \(\omega=2\pi f\),
+            \(v=V_m\sin(\omega t\pm\phi)\),
+            valor promedio, RMS
+            (\(V_{\mathrm{rms}}=V_m/\sqrt{2}\))
+            y desfase.
+            En 2026 la senoidal no es un generador de laboratorio:
+            es la red 50/60&nbsp;Hz a la que se engancha el
+            inversor SiC de un parque FV, el estator de un DFIG,
+            el PLL de un BESS y el electrolizador. El PWM
+            a 20–100&nbsp;kHz es la portadora; el fundamental
+            de 50/60&nbsp;Hz es lo que factura el medidor y lo
+            que exige el código de red (IEEE&nbsp;1547,
+            IEC&nbsp;61727). Un valor promedio distinto de
+            cero es inyección de DC: el inversor se desconecta.
+            El RMS es el nombre de placa, el calor \(I^2R\)
+            y lo que lee un true-RMS; un d’Arsonval con
+            rectificador de media onda, no.
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(v=V_m\sin(\omega t+\phi)\),
+              \(V_{\mathrm{rms}}=V_m/\sqrt{2}\) y
+              \(\omega=2\pi f\) sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-13-2">Sec 13.2</button>
+            <button class="tab-btn" data-target="sec-13-3">Sec 13.3</button>
+            <button class="tab-btn" data-target="sec-13-4">Sec 13.4</button>
+            <button class="tab-btn" data-target="sec-13-5">Sec 13.5</button>
+            <button class="tab-btn" data-target="sec-13-6">Sec 13.6</button>
+            <button class="tab-btn" data-target="sec-13-7">Sec 13.7</button>
+            <button class="tab-btn" data-target="sec-13-8">Sec 13.8</button>
+            <button class="tab-btn" data-target="sec-13-10">Sec 13.10</button>
+          </div>
+
+          <div class="tab-content active" id="sec-13-2">
+            <h2>Sección 13.2: Características del voltaje senoidal de ca</h2>
+            <p class="chapter-discourse">
+              Periodo \(T\), frecuencia \(f=1/T\), ciclo,
+              pico y pico a pico. En 2026 \(T=20\,\mathrm{ms}\)
+              es la red 50&nbsp;Hz; \(16{,}67\,\mathrm{ms}\) es
+              60&nbsp;Hz. Un diente de sierra es la portadora
+              PWM del MPPT; una cuadrada de 20&nbsp;kHz es el
+              DAB de un rack LFP. El osciloscopio del libro es
+              el DSO / analizador de red que cuelga del
+              POI.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-13-2">Selecciona un problema:</label>
+                <select id="preset-13-2" class="book-preset-select" data-section="13-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: fig. 13.83, T, ciclos, f, pico</option>
+                  <option value="p2">Prob 2: fig. 13.84 (PWM / DAB)</option>
+                  <option value="p3">Prob 3: diente de sierra fig. 13.85</option>
+                  <option value="p4a">Prob 4.a: T si f = 25 Hz</option>
+                  <option value="p4b">Prob 4.b: T si f = 35 MHz</option>
+                  <option value="p4c">Prob 4.c: T si f = 55 kHz</option>
+                  <option value="p4d">Prob 4.d: T si f = 1 Hz</option>
+                  <option value="p5a">Prob 5.a: f si T = 1/60 s</option>
+                  <option value="p5b">Prob 5.b: f si T = 0.01 s</option>
+                  <option value="p5c">Prob 5.c: f si T = 34 ms</option>
+                  <option value="p5d">Prob 5.d: f si T = 25 µs</option>
+                  <option value="p6">Prob 6: 80 ciclos en 24 ms</option>
+                  <option value="p7">Prob 7: 20 Hz, cinco ciclos</option>
+                  <option value="p8">Prob 8: 42 ciclos en 6 s</option>
+                  <option value="p9">Prob 9: cuadrada 20 kHz, 10 mV</option>
+                  <option value="p10">Prob 10: DSO fig. 13.86 + offset +25 mV</option>
+                </select>
+              </div>
+              <div id="desc-preset-13-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(T = 1/f\) · ciclos</h3>
+              <p class="hint-inline">Deja vacío \(T\) o \(f\). Opcional: \(n\) ciclos → tiempo, o tiempo → \(n\).</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s132-t">\(T\):</label>
+                  <input type="text" id="s132-t" placeholder="" />
+                  <select id="s132-t-u">
+                    <option value="1">s</option>
+                    <option value="1e-3" selected>ms</option>
+                    <option value="1e-6">µs</option>
+                    <option value="1e-9">ns</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s132-f">\(f\):</label>
+                  <input type="text" id="s132-f" placeholder="" />
+                  <select id="s132-f-u">
+                    <option value="1" selected>Hz</option>
+                    <option value="1e3">kHz</option>
+                    <option value="1e6">MHz</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s132-n">ciclos \(n\):</label>
+                  <input type="text" id="s132-n" placeholder="1" />
+                </div>
+                <div class="k-input">
+                  <label for="s132-tn">tiempo de n ciclos:</label>
+                  <input type="text" id="s132-tn" placeholder="" />
+                  <select id="s132-tn-u">
+                    <option value="1">s</option>
+                    <option value="1e-3" selected>ms</option>
+                    <option value="1e-6">µs</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s132" class="action-btn mt-1">T ↔ f</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 13.83–13.85 — periodo, ciclos, pico</h3>
+              <div class="input-group">
+                <label for="s132f-fig">Figura:</label>
+                <select id="s132f-fig">
+                  <option value="83">13.83 — rampa FV / tracker (prob. 1)</option>
+                  <option value="84">13.84 — PWM DAB (prob. 2, 9, 47)</option>
+                  <option value="85">13.85 — diente de sierra portadora (prob. 3, 48)</option>
+                  <option value="84b">13.84 a 20 kHz, 10 mV (prob. 9)</option>
+                </select>
+                <button id="btn-s132f" class="action-btn">Resolver figura</button>
+              </div>
+              <svg class="wave-svg" id="svg-s132f" viewBox="0 0 640 280" role="img" aria-label="Forma de onda 13.2"></svg>
+              <p class="caption-fig">El pico a pico no es el doble del pico si la onda no es simétrica — el «piense» de la 13.83.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-2f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>DSO — figura 13.86</h3>
+              <p class="hint-inline">Sensibilidad vertical 50 mV/div, horizontal 10 µs/div. Suma un offset de DC (inyección, rail, BESS) y el trazo sube.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s132s-dc">Offset DC (mV):</label>
+                  <input type="text" id="s132s-dc" placeholder="0" />
+                </div>
+              </div>
+              <button id="btn-s132s" class="action-btn mt-1">Leer DSO</button>
+              <svg class="scope-svg" id="svg-s132s" viewBox="0 0 640 400" role="img" aria-label="Osciloscopio 13.86"></svg>
+              <p class="caption-fig">Figura 13.86 — POI de un inversor. +25 mV de DC es inyección: el código de red la limita a unos mA.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-2s" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-13-3">
+            <h2>Sección 13.3: La onda senoidal</h2>
+            <p class="chapter-discourse">
+              Un radián es \(180^\circ/\pi \approx 57{,}3^\circ\).
+              \(\omega = 2\pi f = 2\pi/T\). El vector radial
+              que gira es el fasor del PLL: 377&nbsp;rad/s
+              en 60&nbsp;Hz, 314&nbsp;rad/s en 50&nbsp;Hz.
+              Recorrer \(45^\circ\) a 60&nbsp;Hz tarda
+              \(2{,}08\,\mathrm{ms}\) — un octavo de ciclo
+              de red, el tiempo de un LVRT corto.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-13-3">Selecciona un problema:</label>
+                <select id="preset-13-3" class="book-preset-select" data-section="13-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p11a">Prob 11.a: 45° → rad</option>
+                  <option value="p11b">Prob 11.b: 60° → rad</option>
+                  <option value="p11c">Prob 11.c: 120° → rad</option>
+                  <option value="p11d">Prob 11.d: 270° → rad</option>
+                  <option value="p11e">Prob 11.e: 178° → rad</option>
+                  <option value="p11f">Prob 11.f: 221° → rad</option>
+                  <option value="p12a">Prob 12.a: π/4 → °</option>
+                  <option value="p12b">Prob 12.b: π/6 → °</option>
+                  <option value="p12c">Prob 12.c: π/10 → °</option>
+                  <option value="p12d">Prob 12.d: 7π/6 → °</option>
+                  <option value="p12e">Prob 12.e: 3π → °</option>
+                  <option value="p12f">Prob 12.f: 0.55π → °</option>
+                  <option value="p13a">Prob 13.a: ω, T = 2 s</option>
+                  <option value="p13b">Prob 13.b: ω, T = 0.3 ms</option>
+                  <option value="p13c">Prob 13.c: ω, T = 4 µs</option>
+                  <option value="p13d">Prob 13.d: ω, T = 1/26 s</option>
+                  <option value="p14a">Prob 14.a: ω, 50 Hz</option>
+                  <option value="p14b">Prob 14.b: ω, 600 Hz</option>
+                  <option value="p14c">Prob 14.c: ω, 2 kHz</option>
+                  <option value="p14d">Prob 14.d: ω, 0.004 MHz</option>
+                  <option value="p15a">Prob 15.a: 754 rad/s</option>
+                  <option value="p15b">Prob 15.b: 8.4 rad/s</option>
+                  <option value="p15c">Prob 15.c: 6000 rad/s</option>
+                  <option value="p15d">Prob 15.d: 1/16 rad/s</option>
+                  <option value="p16">Prob 16: 60 Hz, 45°</option>
+                  <option value="p17">Prob 17: 30° en 5 ms</option>
+                </select>
+              </div>
+              <div id="desc-preset-13-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Grados ↔ radianes</h3>
+              <p class="hint-inline">Deja vacío uno. También acepta múltiplos de π en el campo de radianes (ej. 7/6).</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s133-deg">grados:</label>
+                  <input type="text" id="s133-deg" placeholder="45" />
+                </div>
+                <div class="k-input">
+                  <label for="s133-rad">radianes:</label>
+                  <input type="text" id="s133-rad" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s133-pi">× π (opcional):</label>
+                  <input type="text" id="s133-pi" placeholder="vacío, o 0.55" />
+                </div>
+              </div>
+              <button id="btn-s133a" class="action-btn mt-1">Convertir ángulo</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-3a" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(\omega = 2\pi f = 2\pi / T\)</h3>
+              <p class="hint-inline">Indica \(T\), \(f\) o \(\omega\). El PLL del inversor vive aquí.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s133-t">\(T\):</label>
+                  <input type="text" id="s133-t" placeholder="" />
+                  <select id="s133-t-u">
+                    <option value="1" selected>s</option>
+                    <option value="1e-3">ms</option>
+                    <option value="1e-6">µs</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s133-f">\(f\):</label>
+                  <input type="text" id="s133-f" placeholder="50" />
+                  <select id="s133-f-u">
+                    <option value="1" selected>Hz</option>
+                    <option value="1e3">kHz</option>
+                    <option value="1e6">MHz</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s133-w">\(\omega\) (rad/s):</label>
+                  <input type="text" id="s133-w" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s133-ang">ángulo (°):</label>
+                  <input type="text" id="s133-ang" placeholder="45" />
+                </div>
+              </div>
+              <button id="btn-s133b" class="action-btn mt-1">ω, f, T y tiempo de ángulo</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-3b" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-13-4">
+            <h2>Sección 13.4: Formato general \(v = V_m \sin(\omega t \pm \phi)\)</h2>
+            <p class="chapter-discourse">
+              \(V_m\) (o \(I_m\)) es el pico; \(\omega\) fija
+              \(f\); \(\phi\) es el desfase del PLL.
+              Letras minúsculas: instantáneo. Mayúsculas: pico.
+              Un inversor 400&nbsp;V<sub>rms</sub> trifásico
+              tiene \(V_m = 400\sqrt{2}\) por fase a neutro
+              si está en estrella — el aislamiento se dimensiona
+              al pico, no al RMS.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-13-4">Selecciona un problema:</label>
+                <select id="preset-13-4" class="book-preset-select" data-section="13-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p18a">Prob 18.a: 20 sen 377t</option>
+                  <option value="p18b">Prob 18.b: 5 sen 754t</option>
+                  <option value="p18c">Prob 18.c: 10⁶ sen 10 000t</option>
+                  <option value="p18d">Prob 18.d: 0.001 sen 942t</option>
+                  <option value="p18e">Prob 18.e: −7.6 sen 43.6t</option>
+                  <option value="p18f">Prob 18.f: (1/42) sen 6.283t</option>
+                  <option value="p19">Prob 19: trazar 5 sen 754t</option>
+                  <option value="p20">Prob 20: trazar 10⁶ sen 10 000t</option>
+                  <option value="p21">Prob 21: trazar −7.6 sen 43.6t</option>
+                  <option value="p22">Prob 22: 300 sen 157t, ½ ciclo</option>
+                  <option value="p23">Prob 23: 0.5 sen α, α = 72°</option>
+                  <option value="p24">Prob 24: 20 sen α, α = 1.2π</option>
+                  <option value="p25">Prob 25: 30 mV sen α = 6 mV</option>
+                  <option value="p26">Prob 26: 40 V a 30°, t = 1 ms</option>
+                </select>
+              </div>
+              <div id="desc-preset-13-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Amplitud y frecuencia de \(A\sin(\omega t)\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s134-a">\(A\) (pico):</label>
+                  <input type="text" id="s134-a" placeholder="20" />
+                </div>
+                <div class="k-input">
+                  <label for="s134-w">\(\omega\) (rad/s):</label>
+                  <input type="text" id="s134-w" placeholder="377" />
+                </div>
+                <div class="k-input">
+                  <label for="s134-axis">abscisa:</label>
+                  <select id="s134-axis">
+                    <option value="deg">ángulo en grados</option>
+                    <option value="rad">ángulo en radianes</option>
+                    <option value="time">tiempo en segundos</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s134" class="action-btn mt-1">Amplitud, f y trazo</button>
+              <svg class="wave-svg" id="svg-s134" viewBox="0 0 640 280" role="img" aria-label="Senoidal 13.4"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Valor instantáneo y ángulos</h3>
+              <p class="hint-inline">\(v = A\sin\alpha\). Indica \(\alpha\) para evaluar, o el valor para despejar los ángulos.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s134i-a">\(A\):</label>
+                  <input type="text" id="s134i-a" placeholder="20" />
+                </div>
+                <div class="k-input">
+                  <label for="s134i-al">\(\alpha\):</label>
+                  <input type="text" id="s134i-al" placeholder="72" />
+                  <select id="s134i-alu">
+                    <option value="deg" selected>grados</option>
+                    <option value="rad">radianes</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s134i-v">valor (vacío para evaluar):</label>
+                  <input type="text" id="s134i-v" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s134i" class="action-btn mt-1">Instantáneo / ángulos</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-4i" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Construir \(v = V_m\sin(\omega t)\) a partir de un punto</h3>
+              <p class="hint-inline">Dado \(v\) en un ángulo \(\alpha\) y el instante \(t\). El punto de un POI / de un CT.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s134b-v">\(v\):</label>
+                  <input type="text" id="s134b-v" placeholder="40" />
+                </div>
+                <div class="k-input">
+                  <label for="s134b-al">\(\alpha\) (°):</label>
+                  <input type="text" id="s134b-al" placeholder="30" />
+                </div>
+                <div class="k-input">
+                  <label for="s134b-t">\(t\):</label>
+                  <input type="text" id="s134b-t" placeholder="1" />
+                  <select id="s134b-t-u">
+                    <option value="1">s</option>
+                    <option value="1e-3" selected>ms</option>
+                    <option value="1e-6">µs</option>
+                  </select>
+                </div>
+              </div>
+              <button id="btn-s134b" class="action-btn mt-1">Expresión senoidal</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-4b" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-13-5">
+            <h2>Sección 13.5: Relaciones de fase</h2>
+            <p class="chapter-discourse">
+              \(v=V_m\sin(\omega t+\phi_v)\) y
+              \(i=I_m\sin(\omega t+\phi_i)\).
+              Si \(\phi_v&gt;\phi_i\), \(v\) adelanta
+              (el condensador del filtro LCL; el C del DC-link
+              no, ese es DC). El PLL del inversor mide este
+              ángulo contra la red; 40° a \(\omega=1800\)
+              es \(0{,}39\,\mathrm{ms}\) de retraso — un
+              cuarto de milisegundo de un DFIG.
+              \(\cos\alpha=\sin(\alpha+90^\circ)\);
+              un signo menos es \(180^\circ\).
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-13-5">Selecciona un problema:</label>
+                <select id="preset-13-5" class="book-preset-select" data-section="13-5">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p27">Prob 27: sen(377t + 60°)</option>
+                  <option value="p28a">Prob 28.a: 50 sen(ωt)</option>
+                  <option value="p28b">Prob 28.b: −20 sen(ωt + 2°)</option>
+                  <option value="p28c">Prob 28.c: 5 sen(ωt + 60°)</option>
+                  <option value="p28d">Prob 28.d: 4 cos ωt</option>
+                  <option value="p28e">Prob 28.e: 2 cos(ωt + 10°)</option>
+                  <option value="p28f">Prob 28.f: −5 cos(ωt + 20°)</option>
+                  <option value="p29a">Prob 29.a: +50° vs +40°</option>
+                  <option value="p29b">Prob 29.b: −80° vs −10°</option>
+                  <option value="p29c">Prob 29.c: −60° vs +20°</option>
+                  <option value="p29d">Prob 29.d: −210° vs −60°</option>
+                  <option value="p30a">Prob 30.a: 2 cos(ωt − 30°) y 5 sen(ωt + 60°)</option>
+                  <option value="p30b">Prob 30.b: −sen(ωt + 20°) y 10 sen(ωt − 70°)</option>
+                  <option value="p30c">Prob 30.c: −4 cos(ωt + 90°) y −2 sen(ωt + 10°)</option>
+                  <option value="p31a">Prob 31.a: fig. 13.87.a, 60 Hz</option>
+                  <option value="p31b">Prob 31.b: fig. 13.87.b, 1000 Hz</option>
+                  <option value="p32a">Prob 32.a: fig. 13.88.a, 25 Hz</option>
+                  <option value="p32b">Prob 32.b: fig. 13.88.b, 10 kHz</option>
+                  <option value="p33">Prob 33: t₁, fig. 13.89</option>
+                  <option value="p34">Prob 34: t₁, fig. 13.90</option>
+                  <option value="p35">Prob 35: retraso 40° a ω = 1800</option>
+                  <option value="p36">Prob 36: DSO fig. 13.91</option>
+                </select>
+              </div>
+              <div id="desc-preset-13-5" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Desfase entre dos senoides</h3>
+              <p class="hint-inline">Tipo sen o cos; el signo menos es 180°. Se reduce a \(|\phi|\le 180^\circ\).</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s135-a1">\(A_1\):</label>
+                  <input type="text" id="s135-a1" placeholder="4" />
+                  <select id="s135-k1">
+                    <option value="sin" selected>sen(ωt + φ)</option>
+                    <option value="cos">cos(ωt + φ)</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s135-p1">\(\phi_1\) (°):</label>
+                  <input type="text" id="s135-p1" placeholder="50" />
+                </div>
+                <div class="k-input">
+                  <label for="s135-a2">\(A_2\):</label>
+                  <input type="text" id="s135-a2" placeholder="6" />
+                  <select id="s135-k2">
+                    <option value="sin" selected>sen(ωt + φ)</option>
+                    <option value="cos">cos(ωt + φ)</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s135-p2">\(\phi_2\) (°):</label>
+                  <input type="text" id="s135-p2" placeholder="40" />
+                </div>
+                <div class="k-input">
+                  <label for="s135-w">\(\omega\) (rad/s, opcional):</label>
+                  <input type="text" id="s135-w" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s135" class="action-btn mt-1">Relación de fase</button>
+              <svg class="wave-svg" id="svg-s135" viewBox="0 0 640 280" role="img" aria-label="Dos senoides"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-5" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 13.87–13.90 — expresión y \(t_1\)</h3>
+              <div class="input-group">
+                <label for="s135f-fig">Figura:</label>
+                <select id="s135f-fig">
+                  <option value="87a">13.87.a — 25 V, 60 Hz, +π/6</option>
+                  <option value="87b">13.87.b — 3 mA, 1 kHz, −2π/3</option>
+                  <option value="88a">13.88.a — 0.01 V, 25 Hz, −11π/18</option>
+                  <option value="88b">13.88.b — 2 mA, 10 kHz, +3π/4</option>
+                  <option value="89">13.89 — t₁ de 200 sen(2π·1000 t + 60°)</option>
+                  <option value="90">13.90 — t₁ de 4 sen(50 000 t − 40°)</option>
+                </select>
+                <button id="btn-s135f" class="action-btn">Resolver figura</button>
+              </div>
+              <svg class="wave-svg" id="svg-s135f" viewBox="0 0 640 280" role="img" aria-label="Fase 13.5"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-5f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>DSO — figura 13.91 (dos canales)</h3>
+              <p class="hint-inline">0.5 V/div, 1 ms/div. Canal e (rojo) y canal i (azul) en el POI.</p>
+              <button id="btn-s135s" class="action-btn">Leer DSO 13.91</button>
+              <svg class="scope-svg" id="svg-s135s" viewBox="0 0 640 400" role="img" aria-label="Osciloscopio 13.91"></svg>
+              <p class="caption-fig">Figura 13.91 — e adelanta a i. En un filtro LCL el voltaje de red y la corriente de inyección no están en fase: el Q del parque.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-5s" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-13-6">
+            <h2>Sección 13.6: Valor promedio</h2>
+            <p class="chapter-discourse">
+              \(V_{\mathrm{avg}} = (\text{área neta})/T\).
+              Una senoidal pura promedia cero: no mueve un
+              electrólito ni un watt-hora neto en DC.
+              Un promedio distinto de cero es el offset del
+              inversor, la inyección de DC que el código de
+              red corta, o el rail que el acoplamiento CA
+              del DSO bloquea. Pasar de CD a CA en el canal
+              vertical resta \(V_{\mathrm{avg}}\) y recentra
+              el trazo — el condensador de acoplo del scope,
+              no un trueno.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-13-6">Selecciona un problema:</label>
+                <select id="preset-13-6" class="book-preset-select" data-section="13-6">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p37">Prob 37: DSO fig. 13.92 (DC → CA)</option>
+                  <option value="p38a">Prob 38.a: fig. 13.93.a</option>
+                  <option value="p38b">Prob 38.b: fig. 13.93.b</option>
+                  <option value="p39a">Prob 39.a: fig. 13.94.a</option>
+                  <option value="p39b">Prob 39.b: fig. 13.94.b</option>
+                  <option value="p40">Prob 40: fig. 13.95, 0 a 10 s</option>
+                  <option value="p41">Prob 41: pulsos fig. 13.96</option>
+                </select>
+              </div>
+              <div id="desc-preset-13-6" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 13.92–13.96 — promedio (y acoplo CA)</h3>
+              <div class="input-group">
+                <label for="s136-fig">Figura:</label>
+                <select id="s136-fig">
+                  <option value="92">13.92 — DSO, senoidal con offset</option>
+                  <option value="92ac">13.92 en acoplo CA</option>
+                  <option value="93a">13.93.a — escalones 0–3 s</option>
+                  <option value="93b">13.93.b — rampa + pulso 8 ms</option>
+                  <option value="94a">13.94.a — triángulos 0–8 s</option>
+                  <option value="94b">13.94.b — seno + escalón (ωt)</option>
+                  <option value="95">13.95 — 1−e⁻ᵗ y e⁵⁻ᵗ, 0–10 s</option>
+                  <option value="96">13.96 — pulsos DSO</option>
+                  <option value="96ac">13.96 en acoplo CA</option>
+                </select>
+                <button id="btn-s136" class="action-btn">Área / promedio</button>
+              </div>
+              <svg class="wave-svg" id="svg-s136" viewBox="0 0 640 320" role="img" aria-label="Valor promedio"></svg>
+              <p class="caption-fig">Acoplo CA = restar el promedio. En un inversor, ese DC es el que el transformador de evacuación no deja pasar y el relé de inyección sí ve.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-6" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-13-7">
+            <h2>Sección 13.7: Valores efectivos (rms)</h2>
+            <p class="chapter-discourse">
+              \(V_{\mathrm{rms}} = \sqrt{(1/T)\int v^2\,dt}\).
+              Para una senoidal, \(V_{\mathrm{rms}}=V_m/\sqrt{2}=0{,}707\,V_m\).
+              Es el DC que produce el mismo calor \(I^2R\)
+              en el cable, el mismo kWh en el medidor y el
+              mismo nombre de placa del inversor. Un
+              400&nbsp;V<sub>rms</sub> no es 400&nbsp;V de pico:
+              el pico es \(566\,\mathrm{V}\) y el aislamiento,
+              el MOV y el DC-link se compran contra eso.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-13-7">Selecciona un problema:</label>
+                <select id="preset-13-7" class="book-preset-select" data-section="13-7">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p42a">Prob 42.a: 20 sen 754t</option>
+                  <option value="p42b">Prob 42.b: 7.07 sen 377t</option>
+                  <option value="p42c">Prob 42.c: 0.006 sen(400t + 20°)</option>
+                  <option value="p42d">Prob 42.d: 16 mA sen(377t − 10°)</option>
+                  <option value="p43a">Prob 43.a: 1.414 V rms, 60 Hz</option>
+                  <option value="p43b">Prob 43.b: 70.7 V rms, 60 Hz</option>
+                  <option value="p43c">Prob 43.c: 0.06 A rms, 60 Hz</option>
+                  <option value="p43d">Prob 43.d: 24 µA rms, 60 Hz</option>
+                  <option value="p44">Prob 44: fig. 13.97</option>
+                  <option value="p45">Prob 45: fig. 13.98</option>
+                  <option value="p46">Prob 46: cuadrada fig. 13.99</option>
+                  <option value="p47">Prob 47: fig. 13.84, rms y promedio</option>
+                  <option value="p48">Prob 48: promedio fig. 13.85</option>
+                  <option value="p49a">Prob 49.a: DSO fig. 13.100.a</option>
+                  <option value="p49b">Prob 49.b: DSO fig. 13.100.b</option>
+                </select>
+              </div>
+              <div id="desc-preset-13-7" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>RMS de una senoidal — \(V_{\mathrm{rms}} = V_m/\sqrt{2}\)</h3>
+              <p class="hint-inline">Deja vacío el pico o el RMS. Fase y \(\omega\) no cambian el RMS.</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s137-vm">pico \(V_m\) / \(I_m\):</label>
+                  <input type="text" id="s137-vm" placeholder="20" />
+                </div>
+                <div class="k-input">
+                  <label for="s137-rms">RMS:</label>
+                  <input type="text" id="s137-rms" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s137-f">\(f\) (Hz):</label>
+                  <input type="text" id="s137-f" placeholder="60" />
+                </div>
+                <div class="k-input">
+                  <label for="s137-ph">\(\phi\) (°):</label>
+                  <input type="text" id="s137-ph" placeholder="0" />
+                </div>
+              </div>
+              <button id="btn-s137" class="action-btn mt-1">RMS senoidal</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-7" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 13.97–13.100 — RMS de un ciclo</h3>
+              <div class="input-group">
+                <label for="s137f-fig">Figura:</label>
+                <select id="s137f-fig">
+                  <option value="97">13.97 — pulsos irregulares (prob. 44)</option>
+                  <option value="98">13.98 — escalera (prob. 45)</option>
+                  <option value="99">13.99 — cuadrada ±10 V (prob. 46)</option>
+                  <option value="84r">13.84 — PWM (prob. 47)</option>
+                  <option value="85r">13.85 — diente de sierra (prob. 48)</option>
+                  <option value="100a">13.100.a — DSO 20 mV/div</option>
+                  <option value="100b">13.100.b — DSO 0.2 V/div</option>
+                </select>
+                <button id="btn-s137f" class="action-btn">RMS / promedio</button>
+              </div>
+              <svg class="wave-svg" id="svg-s137f" viewBox="0 0 640 320" role="img" aria-label="RMS"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-7f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-13-8">
+            <h2>Sección 13.8: Medidores e instrumentos de ca</h2>
+            <p class="chapter-discourse">
+              Un d’Arsonval con rectificador de media onda
+              y escala RMS está calibrado para senoidales:
+              lee \(V_m/\sqrt{2}\) si la forma es seno, y
+              \(2{,}22\,V_{\mathrm{dc}}\) si le echas DC
+              (el factor de forma \(\pi/\sqrt{2}\)).
+              En 2026 eso es el polímetro barato frente al
+              true-RMS (Fluke, analizador de red, PMU) que
+              integra \(v^2\). El PWM de un SiC engaña al
+              primero y no al segundo. El VOM y la pinza
+              Amp-Clamp del glosario son el polímetro y la
+              pinza Rogowski / Hall del rack.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-13-8">Selecciona un problema:</label>
+                <select id="preset-13-8" class="book-preset-select" data-section="13-8">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p50a">Prob 50.a: fig. 13.101.a, 4 mA en 2 kΩ</option>
+                  <option value="p50b">Prob 50.b: fig. 13.101.b, 16 sen(377t + 20°)</option>
+                </select>
+              </div>
+              <div id="desc-preset-13-8" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Lectura del medidor — figura 13.101</h3>
+              <div class="input-group">
+                <label for="s138-fig">Situación:</label>
+                <select id="s138-fig">
+                  <option value="101a">13.101.a — DC 4 mA, 2 kΩ, escala RMS media onda</option>
+                  <option value="101b">13.101.b — 16 sen(377t + 20°)</option>
+                </select>
+                <button id="btn-s138" class="action-btn">Lectura</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s138" viewBox="0 0 640 220" role="img" aria-label="Medidor 13.101"></svg>
+              <p class="caption-fig">Media onda calibrada en RMS: senoidal → lectura correcta. DC → 2.22 veces de más. Por eso el true-RMS es el instrumento de planta.</p>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-8" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-13-10">
+            <h2>Sección 13.10: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              C++ / QBASIC / Pascal del libro se sustituyen
+              por estos solucionadores: RMS-f-T de una
+              senoide, desfase entre dos, y promedio+RMS
+              de un pulso a tramos. El «print» de 1990 es
+              el recuadro. El navegador es 2026.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-13-10">Selecciona un problema:</label>
+                <select id="preset-13-10" class="book-preset-select" data-section="13-10">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p51">Prob 51: senoide → RMS, f, T</option>
+                  <option value="p52">Prob 52: desfase entre dos senoides</option>
+                  <option value="p53">Prob 53: pulso alterno, promedio y RMS</option>
+                </select>
+              </div>
+              <div id="desc-preset-13-10" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Prob. 51 — senoide → RMS, f, T</h3>
+              <p class="hint-inline">\(v = A \sin(\omega t + \phi)\). El programa del libro, en el navegador.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s1310-a">\(A\):</label><input type="text" id="s1310-a" placeholder="20" /></div>
+                <div class="k-input"><label for="s1310-w">\(\omega\) (rad/s):</label><input type="text" id="s1310-w" placeholder="377" /></div>
+                <div class="k-input"><label for="s1310-ph">\(\phi\) (°):</label><input type="text" id="s1310-ph" placeholder="0" /></div>
+              </div>
+              <button id="btn-s1310a" class="action-btn mt-1">RMS, f, T</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-10a" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Prob. 52 — cuál adelanta</h3>
+              <p class="hint-inline">Misma \(\omega\). Se reescribe cada una como seno de amplitud positiva.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s1310b-a1">\(A_1\):</label><input type="text" id="s1310b-a1" placeholder="60" /></div>
+                <div class="k-input"><label for="s1310b-p1">\(\phi_1\) (°):</label><input type="text" id="s1310b-p1" placeholder="20" /></div>
+                <div class="k-input"><label for="s1310b-a2">\(A_2\):</label><input type="text" id="s1310b-a2" placeholder="1.2" /></div>
+                <div class="k-input"><label for="s1310b-p2">\(\phi_2\) (°):</label><input type="text" id="s1310b-p2" placeholder="-20" /></div>
+                <div class="k-input"><label for="s1310b-w">\(\omega\):</label><input type="text" id="s1310b-w" placeholder="1800" /></div>
+              </div>
+              <button id="btn-s1310b" class="action-btn mt-1">Desfase</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-10b" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Prob. 53 — pulso a tramos (promedio y RMS)</h3>
+              <p class="hint-inline">Tramos constantes. Vacía un nivel para cortar la lista. Un ciclo de PWM, de un dump o de un chopper de electrolizador.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s1310c-t0">t₀ … t₁, v:</label>
+                  <input type="text" id="s1310c-t0" placeholder="0" style="width:5rem;" />
+                  <input type="text" id="s1310c-t1" placeholder="4" style="width:5rem;" />
+                  <input type="text" id="s1310c-v0" placeholder="10" style="width:5rem;" />
+                </div>
+                <div class="k-input"><label for="s1310c-t1b">t₁ … t₂, v:</label>
+                  <input type="text" id="s1310c-t1b" placeholder="4" style="width:5rem;" />
+                  <input type="text" id="s1310c-t2" placeholder="8" style="width:5rem;" />
+                  <input type="text" id="s1310c-v1" placeholder="-10" style="width:5rem;" />
+                </div>
+                <div class="k-input"><label for="s1310c-t2b">t₂ … t₃, v:</label>
+                  <input type="text" id="s1310c-t2b" placeholder="" style="width:5rem;" />
+                  <input type="text" id="s1310c-t3" placeholder="" style="width:5rem;" />
+                  <input type="text" id="s1310c-v2" placeholder="" style="width:5rem;" />
+                </div>
+                <div class="k-input"><label for="s1310c-t3b">t₃ … t₄, v:</label>
+                  <input type="text" id="s1310c-t3b" placeholder="" style="width:5rem;" />
+                  <input type="text" id="s1310c-t4" placeholder="" style="width:5rem;" />
+                  <input type="text" id="s1310c-v3" placeholder="" style="width:5rem;" />
+                </div>
+              </div>
+              <button id="btn-s1310c" class="action-btn mt-1">Promedio y RMS</button>
+              <svg class="wave-svg" id="svg-s1310c" viewBox="0 0 640 260" role="img" aria-label="Pulso a tramos"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-13-10c" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-13-0" aria-labelledby="glossary-13-heading">
+            <h2 id="glossary-13-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de formas de onda senoidales, RMS,
+              fase e instrumentos del capítulo 13, reescritos
+              para renovables 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Amp-Clamp®</dt>
+                <dd>Pinza que mide corriente sin abrir el circuito. En 2026 es la Rogowski / Hall del feeder 1500&nbsp;V<sub>cc</sub> y del bus de un BESS; también hace de voltímetro o de óhmetro de strings.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Amplitud pico</dt>
+                <dd>Máximo de la forma de onda medido desde su valor promedio, en letras mayúsculas (\(V_m\), \(I_m\)). El aislamiento, el MOV y el DC-link se compran contra este número, no contra el RMS.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Ciclo</dt>
+                <dd>La porción de la forma de onda contenida en un periodo. Un ciclo de red es 20&nbsp;ms a 50&nbsp;Hz; un ciclo PWM de un DAB es 10–50&nbsp;µs.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Contador de frecuencia</dt>
+                <dd>Instrumento que muestra \(f\) o \(T\) en digital. El relé de frecuencia del POI, el PMU y el analizador de red: si \(f\) se sale de 47.5–51.5&nbsp;Hz (o 59.3–60.5), el inversor se cae.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Forma de onda</dt>
+                <dd>Trayectoria de una magnitud frente a tiempo, ángulo, radianes o temperatura. El \(v(t)\) del POI, el \(i(t)\) del string, el PWM del SiC.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Forma de onda alterna</dt>
+                <dd>Oscila por encima y por debajo de un nivel de referencia. La red, la salida del inversor, el estator del DFIG. Un rail de BESS no es alterna: es DC con rizado.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Forma de onda periódica</dt>
+                <dd>Se repite cada \(T\). Red 50/60&nbsp;Hz, portadora PWM, diente de sierra del MPPT. Un transitorio de LVRT no es periódico.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Forma de onda senoidal de ca</dt>
+                <dd>Alterna de amplitud igual arriba y abajo de un eje. El fundamental que el código de red quiere ver; el resto es THD que el LCL tiene que comerse.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Frecuencia (\(f\))</dt>
+                <dd>Ciclos por segundo, en hertz. 50/60&nbsp;Hz de red, 400&nbsp;Hz de auxiliar de planta, 20–100&nbsp;kHz del DAB, MHz de PLC en el cable.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Galvanómetro de electrodinamómetro</dt>
+                <dd>Instrumento que mide ca y cd sin cambiar el circuito interno. El true-RMS de 2026 (analizador de red, polímetro de planta) es su heredero: no le engaña el PWM.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Osciloscopio</dt>
+                <dd>El libro habla de un tubo de rayos catódicos. En 2026 es el DSO / analizador de potencia que cuelga del POI: 8×10 divisiones, acoplo CD o CA, dos canales para \(e\) e \(i\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Periodo (\(T\))</dt>
+                <dd>Tiempo entre repeticiones sucesivas. \(T=1/f\). 20&nbsp;ms de red, 16.67&nbsp;ms en 60&nbsp;Hz, microsegundos del DAB.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Radián (rad)</dt>
+                <dd>\(\approx 57{,}3^\circ\); \(2\pi\,\mathrm{rad}=360^\circ\). El PLL trabaja en radianes; el relé de desfase, en grados. \(\omega t\) del inversor es esto.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Relación de fase</dt>
+                <dd>Cuál de dos formas de onda adelanta o retrasa, y por cuántos grados o radianes. El Q del parque, el factor de potencia del electrolizador, el PLL contra la red.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Valor efectivo</dt>
+                <dd>El DC equivalente de cualquier voltaje o corriente alterna: el que produce el mismo calor. Coincide con el RMS. Es el número de placa del inversor.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Valor instantáneo</dt>
+                <dd>Magnitud en un instante, letras minúsculas (\(v\), \(i\)). Lo que muestrea el ADC del inversor a decenas de kHz.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Valor pico</dt>
+                <dd>Máximo de la forma de onda, letras mayúsculas. \(V_m = V_{\mathrm{rms}}\sqrt{2}\) en una senoide. El cresta del LVRT y del aislamiento.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Valor pico a pico</dt>
+                <dd>Excursión total, pico negativo a positivo. Suma de los absolutos. Si la onda no es simétrica (fig. 13.83), no es el doble del pico positivo.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Valor promedio</dt>
+                <dd>Nivel tal que el área por encima iguala el área por debajo. En una senoide es cero; si no lo es, hay DC y el código de red se queja.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Valor (rms) (raíz cuadrático medio)</dt>
+                <dd>\(\sqrt{(1/T)\int x^2\,dt}\). Efectivo. Senoidal: \(0{,}707\,X_m\). Cuadrada simétrica: el propio pico. PWM: depende del duty.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Velocidad angular</dt>
+                <dd>\(\omega=2\pi f\), en rad/s. La velocidad del fasor. 314 rad/s (50 Hz) o 377 rad/s (60 Hz) es el giro del PLL; el DAB gira a cientos de krad/s.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>VOM</dt>
+                <dd>Volt-ohm-miliamperímetro: resistencia y niveles de corriente y voltaje de ca y cd. El polímetro de planta; el true-RMS, no el de bobina móvil barato, si hay PWM.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>FV, eólica, océano, H<sub>2</sub>, BESS. La senoidal de 2026 es la del inversor y la del DFIG; el RMS es lo que se factura; el promedio distinto de cero es un trip.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
+      <details class="chapter-1-fold" id="capitulo-14">
+        <summary class="chapter-1-summary" aria-label="Capítulo 14.0">
+          <span class="chapter-1-title">14.0</span>
+          <span class="chapter-1-arrow" aria-hidden="true"></span>
+        </summary>
+        <div class="chapter-1-body">
+          <p class="chapter-discourse">
+            Elementos básicos en senoidal y fasores:
+            \(v=L\,di/dt\), \(i=C\,dv/dt\),
+            \(X_L=\omega L\), \(X_C=1/(\omega C)\),
+            \(P=V_{\mathrm{rms}}I_{\mathrm{rms}}\cos\theta\)
+            y el plano \(j\).
+            En 2026 \(R\) es el dump y el cable AA-8000;
+            \(L\) es el LCL, el DAB y el estator del DFIG;
+            \(C\) es el DC-link, el filtro del inversor SiC
+            y el snubber. El fasor es el PLL: una foto a
+            \(t=0\) del POI. El factor de potencia es el
+            setpoint Q de IEEE&nbsp;1547, no un número de
+            laboratorio. \(jX_L\) adelanta; \(-jX_C\)
+            retrasa. CD: \(X_L=0\), \(X_C\to\infty\).
+          </p>
+          <p class="chapter-discourse">
+            <span class="source-chip conv">Convencional</span>
+            hidro · geo · biomasa · CSP
+            <span class="source-chip nconv">No convencional</span>
+            FV · eólica · océano · H<sub>2</sub> · BESS
+          </p>
+          <div class="archimedes-cta-wrap">
+            <a class="archimedes-cta" href="https://apps.apple.com/cl/app/archimedes/id806601044?l=en-GB&amp;mt=12"
+              target="_blank" rel="noopener noreferrer">
+              Practicar notación matemática en Archimedes
+            </a>
+            <p class="archimedes-cta-note">
+              App para escribir \(X_L=\omega L\),
+              \(P=\tfrac12 V_m I_m\cos\theta\) y
+              \(a+jb=A\angle\phi\) sin pelearse con el teclado.
+            </p>
+          </div>
+
+          <div class="aemaeth-tabs">
+            <button class="tab-btn active" data-target="sec-14-2">Sec 14.2</button>
+            <button class="tab-btn" data-target="sec-14-3">Sec 14.3</button>
+            <button class="tab-btn" data-target="sec-14-4">Sec 14.4</button>
+            <button class="tab-btn" data-target="sec-14-5">Sec 14.5</button>
+            <button class="tab-btn" data-target="sec-14-9">Sec 14.9</button>
+            <button class="tab-btn" data-target="sec-14-10">Sec 14.10</button>
+            <button class="tab-btn" data-target="sec-14-12">Sec 14.12</button>
+            <button class="tab-btn" data-target="sec-14-13">Sec 14.13</button>
+          </div>
+
+          <div class="tab-content active" id="sec-14-2">
+            <h2>Sección 14.2: La derivada</h2>
+            <p class="chapter-discourse">
+              \(d/dt\,[A\sin(\omega t+\phi)]=\omega A\cos(\omega t+\phi)=\omega A\sin(\omega t+\phi+90^\circ)\).
+              Subir \(\omega\) agranda la derivada: el
+              \(di/dt\) de un SiC a 50&nbsp;kHz no es el de
+              un DFIG a 50&nbsp;Hz. La pendiente de la
+              senoide es máxima al cruzar cero y nula en
+              el pico — Faraday y el DC-link se leen así.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-14-2">Selecciona un problema:</label>
+                <select id="preset-14-2" class="book-preset-select" data-section="14-2">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p1">Prob 1: 1 sen 3.14t, un ciclo y derivada</option>
+                  <option value="p2">Prob 2: 1 sen 15.71t, comparar con 1</option>
+                  <option value="p3a">Prob 3.a: 10 sen 377t</option>
+                  <option value="p3b">Prob 3.b: 0.6 sen(754t + 20°)</option>
+                  <option value="p3c">Prob 3.c: √2·20 sen(157t − 20°)</option>
+                  <option value="p3d">Prob 3.d: −200 sen(t + 180°)</option>
+                </select>
+              </div>
+              <div id="desc-preset-14-2" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(d/dt\) de \(A\sin(\omega t+\phi)\)</h3>
+              <p class="hint-inline">El \(di/dt\) del LCL y el \(dv/dt\) del DC-link. La derivada adelanta 90° y se multiplica por \(\omega\).</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s142-a">\(A\):</label>
+                  <input type="text" id="s142-a" placeholder="1" />
+                  <select id="s142-k">
+                    <option value="sin" selected>sen(ωt + φ)</option>
+                    <option value="cos">cos(ωt + φ)</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s142-w">\(\omega\) (rad/s):</label>
+                  <input type="text" id="s142-w" placeholder="3.14" />
+                </div>
+                <div class="k-input">
+                  <label for="s142-ph">\(\phi\) (°):</label>
+                  <input type="text" id="s142-ph" placeholder="0" />
+                </div>
+              </div>
+              <button id="btn-s142" class="action-btn mt-1">Derivar y trazar</button>
+              <svg class="wave-svg" id="svg-s142" viewBox="0 0 640 280" role="img" aria-label="Senoide y derivada"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-2" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-14-3">
+            <h2>Sección 14.3: Respuesta de R, L y C</h2>
+            <p class="chapter-discourse">
+              Resistencia: \(v\) e \(i\) en fase,
+              \(V=IR\). Inductor: \(v\) adelanta \(90^\circ\),
+              \(X_L=\omega L\), CD es corto.
+              Capacitor: \(i\) adelanta \(90^\circ\),
+              \(X_C=1/(\omega C)\), CD es abierto.
+              El LCL a 50&nbsp;Hz es casi un cable; a
+              20&nbsp;kHz es un muro. El DC-link a 50&nbsp;Hz
+              es un abierto enorme; a la portadora PWM, un
+              corto.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-14-3">Selecciona un problema:</label>
+                <select id="preset-14-3" class="book-preset-select" data-section="14-3">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p4a">Prob 4.a: 5 Ω, 150 sen 377t</option>
+                  <option value="p4b">Prob 4.b: 5 Ω, 30 sen(377t + 20°)</option>
+                  <option value="p4c">Prob 4.c: 5 Ω, 40 cos(ωt + 10°)</option>
+                  <option value="p4d">Prob 4.d: 5 Ω, −80 sen(ωt + 40°)</option>
+                  <option value="p5a">Prob 5.a: 7 kΩ, 0.03 sen 754t</option>
+                  <option value="p5b">Prob 5.b: 7 kΩ, 2 mA sen(400t − 120°)</option>
+                  <option value="p5c">Prob 5.c: 7 kΩ, 6 µA cos(ωt − 2°)</option>
+                  <option value="p5d">Prob 5.d: 7 kΩ, −0.004 cos(ωt − 90°)</option>
+                  <option value="p6a">Prob 6.a: XL de 2 H en CD</option>
+                  <option value="p6b">Prob 6.b: 2 H, 25 Hz</option>
+                  <option value="p6c">Prob 6.c: 2 H, 60 Hz</option>
+                  <option value="p6d">Prob 6.d: 2 H, 2 kHz</option>
+                  <option value="p6e">Prob 6.e: 2 H, 100 kHz</option>
+                  <option value="p7a">Prob 7.a: XL = 20 Ω, 2 Hz → L</option>
+                  <option value="p7b">Prob 7.b: 1000 Ω, 60 Hz</option>
+                  <option value="p7c">Prob 7.c: 5280 Ω, 1 kHz</option>
+                  <option value="p8a">Prob 8.a: 10 H, XL = 50 Ω → f</option>
+                  <option value="p8b">Prob 8.b: 10 H, 3770 Ω</option>
+                  <option value="p8c">Prob 8.c: 10 H, 15.7 kΩ</option>
+                  <option value="p8d">Prob 8.d: 10 H, 243 Ω</option>
+                  <option value="p9a">Prob 9.a: XL = 20 Ω, i = 5 sen ωt</option>
+                  <option value="p9b">Prob 9.b: i = 0.4 sen(ωt + 60°)</option>
+                  <option value="p9c">Prob 9.c: i = −6 sen(ωt − 30°)</option>
+                  <option value="p9d">Prob 9.d: i = 3 cos(ωt + 10°)</option>
+                  <option value="p10a">Prob 10.a: 0.1 H, 30 sen 30t</option>
+                  <option value="p10b">Prob 10.b: 0.1 H, 0.006 sen 377t</option>
+                  <option value="p10c">Prob 10.c: 0.1 H, 5 µA sen(400t + 20°)</option>
+                  <option value="p10d">Prob 10.d: 0.1 H, −4 cos(20t − 70°)</option>
+                  <option value="p11a">Prob 11.a: XL = 50 Ω, 50 sen ωt</option>
+                  <option value="p11b">Prob 11.b: 30 sen(ωt + 20°)</option>
+                  <option value="p11c">Prob 11.c: 40 cos(ωt + 10°)</option>
+                  <option value="p11d">Prob 11.d: −80 sen(377t + 40°)</option>
+                  <option value="p12a">Prob 12.a: 0.2 H, 1.5 sen 60t</option>
+                  <option value="p12b">Prob 12.b: 0.016 sen(t + 4°)</option>
+                  <option value="p12c">Prob 12.c: −4.8 sen(0.05t + 50°)</option>
+                  <option value="p12d">Prob 12.d: 9 mA cos(377t + 360°)</option>
+                  <option value="p13a">Prob 13.a: XC de 5 µF en CD</option>
+                  <option value="p13b">Prob 13.b: 5 µF, 60 Hz</option>
+                  <option value="p13c">Prob 13.c: 5 µF, 120 Hz</option>
+                  <option value="p13d">Prob 13.d: 5 µF, 1800 Hz</option>
+                  <option value="p13e">Prob 13.e: 5 µF, 24 kHz</option>
+                  <option value="p14a">Prob 14.a: XC = 250 Ω, 60 Hz → C</option>
+                  <option value="p14b">Prob 14.b: 55 Ω, 312 Hz</option>
+                  <option value="p14c">Prob 14.c: 10 Ω, 25 Hz</option>
+                  <option value="p15a">Prob 15.a: 50 µF, XC = 342 Ω → f</option>
+                  <option value="p15b">Prob 15.b: 684 Ω</option>
+                  <option value="p15c">Prob 15.c: 171 Ω</option>
+                  <option value="p15d">Prob 15.d: 2000 Ω</option>
+                  <option value="p16a">Prob 16.a: XC = 2.5 Ω, 100 sen ωt</option>
+                  <option value="p16b">Prob 16.b: 0.4 sen(ωt + 20°)</option>
+                  <option value="p16c">Prob 16.c: 8 cos(ωt + 10°)</option>
+                  <option value="p16d">Prob 16.d: −70 sen(ωt + 40°)</option>
+                  <option value="p17a">Prob 17.a: 1 µF, 30 sen 200t</option>
+                  <option value="p17b">Prob 17.b: 90 sen 377t</option>
+                  <option value="p17c">Prob 17.c: −120 sen(374t + 30°)</option>
+                  <option value="p17d">Prob 17.d: 70 cos(800t − 20°)</option>
+                  <option value="p18a">Prob 18.a: XC = 10 Ω, i = 50 sen ωt</option>
+                  <option value="p18b">Prob 18.b: i = 40 sen(ωt + 60°)</option>
+                  <option value="p18c">Prob 18.c: i = −6 sen(ωt − 30°)</option>
+                  <option value="p18d">Prob 18.d: i = 3 cos(ωt + 10°)</option>
+                  <option value="p19a">Prob 19.a: 0.5 µF, 0.20 sen 300t</option>
+                  <option value="p19b">Prob 19.b: 0.007 sen 377t</option>
+                  <option value="p19c">Prob 19.c: 0.048 cos 754t</option>
+                  <option value="p19d">Prob 19.d: 0.08 sen(1600t − 80°)</option>
+                  <option value="p20a">Prob 20.a: identificar R/L/C, 550 sen / 11 sen</option>
+                  <option value="p20b">Prob 20.b: 36 sen / 4 sen</option>
+                  <option value="p20c">Prob 20.c: 10.5 sen / 1.5 sen, misma fase</option>
+                  <option value="p21a">Prob 21.a: 2000 sen ωt / 5 cos ωt</option>
+                  <option value="p21b">Prob 21.b: 80 sen(157t+150°) / 2 sen(157t+60°)</option>
+                  <option value="p21c">Prob 21.c: 35 sen(ωt−20°) / 7 cos(ωt−110°)</option>
+                </select>
+              </div>
+              <div id="desc-preset-14-3" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>R, L o C — de \(v\) e \(i\) al otro</h3>
+              <p class="hint-inline">Deja vacío el voltaje o la corriente. CD: pon f = 0. Identificar: rellena ambos y deja el elemento en «auto».</p>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s143-el">Elemento:</label>
+                  <select id="s143-el">
+                    <option value="R">R (dump / cable)</option>
+                    <option value="L">L (LCL / DAB / DFIG)</option>
+                    <option value="C">C (DC-link / filtro)</option>
+                    <option value="auto">auto (identificar por fase)</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s143-val">R / L / C:</label>
+                  <input type="text" id="s143-val" placeholder="5" />
+                  <select id="s143-val-u">
+                    <option value="R1" selected>Ω</option>
+                    <option value="R1e3">kΩ</option>
+                    <option value="L1">H</option>
+                    <option value="L1e-3">mH</option>
+                    <option value="C1e-6">µF</option>
+                    <option value="C1e-9">nF</option>
+                    <option value="X1">Ω (solo X)</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s143-f">\(f\) (Hz):</label>
+                  <input type="text" id="s143-f" placeholder="60" />
+                </div>
+                <div class="k-input">
+                  <label for="s143-w">\(\omega\) (rad/s, opcional):</label>
+                  <input type="text" id="s143-w" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s143-va">pico \(v\):</label>
+                  <input type="text" id="s143-va" placeholder="150" />
+                  <select id="s143-vk">
+                    <option value="sin" selected>sen</option>
+                    <option value="cos">cos</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s143-vph">\(\phi_v\) (°):</label>
+                  <input type="text" id="s143-vph" placeholder="0" />
+                </div>
+                <div class="k-input">
+                  <label for="s143-ia">pico \(i\):</label>
+                  <input type="text" id="s143-ia" placeholder="" />
+                  <select id="s143-ik">
+                    <option value="sin" selected>sen</option>
+                    <option value="cos">cos</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s143-iph">\(\phi_i\) (°):</label>
+                  <input type="text" id="s143-iph" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s143" class="action-btn mt-1">R / L / C</button>
+              <svg class="wave-svg" id="svg-s143" viewBox="0 0 640 280" role="img" aria-label="v e i"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-3" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-14-4">
+            <h2>Sección 14.4: Respuesta en frecuencia</h2>
+            <p class="chapter-discourse">
+              \(X_L=2\pi f L\) sube lineal; \(X_C=1/(2\pi f C)\)
+              baja. A 50&nbsp;Hz el LCL es casi transparente;
+              a 20&nbsp;kHz es el muro del PWM. El DC-link
+              a 0&nbsp;Hz es abierto; a la portadora, un
+              corto. Donde \(X_L=X_C\) está la resonancia
+              del filtro — el tono que el código de red no
+              quiere ver.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-14-4">Selecciona un problema:</label>
+                <select id="preset-14-4" class="book-preset-select" data-section="14-4">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p22">Prob 22: XL de 5 mH, 0–100 kHz</option>
+                  <option value="p23">Prob 23: XC de 1 µF, 0–10 kHz</option>
+                  <option value="p24">Prob 24: 1 µF, XC = 2 kΩ → f</option>
+                  <option value="p25">Prob 25: XL = 10 kΩ a 5 kHz → L</option>
+                  <option value="p26">Prob 26: 1 µF y 10 mH, misma X → f</option>
+                  <option value="p27">Prob 27: C para igualar 2 mH a 50 kHz</option>
+                </select>
+              </div>
+              <div id="desc-preset-14-4" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(X_L(f)\) y \(X_C(f)\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s144-l">\(L\):</label>
+                  <input type="text" id="s144-l" placeholder="5" />
+                  <select id="s144-l-u">
+                    <option value="1">H</option>
+                    <option value="1e-3" selected>mH</option>
+                    <option value="1e-6">µH</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s144-c">\(C\):</label>
+                  <input type="text" id="s144-c" placeholder="1" />
+                  <select id="s144-c-u">
+                    <option value="1e-6" selected>µF</option>
+                    <option value="1e-9">nF</option>
+                    <option value="1e-3">mF</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s144-f1">f min (Hz):</label>
+                  <input type="text" id="s144-f1" placeholder="0" />
+                </div>
+                <div class="k-input">
+                  <label for="s144-f2">f max (Hz):</label>
+                  <input type="text" id="s144-f2" placeholder="1e5" />
+                </div>
+                <div class="k-input">
+                  <label for="s144-fx">f de cruce / dato (Hz):</label>
+                  <input type="text" id="s144-fx" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s144-x">X (Ω, opcional):</label>
+                  <input type="text" id="s144-x" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s144" class="action-btn mt-1">Trazar X(f)</button>
+              <svg class="wave-svg" id="svg-s144" viewBox="0 0 640 300" role="img" aria-label="XL y XC vs f"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-4" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-14-5">
+            <h2>Sección 14.5: Potencia promedio y factor de potencia</h2>
+            <p class="chapter-discourse">
+              \(P=\tfrac12 V_m I_m\cos\theta=V_{\mathrm{rms}}I_{\mathrm{rms}}\cos\theta\).
+              \(\theta=\phi_v-\phi_i\). Un L o un C ideales
+              no facturan julios: \(P=0\). El FP atrasado
+              es el DFIG magnetizándose; el adelantado, el
+              filtro capacitivo del inversor. IEEE&nbsp;1547
+              pide setpoint de Q: el inversor no es un
+              resistor.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-14-5">Selecciona un problema:</label>
+                <select id="preset-14-5" class="book-preset-select" data-section="14-5">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p28a">Prob 28.a: P del 20.a</option>
+                  <option value="p28b">Prob 28.b: P del 20.b</option>
+                  <option value="p28c">Prob 28.c: P del 20.c</option>
+                  <option value="p29a">Prob 29.a: P del 21.a</option>
+                  <option value="p29b">Prob 29.b: P del 21.b</option>
+                  <option value="p29c">Prob 29.c: P del 21.c</option>
+                  <option value="p30a">Prob 30.a: 60 sen / 15 sen</option>
+                  <option value="p30b">Prob 30.b: −50 sen / −2 sen</option>
+                  <option value="p30c">Prob 30.c: 50 sen / 3 cos</option>
+                  <option value="p30d">Prob 30.d: 75 sen / 0.08 sen</option>
+                  <option value="p31">Prob 31: tres fórmulas, 8 sen / 48 sen</option>
+                  <option value="p32a">Prob 32: 100 W, 150 V, 2 A</option>
+                  <option value="p32b">Prob 32: P = 0 W</option>
+                  <option value="p32c">Prob 32: P = 300 W</option>
+                  <option value="p33">Prob 33: FP 0.5 atrasado, 500 W</option>
+                  <option value="p34">Prob 34: fig. 14.75, R = 3 Ω</option>
+                  <option value="p35">Prob 35: fig. 14.76, XL = 50 Ω</option>
+                  <option value="p36">Prob 36: fig. 14.77, XC = 400 Ω</option>
+                </select>
+              </div>
+              <div id="desc-preset-14-5" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>\(P\) y \(F_P\)</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s145-va">pico \(v\):</label>
+                  <input type="text" id="s145-va" placeholder="60" />
+                  <select id="s145-vk">
+                    <option value="sin" selected>sen</option>
+                    <option value="cos">cos</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s145-vph">\(\phi_v\) (°):</label>
+                  <input type="text" id="s145-vph" placeholder="30" />
+                </div>
+                <div class="k-input">
+                  <label for="s145-ia">pico \(i\):</label>
+                  <input type="text" id="s145-ia" placeholder="15" />
+                  <select id="s145-ik">
+                    <option value="sin" selected>sen</option>
+                    <option value="cos">cos</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s145-iph">\(\phi_i\) (°):</label>
+                  <input type="text" id="s145-iph" placeholder="60" />
+                </div>
+                <div class="k-input">
+                  <label for="s145-p">P (W, opcional):</label>
+                  <input type="text" id="s145-p" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s145-vrms">Vrms (opcional):</label>
+                  <input type="text" id="s145-vrms" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s145-irms">Irms (opcional):</label>
+                  <input type="text" id="s145-irms" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s145" class="action-btn mt-1">P y FP</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-5" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 14.75–14.77</h3>
+              <div class="input-group">
+                <label for="s145f-fig">Figura:</label>
+                <select id="s145f-fig">
+                  <option value="75">14.75 — R = 3 Ω, e = 30 sen(377t + 20°)</option>
+                  <option value="76">14.76 — XL = 50 Ω, e = 100 sen(157t + 30°)</option>
+                  <option value="77">14.77 — XC = 400 Ω, i = 3 sen(377t − 20°)</option>
+                </select>
+                <button id="btn-s145f" class="action-btn">Resolver</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s145f" viewBox="0 0 640 200" role="img" aria-label="Circuito 14.5"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-5f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-14-9">
+            <h2>Sección 14.9: Conversión rectangular ↔ polar</h2>
+            <p class="chapter-discourse">
+              \(a+jb = A\angle\phi\), \(A=\sqrt{a^2+b^2}\),
+              \(\phi=\mathrm{atan2}(b,a)\). El PLL del
+              inversor vive en polar (módulo = RMS del POI,
+              ángulo = desfase a la red). El DSP suma en
+              rectangular. \(j\) es el adelanto de 90°:
+              \(jX_L\) del LCL, \(-jX_C\) del filtro.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-14-9">Selecciona un problema:</label>
+                <select id="preset-14-9" class="book-preset-select" data-section="14-9">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p39a">Prob 39.a: 4 + j3</option>
+                  <option value="p39b">Prob 39.b: 2 + j2</option>
+                  <option value="p39c">Prob 39.c: 3.5 + j16</option>
+                  <option value="p39d">Prob 39.d: 100 + j800</option>
+                  <option value="p39e">Prob 39.e: 1000 + j400</option>
+                  <option value="p39f">Prob 39.f: 0.001 + j0.0065</option>
+                  <option value="p39g">Prob 39.g: 7.6 − j9</option>
+                  <option value="p39h">Prob 39.h: −8 + j4</option>
+                  <option value="p39i">Prob 39.i: −15 − j60</option>
+                  <option value="p39j">Prob 39.j: +78 − j65</option>
+                  <option value="p39k">Prob 39.k: −2400 + j3600</option>
+                  <option value="p39l">Prob 39.l: 5e-3 − j25e-3</option>
+                  <option value="p40a">Prob 40.a: 6 ∠ 30°</option>
+                  <option value="p40b">Prob 40.b: 40 ∠ 80°</option>
+                  <option value="p40c">Prob 40.c: 7400 ∠ 70°</option>
+                  <option value="p40d">Prob 40.d: 4e-4 ∠ 8°</option>
+                  <option value="p40e">Prob 40.e: 0.04 ∠ 80°</option>
+                  <option value="p40f">Prob 40.f: 0.0093 ∠ 23°</option>
+                  <option value="p40g">Prob 40.g: 65 ∠ 150°</option>
+                  <option value="p40h">Prob 40.h: 1.2 ∠ 135°</option>
+                  <option value="p40i">Prob 40.i: 500 ∠ 200°</option>
+                  <option value="p40j">Prob 40.j: 6320 ∠ −35°</option>
+                  <option value="p40k">Prob 40.k: 7.52 ∠ −125°</option>
+                  <option value="p40l">Prob 40.l: 0.008 ∠ 310°</option>
+                  <option value="p41a">Prob 41.a: 1 + j15</option>
+                  <option value="p41b">Prob 41.b: 60 + j5</option>
+                  <option value="p41c">Prob 41.c: 0.01 + j0.3</option>
+                  <option value="p41d">Prob 41.d: 100 − j2000</option>
+                  <option value="p41e">Prob 41.e: −5.6 + j86</option>
+                  <option value="p41f">Prob 41.f: −2.7 − j38.6</option>
+                  <option value="p42a">Prob 42.a: 13 ∠ 5°</option>
+                  <option value="p42b">Prob 42.b: 160 ∠ 87°</option>
+                  <option value="p42c">Prob 42.c: 7e-6 ∠ 2°</option>
+                  <option value="p42d">Prob 42.d: 8.7 ∠ 177°</option>
+                  <option value="p42e">Prob 42.e: 76 ∠ −4°</option>
+                  <option value="p42f">Prob 42.f: 396 ∠ 265°</option>
+                </select>
+              </div>
+              <div id="desc-preset-14-9" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Rectangular \(\leftrightarrow\) polar</h3>
+              <p class="hint-inline">Llena a,b o A,φ. El otro par sale.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s149-re">a (real):</label><input type="text" id="s149-re" placeholder="4" /></div>
+                <div class="k-input"><label for="s149-im">b (imag):</label><input type="text" id="s149-im" placeholder="3" /></div>
+                <div class="k-input"><label for="s149-mag">A (módulo):</label><input type="text" id="s149-mag" placeholder="" /></div>
+                <div class="k-input"><label for="s149-ang">φ (°):</label><input type="text" id="s149-ang" placeholder="" /></div>
+              </div>
+              <button id="btn-s149" class="action-btn mt-1">Convertir</button>
+              <svg class="wave-svg" id="svg-s149" viewBox="0 0 640 280" role="img" aria-label="Plano complejo"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-9" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-14-10">
+            <h2>Sección 14.10: Operaciones con complejos</h2>
+            <p class="chapter-discourse">
+              Sumar en rectangular (KVL/KCL del POI).
+              Multiplicar y dividir en polar (Ohm fasorial:
+              \(\mathbf{V}=\mathbf{I}Z\)). El conjugado es
+              el de \(P=\mathrm{Re}(\mathbf{V}\mathbf{I}^*)\).
+              El recíproco \(1/Z\) es la admitancia del
+              filtro. El DSP del inversor hace esto a
+              10–20&nbsp;kHz.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-14-10">Selecciona un problema:</label>
+                <select id="preset-14-10" class="book-preset-select" data-section="14-10">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p43a">Prob 43.a: (4.2+j6.8)+(7.6+j0.2)</option>
+                  <option value="p43b">Prob 43.b: tres sumandos</option>
+                  <option value="p43c">Prob 43.c: µ + 10⁻⁷</option>
+                  <option value="p43d">Prob 43.d: resta</option>
+                  <option value="p43e">Prob 43.e: 167+j243 − (−42.3−j68)</option>
+                  <option value="p43f">Prob 43.f: tres términos</option>
+                  <option value="p43g">Prob 43.g: 6∠20° + 8∠80°</option>
+                  <option value="p43h">Prob 43.h: 42∠45° + 62∠60° − 70∠120°</option>
+                  <option value="p44a">Prob 44.a: (2+j3)(6+j8)</option>
+                  <option value="p44b">Prob 44.b: tres factores</option>
+                  <option value="p44c">Prob 44.c: (0.002+j0.006)(−2+j2)</option>
+                  <option value="p44d">Prob 44.d: tres factores</option>
+                  <option value="p44e">Prob 44.e: (2∠60°)(4∠22°)</option>
+                  <option value="p44f">Prob 44.f: (6.9∠8°)(7.2∠−72°)</option>
+                  <option value="p44g">Prob 44.g: tres polares</option>
+                  <option value="p44h">Prob 44.h: (540∠−20°)(−5∠180°)(6.2∠0°)</option>
+                  <option value="p45a">Prob 45.a: (42∠10°)/(7∠60°)</option>
+                  <option value="p45b">Prob 45.b: (0.006∠120°)/(30∠−20°)</option>
+                  <option value="p45c">Prob 45.c: (4360∠−20°)/(40∠210°)</option>
+                  <option value="p45d">Prob 45.d: (650∠−80°)/(8.5∠360°)</option>
+                  <option value="p45e">Prob 45.e: (8+j8)/(2+j2)</option>
+                  <option value="p45f">Prob 45.f: (8+j42)/(−6+j60)</option>
+                  <option value="p45g">Prob 45.g: (0.05+j0.25)/(8−j60)</option>
+                  <option value="p45h">Prob 45.h: (−4.5−j6)/(0.1−j0.4)</option>
+                  <option value="p46a">Prob 46.a: (4+j3)+(6−j8) sobre (3+j3)−(2+j3)</option>
+                  <option value="p46b">Prob 46.b: 8∠60° / (2∠0° + 100+j100)</option>
+                  <option value="p46c">Prob 46.c: producto / 2∠−30°</option>
+                  <option value="p46d">Prob 46.d: (0.4∠60°)² (300∠40°) / (3+j9)</option>
+                  <option value="p46e">Prob 46.e: 1/(0.02∠10°)² · (2/j)³ · 1/(6²−j√900)</option>
+                  <option value="p47a">Prob 47.a: despejar x, y</option>
+                  <option value="p47b">Prob 47.b: despejar x (polar)</option>
+                  <option value="p47c">Prob 47.c: (5x+j10)(2−jy)</option>
+                  <option value="p47d">Prob 47.d: despejar θ</option>
+                </select>
+              </div>
+              <div id="desc-preset-14-10" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Calculadora compleja</h3>
+              <p class="hint-inline">Cada operando: rectangular o polar (llena un par). Op = +, −, ×, ÷. Tres operandos: deja z3 vacío para ignorarlo.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label>z1 a, b:</label>
+                  <input type="text" id="s1410-a1" placeholder="4.2" style="width:6rem;" />
+                  <input type="text" id="s1410-b1" placeholder="6.8" style="width:6rem;" />
+                </div>
+                <div class="k-input"><label>z1 A, φ:</label>
+                  <input type="text" id="s1410-m1" placeholder="" style="width:6rem;" />
+                  <input type="text" id="s1410-p1" placeholder="" style="width:6rem;" />
+                </div>
+                <div class="k-input">
+                  <label for="s1410-op">op 1–2:</label>
+                  <select id="s1410-op">
+                    <option value="+">+</option>
+                    <option value="-">−</option>
+                    <option value="*">×</option>
+                    <option value="/">÷</option>
+                  </select>
+                </div>
+                <div class="k-input"><label>z2 a, b:</label>
+                  <input type="text" id="s1410-a2" placeholder="7.6" style="width:6rem;" />
+                  <input type="text" id="s1410-b2" placeholder="0.2" style="width:6rem;" />
+                </div>
+                <div class="k-input"><label>z2 A, φ:</label>
+                  <input type="text" id="s1410-m2" placeholder="" style="width:6rem;" />
+                  <input type="text" id="s1410-p2" placeholder="" style="width:6rem;" />
+                </div>
+                <div class="k-input">
+                  <label for="s1410-op2">op con z3:</label>
+                  <select id="s1410-op2">
+                    <option value="" selected>(ninguno)</option>
+                    <option value="+">+</option>
+                    <option value="-">−</option>
+                    <option value="*">×</option>
+                    <option value="/">÷</option>
+                  </select>
+                </div>
+                <div class="k-input"><label>z3 a, b:</label>
+                  <input type="text" id="s1410-a3" placeholder="" style="width:6rem;" />
+                  <input type="text" id="s1410-b3" placeholder="" style="width:6rem;" />
+                </div>
+                <div class="k-input"><label>z3 A, φ:</label>
+                  <input type="text" id="s1410-m3" placeholder="" style="width:6rem;" />
+                  <input type="text" id="s1410-p3" placeholder="" style="width:6rem;" />
+                </div>
+              </div>
+              <button id="btn-s1410" class="action-btn mt-1">Operar</button>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-10" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Problemas 46–47 — expresiones y despejes</h3>
+              <div class="input-group">
+                <label for="s1410s-fig">Caso:</label>
+                <select id="s1410s-fig">
+                  <option value="46a">46.a — fracción rectangular</option>
+                  <option value="46b">46.b — 8∠60° / (2∠0° + 100+j100)</option>
+                  <option value="46c">46.c — producto / 2∠−30°</option>
+                  <option value="46d">46.d — (0.4∠60°)² (300∠40°) / (3+j9)</option>
+                  <option value="46e">46.e — 1/(0.02∠10°)² · (2/j)³ · 1/(36 − j30)</option>
+                  <option value="47a">47.a — (x+j4)+(3x+jy)−j7 = 16∠0°</option>
+                  <option value="47b">47.b — (10∠20°)(x∠−60°) = 30.64−j25.72</option>
+                  <option value="47c">47.c — (5x+j10)(2−jy) = 90−j70</option>
+                  <option value="47d">47.d — (80∠0°)/(20∠θ) = 3.464−j2</option>
+                </select>
+                <button id="btn-s1410s" class="action-btn">Resolver</button>
+              </div>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-10s" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-14-12">
+            <h2>Sección 14.12: Fasores</h2>
+            <p class="chapter-discourse">
+              Un fasor es el vector de módulo constante
+              a \(\phi\) del eje real: la foto del PLL a
+              \(t=0\). Convención RMS:
+              \(A\sin(\omega t+\phi)\;\to\;(A/\sqrt{2})\angle\phi\).
+              KVL y KCL se hacen con números complejos:
+              la suma de senoides a la misma \(\omega\)
+              es un giro de fasores en el POI.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-14-12">Selecciona un problema:</label>
+                <select id="preset-14-12" class="book-preset-select" data-section="14-12">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p37">Prob 37: fig. 14.78, C1 ∥ C2</option>
+                  <option value="p38">Prob 38: fig. 14.79, L1 ∥ L2</option>
+                  <option value="p48a">Prob 48.a: √2·100 sen(ωt + 30°)</option>
+                  <option value="p48b">Prob 48.b: √2·0.25 sen(157t − 40°)</option>
+                  <option value="p48c">Prob 48.c: 100 sen(ωt − 90°)</option>
+                  <option value="p48d">Prob 48.d: 42 sen(377t)</option>
+                  <option value="p48e">Prob 48.e: 6 µA cos ωt</option>
+                  <option value="p48f">Prob 48.f: 3.6 µA cos(754t − 20°)</option>
+                  <option value="p49a">Prob 49.a: 40 A ∠ 20° → senoidal 60 Hz</option>
+                  <option value="p49b">Prob 49.b: 120 V ∠ 0°</option>
+                  <option value="p49c">Prob 49.c: 8 mA ∠ 120°</option>
+                  <option value="p49d">Prob 49.d: 5 V ∠ 90°</option>
+                  <option value="p49e">Prob 49.e: 1200 A ∠ −120°</option>
+                  <option value="p49f">Prob 49.f: 6000/√2 V ∠ −180°</option>
+                  <option value="p50">Prob 50: fig. 14.80, va = e − vb</option>
+                  <option value="p51">Prob 51: fig. 14.81, i1 = is − i2</option>
+                  <option value="p52">Prob 52: fig. 14.82, e = va + vb + vc</option>
+                  <option value="p53">Prob 53: fig. 14.83, is = i1 + 3 i2</option>
+                </select>
+              </div>
+              <div id="desc-preset-14-12" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Senoidal \(\leftrightarrow\) fasor RMS</h3>
+              <div class="kinematics-group">
+                <div class="k-input">
+                  <label for="s1412-a">pico \(A\):</label>
+                  <input type="text" id="s1412-a" placeholder="100" />
+                  <select id="s1412-k">
+                    <option value="sin" selected>sen</option>
+                    <option value="cos">cos</option>
+                  </select>
+                </div>
+                <div class="k-input">
+                  <label for="s1412-ph">\(\phi\) (°):</label>
+                  <input type="text" id="s1412-ph" placeholder="30" />
+                </div>
+                <div class="k-input">
+                  <label for="s1412-f">\(f\) (Hz):</label>
+                  <input type="text" id="s1412-f" placeholder="60" />
+                </div>
+                <div class="k-input">
+                  <label for="s1412-rms">RMS:</label>
+                  <input type="text" id="s1412-rms" placeholder="" />
+                </div>
+                <div class="k-input">
+                  <label for="s1412-pang">∠ fasor (°):</label>
+                  <input type="text" id="s1412-pang" placeholder="" />
+                </div>
+              </div>
+              <button id="btn-s1412" class="action-btn mt-1">Fasor / senoidal</button>
+              <svg class="wave-svg" id="svg-s1412" viewBox="0 0 640 280" role="img" aria-label="Diagrama fasorial"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-12" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Figuras 14.78–14.83 — KVL / KCL fasorial</h3>
+              <div class="input-group">
+                <label for="s1412f-fig">Figura:</label>
+                <select id="s1412f-fig">
+                  <option value="78">14.78 — C1 ∥ C2 (prob. 37)</option>
+                  <option value="79">14.79 — L1 ∥ L2 (prob. 38)</option>
+                  <option value="80">14.80 — va = e − vb (prob. 50)</option>
+                  <option value="81">14.81 — i1 = is − i2 (prob. 51)</option>
+                  <option value="82">14.82 — e = va + vb + vc (prob. 52)</option>
+                  <option value="83">14.83 — is = i1 + i2 + i3 (prob. 53)</option>
+                </select>
+                <button id="btn-s1412f" class="action-btn">Resolver</button>
+              </div>
+              <svg class="circuit-svg" id="svg-s1412f" viewBox="0 0 640 220" role="img" aria-label="Red fasorial"></svg>
+              <svg class="wave-svg" id="svg-s1412p" viewBox="0 0 640 280" role="img" aria-label="Fasores"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-12f" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="tab-content" id="sec-14-13">
+            <h2>Sección 14.13: Análisis por computadora</h2>
+            <p class="chapter-discourse">
+              PSpice / QBASIC del libro se sustituyen por
+              estos solucionadores: derivada, \(X(f)\),
+              \(P\) y \(F_P\), y la suma fasorial.
+              El «print» es el recuadro. El navegador es 2026.
+            </p>
+            <div class="card interactive-card">
+              <h3>Ejercicios preestablecidos</h3>
+              <div class="input-group">
+                <label for="preset-14-13">Selecciona un problema:</label>
+                <select id="preset-14-13" class="book-preset-select" data-section="14-13">
+                  <option value="" disabled selected>-- Elige un problema --</option>
+                  <option value="p54">Prob 54: iC y vC, dos ciclos, 0.2 kHz</option>
+                  <option value="p55">Prob 55: |iC| y fase vs f (100 Hz–100 kHz)</option>
+                  <option value="p56">Prob 56: |Z| del capacitor con ESL, 100 kHz–100 MHz</option>
+                  <option value="p57">Prob 57: programa de la derivada</option>
+                  <option value="p58">Prob 58: v de i en R, L o C</option>
+                  <option value="p59">Prob 59: XL(f) / XC(f)</option>
+                  <option value="p60">Prob 60: P y FP de dos senoides</option>
+                  <option value="p61">Prob 61: suma fasorial + dominio del tiempo</option>
+                </select>
+              </div>
+              <div id="desc-preset-14-13" class="procedure-box prose" style="display: none; margin-bottom: 1rem;"></div>
+            </div>
+            <div class="card interactive-card">
+              <h3>Modelo de capacitor de planta (prob. 56)</h3>
+              <p class="hint-inline">C + ESL + ESR + Rp. Un film DC-link: capacitivo bajo la resonancia, inductivo encima.</p>
+              <div class="kinematics-group">
+                <div class="k-input"><label for="s1413-c">C (µF):</label><input type="text" id="s1413-c" placeholder="0.1" /></div>
+                <div class="k-input"><label for="s1413-ls">Ls (µH):</label><input type="text" id="s1413-ls" placeholder="0.2" /></div>
+                <div class="k-input"><label for="s1413-rs">Rs (MΩ):</label><input type="text" id="s1413-rs" placeholder="2" /></div>
+                <div class="k-input"><label for="s1413-rp">Rp (MΩ):</label><input type="text" id="s1413-rp" placeholder="100" /></div>
+              </div>
+              <button id="btn-s1413" class="action-btn mt-1">|Z|(f)</button>
+              <svg class="wave-svg" id="svg-s1413" viewBox="0 0 640 300" role="img" aria-label="|Z| vs f"></svg>
+              <div class="results-box">
+                <div class="result-row"><strong>Procedimiento y resultado:</strong>
+                  <div id="proc-14-13" class="procedure-box">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <section class="glossary-section" id="glosario-14-0" aria-labelledby="glossary-14-heading">
+            <h2 id="glossary-14-heading">Glosario</h2>
+            <p class="glossary-lead">
+              Términos de derivada, R/L/C senoidal, potencia,
+              complejos y fasores del capítulo 14, reescritos
+              para renovables 2026.
+            </p>
+            <dl class="glossary-grid">
+              <div class="glossary-item">
+                <dt>Complejo conjugado</dt>
+                <dd>Cambio de signo de la parte imaginaria. En el POI, \(\mathbf{I}^*\) es el que hace \(P=\mathrm{Re}(\mathbf{V}\mathbf{I}^*)\): julios reales del inversor, no el Q.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Derivada</dt>
+                <dd>Pendiente instantánea. \(di/dt\) del choke LCL (Faraday, pico del SiC); \(dv/dt\) del DC-link. En una senoide es máxima al cruzar cero y nula en el pico.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Diagrama fasorial</dt>
+                <dd>Foto a \(t=0\) de los fasores. El PLL del inversor, el Q del parque y el desfase del DFIG se dibujan aquí, no en el osciloscopio.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Factor de potencia (\(F_P\))</dt>
+                <dd>\(\cos\theta=P/S\). Setpoint de IEEE 1547: un inversor 2026 no corre a FP = 1 todo el día; entrega Q cuando la red lo pide. Más cerca de 1, más resistivo el POI.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Factores de potencia adelantado y atrasado</dt>
+                <dd>Adelantado: \(i\) adelanta a \(v\), red capacitiva (filtro del inversor, bancos). Atrasado: \(i\) retrasa, red inductiva (DFIG magnetizándose, LCL a 50 Hz).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fasor</dt>
+                <dd>Vector de módulo constante a un ángulo fijo del eje real. Representa \(v\) o \(i\) senoidal. El DSP del SiC trabaja en fasores RMS a 10–20 kHz.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Forma polar</dt>
+                <dd>\(A\angle\phi\): módulo (RMS del POI) y ángulo (desfase a la red, sentido antihorario desde el real positivo). Multiplicar y dividir se hacen aquí.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Forma rectangular</dt>
+                <dd>\(a+jb\): real (eje de P, en fase) e imaginario (eje de Q, con \(j\)). Sumar KVL/KCL aquí. \(j\) es un adelanto de 90°.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Número complejo</dt>
+                <dd>Punto del plano: real e imaginario, o módulo y ángulo. El estado del PLL es uno; la impedancia del LCL es otro.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Potencia promedio o real</dt>
+                <dd>\(P=V_{\mathrm{rms}}I_{\mathrm{rms}}\cos\theta\), lo que se factura y se disipa en un ciclo. El L y el C ideales no facturan; el dump y el cable sí.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Reactancia</dt>
+                <dd>Oposición de L o C al flujo de carga, sin disipar: intercambio con el campo. \(X_L=\omega L\) del DAB; \(X_C=1/(\omega C)\) del DC-link. En DC, \(X_L=0\) y \(X_C\to\infty\).</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Recíproco</dt>
+                <dd>\(1/z\). Admitancia del filtro, del string y de la red Thévenin vista por el inversor. En polar: invertir módulo y cambiar signo al ángulo.</dd>
+              </div>
+              <div class="glossary-item">
+                <dt>Fuente renovable no convencional</dt>
+                <dd>FV, eólica, océano, H<sub>2</sub>, BESS. Los fasores de 2026 son los del POI; \(X_L\) y \(X_C\) son el LCL y el DC-link; el FP es un setpoint, no un accidente.</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+      </details>
+
     </section>
   </main>
 

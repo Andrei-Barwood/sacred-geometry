@@ -1052,3 +1052,53 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
   background: rgba(30, 132, 73, 0.16);
   font-weight: 700;
 }
+
+/* Chapter 13.0 — sinusoidal AC, inverters, RMS */
+.scope-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.4rem 0 0.2rem;
+  background: #e4d5a4;
+  border-radius: 14px;
+  border: 2px solid #8a7544;
+  color: #3a3220;
+}
+
+[data-theme="dark"] .scope-svg {
+  background: #2a2618;
+  border-color: #7a6a3a;
+  color: #e8dcb0;
+}
+
+.wave-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  margin: 0.4rem 0 0.2rem;
+  color: var(--text-dark);
+}
+
+.lead-pill {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  padding: 0.12rem 0.5rem;
+  border-radius: 999px;
+  margin-right: 0.3rem;
+}
+
+.lead-v {
+  background: rgba(192, 57, 43, 0.16);
+  color: #7b241c;
+}
+
+.lead-i {
+  background: rgba(36, 113, 163, 0.16);
+  color: #1a5276;
+}
+
+[data-theme="dark"] .lead-v { color: #f5b7b1; }
+[data-theme="dark"] .lead-i { color: #aed6f1; }

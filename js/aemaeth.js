@@ -817,6 +817,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initSec10();
   initSec11();
   initSec12();
+  initSec13();
+  initSec14();
   initMiniCalc();
   initChapterFold();
 });
@@ -13554,4 +13556,2512 @@ Object.assign(presetsData, {
       desc: "Prob. 46 — abre antes de 5τ (1 µs = 2τ en 12.76). iL y vL al abrir no son los de estado estable." }
   }
 });
+
+// --- Chapter 13.0: sinusoidal AC (inversores, RMS, PLL 2026) ---
+const HALF_WAVE_RMS_CAL = Math.PI / Math.SQRT2; // 2.221
+
+function parseFlexNumber(raw) {
+  if (raw == null) return null;
+  let s = String(raw).trim().replace(/\s+/g, "").replace(/,/g, ".").replace(/π/g, "pi");
+  if (!s) return null;
+  const low = s.toLowerCase();
+  if (low.includes("/")) {
+    const parts = low.split("/");
+    if (parts.length !== 2) throw new Error("Fracción inválida.");
+    return parseFlexNumber(parts[0]) / parseFlexNumber(parts[1]);
+  }
+  if (low === "pi") return Math.PI;
+  if (low.endsWith("pi")) {
+    const coef = low.slice(0, -2);
+    if (coef === "" || coef === "+") return Math.PI;
+    if (coef === "-") return -Math.PI;
+    return parseFlexNumber(coef) * Math.PI;
+  }
+  return parseNumberInput(low.replace(/x10\^/g, "e"));
+}
+
+function readFlex(id) {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  const raw = (el.value || "").trim();
+  if (raw === "") return null;
+  return parseFlexNumber(raw);
+}
+
+function wrapDeg(d) {
+  let x = ((d + 180) % 360 + 360) % 360 - 180;
+  if (x === -180) x = 180;
+  return x;
+}
+
+function asSine(amp, phaseDeg, kind) {
+  let a = Number(amp), p = Number(phaseDeg) || 0;
+  if (kind === "cos") p += 90;
+  if (a < 0) { a = -a; p += 180; }
+  p = wrapDeg(p);
+  return { amp: a, phase: p };
+}
+
+function segsArea(segs) {
+  let A = 0;
+  for (const s of segs) {
+    const dt = s.t1 - s.t0;
+    if (s.kind === "const") A += s.v * dt;
+    else if (s.kind === "lin") A += 0.5 * (s.v0 + s.v1) * dt;
+    else if (s.kind === "sine") {
+      const w = s.w, amp = s.amp, phi = s.phi || 0, off = s.off || 0;
+      const F = (t) => off * t - amp * Math.cos(w * t + phi) / w;
+      A += F(s.t1) - F(s.t0);
+    } else if (s.kind === "cos") {
+      const w = s.w, amp = s.amp, phi = s.phi || 0, off = s.off || 0;
+      const F = (t) => off * t + amp * Math.sin(w * t + phi) / w;
+      A += F(s.t1) - F(s.t0);
+    }
+  }
+  return A;
+}
+
+function segsMoment2(segs) {
+  let Q = 0;
+  for (const s of segs) {
+    const dt = s.t1 - s.t0;
+    if (s.kind === "const") Q += s.v * s.v * dt;
+    else if (s.kind === "lin") {
+      const a = s.v0, b = s.v1;
+      Q += ((a * a + a * b + b * b) / 3) * dt;
+    } else {
+      const n = 120;
+      for (let i = 0; i < n; i++) {
+        const t = s.t0 + (dt * (i + 0.5)) / n;
+        const v = segsValueAt([s], t);
+        Q += v * v * (dt / n);
+      }
+    }
+  }
+  return Q;
+}
+
+function segsValueAt(segs, t) {
+  for (const s of segs) {
+    if (t < s.t0 - 1e-15 || t > s.t1 + 1e-15) continue;
+    if (s.kind === "const") return s.v;
+    if (s.kind === "lin") {
+      const u = (t - s.t0) / (s.t1 - s.t0 || 1);
+      return s.v0 + (s.v1 - s.v0) * u;
+    }
+    if (s.kind === "sine") return (s.off || 0) + s.amp * Math.sin(s.w * t + (s.phi || 0));
+    if (s.kind === "cos") return (s.off || 0) + s.amp * Math.cos(s.w * t + (s.phi || 0));
+  }
+  return 0;
+}
+
+function segsPts(segs, nSine = 48) {
+  const pts = [];
+  for (const s of segs) {
+    if (s.kind === "const") {
+      pts.push({ x: s.t0, y: s.v }, { x: s.t1, y: s.v });
+    } else if (s.kind === "lin") {
+      pts.push({ x: s.t0, y: s.v0 }, { x: s.t1, y: s.v1 });
+    } else {
+      for (let i = 0; i <= nSine; i++) {
+        const t = s.t0 + (s.t1 - s.t0) * i / nSine;
+        pts.push({ x: t, y: segsValueAt([s], t) });
+      }
+    }
+  }
+  return pts;
+}
+
+function drawWaveBook(svg, cfg) {
+  if (!svg) return;
+  const W = 640, H = cfg.H || 280, L = 58, R = 18, Top = 16, B = 42;
+  const pw = W - L - R, ph = H - Top - B;
+  const xMin = cfg.xMin, xMax = cfg.xMax, yMin = cfg.yMin, yMax = cfg.yMax;
+  const xOf = (x) => L + ((x - xMin) / (xMax - xMin)) * pw;
+  const yOf = (y) => Top + ph - ((y - yMin) / (yMax - yMin)) * ph;
+  const xTicks = cfg.xTicks || [];
+  const yTicks = cfg.yTicks || [];
+  const gridX = xTicks.map((x) => {
+    const px = xOf(x);
+    return `<line x1="${px}" y1="${Top}" x2="${px}" y2="${Top + ph}" stroke="currentColor" opacity="0.12"/>
+      <text x="${px}" y="${H - 16}" text-anchor="middle" font-size="11" fill="currentColor">${x}</text>`;
+  }).join("");
+  const gridY = yTicks.map((y) => {
+    const py = yOf(y);
+    return `<line x1="${L}" y1="${py}" x2="${W - R}" y2="${py}" stroke="currentColor" opacity="0.12"/>
+      <text x="${L - 6}" y="${py + 4}" text-anchor="end" font-size="11" fill="currentColor">${y}</text>`;
+  }).join("");
+  const zero = (yMin < 0 && yMax > 0)
+    ? `<line x1="${L}" y1="${yOf(0)}" x2="${W - R}" y2="${yOf(0)}" stroke="currentColor" stroke-width="1" opacity="0.45"/>`
+    : "";
+  const fills = (cfg.series || []).map((s) => {
+    if (!s.fill || !s.pts.length) return "";
+    const base = yOf(0);
+    const poly = s.pts.map((p) => `${xOf(p.x).toFixed(1)},${yOf(p.y).toFixed(1)}`).join(" ");
+    const first = s.pts[0], last = s.pts[s.pts.length - 1];
+    return `<polygon fill="${s.fill}" opacity="0.28" points="${xOf(first.x).toFixed(1)},${base} ${poly} ${xOf(last.x).toFixed(1)},${base}"/>`;
+  }).join("");
+  const polylines = (cfg.series || []).map((s) => {
+    const pts = s.pts.map((p) => `${xOf(p.x).toFixed(1)},${yOf(p.y).toFixed(1)}`).join(" ");
+    const dash = s.dash ? ` stroke-dasharray="${s.dash}"` : "";
+    return `<polyline fill="none" stroke="${s.color}" stroke-width="${s.width || 2.3}"${dash} points="${pts}"/>`;
+  }).join("");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.innerHTML = `
+    <rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>
+    ${gridX}${gridY}${zero}${fills}
+    <line x1="${L}" y1="${Top}" x2="${L}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.4"/>
+    <line x1="${L}" y1="${Top + ph}" x2="${W - R}" y2="${Top + ph}" stroke="currentColor" stroke-width="1.4"/>
+    ${polylines}
+    <text x="${W / 2}" y="${H - 4}" text-anchor="middle" font-size="12" fill="currentColor">${cfg.xLabel || ""}</text>
+    <text x="14" y="${Top + ph / 2}" text-anchor="middle" font-size="12" fill="currentColor" transform="rotate(-90 14 ${Top + ph / 2})">${cfg.yLabel || ""}</text>
+  `;
+}
+
+function drawScopeScreen(svg, cfg) {
+  if (!svg) return;
+  const W = 640, H = 400, cols = 10, rows = 8;
+  const L = 22, R = 16, Top = 14, B = 34;
+  const pw = W - L - R, ph = H - Top - B;
+  const dx = pw / cols, dy = ph / rows;
+  const x0 = L, y0 = Top, cx = x0 + pw / 2, cy = y0 + ph / 2;
+  const vSens = cfg.vSens, tSens = cfg.tSens;
+  const xOf = (t) => x0 + (t / tSens) * dx;
+  const yOf = (v) => cy - (v / vSens) * dy;
+  let grid = "";
+  for (let i = 0; i <= cols; i++) {
+    const x = x0 + i * dx;
+    grid += `<line x1="${x}" y1="${y0}" x2="${x}" y2="${y0 + ph}" stroke="#6a5a32" stroke-width="${i === 5 ? 1.5 : 0.7}" opacity="${i === 5 ? 0.85 : 0.45}"/>`;
+  }
+  for (let j = 0; j <= rows; j++) {
+    const y = y0 + j * dy;
+    grid += `<line x1="${x0}" y1="${y}" x2="${x0 + pw}" y2="${y}" stroke="#6a5a32" stroke-width="${j === 4 ? 1.5 : 0.7}" opacity="${j === 4 ? 0.85 : 0.45}"/>`;
+  }
+  for (let k = -5; k <= 5; k++) {
+    if (k === 0) continue;
+    const x = cx + k * dx * 0.2;
+    const y = cy + k * dy * 0.2;
+    grid += `<line x1="${x}" y1="${cy - 4}" x2="${x}" y2="${cy + 4}" stroke="#6a5a32" stroke-width="0.8"/>`;
+    grid += `<line x1="${cx - 4}" y1="${y}" x2="${cx + 4}" y2="${y}" stroke="#6a5a32" stroke-width="0.8"/>`;
+  }
+  const traces = (cfg.series || []).map((s) => {
+    const pts = s.pts.map((p) => `${xOf(p.x).toFixed(1)},${yOf(p.y).toFixed(1)}`).join(" ");
+    return `<polyline fill="none" stroke="${s.color}" stroke-width="2.4" points="${pts}"/>`;
+  }).join("");
+  const labels = (cfg.labels || []).map((lb) =>
+    `<text x="${xOf(lb.t)}" y="${yOf(lb.v)}" font-size="13" font-style="italic" fill="${lb.color || "#1a3a6b"}">${lb.text}</text>`
+  ).join("");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.innerHTML = `
+    <rect x="4" y="4" width="${W - 8}" height="${H - 8}" rx="18" fill="#e4d5a4"/>
+    <rect x="${x0}" y="${y0}" width="${pw}" height="${ph}" fill="none"/>
+    ${grid}${traces}${labels}
+    <text x="${W / 2}" y="${H - 10}" text-anchor="middle" font-size="12" fill="#3a3220">${cfg.caption || ""}</text>
+  `;
+}
+
+function sineTrace(amp, T, phiDeg, offset, tEnd, n = 160) {
+  const pts = [];
+  const w = 2 * Math.PI / T;
+  const phi = (phiDeg || 0) * Math.PI / 180;
+  for (let i = 0; i <= n; i++) {
+    const t = (tEnd * i) / n;
+    pts.push({ x: t, y: offset + amp * Math.sin(w * t + phi) });
+  }
+  return pts;
+}
+
+function ticksAround(min, max, n = 6) {
+  return niceTicks(min, max, n);
+}
+
+function packWave(segs, T, extra) {
+  const area = segsArea(segs);
+  const avg = area / T;
+  const rms = Math.sqrt(segsMoment2(segs) / T);
+  return Object.assign({ segs, T, area, avg, rms }, extra || {});
+}
+
+function bookFromPack(pack, svg, opts) {
+  const pts = segsPts(pack.segs);
+  const xs = pts.map((p) => p.x), ys = pts.map((p) => p.y);
+  const yAbs = Math.max(...ys.map(Math.abs), 1e-9);
+  drawWaveBook(svg, {
+    xMin: opts.xMin != null ? opts.xMin : Math.min(...xs),
+    xMax: opts.xMax != null ? opts.xMax : Math.max(...xs),
+    yMin: opts.yMin != null ? opts.yMin : -yAbs * 1.25,
+    yMax: opts.yMax != null ? opts.yMax : yAbs * 1.25,
+    xTicks: opts.xTicks,
+    yTicks: opts.yTicks,
+    xLabel: opts.xLabel || "t",
+    yLabel: opts.yLabel || "v",
+    H: opts.H,
+    series: [{ pts, color: "#1a5276", fill: "#2471a3" }]
+  });
+}
+
+const FIG13 = {};
+
+FIG13["83"] = {
+  pack: packWave([
+    { kind: "lin", t0: 0, t1: 6, v0: 0, v1: 5 },
+    { kind: "lin", t0: 6, t1: 8, v0: 5, v1: -1 },
+    { kind: "lin", t0: 8, t1: 10, v0: -1, v1: 0 },
+    { kind: "lin", t0: 10, t1: 16, v0: 0, v1: 5 },
+    { kind: "lin", t0: 16, t1: 18, v0: 5, v1: -1 },
+    { kind: "lin", t0: 18, t1: 20, v0: -1, v1: 0 }
+  ], 10, { unitT: "ms", unitV: "V" }),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 20, yMin: -3, yMax: 6, xTicks: [0, 6, 8, 10, 16, 18, 20], yTicks: [0, 5], xLabel: "t (ms)", yLabel: "v (V)" });
+  },
+  solve() {
+    const T = 10e-3, f = 1 / T;
+    return `Prob. 1 — fig. 13.83. Pico positivo a 6 ms y 16 ms → ${mj("T = 10\\,\\mathrm{ms}")}.\n` +
+      `De 0 a 20 ms hay 2 ciclos. ${mj(`f = 1/T = ${texQtyBody(f, "Hz")}`)} (rampa de un tracker / de un MPPT).\n` +
+      `Amplitud positiva = 5 V. El pico negativo se lee ≈ −1 V (no está etiquetado: por eso «piense»).\n` +
+      `${mj("V_{p-p} \\approx 6\\,\\mathrm{V}")}, no 10 V: la onda no es simétrica.`;
+  }
+};
+
+FIG13["84"] = {
+  pack: packWave([
+    { kind: "const", t0: 0, t1: 5, v: 10 },
+    { kind: "const", t0: 5, t1: 10, v: -10 },
+    { kind: "const", t0: 10, t1: 15, v: 0 },
+    { kind: "const", t0: 15, t1: 20, v: 10 },
+    { kind: "const", t0: 20, t1: 25, v: -10 },
+    { kind: "const", t0: 25, t1: 30, v: 0 },
+    { kind: "const", t0: 30, t1: 35, v: 10 }
+  ], 15, { unitT: "µs" }),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 35, yMin: -12, yMax: 12, xTicks: [0, 5, 10, 15, 20, 25, 30, 35], yTicks: [-10, 0, 10], xLabel: "t (µs)", yLabel: "v (V)" });
+  },
+  solve() {
+    const T = 15e-6, f = 1 / T, n = 35 / 15;
+    const p = this.pack;
+    return `Prob. 2 — fig. 13.84. Un ciclo = +10 / −10 / 0, cada 5 µs → ${mj("T = 15\\,\\mu\\mathrm{s}")}.\n` +
+      `Se muestran ${formatQtyPlain(n)} ciclos (2 completos + el +10 del tercero).\n` +
+      `${mj(`f = ${texQtyBody(f, "Hz")}`)} — PWM de un DAB / SiC, no de red.\n` +
+      `Pico +10 V, ${mj("V_{p-p} = 20\\,\\mathrm{V}")}.`;
+  }
+};
+
+FIG13["84b"] = {
+  pack: packWave([
+    { kind: "const", t0: 0, t1: 50 / 3, v: 10 },
+    { kind: "const", t0: 50 / 3, t1: 100 / 3, v: -10 },
+    { kind: "const", t0: 100 / 3, t1: 50, v: 0 },
+    { kind: "const", t0: 50, t1: 200 / 3, v: 10 },
+    { kind: "const", t0: 200 / 3, t1: 250 / 3, v: -10 },
+    { kind: "const", t0: 250 / 3, t1: 100, v: 0 }
+  ], 50),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 100, yMin: -12, yMax: 12, xTicks: [0, 16.7, 33.3, 50, 66.7, 83.3, 100], yTicks: [-10, 0, 10], xLabel: "t (µs)", yLabel: "v (mV)" });
+  },
+  solve() {
+    const T = 1 / 20000;
+    return `Prob. 9 — misma geometría que 13.84, ${mj("f = 20\\,\\mathrm{kHz}")}, pico 10 mV.\n` +
+      `${mj(`T = 1/f = ${texQtyBody(T, "s")}`)} = 50 µs. Cada tercio (alto / bajo / cero) dura 16.7 µs.\n` +
+      `Es el PWM de un DAB de rack LFP: 20 kHz, no 50 Hz.`;
+  }
+};
+
+FIG13["85"] = {
+  pack: packWave([
+    { kind: "lin", t0: -4, t1: 6, v0: 0, v1: 20 },
+    { kind: "lin", t0: 6, t1: 6.2, v0: 20, v1: 0 },
+    { kind: "lin", t0: 6.2, t1: 16, v0: 0, v1: 20 },
+    { kind: "lin", t0: 16, t1: 16.2, v0: 20, v1: 0 },
+    { kind: "lin", t0: 16.2, t1: 26, v0: 0, v1: 20 },
+    { kind: "lin", t0: 26, t1: 26.2, v0: 20, v1: 0 },
+    { kind: "lin", t0: 26.2, t1: 36, v0: 0, v1: 20 },
+    { kind: "lin", t0: 36, t1: 36.2, v0: 20, v1: 0 },
+    { kind: "lin", t0: 36.2, t1: 40, v0: 0, v1: 8 }
+  ], 10),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 40, yMin: -2, yMax: 24, xTicks: [0, 6, 16, 26, 36], yTicks: [0, 20], xLabel: "t (ms)", yLabel: "v (V)" });
+  },
+  solve() {
+    const T = 10e-3, f = 1 / T;
+    return `Prob. 3 — fig. 13.85. Picos en 6, 16, 26, 36 ms → ${mj("T = 10\\,\\mathrm{ms}")}, ${mj(`f = ${texQtyBody(f, "Hz")}`)}.\n` +
+      `Diente de sierra: portadora PWM de un MPPT / de un inversor. Pico 20 V.`;
+  }
+};
+
+FIG13["87a"] = {
+  draw(svg) {
+    const w = 1, phi = Math.PI / 6, pts = [];
+    for (let i = 0; i <= 120; i++) {
+      const th = -Math.PI / 2 + (2.4 * Math.PI * i) / 120;
+      pts.push({ x: th, y: 25 * Math.sin(w * th + phi) });
+    }
+    drawWaveBook(svg, { xMin: -1, xMax: 7, yMin: -30, yMax: 30, xTicks: [0], yTicks: [0, 25], xLabel: "ωt", yLabel: "v (V)",
+      series: [{ pts, color: "#1a5276", fill: "#2471a3" }] });
+  },
+  solve() {
+    return `Prob. 31.a — fig. 13.87.a. Cero (subiendo) en ${mj("-\\pi/6")}: ${mj("\\phi = +30^{\\circ}")}.\n` +
+      `${mj("f = 60\\,\\mathrm{Hz}")} → ${mj("\\omega = 377\\,\\mathrm{rad/s}")}. Pico 25 V.\n` +
+      `${mj("v = 25\\,\\mathrm{sen}(377t + 30^{\\circ})\\,\\mathrm{V}")}.\n` +
+      `Estator de un DFIG / tensión de red 60 Hz adelantada 30° al PLL.`;
+  }
+};
+
+FIG13["87b"] = {
+  draw(svg) {
+    const phi = -2 * Math.PI / 3, pts = [];
+    for (let i = 0; i <= 120; i++) {
+      const th = -Math.PI + (2.6 * Math.PI * i) / 120;
+      pts.push({ x: th, y: 3e-3 * Math.sin(th + phi) });
+    }
+    drawWaveBook(svg, { xMin: -2.4, xMax: 6.5, yMin: -0.004, yMax: 0.004, xTicks: [0], yTicks: [0, -0.003], xLabel: "ωt", yLabel: "i (A)",
+      series: [{ pts, color: "#1a5276", fill: "#2471a3" }] });
+  },
+  solve() {
+    return `Prob. 31.b — fig. 13.87.b. Retraso ${mj("2\\pi/3 = 120^{\\circ}")}. Pico 3 mA, ${mj("f = 1000\\,\\mathrm{Hz}")}.\n` +
+      `${mj("i = 3\\times 10^{-3}\\,\\mathrm{sen}(2000\\pi t - 120^{\\circ})\\,\\mathrm{A}")}.\n` +
+      `Auxiliar de un rack / CT de un feeder a 1 kHz.`;
+  }
+};
+
+FIG13["88a"] = {
+  draw(svg) {
+    const phi = -11 * Math.PI / 18, pts = [];
+    for (let i = 0; i <= 140; i++) {
+      const th = 0 + (2.4 * Math.PI * i) / 140;
+      pts.push({ x: th, y: 0.01 * Math.sin(th + phi) });
+    }
+    drawWaveBook(svg, { xMin: 0, xMax: 8, yMin: -0.012, yMax: 0.012, xTicks: [0, 1.92], yTicks: [0, 0.01], xLabel: "ωt", yLabel: "v (V)",
+      series: [{ pts, color: "#1a5276", fill: "#2471a3" }] });
+  },
+  solve() {
+    const w = 2 * Math.PI * 25;
+    return `Prob. 32.a — fig. 13.88.a. Cero (subiendo) a ${mj("11\\pi/18 = 110^{\\circ}")}. Pico 0.01 V, ${mj("f = 25\\,\\mathrm{Hz}")}.\n` +
+      `${mj(`v = 0.01\\,\\mathrm{sen}(${texQtyBody(w)} t - 110^{\\circ})\\,\\mathrm{V}`)}.\n` +
+      `Señal de un encoder / de un PLL lento de un aerogenerador.`;
+  }
+};
+
+FIG13["88b"] = {
+  draw(svg) {
+    const phi = 3 * Math.PI / 4, pts = [];
+    for (let i = 0; i <= 140; i++) {
+      const th = -2 + (2.5 * Math.PI * i) / 140;
+      pts.push({ x: th, y: 2e-3 * Math.sin(th + phi) });
+    }
+    drawWaveBook(svg, { xMin: -2.6, xMax: 6.2, yMin: -0.0024, yMax: 0.0024, xTicks: [0], yTicks: [0, 0.002], xLabel: "ωt", yLabel: "i (A)",
+      series: [{ pts, color: "#1a5276", fill: "#2471a3" }] });
+  },
+  solve() {
+    const w = 2 * Math.PI * 1e4;
+    return `Prob. 32.b — fig. 13.88.b. Adelanto ${mj("3\\pi/4 = 135^{\\circ}")}. Pico 2 mA, ${mj("f = 10\\,\\mathrm{kHz}")}.\n` +
+      `${mj(`i = 2\\times 10^{-3}\\,\\mathrm{sen}(${texQtyBody(w)} t + 135^{\\circ})\\,\\mathrm{A}`)}.\n` +
+      `Rizado de un DAB / de un chopper de electrolizador.`;
+  }
+};
+
+FIG13["89"] = {
+  draw(svg) {
+    const pts = [];
+    for (let i = 0; i <= 160; i++) {
+      const wt = -Math.PI + (3.2 * Math.PI * i) / 160;
+      const t = wt / (2 * Math.PI * 1000);
+      pts.push({ x: wt, y: 200 * Math.sin(wt + Math.PI / 3) });
+    }
+    drawWaveBook(svg, { xMin: -3.3, xMax: 6.6, yMin: -240, yMax: 240, xTicks: [-3.14, 0, 3.14, 6.28], yTicks: [0, 200], xLabel: "ωt (rad)", yLabel: "v",
+      series: [{ pts, color: "#1a5276", fill: "#2471a3" }] });
+  },
+  solve() {
+    const w = 2 * Math.PI * 1000;
+    const t1 = (120 * Math.PI / 180) / w;
+    return `Prob. 33 — ${mj("v = 200\\,\\mathrm{sen}(2\\pi 1000 t + 60^{\\circ})")}.\n` +
+      `t₁ es el primer cero bajando: ${mj("\\omega t + 60^{\\circ} = 180^{\\circ}")} → ${mj("\\omega t = 120^{\\circ}")}.\n` +
+      `${mj(`t_1 = 120^{\\circ}/\\omega = ${texQtyBody(t1, "s")}`)} = 333 µs.\n` +
+      `Un tercio de milisegundo: el tiempo que tarda el pico de un inversor 1 kHz (auxiliar / DAB lento) en cruzar cero.`;
+  }
+};
+
+FIG13["90"] = {
+  draw(svg) {
+    const pts = [];
+    const w = 50000, phi = -40 * Math.PI / 180;
+    for (let i = 0; i <= 160; i++) {
+      const wt = -Math.PI + (3.2 * Math.PI * i) / 160;
+      pts.push({ x: wt, y: 4 * Math.sin(wt + phi) });
+    }
+    drawWaveBook(svg, { xMin: -3.3, xMax: 6.6, yMin: -5, yMax: 5, xTicks: [-3.14, 0, 3.14, 6.28], yTicks: [0, 4], xLabel: "ωt", yLabel: "i (A)",
+      series: [{ pts, color: "#1a5276", fill: "#2471a3" }] });
+  },
+  solve() {
+    const w = 50000;
+    const t1 = (40 * Math.PI / 180) / w;
+    return `Prob. 34 — ${mj("i = 4\\,\\mathrm{sen}(50000 t - 40^{\\circ})")}.\n` +
+      `t₁ es el primer cero subiendo: ${mj("\\omega t - 40^{\\circ} = 0")}.\n` +
+      `${mj(`t_1 = 40^{\\circ}/\\omega = ${texQtyBody(t1, "s")}`)} = 14.0 µs.\n` +
+      `El retraso del PLL de un chopper a 50 krad/s.`;
+  }
+};
+
+FIG13["92"] = {
+  draw(svg) {
+    const T = 0.4e-3, tEnd = 10 * 0.2e-3;
+    const pts = sineTrace(0.010, T, 90, -0.025, tEnd);
+    drawScopeScreen(svg, { vSens: 0.010, tSens: 0.2e-3, series: [{ pts, color: "#1a5276" }],
+      caption: "10 mV/div · 0.2 ms/div · acoplo CD" });
+  },
+  solve() {
+    return `Prob. 37 — fig. 13.92. 5 ciclos en 10 div → 2 div/ciclo.\n` +
+      `${mj("T = 2\\times 0.2\\,\\mathrm{ms} = 0.400\\,\\mathrm{ms}")}, ${mj("f = 2.50\\,\\mathrm{kHz}")}.\n` +
+      `Centro de la senoide ≈ 2.5 div bajo el eje: ${mj("V_{\\mathrm{avg}} = -25\\,\\mathrm{mV}")}.\n` +
+      `Pico AC ≈ 1 div = 10 mV. Offset de un inversor / inyección de DC: el código de red la corta.`;
+  }
+};
+
+FIG13["92ac"] = {
+  draw(svg) {
+    const T = 0.4e-3, tEnd = 10 * 0.2e-3;
+    const pts = sineTrace(0.010, T, 90, 0, tEnd);
+    drawScopeScreen(svg, { vSens: 0.010, tSens: 0.2e-3, series: [{ pts, color: "#1a5276" }],
+      caption: "acoplo CA: se resta Vavg, el trazo se recentra" });
+  },
+  solve() {
+    return `Prob. 37.d — acoplo CA = condensador de acoplo del DSO: resta ${mj("V_{\\mathrm{avg}} = -25\\,\\mathrm{mV}")}.\n` +
+      `La senoide queda centrada, promedio nulo, misma amplitud 10 mV. El DC no se factura; el RMS AC sí.`;
+  }
+};
+
+FIG13["93a"] = {
+  pack: packWave([
+    { kind: "const", t0: -0.4, t1: 0, v: -3 },
+    { kind: "const", t0: 0, t1: 1, v: 6 },
+    { kind: "const", t0: 1, t1: 2, v: 3 },
+    { kind: "const", t0: 2, t1: 3, v: -3 },
+    { kind: "const", t0: 3, t1: 3.6, v: 6 }
+  ], 3),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: -0.5, xMax: 4, yMin: -4, yMax: 7, xTicks: [0, 1, 2, 3], yTicks: [-3, 0, 3, 6], xLabel: "t (s)", yLabel: "v (V)" });
+  },
+  solve() {
+    const avg = (6 * 1 + 3 * 1 + (-3) * 1) / 3;
+    return `Prob. 38.a — fig. 13.93.a. Un ciclo = 0 a 3 s.\n` +
+      `Área = ${mj("6\\cdot 1 + 3\\cdot 1 + (-3)\\cdot 1 = 6\\,\\mathrm{V\\cdot s}")}.\n` +
+      `${mj(`V_{\\mathrm{avg}} = 6/3 = ${texQtyBody(avg, "V")}`)}.\n` +
+      `Escalones de un dump / de un lastre de planta: el promedio no es cero, hay DC.`;
+  }
+};
+
+FIG13["93b"] = {
+  pack: packWave([
+    { kind: "lin", t0: 0, t1: 4, v0: 0, v1: 20 },
+    { kind: "const", t0: 4, t1: 6, v: -8 },
+    { kind: "const", t0: 6, t1: 8, v: 0 },
+    { kind: "lin", t0: 8, t1: 10, v0: 0, v1: 10 }
+  ], 8),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 11, yMin: -10, yMax: 22, xTicks: [0, 4, 6, 8], yTicks: [-8, 0, 20], xLabel: "t (ms)", yLabel: "i (mA)", yMax: 24 });
+  },
+  solve() {
+    const area = 0.5 * 4 * 20 + (-8) * 2;
+    const avg = area / 8;
+    return `Prob. 38.b — fig. 13.93.b. Un ciclo = 0 a 8 ms (el triángulo de t>8 es el siguiente).\n` +
+      `Área = ${mj("\\tfrac12\\cdot 4\\cdot 20 + (-8)\\cdot 2 = 24\\,\\mathrm{mA\\cdot ms}")}.\n` +
+      `${mj(`I_{\\mathrm{avg}} = 24/8 = ${texQtyBody(avg, "mA")}`)}.\n` +
+      `Rampa de un MPPT + pulso de dump.`;
+  }
+};
+
+FIG13["94a"] = {
+  pack: packWave([
+    { kind: "const", t0: 0, t1: 1, v: 0 },
+    { kind: "lin", t0: 1, t1: 4, v0: 0, v1: 10 },
+    { kind: "lin", t0: 4, t1: 6, v0: 10, v1: 0 },
+    { kind: "lin", t0: 6, t1: 7, v0: 0, v1: -10 },
+    { kind: "lin", t0: 7, t1: 8, v0: -10, v1: 0 },
+    { kind: "const", t0: 8, t1: 9, v: 0 },
+    { kind: "lin", t0: 9, t1: 11, v0: 0, v1: 6 }
+  ], 8),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 11, yMin: -12, yMax: 12, xTicks: [0, 1, 4, 6, 8], yTicks: [-10, 0, 10], xLabel: "t (s)", yLabel: "v (V)" });
+  },
+  solve() {
+    const ap = 0.5 * 5 * 10, an = 0.5 * 2 * (-10);
+    const avg = (ap + an) / 8;
+    return `Prob. 39.a — fig. 13.94.a. Ciclo 0 a 8 s.\n` +
+      `Triángulo + : base 5 s, h 10 V → área 25 V·s. Triángulo − : base 2 s → −10 V·s.\n` +
+      `${mj(`V_{\\mathrm{avg}} = 15/8 = ${texQtyBody(avg, "V")}`)}.\n` +
+      `Rampa asimétrica de un pitch / de un tracker: hay DC.`;
+  }
+};
+
+FIG13["94b"] = {
+  pack: packWave([
+    { kind: "lin", t0: 0, t1: Math.PI / 4, v0: 10, v1: 0 },
+    { kind: "const", t0: Math.PI / 4, t1: Math.PI / 2, v: 0 },
+    { kind: "cos", t0: Math.PI / 2, t1: 3 * Math.PI / 2, amp: 15, w: 1, phi: 0, off: 0 },
+    { kind: "const", t0: 3 * Math.PI / 2, t1: 2 * Math.PI, v: -5 }
+  ], 2 * Math.PI),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 7.2, yMin: -18, yMax: 14, xTicks: [0, 0.79, 1.57, 3.14, 4.71, 6.28], yTicks: [-15, -5, 0, 10], xLabel: "ωt (rad)", yLabel: "i (mA)" });
+  },
+  solve() {
+    const areaLin = 0.5 * (Math.PI / 4) * 10;
+    const areaSin = 15 * (Math.sin(3 * Math.PI / 2) - Math.sin(Math.PI / 2));
+    const areaRec = -5 * (Math.PI / 2);
+    const area = areaLin + areaSin + areaRec;
+    const avg = area / (2 * Math.PI);
+    return `Prob. 39.b — fig. 13.94.b. Ciclo 0 a ${mj("2\\pi")}.\n` +
+      `0→π/4: triángulo 10→0, área ${mj("5\\pi/4")}. π/2→3π/2: ${mj("15\\cos\\omega t")}, área −30.\n` +
+      `3π/2→2π: −5 mA, área ${mj("-5\\pi/2")}.\n` +
+      `${mj(`I_{\\mathrm{avg}} = ${texQtyBody(avg, "mA")}`)}.\n` +
+      `Media onda de un rectificador de un electrolizador + un lastre.`;
+  }
+};
+
+FIG13["95"] = {
+  draw(svg) {
+    const pts = [];
+    for (let i = 0; i <= 100; i++) {
+      const t = 10 * i / 100;
+      const v = t <= 5 ? 1 - Math.exp(-t) : Math.exp(5 - t);
+      pts.push({ x: t, y: v });
+    }
+    drawWaveBook(svg, { xMin: 0, xMax: 10, yMin: 0, yMax: 1.15, xTicks: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10], yTicks: [0, 1], xLabel: "t (s)", yLabel: "v (V)",
+      H: 300, series: [{ pts, color: "#1a5276", fill: "#2471a3" }] });
+  },
+  solve() {
+    const vs = [0, 0.632, 0.865, 0.951, 0.981, 0.993, 0.368, 0.135, 0.049, 0.019, 0.007];
+    let trap = 0;
+    for (let i = 0; i < 10; i++) trap += 0.5 * (vs[i] + vs[i + 1]);
+    const a1 = 5 + Math.exp(-5) - 1;
+    const a2 = 1 - Math.exp(-5);
+    const area = a1 + a2;
+    return `Prob. 40 — fig. 13.95. ${mj("0\\le t\\le 5:\\, v=1-e^{-t}")}. ${mj("5\\le t\\le 10:\\, v=e^{5-t}")}.\n` +
+      `Trapecios de 1 s con los puntos rotulados: área ≈ ${formatQtyPlain(trap)} V·s (el libro da 5 V·s).\n` +
+      `Área real: ${mj(`\\int_0^{5}(1-e^{-t})dt + \\int_5^{10}e^{5-t}dt = ${texQtyBody(area, "V\\cdot s")}`)}.\n` +
+      `${mj(`V_{\\mathrm{avg}} = 5/10 = 0.500\\,\\mathrm{V}`)}.\n` +
+      `Carga y discharge de un film DC-link / de un precharge: el área son volt-segundos.`;
+  }
+};
+
+FIG13["96"] = {
+  draw(svg) {
+    const tSens = 10e-6, T = 40e-6, tEnd = 10 * tSens;
+    const pts = [];
+    for (let t = 0; t <= tEnd + 1e-12; t += tSens / 20) {
+      const u = ((t % T) + T) % T;
+      const hi = (u < 15e-6) || (u >= 25e-6 && u < 30e-6);
+      pts.push({ x: t, y: hi ? 0.020 : 0 });
+    }
+    drawScopeScreen(svg, { vSens: 0.010, tSens, series: [{ pts, color: "#1a5276" }],
+      caption: "10 mV/div · 10 µs/div · acoplo CD" });
+  },
+  solve() {
+    return `Prob. 41 — fig. 13.96. Pareja ancho+estrecho cada 4 div → ${mj("T = 40\\,\\mu\\mathrm{s}")}, ${mj("f = 25\\,\\mathrm{kHz}")}.\n` +
+      `Alto 2 div = 20 mV. Duty ≈ 50 % → ${mj("V_{\\mathrm{avg}} = 10\\,\\mathrm{mV}")}.\n` +
+      `PWM de un DAB. El promedio es el DC que ve el filtro; el RMS es el estrés del SiC.`;
+  }
+};
+
+FIG13["96ac"] = {
+  draw(svg) {
+    const tSens = 10e-6, T = 40e-6, tEnd = 10 * tSens, avg = 0.010;
+    const pts = [];
+    for (let t = 0; t <= tEnd + 1e-12; t += tSens / 20) {
+      const u = ((t % T) + T) % T;
+      const hi = (u < 15e-6) || (u >= 25e-6 && u < 30e-6);
+      pts.push({ x: t, y: (hi ? 0.020 : 0) - avg });
+    }
+    drawScopeScreen(svg, { vSens: 0.010, tSens, series: [{ pts, color: "#1a5276" }],
+      caption: "acoplo CA: el pulso cruza el eje (Vavg restado)" });
+  },
+  solve() {
+    return `Prob. 41.d — acoplo CA resta 10 mV. Los pulsos van de −10 mV a +10 mV.\n` +
+      `El DSO ya no muestra el DC del duty: exactamente lo que hace el transformador de evacuación.`;
+  }
+};
+
+FIG13["97"] = {
+  pack: packWave([
+    { kind: "const", t0: 0, t1: 4, v: 2 },
+    { kind: "const", t0: 4, t1: 6, v: 0 },
+    { kind: "const", t0: 6, t1: 7, v: -2 },
+    { kind: "const", t0: 7, t1: 10, v: 0 },
+    { kind: "const", t0: 10, t1: 10.4, v: 3 },
+    { kind: "const", t0: 10.4, t1: 12, v: 0 }
+  ], 12),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 13, yMin: -3, yMax: 4, xTicks: [0, 4, 6, 7, 10, 12], yTicks: [-2, 0, 2, 3], xLabel: "t (s)", yLabel: "v (V)" });
+  },
+  solve() {
+    const T = 12, q = 4 * 4 + 4 * 1 + 9 * 0.4, rms = Math.sqrt(q / T);
+    const avg = (2 * 4 + (-2) * 1 + 3 * 0.4) / T;
+    return `Prob. 44 — fig. 13.97. Ciclo 0 a 12 s. Pulso de 3 V leído 10.0–10.4 s (0.40 s).\n` +
+      `${mj("\\int v^{2} dt = 2^{2}\\cdot 4 + (-2)^{2}\\cdot 1 + 3^{2}\\cdot 0.4 = 23.6")}.\n` +
+      `${mj(`V_{\\mathrm{rms}} = \\sqrt{23.6/12} = ${texQtyBody(rms, "V")}`)}.\n` +
+      `Promedio ${formatQty(avg, "V")} (hay DC: un string con huecos de nube y un pulso de dump).`;
+  }
+};
+
+FIG13["98"] = {
+  pack: packWave([
+    { kind: "const", t0: 0, t1: 2, v: 3 },
+    { kind: "const", t0: 2, t1: 4, v: 2 },
+    { kind: "const", t0: 4, t1: 6, v: 1 },
+    { kind: "const", t0: 6, t1: 8, v: -1 },
+    { kind: "const", t0: 8, t1: 10, v: -3 },
+    { kind: "const", t0: 10, t1: 12, v: -2 }
+  ], 12),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 13, yMin: -4, yMax: 4, xTicks: [0, 2, 4, 6, 8, 10, 12], yTicks: [-3, -2, -1, 0, 1, 2, 3], xLabel: "t (s)", yLabel: "v (V)" });
+  },
+  solve() {
+    const q = (9 + 4 + 1 + 1 + 9 + 4) * 2, rms = Math.sqrt(q / 12);
+    return `Prob. 45 — fig. 13.98. Escalera 3, 2, 1, −1, −3, −2 V, 2 s cada peldaño, T = 12 s.\n` +
+      `${mj("\\int v^{2} dt = 56")}. ${mj(`V_{\\mathrm{rms}} = \\sqrt{56/12} = ${texQtyBody(rms, "V")}`)}.\n` +
+      `Promedio 0 (simétrica en área). Un dispatch escalonado de un BESS, sin DC neto.`;
+  }
+};
+
+FIG13["99"] = {
+  pack: packWave([
+    { kind: "const", t0: 0, t1: 4, v: 10 },
+    { kind: "const", t0: 4, t1: 8, v: -10 }
+  ], 8),
+  draw(svg) {
+    bookFromPack(this.pack, svg, { xMin: 0, xMax: 9, yMin: -12, yMax: 12, xTicks: [0, 4, 8], yTicks: [-10, 0, 10], xLabel: "t (ms)", yLabel: "v (V)" });
+  },
+  solve() {
+    return `Prob. 46 — fig. 13.99. Cuadrada ±10 V, T = 8 ms, duty 50 %.\n` +
+      `${mj("V_{\\mathrm{avg}} = 0")}. ${mj("V_{\\mathrm{rms}} = 10\\,\\mathrm{V}")} (el pico: \(v^{2}\) es constante).\n` +
+      `Puente H de un DAB / de un inversor a baja frecuencia. El RMS es el pico, no \(0{,}707\,V_m\).`;
+  }
+};
+
+FIG13["84r"] = {
+  draw(svg) { FIG13["84"].draw(svg); },
+  solve() {
+    const T = 15, q = 100 * 5 + 100 * 5, rms = Math.sqrt(q / T);
+    return `Prob. 47 — fig. 13.84. T = 15 µs.\n` +
+      `${mj("V_{\\mathrm{avg}} = (10\\cdot 5 - 10\\cdot 5 + 0)/15 = 0")}.\n` +
+      `${mj(`V_{\\mathrm{rms}} = \\sqrt{(100\\cdot 5 + 100\\cdot 5)/15} = ${texQtyBody(rms, "V")}`)}.\n` +
+      `PWM simétrico: no hay DC, el RMS no es el pico (hay un tercio a cero).`;
+  }
+};
+
+FIG13["85r"] = {
+  draw(svg) { FIG13["85"].draw(svg); },
+  solve() {
+    return `Prob. 48 — fig. 13.85. Diente 0 → 20 V, T = 10 ms.\n` +
+      `Área de un ciclo = ${mj("\\tfrac12\\cdot 10\\,\\mathrm{ms}\\cdot 20\\,\\mathrm{V}")}.\n` +
+      `${mj("V_{\\mathrm{avg}} = 10\\,\\mathrm{V}")} (la mitad del pico).\n` +
+      `Portadora PWM: el promedio es el duty × pico si el diente va de 0 a \(V_m\).`;
+  }
+};
+
+FIG13["100a"] = {
+  draw(svg) {
+    const tSens = 10e-6, T = 40e-6, tEnd = 10 * tSens;
+    const pts = sineTrace(0.035, T, 90, 0.025, tEnd);
+    drawScopeScreen(svg, { vSens: 0.020, tSens, series: [{ pts, color: "#1a5276" }],
+      caption: "20 mV/div · 10 µs/div" });
+  },
+  solve() {
+    const dc = 0.025, ac = 0.035, rms = Math.sqrt(dc * dc + (ac * ac) / 2);
+    return `Prob. 49.a — fig. 13.100.a. 2.5 ciclos / 10 div → ${mj("T = 40\\,\\mu\\mathrm{s}")}, ${mj("f = 25\\,\\mathrm{kHz}")}.\n` +
+      `Pico ≈ +3 div = +60 mV, valle ≈ −0.5 div = −10 mV → ${mj("V_{\\mathrm{avg}} = 25\\,\\mathrm{mV}")}, ${mj("V_{\\mathrm{ac}} = 35\\,\\mathrm{mV}")} pico.\n` +
+      `${mj(`V_{\\mathrm{rms}} = \\sqrt{V_{dc}^{2} + V_{m}^{2}/2} = ${texQtyBody(rms, "V")}`)} = 35.2 mV.\n` +
+      `Rizado de un DC-link con offset: el RMS calienta el cable, el DC es inyección.`;
+  }
+};
+
+FIG13["100b"] = {
+  draw(svg) {
+    const tSens = 50e-6, T = 100e-6, tEnd = 10 * tSens;
+    const pts = sineTrace(0.20, T, 90, -0.20, tEnd);
+    drawScopeScreen(svg, { vSens: 0.20, tSens, series: [{ pts, color: "#1a5276" }],
+      caption: "0.2 V/div · 50 µs/div" });
+  },
+  solve() {
+    const dc = -0.20, ac = 0.20, rms = Math.sqrt(dc * dc + (ac * ac) / 2);
+    return `Prob. 49.b — fig. 13.100.b. 5 ciclos / 10 div → ${mj("T = 100\\,\\mu\\mathrm{s}")}, ${mj("f = 10\\,\\mathrm{kHz}")}.\n` +
+      `Picos en el eje, valles a −2 div = −0.40 V → ${mj("V_{\\mathrm{avg}} = -0.200\\,\\mathrm{V}")}, pico AC 0.200 V.\n` +
+      `${mj(`V_{\\mathrm{rms}} = ${texQtyBody(rms, "V")}`)}.\n` +
+      `Rizado negativo de un chopper de electrolizador / de un DAB.`;
+  }
+};
+
+FIG13["101a"] = {
+  draw(svg) {
+    const d = S();
+    d.box(40, 40, 160, 120, "");
+    d.txt(52, 70, "d'Arsonval", "#1a5276");
+    d.txt(52, 92, "escala RMS", "#1a5276");
+    d.txt(52, 112, "(media onda)", "#1a5276");
+    d.o(200, 70); d.o(200, 130);
+    d.w(200, 70, 280, 70); d.w(200, 130, 280, 130);
+    d.w(280, 70, 280, 40); d.w(280, 40, 360, 40);
+    d.rv(360, 40, 120, "2 kΩ");
+    d.w(360, 160, 280, 160); d.w(280, 160, 280, 130);
+    d.txt(300, 30, "+", "#1e8449");
+    d.txt(300, 178, "−", "#c0392b");
+    d.arrD(400, 50, "Icd = 4 mA");
+    d.txt(48, 175, "Voltímetro", "#2471a3");
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const vdc = 0.004 * 2000;
+    const reading = HALF_WAVE_RMS_CAL * vdc;
+    return `Prob. 50.a — fig. 13.101.a. ${mj("V = I R = 4\\,\\mathrm{mA}\\times 2\\,\\mathrm{k}\\Omega = 8.00\\,\\mathrm{V}")} DC.\n` +
+      `PMMC + rectificador de media onda, escala RMS: factor ${mj("\\pi/\\sqrt{2} = 2.221")}.\n` +
+      `Lectura = ${mj(`2.221\\times 8.00 = ${texQtyBody(reading, "V")}`)}.\n` +
+      `Un true-RMS leería 8.00 V. El de media onda, no: por eso el polímetro barato miente en DC y en PWM.`;
+  }
+};
+
+FIG13["101b"] = {
+  draw(svg) {
+    const d = S();
+    d.txt(40, 50, "ca", "#2471a3");
+    d.w(80, 80, 200, 80); d.w(80, 160, 200, 160);
+    d.arrR(140, 80, ""); d.arrR(140, 160, "");
+    d.rv(240, 80, 80, "v = 16 sen(377t + 20°)");
+    d.txt(258, 70, "+", "#1e8449");
+    d.txt(258, 178, "−", "#c0392b");
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const vm = 16, rms = vm / Math.SQRT2, f = 377 / (2 * Math.PI);
+    return `Prob. 50.b — fig. 13.101.b. ${mj("v = 16\\,\\mathrm{sen}(377t + 20^{\\circ})")}.\n` +
+      `${mj("f = 377/(2\\pi) = 60.0\\,\\mathrm{Hz}")} (red). ${mj(`V_{\\mathrm{rms}} = 16/\\sqrt{2} = ${texQtyBody(rms, "V")}`)}.\n` +
+      `El medidor está calibrado para senoidales: lee ${formatQty(rms, "V")} (correcto).\n` +
+      `La fase +20° no cambia el RMS ni la lectura de un instrumento de valor efectivo.`;
+  }
+};
+
+function bindWave(selId, btnId, svgId, outId, cat) {
+  const sel = document.getElementById(selId);
+  const svg = document.getElementById(svgId);
+  const out = document.getElementById(outId);
+  const paint = () => {
+    if (!sel || !svg) return;
+    const it = cat[sel.value];
+    if (it && it.draw) it.draw(svg);
+  };
+  const run = () => {
+    paint();
+    try {
+      const it = cat[sel.value];
+      if (!it || !it.solve) throw new Error("Figura no implementada.");
+      setMathText(out, it.solve());
+    } catch (e) { setMathText(out, e.message); }
+  };
+  document.getElementById(btnId)?.addEventListener("click", run);
+  sel?.addEventListener("change", paint);
+  paint();
+}
+
+function plotSineCard(svg, amp, omega, axis) {
+  const f = Math.abs(omega) / (2 * Math.PI);
+  const T = f ? 1 / f : 1;
+  let xMin, xMax, xLabel, pts = [];
+  if (axis === "deg") {
+    xMin = 0; xMax = 360; xLabel = "α (°)";
+    for (let i = 0; i <= 180; i++) {
+      const deg = xMax * i / 180;
+      pts.push({ x: deg, y: amp * Math.sin(deg * Math.PI / 180) });
+    }
+  } else if (axis === "rad") {
+    xMin = 0; xMax = 2 * Math.PI; xLabel = "α (rad)";
+    for (let i = 0; i <= 180; i++) {
+      const th = xMax * i / 180;
+      pts.push({ x: th, y: amp * Math.sin(th) });
+    }
+  } else {
+    xMin = 0; xMax = 2 * T; xLabel = "t (s)";
+    for (let i = 0; i <= 180; i++) {
+      const t = xMax * i / 180;
+      pts.push({ x: t, y: amp * Math.sin(omega * t) });
+    }
+  }
+  const ym = Math.abs(amp) * 1.25 || 1;
+  drawWaveBook(svg, {
+    xMin, xMax, yMin: -ym, yMax: ym,
+    xTicks: axis === "deg" ? [0, 90, 180, 270, 360] : axis === "rad" ? [0, 1.57, 3.14, 4.71, 6.28] : ticksAround(xMin, xMax, 4),
+    yTicks: ticksAround(-ym, ym, 4),
+    xLabel, yLabel: "v",
+    series: [{ pts, color: "#1a5276", fill: "#2471a3" }]
+  });
+}
+
+function initSec13() {
+  bindWave("s132f-fig", "btn-s132f", "svg-s132f", "proc-13-2f", FIG13);
+  bindWave("s135f-fig", "btn-s135f", "svg-s135f", "proc-13-5f", FIG13);
+  bindWave("s136-fig", "btn-s136", "svg-s136", "proc-13-6", FIG13);
+  bindWave("s137f-fig", "btn-s137f", "svg-s137f", "proc-13-7f", FIG13);
+  bindWave("s138-fig", "btn-s138", "svg-s138", "proc-13-8", FIG13);
+
+  document.getElementById("btn-s132")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-2");
+    try {
+      let T = readFlex("s132-t");
+      let f = readFlex("s132-f");
+      let n = readFlex("s132-n");
+      let tn = readFlex("s132-tn");
+      if (T != null) T *= readUnit("s132-t-u");
+      if (f != null) f *= readUnit("s132-f-u");
+      if (tn != null) tn *= readUnit("s132-tn-u");
+      let proc = `${mj("T = 1/f")}, ${mj("f = 1/T")}. Red 50 Hz → 20 ms; 60 Hz → 16.7 ms.\n`;
+      if (T == null && f == null && tn != null && n) {
+        T = tn / n; f = 1 / T;
+      } else if (T == null && f != null) T = 1 / f;
+      else if (f == null && T != null) f = 1 / T;
+      else if (T != null && f != null) {
+        proc += `Comprobación: 1/T = ${formatQty(1 / T, "Hz")} vs f = ${formatQty(f, "Hz")}.\n`;
+      } else throw new Error("Indica T o f (o n ciclos y su duración).");
+      writeQtyField("s132-t", "s132-t-u", T);
+      writeQtyField("s132-f", "s132-f-u", f);
+      proc += `${mj(`T = ${texQtyBody(T, "s")}`)}, ${mj(`f = ${texQtyBody(f, "Hz")}`)}.\n`;
+      if (n == null && tn != null) n = tn / T;
+      if (tn == null && n != null) tn = n * T;
+      if (n != null) {
+        writeQtyField("s132-tn", "s132-tn-u", n * T);
+        setField("s132-n", n);
+        proc += `${formatQtyPlain(n)} ciclos duran ${formatQty(n * T, "s")}.`;
+      }
+      setMathText(out, proc);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  const paint86 = (dc) => {
+    const tSens = 10e-6, T = 40e-6, tEnd = 10 * tSens;
+    const pts = sineTrace(0.100, T, 90, dc, tEnd);
+    drawScopeScreen(document.getElementById("svg-s132s"), {
+      vSens: 0.050, tSens, series: [{ pts, color: "#1a5276" }],
+      caption: dc ? `offset DC = ${(dc * 1e3).toFixed(1)} mV` : "sin offset"
+    });
+  };
+  paint86(0);
+
+  document.getElementById("btn-s132s")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-2s");
+    try {
+      const dcIn = readFlex("s132s-dc") ?? 0;
+      const dc = dcIn * 1e-3;
+      paint86(dc);
+      const vp = 0.100, T = 40e-6, f = 1 / T;
+      let proc = `Fig. 13.86. Pico a pico visual ≈ 4 div × 50 mV = 200 mV → ${mj(`V_m = ${texQtyBody(vp, "V")}`)}.\n`;
+      proc += `Un ciclo ≈ 4 div × 10 µs → ${mj(`T = ${texQtyBody(T, "s")}`)}, ${mj(`f = ${texQtyBody(f, "Hz")}`)}.\n`;
+      if (dc) {
+        proc += `Offset ${formatQty(dc, "V")} = ${(dc / 0.050).toFixed(2)} div. El trazo sube.\n`;
+        proc += `+25 mV es inyección de DC en el POI: IEEE 1547 la limita; el relé de DC tripalea.`;
+      } else proc += `Sin offset: senoidal centrada de un inversor enganchado.`;
+      setMathText(out, proc);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s133a")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-3a");
+    try {
+      const degIn = readFlex("s133-deg");
+      const radIn = readFlex("s133-rad");
+      const piIn = readFlex("s133-pi");
+      let deg, rad, proc = `${mj("\\mathrm{rad} = ^{\\circ}\\times\\pi/180")}, ${mj("1\\,\\mathrm{rad} \\approx 57.3^{\\circ}")}. ${mj("2\\pi\\,\\mathrm{rad} = 360^{\\circ}")}.\n`;
+      if (degIn != null) {
+        deg = degIn; rad = deg * Math.PI / 180;
+        setField("s133-rad", rad);
+        setField("s133-pi", deg / 180);
+      } else if (piIn != null) {
+        rad = piIn * Math.PI; deg = rad * 180 / Math.PI;
+        setField("s133-deg", deg);
+        setField("s133-rad", rad);
+      } else if (radIn != null) {
+        rad = radIn; deg = rad * 180 / Math.PI;
+        setField("s133-deg", deg);
+        setField("s133-pi", rad / Math.PI);
+      } else throw new Error("Indica grados, radianes o el coeficiente de π.");
+      proc += `${formatQtyPlain(deg)}° = ${formatQty(rad, "rad")} = ${formatQtyPlain(rad / Math.PI)} π rad.`;
+      setMathText(out, proc);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s133b")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-3b");
+    try {
+      let T = readFlex("s133-t");
+      let f = readFlex("s133-f");
+      let w = readFlex("s133-w");
+      const ang = readFlex("s133-ang");
+      if (T != null) T *= readUnit("s133-t-u");
+      if (f != null) f *= readUnit("s133-f-u");
+      let proc = `${mj("\\omega = 2\\pi f = 2\\pi/T")}. PLL: 314 rad/s (50 Hz), 377 rad/s (60 Hz).\n`;
+      if (w == null && f == null && T != null && ang != null) {
+        w = (ang * Math.PI / 180) / T;
+        f = w / (2 * Math.PI);
+        proc += `Ángulo ${formatQtyPlain(ang)}° en ${formatQty(T, "s")} → ω = θ/t (aquí T es el tiempo de recorrido, no el periodo).\n`;
+        T = 1 / f;
+      } else if (w != null) { f = w / (2 * Math.PI); T = 1 / f; }
+      else if (f != null) { w = 2 * Math.PI * f; T = 1 / f; }
+      else if (T != null) { f = 1 / T; w = 2 * Math.PI * f; }
+      else throw new Error("Indica T, f o ω.");
+      writeQtyField("s133-t", "s133-t-u", T);
+      writeQtyField("s133-f", "s133-f-u", f);
+      setField("s133-w", w);
+      proc += `${mj(`\\omega = ${texQtyBody(w, "rad/s")}`)}, ${mj(`f = ${texQtyBody(f, "Hz")}`)}, ${mj(`T = ${texQtyBody(T, "s")}`)}.\n`;
+      if (ang != null && w) {
+        const tAng = (ang * Math.PI / 180) / w;
+        proc += `Recorrer ${formatQtyPlain(ang)}° tarda ${formatQty(tAng, "s")}.`;
+      }
+      setMathText(out, proc);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s134")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-4");
+    try {
+      const A = readFlex("s134-a"), w = readFlex("s134-w");
+      const axis = document.getElementById("s134-axis")?.value || "deg";
+      if (A == null || w == null) throw new Error("Indica A y ω.");
+      const f = Math.abs(w) / (2 * Math.PI), T = 1 / f;
+      plotSineCard(document.getElementById("svg-s134"), A, w, axis);
+      setMathText(out, `${mj(`v = ${texQtyBody(A)}\\,\\mathrm{sen}(${texQtyBody(w)} t)`)}.\n` +
+        `Pico |A| = ${formatQty(Math.abs(A))}. ${mj(`f = \\omega/(2\\pi) = ${texQtyBody(f, "Hz")}`)}, ${mj(`T = ${texQtyBody(T, "s")}`)}.\n` +
+        (A < 0 ? "A negativa = inversión: equivalente a +180° de fase (un string al revés).\n" : "") +
+        `Abscisa: ${axis === "deg" ? "grados" : axis === "rad" ? "radianes" : "tiempo"}.`);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s134i")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-4i");
+    try {
+      const A = readFlex("s134i-a"), al = readFlex("s134i-al"), v = readFlex("s134i-v");
+      if (A == null) throw new Error("Indica A.");
+      const unit = document.getElementById("s134i-alu")?.value || "deg";
+      if (v == null) {
+        if (al == null) throw new Error("Indica α o el valor.");
+        const rad = unit === "deg" ? al * Math.PI / 180 : al;
+        const val = A * Math.sin(rad);
+        setMathText(out, `${mj("v = A\\,\\mathrm{sen}\\,\\alpha")}.\n` +
+          `α = ${unit === "deg" ? formatQtyPlain(al) + "°" : formatQty(al, "rad")} → ${mj(`v = ${texQtyBody(val)}`)}.`);
+      } else {
+        const s = v / A;
+        if (Math.abs(s) > 1) throw new Error("|v| > |A|: no hay ángulo real.");
+        const a1 = Math.asin(s) * 180 / Math.PI;
+        const a2 = 180 - a1;
+        setMathText(out, `${mj("\\mathrm{sen}\\,\\alpha = v/A")} = ${formatQtyPlain(s)}.\n` +
+          `α = ${formatQtyPlain(a1)}° o ${formatQtyPlain(a2)}° (y ±360°k).\n` +
+          `Dos instantes por ciclo: el ADC del inversor los ve los dos.`);
+      }
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s134b")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-4b");
+    try {
+      const v = readFlex("s134b-v"), al = readFlex("s134b-al");
+      let t = readFlex("s134b-t");
+      if (v == null || al == null || t == null) throw new Error("Indica v, α y t.");
+      t *= readUnit("s134b-t-u");
+      const s = Math.sin(al * Math.PI / 180);
+      if (Math.abs(s) < 1e-12) throw new Error("sen α = 0: no define Vm.");
+      const Vm = v / s;
+      const w = (al * Math.PI / 180) / t;
+      const f = w / (2 * Math.PI);
+      setMathText(out, `${mj("v = V_m\\,\\mathrm{sen}\\,\\alpha")} → ${mj(`V_m = v/\\mathrm{sen}\\alpha = ${texQtyBody(Vm)}`)}.\n` +
+        `${mj("\\alpha = \\omega t")} → ${mj(`\\omega = ${texQtyBody(w, "rad/s")}`)}, ${mj(`f = ${texQtyBody(f, "Hz")}`)}.\n` +
+        `${mj(`v = ${texQtyBody(Vm)}\\,\\mathrm{sen}(${texQtyBody(w)} t)`)}.\n` +
+        `Un punto del POI fija pico y PLL si asumes φ = 0.`);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  const runPhase = (a1, k1, p1, a2, k2, p2, w, svg, out) => {
+    const s1 = asSine(a1, p1, k1), s2 = asSine(a2, p2, k2);
+    const lead = wrapDeg(s1.phase - s2.phase);
+    let proc = `Forma 1 → ${mj(`${texQtyBody(s1.amp)}\\,\\mathrm{sen}(\\omega t + ${texQtyBody(s1.phase)}^{\\circ})`)}.\n`;
+    proc += `Forma 2 → ${mj(`${texQtyBody(s2.amp)}\\,\\mathrm{sen}(\\omega t + ${texQtyBody(s2.phase)}^{\\circ})`)}.\n`;
+    if (Math.abs(lead) < 0.05) proc += `En fase (el PLL y la red coinciden; FP ≈ 1).\n`;
+    else if (lead > 0) proc += `La 1 adelanta a la 2 por ${formatQtyPlain(lead)}°.\n`;
+    else proc += `La 1 retrasa respecto a la 2 por ${formatQtyPlain(-lead)}°.\n`;
+    if (w) {
+      const dt = Math.abs(lead) * Math.PI / 180 / w;
+      proc += `Retraso temporal = |φ|/ω = ${formatQty(dt, "s")}.`;
+    }
+    if (svg) {
+      const pts1 = [], pts2 = [];
+      for (let i = 0; i <= 180; i++) {
+        const deg = 360 * i / 180;
+        pts1.push({ x: deg, y: s1.amp * Math.sin((deg + s1.phase) * Math.PI / 180) });
+        pts2.push({ x: deg, y: s2.amp * Math.sin((deg + s2.phase) * Math.PI / 180) });
+      }
+      const ym = Math.max(s1.amp, s2.amp) * 1.25;
+      drawWaveBook(svg, { xMin: 0, xMax: 360, yMin: -ym, yMax: ym, xTicks: [0, 90, 180, 270, 360], yTicks: ticksAround(-ym, ym, 4),
+        xLabel: "ωt (°)", yLabel: "v, i",
+        series: [
+          { pts: pts1, color: "#c0392b", fill: null },
+          { pts: pts2, color: "#2471a3", fill: null, dash: "6 3" }
+        ] });
+    }
+    setMathText(out, proc);
+  };
+
+  document.getElementById("btn-s135")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-5");
+    try {
+      const a1 = readFlex("s135-a1"), a2 = readFlex("s135-a2");
+      const p1 = readFlex("s135-p1") ?? 0, p2 = readFlex("s135-p2") ?? 0;
+      const w = readFlex("s135-w");
+      if (a1 == null || a2 == null) throw new Error("Indica ambas amplitudes.");
+      const k1 = document.getElementById("s135-k1")?.value || "sin";
+      const k2 = document.getElementById("s135-k2")?.value || "sin";
+      runPhase(a1, k1, p1, a2, k2, p2, w, document.getElementById("svg-s135"), out);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  const paint91 = () => {
+    const tSens = 1e-3, T = 8e-3, tEnd = 10 * tSens;
+    const e = sineTrace(1.5, T, 90, 0, tEnd);
+    const i = sineTrace(1.0, T, 0, 0, tEnd);
+    drawScopeScreen(document.getElementById("svg-s135s"), {
+      vSens: 0.5, tSens,
+      series: [{ pts: e, color: "#c0392b" }, { pts: i, color: "#1a5276" }],
+      labels: [{ t: 1.2e-3, v: 1.35, text: "e", color: "#c0392b" }, { t: 2.6e-3, v: 0.7, text: "i", color: "#1a5276" }],
+      caption: "0.5 V/div · 1 ms/div"
+    });
+  };
+  paint91();
+  document.getElementById("btn-s135s")?.addEventListener("click", () => {
+    paint91();
+    const er = 1.5 / Math.SQRT2, ir = 1.0 / Math.SQRT2;
+    setMathText(document.getElementById("proc-13-5s"),
+      `Prob. 36 — fig. 13.91. Un ciclo ≈ 8 div × 1 ms → ${mj("T = 8.00\\,\\mathrm{ms}")}, ${mj("f = 125\\,\\mathrm{Hz}")} (ambas).\n` +
+      `e: 3 div × 0.5 V = 1.50 V pico → ${mj(`V_{\\mathrm{rms}} = ${texQtyBody(er, "V")}`)}.\n` +
+      `i: 2 div × 0.5 V = 1.00 V pico → ${mj(`I_{\\mathrm{rms}} = ${texQtyBody(ir, "V")}`)} (el canal i está en voltios: shunt / sonda).\n` +
+      `Pico de e en el borde izquierdo; pico de i ≈ 2 div después → 2/8 × 360° = 90°.\n` +
+      `e adelanta a i 90° (Q capacitivo del LCL / de un filtro de planta).`);
+  });
+
+  document.getElementById("btn-s137")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-7");
+    try {
+      let vm = readFlex("s137-vm"), rms = readFlex("s137-rms");
+      const f = readFlex("s137-f") ?? 60;
+      const ph = readFlex("s137-ph") ?? 0;
+      if (vm == null && rms == null) throw new Error("Indica pico o RMS.");
+      if (rms == null) rms = Math.abs(vm) / Math.SQRT2;
+      else if (vm == null) vm = rms * Math.SQRT2;
+      setField("s137-vm", vm);
+      setField("s137-rms", rms);
+      const w = 2 * Math.PI * f;
+      setMathText(out, `${mj("V_{\\mathrm{rms}} = V_m/\\sqrt{2} = 0.707 V_m")}. Fase y ω no entran.\n` +
+        `Pico ${formatQty(vm)}, RMS ${formatQty(rms)}.\n` +
+        `${mj(`v = ${texQtyBody(vm)}\\,\\mathrm{sen}(${texQtyBody(w)} t + ${texQtyBody(ph)}^{\\circ})`)}.\n` +
+        `El nombre de placa de un inversor es el RMS; el MOV se compra al pico.`);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s1310a")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-10a");
+    try {
+      const A = readFlex("s1310-a"), w = readFlex("s1310-w"), ph = readFlex("s1310-ph") ?? 0;
+      if (A == null || w == null) throw new Error("Indica A y ω.");
+      const f = Math.abs(w) / (2 * Math.PI), T = 1 / f, rms = Math.abs(A) / Math.SQRT2;
+      setMathText(out, `Prob. 51 — el «print» de QBASIC:\n` +
+        `${mj(`V_{\\mathrm{rms}} = |A|/\\sqrt{2} = ${texQtyBody(rms)}`)}\n` +
+        `${mj(`f = \\omega/(2\\pi) = ${texQtyBody(f, "Hz")}`)}\n` +
+        `${mj(`T = 1/f = ${texQtyBody(T, "s")}`)}\n` +
+        `φ = ${formatQtyPlain(ph)}° no cambia RMS ni f. El navegador sustituye a Pascal.`);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s1310b")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-10b");
+    try {
+      const a1 = readFlex("s1310b-a1"), a2 = readFlex("s1310b-a2");
+      const p1 = readFlex("s1310b-p1") ?? 0, p2 = readFlex("s1310b-p2") ?? 0;
+      const w = readFlex("s1310b-w");
+      if (a1 == null || a2 == null) throw new Error("Indica ambas amplitudes.");
+      runPhase(a1, "sin", p1, a2, "sin", p2, w, null, out);
+    } catch (err) { setMathText(out, err.message); }
+  });
+
+  document.getElementById("btn-s1310c")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-13-10c");
+    try {
+      const rows = [
+        ["s1310c-t0", "s1310c-t1", "s1310c-v0"],
+        ["s1310c-t1b", "s1310c-t2", "s1310c-v1"],
+        ["s1310c-t2b", "s1310c-t3", "s1310c-v2"],
+        ["s1310c-t3b", "s1310c-t4", "s1310c-v3"]
+      ];
+      const segs = [];
+      for (const [a, b, c] of rows) {
+        const t0 = readFlex(a), t1 = readFlex(b), v = readFlex(c);
+        if (t0 == null || t1 == null || v == null) continue;
+        segs.push({ kind: "const", t0, t1, v });
+      }
+      if (!segs.length) throw new Error("Indica al menos un tramo t0, t1, v.");
+      const T = segs[segs.length - 1].t1 - segs[0].t0;
+      if (T <= 0) throw new Error("El ciclo tiene que avanzar en t.");
+      const p = packWave(segs, T);
+      bookFromPack(p, document.getElementById("svg-s1310c"), { xLabel: "t", yLabel: "v" });
+      setMathText(out, `Prob. 53 — pulso a tramos, T = ${formatQty(T)}.\n` +
+        `Área neta = ${formatQty(p.area)}. ${mj(`V_{\\mathrm{avg}} = ${texQtyBody(p.avg)}`)}.\n` +
+        `${mj(`V_{\\mathrm{rms}} = ${texQtyBody(p.rms)}`)}.\n` +
+        `PWM de un SiC / dump / chopper: el promedio es el DC; el RMS es el calor.`);
+    } catch (err) { setMathText(out, err.message); }
+  });
+}
+
+Object.assign(presetsData, {
+  "13-2": {
+    p1: { selects: { "s132f-fig": "83" }, click: "btn-s132f",
+      desc: "Prob. 1 — fig. 13.83. T = 10 ms, 2 ciclos, f = 100 Hz. Pico +5 V; pico negativo ≈ −1 V → Vp-p ≈ 6 V (no 10). Rampa de un tracker." },
+    p2: { selects: { "s132f-fig": "84" }, click: "btn-s132f",
+      desc: "Prob. 2 — fig. 13.84. T = 15 µs, 2.33 ciclos, f = 66.7 kHz. Pico +10 V, Vp-p = 20 V. PWM de un DAB." },
+    p3: { selects: { "s132f-fig": "85" }, click: "btn-s132f",
+      desc: "Prob. 3 — fig. 13.85. T = 10 ms, f = 100 Hz. Diente de sierra, portadora PWM de un MPPT." },
+    p4a: { fields: { "s132-t": "", "s132-f": "25", "s132-n": "1", "s132-tn": "" }, selects: { "s132-f-u": "1" }, click: "btn-s132",
+      desc: "Prob. 4.a — f = 25 Hz → T = 40.0 ms. Infra/baja de un parque aislado." },
+    p4b: { fields: { "s132-t": "", "s132-f": "35", "s132-n": "1", "s132-tn": "" }, selects: { "s132-f-u": "1e6" }, click: "btn-s132",
+      desc: "Prob. 4.b — f = 35 MHz → T = 28.6 ns. PLC / radio de un parque, no potencia." },
+    p4c: { fields: { "s132-t": "", "s132-f": "55", "s132-n": "1", "s132-tn": "" }, selects: { "s132-f-u": "1e3" }, click: "btn-s132",
+      desc: "Prob. 4.c — f = 55 kHz → T = 18.2 µs. DAB / SiC de un rack LFP." },
+    p4d: { fields: { "s132-t": "", "s132-f": "1", "s132-n": "1", "s132-tn": "" }, selects: { "s132-f-u": "1" }, click: "btn-s132",
+      desc: "Prob. 4.d — f = 1 Hz → T = 1.00 s. Un ciclo por segundo: casi un dispatch, no red." },
+    p5a: { fields: { "s132-t": "1/60", "s132-f": "", "s132-n": "1", "s132-tn": "" }, selects: { "s132-t-u": "1" }, click: "btn-s132",
+      desc: "Prob. 5.a — T = 1/60 s → f = 60.0 Hz. Red americana / de planta en 60 Hz." },
+    p5b: { fields: { "s132-t": "0.01", "s132-f": "", "s132-n": "1", "s132-tn": "" }, selects: { "s132-t-u": "1" }, click: "btn-s132",
+      desc: "Prob. 5.b — T = 0.01 s → f = 100 Hz. Armónico 2 de 50 Hz / rizado de un rectificador." },
+    p5c: { fields: { "s132-t": "34", "s132-f": "", "s132-n": "1", "s132-tn": "" }, selects: { "s132-t-u": "1e-3" }, click: "btn-s132",
+      desc: "Prob. 5.c — T = 34 ms → f = 29.4 Hz. Subfrecuencia: un relé de subfrecuencia dispararía." },
+    p5d: { fields: { "s132-t": "25", "s132-f": "", "s132-n": "1", "s132-tn": "" }, selects: { "s132-t-u": "1e-6" }, click: "btn-s132",
+      desc: "Prob. 5.d — T = 25 µs → f = 40.0 kHz. Conmutación de un SiC." },
+    p6: { fields: { "s132-t": "", "s132-f": "", "s132-n": "80", "s132-tn": "24" }, selects: { "s132-tn-u": "1e-3" }, click: "btn-s132",
+      desc: "Prob. 6 — 80 ciclos en 24 ms → T = 0.300 ms, f = 3.33 kHz. Un burst de PWM." },
+    p7: { fields: { "s132-t": "", "s132-f": "20", "s132-n": "5", "s132-tn": "" }, selects: { "s132-f-u": "1" }, click: "btn-s132",
+      desc: "Prob. 7 — f = 20 Hz, 5 ciclos → 0.250 s. Cinco ciclos de una red débil." },
+    p8: { fields: { "s132-t": "", "s132-f": "", "s132-n": "42", "s132-tn": "6" }, selects: { "s132-tn-u": "1" }, click: "btn-s132",
+      desc: "Prob. 8 — 42 ciclos en 6 s → f = 7.00 Hz. Demasiado lento para red; es un dispatch." },
+    p9: { selects: { "s132f-fig": "84b" }, click: "btn-s132f",
+      desc: "Prob. 9 — cuadrada tipo 13.84, 20 kHz, 10 mV pico. T = 50 µs. DAB de un BESS." },
+    p10: { fields: { "s132s-dc": "25" }, click: "btn-s132s",
+      desc: "Prob. 10 — fig. 13.86. Vm = 100 mV, T = 40 µs, f = 25 kHz. +25 mV de DC sube el trazo 0.5 div: inyección en el POI." }
+  },
+  "13-3": {
+    p11a: { fields: { "s133-deg": "45", "s133-rad": "", "s133-pi": "" }, click: "btn-s133a",
+      desc: "Prob. 11.a — 45° = π/4 = 0.785 rad." },
+    p11b: { fields: { "s133-deg": "60", "s133-rad": "", "s133-pi": "" }, click: "btn-s133a",
+      desc: "Prob. 11.b — 60° = π/3 = 1.047 rad." },
+    p11c: { fields: { "s133-deg": "120", "s133-rad": "", "s133-pi": "" }, click: "btn-s133a",
+      desc: "Prob. 11.c — 120° = 2π/3 = 2.094 rad." },
+    p11d: { fields: { "s133-deg": "270", "s133-rad": "", "s133-pi": "" }, click: "btn-s133a",
+      desc: "Prob. 11.d — 270° = 3π/2 = 4.712 rad." },
+    p11e: { fields: { "s133-deg": "178", "s133-rad": "", "s133-pi": "" }, click: "btn-s133a",
+      desc: "Prob. 11.e — 178° = 3.107 rad." },
+    p11f: { fields: { "s133-deg": "221", "s133-rad": "", "s133-pi": "" }, click: "btn-s133a",
+      desc: "Prob. 11.f — 221° = 3.857 rad." },
+    p12a: { fields: { "s133-deg": "", "s133-rad": "", "s133-pi": "1/4" }, click: "btn-s133a",
+      desc: "Prob. 12.a — π/4 = 45.0°." },
+    p12b: { fields: { "s133-deg": "", "s133-rad": "", "s133-pi": "1/6" }, click: "btn-s133a",
+      desc: "Prob. 12.b — π/6 = 30.0°." },
+    p12c: { fields: { "s133-deg": "", "s133-rad": "", "s133-pi": "1/10" }, click: "btn-s133a",
+      desc: "Prob. 12.c — π/10 = 18.0°." },
+    p12d: { fields: { "s133-deg": "", "s133-rad": "", "s133-pi": "7/6" }, click: "btn-s133a",
+      desc: "Prob. 12.d — 7π/6 = 210°." },
+    p12e: { fields: { "s133-deg": "", "s133-rad": "", "s133-pi": "3" }, click: "btn-s133a",
+      desc: "Prob. 12.e — 3π = 540° (una vuelta y media del PLL)." },
+    p12f: { fields: { "s133-deg": "", "s133-rad": "", "s133-pi": "0.55" }, click: "btn-s133a",
+      desc: "Prob. 12.f — 0.55π = 99.0°." },
+    p13a: { fields: { "s133-t": "2", "s133-f": "", "s133-w": "", "s133-ang": "" }, selects: { "s133-t-u": "1" }, click: "btn-s133b",
+      desc: "Prob. 13.a — T = 2 s → ω = π = 3.14 rad/s." },
+    p13b: { fields: { "s133-t": "0.3", "s133-f": "", "s133-w": "" }, selects: { "s133-t-u": "1e-3" }, click: "btn-s133b",
+      desc: "Prob. 13.b — T = 0.3 ms → ω = 2.09×10⁴ rad/s." },
+    p13c: { fields: { "s133-t": "4", "s133-f": "", "s133-w": "" }, selects: { "s133-t-u": "1e-6" }, click: "btn-s133b",
+      desc: "Prob. 13.c — T = 4 µs → ω = 1.57×10⁶ rad/s. Un SiC." },
+    p13d: { fields: { "s133-t": "1/26", "s133-f": "", "s133-w": "" }, selects: { "s133-t-u": "1" }, click: "btn-s133b",
+      desc: "Prob. 13.d — T = 1/26 s → ω = 163 rad/s, f = 26.0 Hz." },
+    p14a: { fields: { "s133-t": "", "s133-f": "50", "s133-w": "" }, selects: { "s133-f-u": "1" }, click: "btn-s133b",
+      desc: "Prob. 14.a — 50 Hz → ω = 314 rad/s. Red europea / chilena." },
+    p14b: { fields: { "s133-t": "", "s133-f": "600", "s133-w": "" }, selects: { "s133-f-u": "1" }, click: "btn-s133b",
+      desc: "Prob. 14.b — 600 Hz → ω = 3.77×10³ rad/s." },
+    p14c: { fields: { "s133-t": "", "s133-f": "2", "s133-w": "" }, selects: { "s133-f-u": "1e3" }, click: "btn-s133b",
+      desc: "Prob. 14.c — 2 kHz → ω = 1.26×10⁴ rad/s. Auxiliar de planta." },
+    p14d: { fields: { "s133-t": "", "s133-f": "0.004", "s133-w": "" }, selects: { "s133-f-u": "1e6" }, click: "btn-s133b",
+      desc: "Prob. 14.d — 0.004 MHz = 4 kHz → ω = 2.51×10⁴ rad/s." },
+    p15a: { fields: { "s133-t": "", "s133-f": "", "s133-w": "754" }, click: "btn-s133b",
+      desc: "Prob. 15.a — 754 rad/s → f = 120 Hz, T = 8.33 ms. Armónico 2 de 60 Hz." },
+    p15b: { fields: { "s133-t": "", "s133-f": "", "s133-w": "8.4" }, click: "btn-s133b",
+      desc: "Prob. 15.b — 8.4 rad/s → f = 1.34 Hz, T = 0.748 s." },
+    p15c: { fields: { "s133-t": "", "s133-f": "", "s133-w": "6000" }, click: "btn-s133b",
+      desc: "Prob. 15.c — 6000 rad/s → f = 955 Hz, T = 1.05 ms." },
+    p15d: { fields: { "s133-t": "", "s133-f": "", "s133-w": "1/16" }, click: "btn-s133b",
+      desc: "Prob. 15.d — 1/16 rad/s → f = 9.95 mHz, T = 101 s." },
+    p16: { fields: { "s133-t": "", "s133-f": "60", "s133-w": "", "s133-ang": "45" }, selects: { "s133-f-u": "1" }, click: "btn-s133b",
+      desc: "Prob. 16 — 60 Hz, 45° → t = 2.08 ms. Un octavo de ciclo de red; un LVRT corto." },
+    p17: { fields: { "s133-t": "5", "s133-f": "", "s133-w": "", "s133-ang": "30" }, selects: { "s133-t-u": "1e-3" }, click: "btn-s133b",
+      desc: "Prob. 17 — 30° en 5 ms → ω = 105 rad/s, f = 16.7 Hz. Una red cayéndose." }
+  },
+  "13-4": {
+    p18a: { fields: { "s134-a": "20", "s134-w": "377" }, selects: { "s134-axis": "time" }, click: "btn-s134",
+      desc: "Prob. 18.a — 20 sen 377t. Pico 20, f = 60.0 Hz. Tensión de red." },
+    p18b: { fields: { "s134-a": "5", "s134-w": "754" }, selects: { "s134-axis": "time" }, click: "btn-s134",
+      desc: "Prob. 18.b — 5 sen 754t. Pico 5, f = 120 Hz. Armónico 2." },
+    p18c: { fields: { "s134-a": "1e6", "s134-w": "10000" }, selects: { "s134-axis": "time" }, click: "btn-s134",
+      desc: "Prob. 18.c — 10⁶ sen 10 000t. Pico 1.00×10⁶, f = 1.59 kHz." },
+    p18d: { fields: { "s134-a": "0.001", "s134-w": "942" }, selects: { "s134-axis": "time" }, click: "btn-s134",
+      desc: "Prob. 18.d — 0.001 sen 942t. Pico 1.00 mV, f = 150 Hz." },
+    p18e: { fields: { "s134-a": "-7.6", "s134-w": "43.6" }, selects: { "s134-axis": "time" }, click: "btn-s134",
+      desc: "Prob. 18.e — −7.6 sen 43.6t. |A| = 7.6, f = 6.94 Hz. Signo menos = 180°." },
+    p18f: { fields: { "s134-a": "1/42", "s134-w": "6.283" }, selects: { "s134-axis": "time" }, click: "btn-s134",
+      desc: "Prob. 18.f — (1/42) sen 6.283t. Pico 0.0238, f = 1.00 Hz." },
+    p19: { fields: { "s134-a": "5", "s134-w": "754" }, selects: { "s134-axis": "deg" }, click: "btn-s134",
+      desc: "Prob. 19 — 5 sen 754t. Cambia la abscisa a grados / radianes / tiempo." },
+    p20: { fields: { "s134-a": "1e6", "s134-w": "10000" }, selects: { "s134-axis": "rad" }, click: "btn-s134",
+      desc: "Prob. 20 — 10⁶ sen 10 000t en radianes." },
+    p21: { fields: { "s134-a": "-7.6", "s134-w": "43.6" }, selects: { "s134-axis": "time" }, click: "btn-s134",
+      desc: "Prob. 21 — −7.6 sen 43.6t. La onda nace negativa." },
+    p22: { fields: { "s134-a": "300", "s134-w": "157" }, selects: { "s134-axis": "time" }, click: "btn-s134",
+      desc: "Prob. 22 — e = 300 sen 157t. ω = 157 → T = 40.0 ms, ½ ciclo = T/2 = 20.0 ms. El tiempo que tarda un polo de un generador lento en cruzar cero." },
+    p23: { fields: { "s134i-a": "0.5", "s134i-al": "72", "s134i-v": "" }, selects: { "s134i-alu": "deg" }, click: "btn-s134i",
+      desc: "Prob. 23 — i = 0.5 sen 72° = 0.476 A." },
+    p24: { fields: { "s134i-a": "20", "s134i-al": "1.2pi", "s134i-v": "" }, selects: { "s134i-alu": "rad" }, click: "btn-s134i",
+      desc: "Prob. 24 — v = 20 sen(1.2π) = 20 sen 216° = −11.8 V." },
+    p25: { fields: { "s134i-a": "30e-3", "s134i-al": "", "s134i-v": "6e-3" }, click: "btn-s134i",
+      desc: "Prob. 25 — 30 mV sen α = 6 mV → sen α = 0.200 → α = 11.5° o 168°." },
+    p26: { fields: { "s134b-v": "40", "s134b-al": "30", "s134b-t": "1" }, selects: { "s134b-t-u": "1e-3" }, click: "btn-s134b",
+      desc: "Prob. 26 — 40 V a 30°, t = 1 ms → Vm = 80 V, ω = 524 rad/s, v = 80 sen(524 t)." }
+  },
+  "13-5": {
+    p27: { fields: { "s135-a1": "1", "s135-p1": "60", "s135-a2": "1", "s135-p2": "0", "s135-w": "377" }, selects: { "s135-k1": "sin", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 27 — sen(377t + 60°) adelanta 60° a sen(377t). Red 60 Hz con PLL a +60°." },
+    p28a: { fields: { "s135-a1": "50", "s135-p1": "0", "s135-a2": "50", "s135-p2": "0" }, selects: { "s135-k1": "sin" }, click: "btn-s135",
+      desc: "Prob. 28.a — 50 sen(ωt). Referencia de fase cero." },
+    p28b: { fields: { "s135-a1": "-20", "s135-p1": "2", "s135-a2": "20", "s135-p2": "0" }, selects: { "s135-k1": "sin", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 28.b — −20 sen(ωt + 2°) = 20 sen(ωt − 178°)." },
+    p28c: { fields: { "s135-a1": "5", "s135-p1": "60", "s135-a2": "5", "s135-p2": "0" }, click: "btn-s135",
+      desc: "Prob. 28.c — 5 sen(ωt + 60°). Adelanta 60° a la referencia." },
+    p28d: { fields: { "s135-a1": "4", "s135-p1": "0", "s135-a2": "4", "s135-p2": "0" }, selects: { "s135-k1": "cos", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 28.d — 4 cos ωt = 4 sen(ωt + 90°). Adelanta 90° al seno." },
+    p28e: { fields: { "s135-a1": "2", "s135-p1": "10", "s135-a2": "2", "s135-p2": "0" }, selects: { "s135-k1": "cos", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 28.e — 2 cos(ωt + 10°) = 2 sen(ωt + 100°)." },
+    p28f: { fields: { "s135-a1": "-5", "s135-p1": "20", "s135-a2": "5", "s135-p2": "0" }, selects: { "s135-k1": "cos", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 28.f — −5 cos(ωt + 20°) = 5 sen(ωt − 70°)." },
+    p29a: { fields: { "s135-a1": "4", "s135-p1": "50", "s135-a2": "6", "s135-p2": "40" }, selects: { "s135-k1": "sin", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 29.a — v adelanta a i 10°." },
+    p29b: { fields: { "s135-a1": "25", "s135-p1": "-80", "s135-a2": "5e-3", "s135-p2": "-10" }, click: "btn-s135",
+      desc: "Prob. 29.b — i adelanta a v 70°." },
+    p29c: { fields: { "s135-a1": "0.2", "s135-p1": "-60", "s135-a2": "0.1", "s135-p2": "20" }, click: "btn-s135",
+      desc: "Prob. 29.c — i adelanta a v 80°." },
+    p29d: { fields: { "s135-a1": "200", "s135-p1": "-210", "s135-a2": "25", "s135-p2": "-60" }, click: "btn-s135",
+      desc: "Prob. 29.d — i adelanta a v 150° (φ reducido a |φ| ≤ 180°)." },
+    p30a: { fields: { "s135-a1": "2", "s135-p1": "-30", "s135-a2": "5", "s135-p2": "60" }, selects: { "s135-k1": "cos", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 30.a — 2 cos(ωt − 30°) = 2 sen(ωt + 60°). En fase con i. FP = 1." },
+    p30b: { fields: { "s135-a1": "-1", "s135-p1": "20", "s135-a2": "10", "s135-p2": "-70" }, selects: { "s135-k1": "sin", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 30.b — −sen(ωt + 20°) = sen(ωt − 160°). i adelanta a v 90°." },
+    p30c: { fields: { "s135-a1": "-4", "s135-p1": "90", "s135-a2": "-2", "s135-p2": "10" }, selects: { "s135-k1": "cos", "s135-k2": "sin" }, click: "btn-s135",
+      desc: "Prob. 30.c — −4 cos(ωt + 90°) = 4 sen(ωt). v adelanta a i 170°." },
+    p31a: { selects: { "s135f-fig": "87a" }, click: "btn-s135f",
+      desc: "Prob. 31.a — v = 25 sen(377t + 30°) V. Red 60 Hz, PLL a +30°." },
+    p31b: { selects: { "s135f-fig": "87b" }, click: "btn-s135f",
+      desc: "Prob. 31.b — i = 3 mA sen(2000π t − 120°). 1 kHz, retraso 120°." },
+    p32a: { selects: { "s135f-fig": "88a" }, click: "btn-s135f",
+      desc: "Prob. 32.a — v = 0.01 sen(157 t − 110°) V. 25 Hz." },
+    p32b: { selects: { "s135f-fig": "88b" }, click: "btn-s135f",
+      desc: "Prob. 32.b — i = 2 mA sen(6.28×10⁴ t + 135°) A. 10 kHz, adelanto 135°." },
+    p33: { selects: { "s135f-fig": "89" }, click: "btn-s135f",
+      desc: "Prob. 33 — t₁ = 333 µs (cero bajando a 120° de un 1 kHz)." },
+    p34: { selects: { "s135f-fig": "90" }, click: "btn-s135f",
+      desc: "Prob. 34 — t₁ = 14.0 µs (cero subiendo, 40° / 50 krad/s)." },
+    p35: { fields: { "s135-a1": "60", "s135-p1": "20", "s135-a2": "1.2", "s135-p2": "-20", "s135-w": "1800" }, click: "btn-s135",
+      desc: "Prob. 35 — v adelanta a i 40°. Δt = 40°/1800 = 0.388 ms. DFIG / PLL." },
+    p36: { click: "btn-s135s",
+      desc: "Prob. 36 — fig. 13.91. T = 8.00 ms, f = 125 Hz. e: 1.06 V rms; i: 0.707 V rms. e adelanta 90°." }
+  },
+  "13-6": {
+    p37: { selects: { "s136-fig": "92" }, click: "btn-s136",
+      desc: "Prob. 37 — fig. 13.92. T = 0.400 ms, f = 2.50 kHz, Vavg = −25 mV. Acoplo CA recentra (elige 13.92 CA)." },
+    p38a: { selects: { "s136-fig": "93a" }, click: "btn-s136",
+      desc: "Prob. 38.a — fig. 13.93.a. Vavg = 2.00 V." },
+    p38b: { selects: { "s136-fig": "93b" }, click: "btn-s136",
+      desc: "Prob. 38.b — fig. 13.93.b. Iavg = 3.00 mA." },
+    p39a: { selects: { "s136-fig": "94a" }, click: "btn-s136",
+      desc: "Prob. 39.a — fig. 13.94.a. Vavg = 1.88 V." },
+    p39b: { selects: { "s136-fig": "94b" }, click: "btn-s136",
+      desc: "Prob. 39.b — fig. 13.94.b. Iavg = −5.40 mA." },
+    p40: { selects: { "s136-fig": "95" }, click: "btn-s136",
+      desc: "Prob. 40 — fig. 13.95. Trapecios ≈ 5.00 V·s (área real 5 V·s). Vavg = 0.500 V (0 a 10 s)." },
+    p41: { selects: { "s136-fig": "96" }, click: "btn-s136",
+      desc: "Prob. 41 — fig. 13.96. T = 40 µs, f = 25 kHz, Vavg = 10 mV. Acoplo CA: elige 13.96 CA." }
+  },
+  "13-7": {
+    p42a: { fields: { "s137-vm": "20", "s137-rms": "", "s137-f": "120", "s137-ph": "0" }, click: "btn-s137",
+      desc: "Prob. 42.a — 20 sen 754t. Vrms = 14.1 V. Armónico 2 de 60 Hz." },
+    p42b: { fields: { "s137-vm": "7.07", "s137-rms": "", "s137-f": "60", "s137-ph": "0" }, click: "btn-s137",
+      desc: "Prob. 42.b — 7.07 sen 377t. Vrms = 5.00 V. El 7.07 ya era el pico de un 5 V rms." },
+    p42c: { fields: { "s137-vm": "0.006", "s137-rms": "", "s137-f": "63.7", "s137-ph": "20" }, click: "btn-s137",
+      desc: "Prob. 42.c — 6 mA sen(400t + 20°). Irms = 4.24 mA. La fase no cambia el RMS." },
+    p42d: { fields: { "s137-vm": "16e-3", "s137-rms": "", "s137-f": "60", "s137-ph": "-10" }, click: "btn-s137",
+      desc: "Prob. 42.d — 16 mA sen(377t − 10°). Irms = 11.3 mA. Red 60 Hz." },
+    p43a: { fields: { "s137-vm": "", "s137-rms": "1.414", "s137-f": "60", "s137-ph": "0" }, click: "btn-s137",
+      desc: "Prob. 43.a — 1.414 V rms, 60 Hz, φ = 0 → v = 2.00 sen(377 t) V." },
+    p43b: { fields: { "s137-vm": "", "s137-rms": "70.7", "s137-f": "60", "s137-ph": "0" }, click: "btn-s137",
+      desc: "Prob. 43.b — 70.7 V rms → v = 100 sen(377 t) V. Un rail de auxiliar." },
+    p43c: { fields: { "s137-vm": "", "s137-rms": "0.06", "s137-f": "60", "s137-ph": "0" }, click: "btn-s137",
+      desc: "Prob. 43.c — 0.06 A rms → i = 0.0849 sen(377 t) A." },
+    p43d: { fields: { "s137-vm": "", "s137-rms": "24e-6", "s137-f": "60", "s137-ph": "0" }, click: "btn-s137",
+      desc: "Prob. 43.d — 24 µA rms → i = 33.9 µA sen(377 t)." },
+    p44: { selects: { "s137f-fig": "97" }, click: "btn-s137f",
+      desc: "Prob. 44 — fig. 13.97. Vrms = 1.40 V (ciclo 12 s)." },
+    p45: { selects: { "s137f-fig": "98" }, click: "btn-s137f",
+      desc: "Prob. 45 — fig. 13.98. Vrms = 2.16 V, promedio 0." },
+    p46: { selects: { "s137f-fig": "99" }, click: "btn-s137f",
+      desc: "Prob. 46 — fig. 13.99. Vrms = 10.0 V, Vavg = 0. Cuadrada: RMS = pico." },
+    p47: { selects: { "s137f-fig": "84r" }, click: "btn-s137f",
+      desc: "Prob. 47 — fig. 13.84. Vavg = 0, Vrms = 8.16 V." },
+    p48: { selects: { "s137f-fig": "85r" }, click: "btn-s137f",
+      desc: "Prob. 48 — fig. 13.85. Vavg = 10.0 V (mitad del diente de 20 V)." },
+    p49a: { selects: { "s137f-fig": "100a" }, click: "btn-s137f",
+      desc: "Prob. 49.a — fig. 13.100.a. T = 40 µs, f = 25 kHz, Vavg = 25 mV, Vrms = 35.2 mV." },
+    p49b: { selects: { "s137f-fig": "100b" }, click: "btn-s137f",
+      desc: "Prob. 49.b — fig. 13.100.b. T = 100 µs, f = 10 kHz, Vavg = −0.200 V, Vrms = 0.245 V." }
+  },
+  "13-8": {
+    p50a: { selects: { "s138-fig": "101a" }, click: "btn-s138",
+      desc: "Prob. 50.a — 8.00 V DC en un medidor de media onda calibrado RMS → lectura 17.8 V. El true-RMS diría 8 V." },
+    p50b: { selects: { "s138-fig": "101b" }, click: "btn-s138",
+      desc: "Prob. 50.b — 16 sen(377t + 20°). Lectura = Vrms = 11.3 V (calibrado para senoidales de red)." }
+  },
+  "13-10": {
+    p51: { fields: { "s1310-a": "20", "s1310-w": "377", "s1310-ph": "0" }, click: "btn-s1310a",
+      desc: "Prob. 51 — A = 20, ω = 377. RMS = 14.1, f = 60.0 Hz, T = 16.7 ms. El print de QBASIC, en el navegador." },
+    p52: { fields: { "s1310b-a1": "60", "s1310b-p1": "20", "s1310b-a2": "1.2", "s1310b-p2": "-20", "s1310b-w": "1800" }, click: "btn-s1310b",
+      desc: "Prob. 52 — v adelanta a i 40°, Δt = 0.388 ms (el mismo 35, ahora como programa)." },
+    p53: { fields: { "s1310c-t0": "0", "s1310c-t1": "4", "s1310c-v0": "10", "s1310c-t1b": "4", "s1310c-t2": "8", "s1310c-v1": "-10" }, click: "btn-s1310c",
+      desc: "Prob. 53 — cuadrada ±10, T = 8 (fig. 13.99). Vavg = 0, Vrms = 10. Cambia los tramos para un PWM con duty distinto." }
+  }
+});
+
+// --- Chapter 14.0: R/L/C senoidal, potencia, fasores (renovables 2026) ---
+function C(re, im) { return { re: re || 0, im: im || 0 }; }
+function Cpol(mag, deg) {
+  const r = (Number(deg) || 0) * Math.PI / 180;
+  return { re: mag * Math.cos(r), im: mag * Math.sin(r) };
+}
+function Cmag(z) { return Math.hypot(z.re, z.im); }
+function Cang(z) { return Math.atan2(z.im, z.re) * 180 / Math.PI; }
+function Cadd(a, b) { return C(a.re + b.re, a.im + b.im); }
+function Csub(a, b) { return C(a.re - b.re, a.im - b.im); }
+function Cmul(a, b) { return C(a.re * b.re - a.im * b.im, a.re * b.im + a.im * b.re); }
+function Cdiv(a, b) {
+  const d = b.re * b.re + b.im * b.im;
+  if (Math.abs(d) < 1e-30) throw new Error("División por cero complejo.");
+  return C((a.re * b.re + a.im * b.im) / d, (a.im * b.re - a.re * b.im) / d);
+}
+function Cpow(z, n) {
+  const mag = Math.pow(Cmag(z), n), ang = Cang(z) * n;
+  return Cpol(mag, ang);
+}
+function Cfmt(z) {
+  const mag = Cmag(z), ang = Cang(z);
+  const sign = z.im < 0 ? "−" : "+";
+  return {
+    rect: `${formatQtyPlain(z.re)} ${sign} j\\,${formatQtyPlain(Math.abs(z.im))}`,
+    polar: `${formatQtyPlain(mag)}\\angle ${formatQtyPlain(ang)}^{\\circ}`,
+    mag, ang
+  };
+}
+function Ctex(z) {
+  const f = Cfmt(z);
+  return `${mj(f.rect)} = ${mj(f.polar)}`;
+}
+
+function sineStr(amp, w, ph, kind) {
+  const s = asSine(amp, ph || 0, kind || "sin");
+  const wt = w == null ? "\\omega t" : `${texQtyBody(w)} t`;
+  let phs = "";
+  if (Math.abs(s.phase) >= 0.05) phs = s.phase >= 0 ? ` + ${texQtyBody(s.phase)}^{\\circ}` : ` - ${texQtyBody(-s.phase)}^{\\circ}`;
+  return `${texQtyBody(s.amp)}\\,\\mathrm{sen}(${wt}${phs})`;
+}
+
+function readCx(reId, imId, magId, angId) {
+  const mag = readFlex(magId), ang = readFlex(angId);
+  const re = readFlex(reId), im = readFlex(imId);
+  if (mag != null && ang != null) return Cpol(mag, ang);
+  if (re != null || im != null) return C(re || 0, im || 0);
+  return null;
+}
+
+function applyCxOp(a, op, b) {
+  if (op === "+") return Cadd(a, b);
+  if (op === "-") return Csub(a, b);
+  if (op === "*") return Cmul(a, b);
+  if (op === "/") return Cdiv(a, b);
+  throw new Error("Operación no soportada.");
+}
+
+function drawPhasors(svg, arrows, title) {
+  if (!svg) return;
+  const W = 640, H = 280, cx = 320, cy = 140;
+  const mags = arrows.map((a) => a.mag != null ? a.mag : Cmag(a));
+  const maxm = Math.max(...mags, 1e-12);
+  const sc = 100 / maxm;
+  const axes = `<line x1="40" y1="${cy}" x2="600" y2="${cy}" stroke="currentColor" stroke-width="1.2"/>
+    <line x1="${cx}" y1="20" x2="${cx}" y2="250" stroke="currentColor" stroke-width="1.2"/>
+    <text x="590" y="${cy - 8}" font-size="12" fill="currentColor">Re</text>
+    <text x="${cx + 8}" y="28" font-size="12" fill="currentColor">Im</text>`;
+  const body = arrows.map((a) => {
+    const mag = a.mag != null ? a.mag : Cmag(a);
+    const deg = a.deg != null ? a.deg : Cang(a);
+    const r = deg * Math.PI / 180;
+    const x2 = cx + mag * sc * Math.cos(r);
+    const y2 = cy - mag * sc * Math.sin(r);
+    const col = a.color || "#1a5276";
+    const ang = Math.atan2(cy - y2, x2 - cx);
+    const ahx = x2 - 10 * Math.cos(ang), ahy = y2 + 10 * Math.sin(ang);
+    return `<line x1="${cx}" y1="${cy}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="2.3"/>
+      <polygon points="${x2},${y2} ${ahx - 5 * Math.sin(ang)},${ahy - 5 * Math.cos(ang)} ${ahx + 5 * Math.sin(ang)},${ahy + 5 * Math.cos(ang)}" fill="${col}"/>
+      <text x="${x2 + 8}" y="${y2 - 6}" font-size="12" fill="${col}">${a.lab || ""}</text>`;
+  }).join("");
+  svg.setAttribute("viewBox", `0 0 ${W} ${H}`);
+  svg.innerHTML = `<rect x="0" y="0" width="${W}" height="${H}" fill="transparent"/>${axes}${body}
+    <text x="${W / 2}" y="${H - 8}" text-anchor="middle" font-size="12" fill="currentColor">${title || ""}</text>`;
+}
+
+function plotSinePair(svg, v, i) {
+  const ptsV = [], ptsI = [];
+  for (let k = 0; k <= 180; k++) {
+    const deg = 360 * k / 180;
+    const th = deg * Math.PI / 180;
+    ptsV.push({ x: deg, y: v.amp * Math.sin(th + v.phase * Math.PI / 180) });
+    ptsI.push({ x: deg, y: i.amp * Math.sin(th + i.phase * Math.PI / 180) });
+  }
+  const ym = Math.max(v.amp, i.amp, 1e-12) * 1.25;
+  drawWaveBook(svg, {
+    xMin: 0, xMax: 360, yMin: -ym, yMax: ym,
+    xTicks: [0, 90, 180, 270, 360], yTicks: ticksAround(-ym, ym, 4),
+    xLabel: "ωt (°)", yLabel: "v, i",
+    series: [
+      { pts: ptsV, color: "#c0392b" },
+      { pts: ptsI, color: "#2471a3", dash: "6 3" }
+    ]
+  });
+}
+
+function parseElemUnit(raw) {
+  const v = String(raw || "R1");
+  if (v.startsWith("L")) return { kind: "L", k: Number(v.slice(1)) };
+  if (v.startsWith("C")) return { kind: "C", k: Number(v.slice(1)) };
+  if (v.startsWith("X")) return { kind: "X", k: Number(v.slice(1)) };
+  return { kind: "R", k: Number(v.slice(1)) };
+}
+
+const FIG14 = {};
+
+FIG14["75"] = {
+  draw(svg) {
+    const d = S();
+    d.meter(80, 80, "~"); d.w(80, 40, 80, 64); d.w(80, 96, 80, 140);
+    d.txt(40, 84, "e"); d.txt(70, 32, "+"); d.txt(70, 155, "−");
+    d.w(80, 40, 280, 40); d.w(80, 140, 280, 140);
+    d.rv(280, 40, 100, "3 Ω");
+    d.arrR(180, 40, "i");
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const Vm = 30, w = 377, R = 3, Im = Vm / R, P = (Vm * Im) / 2;
+    const T = 2 * Math.PI / w;
+    return `Prob. 34 — fig. 14.75. Dump 3 Ω, ${mj("e = 30\\,\\mathrm{sen}(377t + 20^{\\circ})")}.\n` +
+      `${mj("i = e/R")} (en fase). ${mj(`i = ${sineStr(Im, w, 20)}`)} A.\n` +
+      `${mj(`P = V_m I_m/2 = ${texQtyBody(P, "W")}`)}. 6 ciclos: ${formatQty(6 * T, "s")} = 100 ms.\n` +
+      `Resistencia de un dump / de un lastre: todo el VA es calor.`;
+  }
+};
+
+FIG14["76"] = {
+  draw(svg) {
+    const d = S();
+    d.meter(80, 80, "~"); d.w(80, 40, 80, 64); d.w(80, 96, 80, 140);
+    d.txt(40, 84, "e"); d.txt(70, 32, "+"); d.txt(70, 155, "−");
+    d.w(80, 40, 280, 40); d.w(80, 140, 280, 140);
+    d.indV(280, 40, 100, "XL = 50 Ω", true);
+    d.arrR(180, 40, "i");
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const Vm = 100, w = 157, XL = 50, Im = Vm / XL, L = XL / w;
+    return `Prob. 35 — fig. 14.76. LCL / choke, ${mj("e = 100\\,\\mathrm{sen}(157t + 30^{\\circ})")}, ${mj("X_L = 50\\,\\Omega")}.\n` +
+      `i retrasa 90°. ${mj(`I_m = V_m/X_L = 2.00\\,\\mathrm{A}`)}.\n` +
+      `${mj(`i = ${sineStr(Im, w, -60)}`)} A.\n` +
+      `${mj(`L = X_L/\\omega = ${texQtyBody(L, "H")}`)}. ${mj("P_{\\mathrm{avg}} = 0")} (L ideal: no factura).\n` +
+      `El calor está en \(R\) del winding, no en \(X_L\).`;
+  }
+};
+
+FIG14["77"] = {
+  draw(svg) {
+    const d = S();
+    d.meter(80, 80, "~"); d.w(80, 40, 80, 64); d.w(80, 96, 80, 140);
+    d.txt(40, 84, "e"); d.txt(70, 32, "+"); d.txt(70, 155, "−");
+    d.w(80, 40, 280, 40); d.w(80, 140, 280, 140);
+    d.capV(280, 40, 100, "XC = 400 Ω");
+    d.arrR(180, 40, "i");
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const Im = 3, w = 377, XC = 400, Vm = Im * XC, C = 1 / (w * XC);
+    return `Prob. 36 — fig. 14.77. DC-link / filtro, ${mj("i = 3\\,\\mathrm{sen}(377t - 20^{\\circ})")}, ${mj("X_C = 400\\,\\Omega")}.\n` +
+      `v retrasa 90° a i. ${mj(`V_m = I_m X_C = ${texQtyBody(Vm, "V")}`)}.\n` +
+      `${mj(`e = ${sineStr(Vm, w, -110)}`)} V.\n` +
+      `${mj(`C = 1/(\\omega X_C) = ${texQtyBody(C, "F")}`)} = 6.63 µF. ${mj("P_{\\mathrm{avg}} = 0")}.\n` +
+      `El film no factura julios; el ESR sí, y no está en este modelo.`;
+  }
+};
+
+FIG14["78"] = {
+  draw(svg) {
+    const d = S();
+    d.meter(70, 90, "~"); d.w(70, 40, 70, 74); d.w(70, 106, 70, 160);
+    d.txt(28, 94, "e"); d.txt(58, 32, "+"); d.txt(58, 175, "−");
+    d.w(70, 40, 220, 40); d.w(70, 160, 360, 160);
+    d.capV(220, 40, 120, "2 µF"); d.txt(236, 100, "C1");
+    d.arrD(248, 70, "i1");
+    d.w(220, 40, 340, 40);
+    d.capV(340, 40, 120, "8 µF"); d.txt(356, 100, "C2");
+    d.arrD(368, 70, "i2");
+    d.w(340, 160, 220, 160);
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const Vm = 100 * Math.SQRT2, w = 1e4, C1 = 2e-6, C2 = 8e-6;
+    const XC1 = 1 / (w * C1), XC2 = 1 / (w * C2);
+    const Im1 = Vm / XC1, Im2 = Vm / XC2;
+    return `Prob. 37 — fig. 14.78. ${mj("e = \\sqrt{2}\\,100\\,\\mathrm{sen}(10^{4}t + 60^{\\circ})")} (Vrms = 100 V, auxiliar 1.59 kHz).\n` +
+      `${mj(`X_{C1} = ${texQtyBody(XC1, "\\Omega")}`)}, ${mj(`X_{C2} = ${texQtyBody(XC2, "\\Omega")}`)}.\n` +
+      `i adelanta 90°. ${mj(`i_1 = ${sineStr(Im1, w, 150)}`)} A.\n` +
+      `${mj(`i_2 = ${sineStr(Im2, w, 150)}`)} A.\n` +
+      `${mj(`i_s = i_1+i_2 = ${sineStr(Im1 + Im2, w, 150)}`)} A.\n` +
+      `Dos films en paralelo en un DC-link: Ceq = 10 µF, misma fase.`;
+  }
+};
+
+FIG14["79"] = {
+  draw(svg) {
+    const d = S();
+    d.isrc(70, 40, 160, "is", false);
+    d.txt(28, 100, "vs"); d.txt(58, 32, "+"); d.txt(58, 175, "−");
+    d.w(70, 40, 220, 40); d.w(70, 160, 360, 160);
+    d.indV(220, 40, 120, "4 mH", true); d.arrD(248, 70, "i1");
+    d.w(220, 40, 340, 40);
+    d.indV(340, 40, 120, "12 mH", true); d.arrD(368, 70, "i2");
+    d.w(340, 160, 220, 160);
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const Im = 6 * Math.SQRT2, w = 1e3, L1 = 4e-3, L2 = 12e-3;
+    const XL1 = w * L1, XL2 = w * L2, Xeq = (XL1 * XL2) / (XL1 + XL2);
+    const Im1 = Im * XL2 / (XL1 + XL2), Im2 = Im * XL1 / (XL1 + XL2);
+    const Vm = Im * Xeq;
+    return `Prob. 38 — fig. 14.79. ${mj("i_s = \\sqrt{2}\\,6\\,\\mathrm{sen}(10^{3}t + 30^{\\circ})")} (Irms = 6 A).\n` +
+      `${mj(`X_{L1} = ${texQtyBody(XL1, "\\Omega")}`)}, ${mj(`X_{L2} = ${texQtyBody(XL2, "\\Omega")}`)}, ${mj(`X_{\\parallel} = ${texQtyBody(Xeq, "\\Omega")}`)}.\n` +
+      `${mj(`v_s = ${sineStr(Vm, w, 120)}`)} V (v adelanta 90° a i).\n` +
+      `${mj(`i_1 = ${sineStr(Im1, w, 30)}`)} A, ${mj(`i_2 = ${sineStr(Im2, w, 30)}`)} A.\n` +
+      `Dos chokes en paralelo: el de 4 mH se come 3/4 de la corriente.`;
+  }
+};
+
+FIG14["80"] = {
+  draw(svg) {
+    const d = S();
+    d.meter(80, 90, "~"); d.w(80, 50, 80, 74); d.w(80, 106, 80, 150);
+    d.txt(18, 94, "e"); d.txt(70, 42, "+"); d.txt(70, 165, "−");
+    d.w(80, 50, 200, 50); d.rh(200, 50, 140, "va"); d.w(340, 50, 420, 50);
+    d.rv(420, 50, 100, "vb");
+    d.w(80, 150, 420, 150);
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const e = Cpol(60 / Math.SQRT2, 20), vb = Cpol(20 / Math.SQRT2, 0);
+    const va = Csub(e, vb), f = Cfmt(va);
+    const Vm = Cmag(va) * Math.SQRT2;
+    return `Prob. 50 — fig. 14.80. KVL: ${mj("\\mathbf{V}_a = \\mathbf{E}-\\mathbf{V}_b")}.\n` +
+      `${mj("\\mathbf{E} = 60/\\sqrt{2}\\angle 20^{\\circ}")}, ${mj("\\mathbf{V}_b = 20/\\sqrt{2}\\angle 0^{\\circ}")}.\n` +
+      `${mj(`\\mathbf{V}_a = ${f.polar}`)} (RMS).\n` +
+      `${mj(`v_a = ${sineStr(Vm, 377, f.ang)}`)} V.\n` +
+      `Caída en el cable / en el filtro serie de un feeder 60 Hz.`;
+  }
+};
+
+FIG14["81"] = {
+  draw(svg) {
+    const d = S();
+    d.w(40, 50, 200, 50); d.arrR(90, 50, "is");
+    d.w(200, 50, 200, 80); d.rv(200, 80, 70, ""); d.arrD(220, 90, "i1");
+    d.w(200, 50, 360, 50); d.w(360, 50, 360, 80); d.rv(360, 80, 70, ""); d.arrD(380, 90, "i2");
+    d.w(200, 150, 360, 150); d.w(40, 150, 200, 150);
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const is = Cpol(20e-6 / Math.SQRT2, 90), i2 = Cpol(6e-6 / Math.SQRT2, -60);
+    const i1 = Csub(is, i2), f = Cfmt(i1);
+    const Im = Cmag(i1) * Math.SQRT2;
+    return `Prob. 51 — fig. 14.81. KCL: ${mj("\\mathbf{I}_1 = \\mathbf{I}_s-\\mathbf{I}_2")}.\n` +
+      `${mj("\\mathbf{I}_s = 20\\,\\mu\\mathrm{A}_{p}/\\sqrt{2}\\angle 90^{\\circ}")}, ${mj("\\mathbf{I}_2 = 6\\,\\mu\\mathrm{A}_{p}/\\sqrt{2}\\angle -60^{\\circ}")}.\n` +
+      `${mj(`i_1 = ${sineStr(Im, null, f.ang)}`)} A.\n` +
+      `Partición de un string: la corriente del combiner menos el ramal que ya mediste.`;
+  }
+};
+
+FIG14["82"] = {
+  draw(svg) {
+    const d = S();
+    d.meter(70, 100, "~"); d.w(70, 50, 70, 84); d.w(70, 116, 70, 160);
+    d.txt(18, 104, "e"); d.txt(60, 42, "+"); d.txt(60, 175, "−");
+    d.w(70, 50, 160, 50); d.rh(160, 50, 120, "va"); d.w(280, 50, 400, 50);
+    d.rv(400, 50, 110, "vb");
+    d.w(70, 160, 160, 160); d.rh(160, 160, 120, "vc"); d.w(280, 160, 400, 160);
+    d.w(280, 50, 280, 80); d.box(260, 80, 40, 50, ""); d.w(280, 130, 280, 160);
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const va = Cpol(60 / Math.SQRT2, 30), vb = Cpol(30 / Math.SQRT2, -30), vc = Cpol(40 / Math.SQRT2, 120);
+    const e = Cadd(Cadd(va, vb), vc), f = Cfmt(e);
+    const Vm = Cmag(e) * Math.SQRT2;
+    return `Prob. 52 — fig. 14.82. Lazo exterior, polaridades de va, vb y vc a favor del giro:\n` +
+      `${mj("\\mathbf{E} = \\mathbf{V}_a+\\mathbf{V}_b+\\mathbf{V}_c")}.\n` +
+      `${Ctex(va)}, ${Ctex(vb)}, ${Ctex(vc)} (RMS).\n` +
+      `${mj(`\\mathbf{E} = ${f.polar}`)}.\n` +
+      `${mj(`e = ${sineStr(Vm, null, f.ang)}`)}.\n` +
+      `Suma de caídas en un lazo de planta: cable, filtro y carga.`;
+  }
+};
+
+FIG14["83"] = {
+  draw(svg) {
+    const d = S();
+    d.w(40, 40, 140, 40); d.arrR(80, 40, "is");
+    d.w(140, 40, 140, 70); d.box(120, 70, 40, 60, ""); d.arrD(168, 90, "i1");
+    d.w(140, 40, 260, 40); d.box(240, 40, 40, 40, ""); d.box(240, 90, 40, 40, "");
+    d.arrD(288, 150, "i2");
+    d.w(260, 40, 380, 40); d.w(380, 40, 380, 70); d.box(360, 70, 40, 60, ""); d.arrD(410, 90, "i3");
+    d.w(140, 160, 380, 160); d.w(40, 160, 140, 160);
+    setSvgMarkup(svg, d.str());
+  },
+  solve() {
+    const i1 = Cpol(6e-3 / Math.SQRT2, 180), i2 = Cpol(8e-3 / Math.SQRT2, 0);
+    const i3 = Cmul(i2, C(2, 0));
+    const is = Cadd(Cadd(i1, i2), i3), f = Cfmt(is);
+    const Im = Cmag(is) * Math.SQRT2;
+    return `Prob. 53 — fig. 14.83. ${mj("i_3 = 2 i_2")}, KCL: ${mj("i_s = i_1+i_2+i_3 = i_1+3 i_2")}.\n` +
+      `${mj("i_1 = 6\\,\\mathrm{mA}\\,\\mathrm{sen}(377t+180^{\\circ})")} = −6 mA en fase con la red.\n` +
+      `${mj("3 i_2 = 24\\,\\mathrm{mA}\\,\\mathrm{sen} 377t")}.\n` +
+      `${mj(`i_s = ${sineStr(Im, 377, f.ang)}`)} A.\n` +
+      `Tres ramales de un combiner: uno invertido (180°), dos a favor.`;
+  }
+};
+
+FIG14["46a"] = {
+  solve() {
+    const num = Cadd(C(4, 3), C(6, -8));
+    const den = Csub(C(3, 3), C(2, 3));
+    const z = Cdiv(num, den);
+    return `Prob. 46.a — ${mj("(4+j3)+(6-j8) = 10-j5")}, ${mj("(3+j3)-(2+j3) = 1")}.\n` +
+      `Cociente = ${Ctex(z)}.`;
+  }
+};
+FIG14["46b"] = {
+  solve() {
+    const den = Cadd(Cpol(2, 0), C(100, 100));
+    const z = Cdiv(Cpol(8, 60), den);
+    return `Prob. 46.b — den = ${Ctex(den)}.\n` +
+      `Cociente = ${Ctex(z)}.`;
+  }
+};
+FIG14["46c"] = {
+  solve() {
+    const num = Cmul(Cmul(Cpol(6, 20), Cpol(120, -40)), C(3, 4));
+    const z = Cdiv(num, Cpol(2, -30));
+    return `Prob. 46.c — numerador = ${Ctex(num)}.\n` +
+      `Cociente = ${Ctex(z)}.`;
+  }
+};
+FIG14["46d"] = {
+  solve() {
+    const num = Cmul(Cpow(Cpol(0.4, 60), 2), Cpol(300, 40));
+    const z = Cdiv(num, C(3, 9));
+    return `Prob. 46.d — ${mj("(0.4\\angle 60^{\\circ})^{2} = 0.16\\angle 120^{\\circ}")}.\n` +
+      `Numerador = ${Ctex(num)}. Cociente = ${Ctex(z)}.`;
+  }
+};
+FIG14["46e"] = {
+  solve() {
+    const a = CinvSafe(Cpow(Cpol(0.02, 10), 2));
+    const b = Cpow(Cdiv(C(2, 0), C(0, 1)), 3);
+    const c = CinvSafe(C(36, -30));
+    const z = Cmul(Cmul(a, b), c);
+    return `Prob. 46.e — ${mj("6^{2}-j\\sqrt{900} = 36-j30")}.\n` +
+      `${mj("1/(0.02\\angle 10^{\\circ})^{2}")} = ${Ctex(a)}.\n` +
+      `${mj("(2/j)^{3}")} = ${Ctex(b)} (1/j = −j).\n` +
+      `Producto = ${Ctex(z)}.`;
+  }
+};
+FIG14["47a"] = {
+  solve() {
+    return `Prob. 47.a — ${mj("(x+j4)+(3x+jy)-j7 = 16")}.\n` +
+      `Real: ${mj("4x = 16")} → ${mj("x = 4")}. Imag: ${mj("4+y-7 = 0")} → ${mj("y = 3")}.\n` +
+      `Un nudo del POI: la parte real es P, la imaginaria Q.`;
+  }
+};
+FIG14["47b"] = {
+  solve() {
+    const rhs = C(30.64, -25.72), p = Cfmt(rhs);
+    return `Prob. 47.b — ${mj("(10\\angle 20^{\\circ})(x\\angle -60^{\\circ}) = x\\angle -40^{\\circ}")}.\n` +
+      `RHS = ${mj(p.polar)} (módulo 40.0). Luego ${mj("x = 40.0")}.`;
+  }
+};
+FIG14["47c"] = {
+  solve() {
+    return `Prob. 47.c — ${mj("(5x+j10)(2-jy) = 90-j70")}.\n` +
+      `Real: ${mj("10x+10y = 90")} → ${mj("x+y = 9")}. Imag: ${mj("20-5xy = -70")} → ${mj("xy = 18")}.\n` +
+      `t² − 9t + 18 = 0 → ${mj("(x,y)=(6,3)")} o ${mj("(3,6)")}. Ambas cumplen.`;
+  }
+};
+FIG14["47d"] = {
+  solve() {
+    const rhs = C(3.464, -2), p = Cfmt(rhs);
+    return `Prob. 47.d — ${mj("(80\\angle 0^{\\circ})/(20\\angle\\theta) = 4\\angle -\\theta")}.\n` +
+      `RHS = ${mj(p.polar)} → ${mj("-\\theta = -30^{\\circ}")}, ${mj("\\theta = 30^{\\circ}")}.`;
+  }
+};
+
+function CinvSafe(z) { return Cdiv(C(1, 0), z); }
+
+function initSec14() {
+  bindWave("s145f-fig", "btn-s145f", "svg-s145f", "proc-14-5f", FIG14);
+  bindWave("s1412f-fig", "btn-s1412f", "svg-s1412f", "proc-14-12f", FIG14);
+  const pSvg = document.getElementById("svg-s1412p");
+  document.getElementById("s1412f-fig")?.addEventListener("change", () => {
+    const k = document.getElementById("s1412f-fig")?.value;
+    paint14phasor(k);
+  });
+  document.getElementById("btn-s1412f")?.addEventListener("click", () => {
+    paint14phasor(document.getElementById("s1412f-fig")?.value);
+  });
+  paint14phasor("78");
+
+  document.getElementById("btn-s1410s")?.addEventListener("click", () => {
+    const key = document.getElementById("s1410s-fig")?.value;
+    const out = document.getElementById("proc-14-10s");
+    try {
+      const it = FIG14[key];
+      if (!it || !it.solve) throw new Error("Caso no implementado.");
+      setMathText(out, it.solve());
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s142")?.addEventListener("click", () => {
+    const out = document.getElementById("proc-14-2");
+    try {
+      const A = readFlex("s142-a"), w = readFlex("s142-w"), ph = readFlex("s142-ph") ?? 0;
+      const kind = document.getElementById("s142-k")?.value || "sin";
+      if (A == null || w == null) throw new Error("Indica A y ω.");
+      const s = asSine(A, ph, kind);
+      const dAmp = s.amp * w, dPh = wrapDeg(s.phase + 90);
+      const f = Math.abs(w) / (2 * Math.PI), T = 1 / f;
+      const pts = [], dpts = [];
+      for (let k = 0; k <= 180; k++) {
+        const t = T * k / 180;
+        pts.push({ x: t, y: s.amp * Math.sin(w * t + s.phase * Math.PI / 180) });
+        dpts.push({ x: t, y: dAmp * Math.sin(w * t + dPh * Math.PI / 180) });
+      }
+      const ym = Math.max(s.amp, dAmp, 1e-12) * 1.2;
+      drawWaveBook(document.getElementById("svg-s142"), {
+        xMin: 0, xMax: T, yMin: -ym, yMax: ym, xTicks: ticksAround(0, T, 4), yTicks: ticksAround(-ym, ym, 4),
+        xLabel: "t (s)", yLabel: "v, dv/dt",
+        series: [{ pts, color: "#1a5276" }, { pts: dpts, color: "#c0392b", dash: "6 3" }]
+      });
+      setMathText(out, `${mj(`v = ${sineStr(s.amp, w, s.phase)}`)}.\n` +
+        `${mj("dv/dt = \\omega A\\,\\cos(\\omega t+\\phi) = \\omega A\\,\\mathrm{sen}(\\omega t+\\phi+90^{\\circ})")}.\n` +
+        `${mj(`dv/dt = ${sineStr(dAmp, w, dPh)}`)}.\n` +
+        `${mj(`f = ${texQtyBody(f, "Hz")}`)}, ${mj(`T = ${texQtyBody(T, "s")}`)} (un ciclo).\n` +
+        `Subir ω agranda la derivada: el SiC a kHz no es el DFIG a 50 Hz. Rojo = derivada.`);
+    } catch (e) { setMathText(out, e.message); }
+  });
+
+  document.getElementById("btn-s143")?.addEventListener("click", () => run143());
+  document.getElementById("btn-s144")?.addEventListener("click", () => run144());
+  document.getElementById("btn-s145")?.addEventListener("click", () => run145());
+  document.getElementById("btn-s149")?.addEventListener("click", () => run149());
+  document.getElementById("btn-s1410")?.addEventListener("click", () => run1410());
+  document.getElementById("btn-s1412")?.addEventListener("click", () => run1412());
+  document.getElementById("btn-s1413")?.addEventListener("click", () => run1413());
+}
+
+function paint14phasor(key) {
+  const svg = document.getElementById("svg-s1412p");
+  if (!svg) return;
+  if (key === "78") {
+    const Vm = 100, w = 1e4, XC1 = 1 / (w * 2e-6), XC2 = 1 / (w * 8e-6);
+    drawPhasors(svg, [
+      { mag: Vm, deg: 60, color: "#c0392b", lab: "E" },
+      { mag: Vm / XC1, deg: 150, color: "#2471a3", lab: "I1" },
+      { mag: Vm / XC2, deg: 150, color: "#1e8449", lab: "I2" }
+    ], "C∥C: i adelanta 90°");
+  } else if (key === "79") {
+    drawPhasors(svg, [
+      { mag: 6, deg: 30, color: "#2471a3", lab: "Is" },
+      { mag: 6 * 3 / 4, deg: 30, color: "#1e8449", lab: "I1" },
+      { mag: 6 * 1 / 4, deg: 30, color: "#7d3c98", lab: "I2" },
+      { mag: 6 * 3, deg: 120, color: "#c0392b", lab: "Vs" }
+    ], "L∥L: v adelanta 90°");
+  } else if (key === "80") {
+    const e = Cpol(60, 20), vb = Cpol(20, 0), va = Csub(e, vb);
+    drawPhasors(svg, [
+      { mag: 60, deg: 20, color: "#c0392b", lab: "E" },
+      { mag: 20, deg: 0, color: "#2471a3", lab: "Vb" },
+      { mag: Cmag(va), deg: Cang(va), color: "#1e8449", lab: "Va" }
+    ], "KVL: Va = E − Vb");
+  } else if (key === "81") {
+    const is = Cpol(20, 90), i2 = Cpol(6, -60), i1 = Csub(is, i2);
+    drawPhasors(svg, [
+      { mag: 20, deg: 90, color: "#c0392b", lab: "Is" },
+      { mag: 6, deg: -60, color: "#2471a3", lab: "I2" },
+      { mag: Cmag(i1), deg: Cang(i1), color: "#1e8449", lab: "I1" }
+    ], "KCL: I1 = Is − I2");
+  } else if (key === "82") {
+    const va = Cpol(60, 30), vb = Cpol(30, -30), vc = Cpol(40, 120), e = Cadd(Cadd(va, vb), vc);
+    drawPhasors(svg, [
+      { mag: 60, deg: 30, color: "#c0392b", lab: "Va" },
+      { mag: 30, deg: -30, color: "#2471a3", lab: "Vb" },
+      { mag: 40, deg: 120, color: "#7d3c98", lab: "Vc" },
+      { mag: Cmag(e), deg: Cang(e), color: "#1e8449", lab: "E" }
+    ], "E = Va+Vb+Vc");
+  } else if (key === "83") {
+    const i1 = Cpol(6, 180), i2 = Cpol(8, 0), is = Cadd(i1, Cmul(i2, C(3, 0)));
+    drawPhasors(svg, [
+      { mag: 6, deg: 180, color: "#c0392b", lab: "I1" },
+      { mag: 8, deg: 0, color: "#2471a3", lab: "I2" },
+      { mag: 16, deg: 0, color: "#7d3c98", lab: "I3=2 I2" },
+      { mag: Cmag(is), deg: Cang(is), color: "#1e8449", lab: "Is" }
+    ], "Is = I1+I2+I3");
+  }
+}
+
+function run143() {
+  const out = document.getElementById("proc-14-3");
+  try {
+    let el = document.getElementById("s143-el")?.value || "R";
+    const u = parseElemUnit(document.getElementById("s143-val-u")?.value);
+    let val = readFlex("s143-val");
+    let f = readFlex("s143-f");
+    let w = readFlex("s143-w");
+    if (w != null && f == null) f = Math.abs(w) / (2 * Math.PI);
+    if (f != null && w == null) w = 2 * Math.PI * f;
+    const va = readFlex("s143-va"), ia = readFlex("s143-ia");
+    const vphIn = readFlex("s143-vph"), iphIn = readFlex("s143-iph");
+    const vk = document.getElementById("s143-vk")?.value || "sin";
+    const ik = document.getElementById("s143-ik")?.value || "sin";
+    let vS = va != null ? asSine(va, vphIn ?? 0, vk) : null;
+    let iS = ia != null ? asSine(ia, iphIn ?? 0, ik) : null;
+    let proc = "";
+    if (el === "auto") {
+      if (!vS || !iS) throw new Error("Para identificar, indica v e i.");
+      const th = wrapDeg(vS.phase - iS.phase);
+      const X = vS.amp / iS.amp;
+      if (Math.abs(th) < 20) {
+        el = "R"; val = X; proc += `θ = ${formatQtyPlain(th)}° ≈ 0 → R. ${mj(`R = V_m/I_m = ${texQtyBody(val, "\\Omega")}`)}.\n`;
+      } else if (Math.abs(th - 90) < 20) {
+        el = "L";
+        proc += `θ = ${formatQtyPlain(th)}° ≈ +90° (v adelanta) → L.\n`;
+        if (w) { val = X / w; proc += `${mj(`X_L = ${texQtyBody(X, "\\Omega")}`)}, ${mj(`L = X_L/\\omega = ${texQtyBody(val, "H")}`)}.\n`; }
+        else { val = X; u.kind = "X"; proc += `${mj(`X_L = ${texQtyBody(X, "\\Omega")}`)}. Falta ω para L.\n`; }
+      } else if (Math.abs(th + 90) < 20) {
+        el = "C";
+        proc += `θ = ${formatQtyPlain(th)}° ≈ −90° (i adelanta) → C.\n`;
+        if (w) { val = 1 / (w * X); proc += `${mj(`X_C = ${texQtyBody(X, "\\Omega")}`)}, ${mj(`C = 1/(\\omega X_C) = ${texQtyBody(val, "F")}`)}.\n`; }
+        else { val = X; u.kind = "X"; proc += `${mj(`X_C = ${texQtyBody(X, "\\Omega")}`)}. Falta ω para C.\n`; }
+      } else throw new Error(`θ = ${formatQtyPlain(th)}° no es 0 ni ±90°: no es R, L o C puros.`);
+    }
+    if (val != null && u.kind !== "X" && el !== "auto") val *= u.k;
+    let X = null;
+    if (el === "R") {
+      X = val;
+      proc += `${mj("v")} e ${mj("i")} en fase. Dump / cable / winding.\n`;
+      if (vS && !iS) { iS = { amp: vS.amp / X, phase: vS.phase }; proc += `${mj(`i = v/R = ${sineStr(iS.amp, w, iS.phase)}`)} A.\n`; }
+      else if (iS && !vS) { vS = { amp: iS.amp * X, phase: iS.phase }; proc += `${mj(`v = i R = ${sineStr(vS.amp, w, vS.phase)}`)} V.\n`; }
+      else if (vS && iS) proc += `Comprobación R = ${formatQty(vS.amp / iS.amp, "Ω")}.\n`;
+      else if (X != null) proc += `${mj(`R = ${texQtyBody(X, "\\Omega")}`)}.\n`;
+    } else if (el === "L") {
+      if (f === 0) { X = 0; proc += `CD: ${mj("X_L = 0")} (corto). El choke de un DAB en DC es un cable.\n`; }
+      else if (u.kind === "X") { X = val; if (w) proc += `${mj(`L = X_L/\\omega = ${texQtyBody(X / w, "H")}`)}.\n`; }
+      else if (val != null && w != null) { X = w * val; proc += `${mj(`X_L = \\omega L = ${texQtyBody(X, "\\Omega")}`)}.\n`; }
+      else if (val != null && w == null) throw new Error("L: indica f o ω.");
+      proc += `v adelanta i 90°. LCL / DAB / DFIG.\n`;
+      if (X != null && X !== 0) {
+        if (vS && !iS) { iS = { amp: vS.amp / X, phase: wrapDeg(vS.phase - 90) }; proc += `${mj(`i = ${sineStr(iS.amp, w, iS.phase)}`)} A.\n`; }
+        else if (iS && !vS) { vS = { amp: iS.amp * X, phase: wrapDeg(iS.phase + 90) }; proc += `${mj(`v = ${sineStr(vS.amp, w, vS.phase)}`)} V.\n`; }
+      } else if (X === 0 && vS) { iS = { amp: Infinity, phase: vS.phase }; proc += `CD: corriente limitada por R del winding, no por L.\n`; }
+    } else if (el === "C") {
+      if (f === 0) { X = Infinity; proc += `CD: ${mj("X_C \\to \\infty")} (abierto). El DC-link no deja pasar DC.\n`; }
+      else if (u.kind === "X") { X = val; if (w) proc += `${mj(`C = 1/(\\omega X_C) = ${texQtyBody(1 / (w * X), "F")}`)}.\n`; }
+      else if (val != null && w != null) { X = 1 / (w * val); proc += `${mj(`X_C = 1/(\\omega C) = ${texQtyBody(X, "\\Omega")}`)}.\n`; }
+      else if (val != null && w == null) throw new Error("C: indica f o ω.");
+      proc += `i adelanta v 90°. DC-link / filtro / snubber.\n`;
+      if (X != null && isFinite(X)) {
+        if (vS && !iS) { iS = { amp: vS.amp / X, phase: wrapDeg(vS.phase + 90) }; proc += `${mj(`i = ${sineStr(iS.amp, w, iS.phase)}`)} A.\n`; }
+        else if (iS && !vS) { vS = { amp: iS.amp * X, phase: wrapDeg(iS.phase - 90) }; proc += `${mj(`v = ${sineStr(vS.amp, w, vS.phase)}`)} V.\n`; }
+      }
+    }
+    if (vS && iS && isFinite(vS.amp) && isFinite(iS.amp)) plotSinePair(document.getElementById("svg-s143"), vS, iS);
+    if (!proc) throw new Error("Indica elemento y al menos v o i.");
+    setMathText(out, proc);
+  } catch (e) { setMathText(out, e.message); }
+}
+
+function run144() {
+  const out = document.getElementById("proc-14-4");
+  try {
+    let L = readFlex("s144-l"), C = readFlex("s144-c");
+    if (L != null) L *= readUnit("s144-l-u");
+    if (C != null) C *= readUnit("s144-c-u");
+    const f1 = readFlex("s144-f1") ?? 0, f2 = readFlex("s144-f2") ?? 1e5;
+    const fx = readFlex("s144-fx"), Xx = readFlex("s144-x");
+    let proc = `${mj("X_L = 2\\pi f L")}, ${mj("X_C = 1/(2\\pi f C)")}.\n`;
+    if (L != null && fx != null && Xx == null) proc += `A ${formatQty(fx, "Hz")}: ${mj(`X_L = ${texQtyBody(2 * Math.PI * fx * L, "\\Omega")}`)}.\n`;
+    if (C != null && fx != null && Xx == null) proc += `A ${formatQty(fx, "Hz")}: ${mj(`X_C = ${texQtyBody(1 / (2 * Math.PI * fx * C), "\\Omega")}`)}.\n`;
+    if (C != null && Xx != null && fx == null) {
+      const f = 1 / (2 * Math.PI * Xx * C);
+      proc += `${mj(`f = 1/(2\\pi X_C C) = ${texQtyBody(f, "Hz")}`)} (XC = R del dump).\n`;
+    }
+    if (L != null && Xx != null && fx == null) {
+      const f = Xx / (2 * Math.PI * L);
+      proc += `${mj(`f = X_L/(2\\pi L) = ${texQtyBody(f, "Hz")}`)}.\n`;
+    }
+    if (L != null && C != null) {
+      const fr = 1 / (2 * Math.PI * Math.sqrt(L * C));
+      proc += `Misma reactancia: ${mj(`f = 1/(2\\pi\\sqrt{LC}) = ${texQtyBody(fr, "Hz")}`)} (resonancia del LCL / del filtro).\n`;
+    }
+    if (L != null && fx != null && C == null && Xx == null) {
+      const XL = 2 * Math.PI * fx * L;
+      const Cm = 1 / (2 * Math.PI * fx * XL);
+      proc += `A ${formatQty(fx, "Hz")}, ${mj(`X_L = ${texQtyBody(XL, "\\Omega")}`)}. C que iguala XC: ${mj(`C = 1/(\\omega X_L) = ${texQtyBody(Cm, "F")}`)}.\n`;
+    }
+    if (L != null && fx != null && Xx != null) {
+      L = Xx / (2 * Math.PI * fx);
+      proc += `${mj(`L = X_L/(2\\pi f) = ${texQtyBody(L, "H")}`)}.\n`;
+    }
+    if (C != null && L == null && fx != null && Xx != null) {
+      C = 1 / (2 * Math.PI * fx * Xx);
+      proc += `${mj(`C = 1/(2\\pi f X_C) = ${texQtyBody(C, "F")}`)}.\n`;
+    }
+    const n = 80, ptsL = [], ptsC = [];
+    const lo = Math.max(f1, f2 * 1e-4), hi = f2 || 1e5;
+    for (let k = 0; k <= n; k++) {
+      const f = lo + (hi - lo) * k / n;
+      if (L != null) ptsL.push({ x: f, y: 2 * Math.PI * f * L });
+      if (C != null) ptsC.push({ x: f, y: 1 / (2 * Math.PI * f * C) });
+    }
+    const ys = [...ptsL, ...ptsC].map((p) => p.y);
+    const yM = Math.max(...ys, 1) * 1.05;
+    const series = [];
+    if (ptsL.length) series.push({ pts: ptsL, color: "#c0392b" });
+    if (ptsC.length) series.push({ pts: ptsC, color: "#2471a3", dash: "6 3" });
+    drawWaveBook(document.getElementById("svg-s144"), {
+      xMin: lo, xMax: hi, yMin: 0, yMax: yM, H: 300,
+      xTicks: ticksAround(lo, hi, 5), yTicks: ticksAround(0, yM, 4),
+      xLabel: "f (Hz)", yLabel: "X (Ω)", series
+    });
+    proc += "Rojo XL (sube); azul XC (baja). El cruce es el tono que el código de red no quiere.";
+    setMathText(out, proc);
+  } catch (e) { setMathText(out, e.message); }
+}
+
+function run145() {
+  const out = document.getElementById("proc-14-5");
+  try {
+    const va = readFlex("s145-va"), ia = readFlex("s145-ia");
+    const vph = readFlex("s145-vph") ?? 0, iph = readFlex("s145-iph") ?? 0;
+    const vk = document.getElementById("s145-vk")?.value || "sin";
+    const ik = document.getElementById("s145-ik")?.value || "sin";
+    let P = readFlex("s145-p"), Vrms = readFlex("s145-vrms"), Irms = readFlex("s145-irms");
+    let proc = `${mj("P = V_m I_m/2\\,\\cos\\theta = V_{\\mathrm{rms}} I_{\\mathrm{rms}}\\cos\\theta")}.\n`;
+    if (va != null && ia != null) {
+      const vS = asSine(va, vph, vk), iS = asSine(ia, iph, ik);
+      const th = wrapDeg(vS.phase - iS.phase);
+      Vrms = vS.amp / Math.SQRT2; Irms = iS.amp / Math.SQRT2;
+      P = Vrms * Irms * Math.cos(th * Math.PI / 180);
+      const S = Vrms * Irms, pf = S ? P / S : 0;
+      const lag = th > 0.5 ? "atrasado (i retrasa: L / DFIG)" : th < -0.5 ? "adelantado (i adelanta: C / filtro)" : "unitario (R / dump)";
+      proc += `θ = φv − φi = ${formatQtyPlain(th)}°. ${lag}.\n`;
+      proc += `${mj(`P = ${texQtyBody(P, "W")}`)}, ${mj(`S = ${texQtyBody(S, "VA")}`)}, ${mj(`F_P = ${texQtyBody(pf)}`)}.\n`;
+      proc += `P = I²R = ${formatQty((iS.amp / Math.SQRT2) ** 2 * (vS.amp / iS.amp) * Math.cos(th * Math.PI / 180), "W")} si interpretas R = (Vm/Im) cosθ.\n`;
+    } else if (P != null && Vrms != null && Irms != null) {
+      const S = Vrms * Irms, pf = S ? P / S : 0;
+      proc += `${mj(`S = VI = ${texQtyBody(S, "VA")}`)}, ${mj(`F_P = P/S = ${texQtyBody(pf)}`)}.\n`;
+      if (Math.abs(P) < 1e-12) proc += "P = 0: L o C ideales, o un inversor en STATCOM puro.\n";
+      if (Math.abs(P - S) < 1e-6 * Math.max(S, 1)) proc += "P = S: FP = 1, todo resistivo (dump).\n";
+    } else if (P != null && va != null) {
+      const vS = asSine(va, vph, vk);
+      Vrms = vS.amp / Math.SQRT2;
+      const pfIn = readFlex("s145-iph"); // reuse? no
+      throw new Error("Para P y v dados, usa el preset 33 (FP conocido).");
+    } else throw new Error("Indica v e i, o P, Vrms e Irms.");
+    setMathText(out, proc);
+  } catch (e) { setMathText(out, e.message); }
+}
+
+function run149() {
+  const out = document.getElementById("proc-14-9");
+  try {
+    const z = readCx("s149-re", "s149-im", "s149-mag", "s149-ang");
+    if (!z) throw new Error("Indica a,b o A,φ.");
+    const f = Cfmt(z);
+    setField("s149-re", z.re); setField("s149-im", z.im);
+    setField("s149-mag", f.mag); setField("s149-ang", f.ang);
+    drawPhasors(document.getElementById("svg-s149"), [{ mag: f.mag, deg: f.ang, color: "#1a5276", lab: "z" }], "plano j");
+    setMathText(out, `Rectangular: ${mj(f.rect)}.\nPolar: ${mj(f.polar)}.\n` +
+      `${mj("A = \\sqrt{a^{2}+b^{2}}")}, ${mj("\\phi = \\mathrm{atan2}(b,a)")}.\n` +
+      `El PLL mira polar; el DSP suma rectangular.`);
+  } catch (e) { setMathText(out, e.message); }
+}
+
+function run1410() {
+  const out = document.getElementById("proc-14-10");
+  try {
+    const z1 = readCx("s1410-a1", "s1410-b1", "s1410-m1", "s1410-p1");
+    const z2 = readCx("s1410-a2", "s1410-b2", "s1410-m2", "s1410-p2");
+    const z3 = readCx("s1410-a3", "s1410-b3", "s1410-m3", "s1410-p3");
+    if (!z1 || !z2) throw new Error("Indica z1 y z2.");
+    const op = document.getElementById("s1410-op")?.value || "+";
+    let z = applyCxOp(z1, op, z2);
+    let proc = `z1 = ${Ctex(z1)}\nz2 = ${Ctex(z2)}\nz1 ${op} z2 = ${Ctex(z)}\n`;
+    const op2 = document.getElementById("s1410-op2")?.value || "";
+    if (op2 && z3) {
+      z = applyCxOp(z, op2, z3);
+      proc += `z3 = ${Ctex(z3)}\n(…) ${op2} z3 = ${Ctex(z)}\n`;
+    }
+    proc += "Suma en rectangular (KVL/KCL). Producto y cociente en polar (Ohm fasorial).";
+    setMathText(out, proc);
+  } catch (e) { setMathText(out, e.message); }
+}
+
+function run1412() {
+  const out = document.getElementById("proc-14-12");
+  try {
+    let A = readFlex("s1412-a"), ph = readFlex("s1412-ph");
+    let rms = readFlex("s1412-rms"), pang = readFlex("s1412-pang");
+    const f = readFlex("s1412-f") ?? 60;
+    const kind = document.getElementById("s1412-k")?.value || "sin";
+    const w = 2 * Math.PI * f;
+    let proc = `Convención RMS: ${mj("A\\,\\mathrm{sen}(\\omega t+\\phi)\\;\\to\\;(A/\\sqrt{2})\\angle\\phi")}.\n`;
+    if (A != null) {
+      const s = asSine(A, ph ?? 0, kind);
+      rms = s.amp / Math.SQRT2; pang = s.phase;
+      setField("s1412-rms", rms); setField("s1412-pang", pang);
+      proc += `Fasor: ${mj(`${texQtyBody(rms)}\\angle ${texQtyBody(pang)}^{\\circ}`)}.\n`;
+    } else if (rms != null && pang != null) {
+      A = rms * Math.SQRT2; ph = pang;
+      setField("s1412-a", A); setField("s1412-ph", ph);
+      proc += `Senoidal 60 Hz: ${mj(sineStr(A, w, ph))}.\n`;
+    } else throw new Error("Indica pico y fase, o RMS y ángulo del fasor.");
+    drawPhasors(document.getElementById("svg-s1412"), [{ mag: rms, deg: pang, color: "#1a5276", lab: "F" }], "fasor RMS");
+    proc += `${mj(`f = ${texQtyBody(f, "Hz")}`)}, ${mj(`\\omega = ${texQtyBody(w, "rad/s")}`)}. El PLL mira este vector.`;
+    setMathText(out, proc);
+  } catch (e) { setMathText(out, e.message); }
+}
+
+function run1413() {
+  const out = document.getElementById("proc-14-13");
+  try {
+    const Cval = (readFlex("s1413-c") ?? 0.1) * 1e-6;
+    const Ls = (readFlex("s1413-ls") ?? 0.2) * 1e-6;
+    const Rs = (readFlex("s1413-rs") ?? 2) * 1e6;
+    const Rp = (readFlex("s1413-rp") ?? 100) * 1e6;
+    const fRes = 1 / (2 * Math.PI * Math.sqrt(Ls * Cval));
+    const pts = [];
+    const f1 = 1e5, f2 = 1e8;
+    for (let k = 0; k <= 80; k++) {
+      const t = k / 80;
+      const f = f1 * Math.pow(f2 / f1, t);
+      const w = 2 * Math.PI * f;
+      const zc = Cdiv(C(1, 0), Cadd(C(1 / Rp, 0), C(0, w * Cval)));
+      const z = Cadd(Cadd(C(Rs, 0), zc), C(0, w * Ls));
+      pts.push({ x: Math.log10(f), y: Math.log10(Math.max(Cmag(z), 1e-6)) });
+    }
+    drawWaveBook(document.getElementById("svg-s1413"), {
+      xMin: 5, xMax: 8, yMin: Math.min(...pts.map((p) => p.y)) - 0.2, yMax: Math.max(...pts.map((p) => p.y)) + 0.2,
+      H: 300, xTicks: [5, 6, 7, 8], yTicks: ticksAround(Math.min(...pts.map((p) => p.y)), Math.max(...pts.map((p) => p.y)), 4),
+      xLabel: "log10 f (Hz)", yLabel: "log10 |Z|", series: [{ pts, color: "#1a5276" }]
+    });
+    setMathText(out, `Prob. 56 — modelo de un film DC-link: ${mj("R_s + (R_p \\parallel 1/j\\omega C) + j\\omega L_s")}.\n` +
+      `${mj(`f_{\\mathrm{res}} = 1/(2\\pi\\sqrt{L_s C}) = ${texQtyBody(fRes, "Hz")}`)} ≈ 1.13 MHz.\n` +
+      `Capacitivo por debajo de la resonancia (el inversor a 20–100 kHz todavía ve un C); inductivo por encima (ESL del pack).\n` +
+      `«¿Para qué intervalo es capacitivo?» — por debajo de ${formatQty(fRes, "Hz")}.`);
+  } catch (e) { setMathText(out, e.message); }
+}
+
+function p14(fields, selects, click, desc) {
+  const o = { desc, click };
+  if (fields) o.fields = fields;
+  if (selects) o.selects = selects;
+  return o;
+}
+
+Object.assign(presetsData, {
+  "14-2": {
+    p1: p14({ "s142-a": "1", "s142-w": "3.14", "s142-ph": "0" }, { "s142-k": "sin" }, "btn-s142",
+      "Prob. 1 — 1 sen 3.14t. f = 0.500 Hz, T = 2.00 s. dv/dt = 3.14 sen(3.14t + 90°). Un ciclo de un dispatch lento."),
+    p2: p14({ "s142-a": "1", "s142-w": "15.71", "s142-ph": "0" }, { "s142-k": "sin" }, "btn-s142",
+      "Prob. 2 — 1 sen 15.71t. f = 2.50 Hz, T = 0.400 s. dv/dt = 15.71 sen(15.71t + 90°). ω ×5 respecto al 1 → derivada ×5."),
+    p3a: p14({ "s142-a": "10", "s142-w": "377", "s142-ph": "0" }, { "s142-k": "sin" }, "btn-s142",
+      "Prob. 3.a — 10 sen 377t. dv/dt = 3770 sen(377t + 90°) V/s. Red 60 Hz."),
+    p3b: p14({ "s142-a": "0.6", "s142-w": "754", "s142-ph": "20" }, { "s142-k": "sin" }, "btn-s142",
+      "Prob. 3.b — 0.6 sen(754t + 20°). dv/dt = 452 sen(754t + 110°). Armónico 2."),
+    p3c: p14({ "s142-a": "28.284", "s142-w": "157", "s142-ph": "-20" }, { "s142-k": "sin" }, "btn-s142",
+      "Prob. 3.c — √2·20 sen(157t − 20°). dv/dt = 4.44×10³ sen(157t + 70°). 25 Hz."),
+    p3d: p14({ "s142-a": "-200", "s142-w": "1", "s142-ph": "180" }, { "s142-k": "sin" }, "btn-s142",
+      "Prob. 3.d — −200 sen(t + 180°). Equivale a 200 sen(t). dv/dt = 200 sen(t + 90°).")
+  },
+  "14-3": {
+    p4a: p14({ "s143-val": "5", "s143-f": "60", "s143-w": "377", "s143-va": "150", "s143-vph": "0", "s143-ia": "", "s143-iph": "" }, { "s143-el": "R", "s143-val-u": "R1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 4.a — 5 Ω, 150 sen 377t. i = 30 sen 377t A. Dump de planta, en fase."),
+    p4b: p14({ "s143-val": "5", "s143-f": "60", "s143-w": "377", "s143-va": "30", "s143-vph": "20", "s143-ia": "", "s143-iph": "" }, { "s143-el": "R", "s143-val-u": "R1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 4.b — i = 6 sen(377t + 20°) A."),
+    p4c: p14({ "s143-val": "5", "s143-f": "", "s143-w": "", "s143-va": "40", "s143-vph": "10", "s143-ia": "", "s143-iph": "" }, { "s143-el": "R", "s143-val-u": "R1", "s143-vk": "cos" }, "btn-s143",
+      "Prob. 4.c — 40 cos(ωt + 10°) = 40 sen(ωt + 100°). i = 8 sen(ωt + 100°) A."),
+    p4d: p14({ "s143-val": "5", "s143-f": "", "s143-w": "", "s143-va": "-80", "s143-vph": "40", "s143-ia": "", "s143-iph": "" }, { "s143-el": "R", "s143-val-u": "R1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 4.d — −80 sen(ωt + 40°) = 80 sen(ωt − 140°). i = 16 sen(ωt − 140°) A."),
+    p5a: p14({ "s143-val": "7", "s143-f": "120", "s143-w": "754", "s143-va": "", "s143-vph": "", "s143-ia": "0.03", "s143-iph": "0" }, { "s143-el": "R", "s143-val-u": "R1e3", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 5.a — 7 kΩ, 0.03 sen 754t. v = 210 sen 754t V."),
+    p5b: p14({ "s143-val": "7", "s143-f": "", "s143-w": "400", "s143-va": "", "s143-ia": "2e-3", "s143-iph": "-120" }, { "s143-el": "R", "s143-val-u": "R1e3", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 5.b — v = 14 sen(400t − 120°) V."),
+    p5c: p14({ "s143-val": "7", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "6e-6", "s143-iph": "-2" }, { "s143-el": "R", "s143-val-u": "R1e3", "s143-ik": "cos" }, "btn-s143",
+      "Prob. 5.c — 6 µA cos(ωt − 2°) → v = 42 mV sen(ωt + 88°)."),
+    p5d: p14({ "s143-val": "7", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "-0.004", "s143-iph": "-90" }, { "s143-el": "R", "s143-val-u": "R1e3", "s143-ik": "cos" }, "btn-s143",
+      "Prob. 5.d — −0.004 cos(ωt − 90°) → v = 28 sen(ωt + 90°) V."),
+    p6a: p14({ "s143-val": "2", "s143-f": "0", "s143-w": "0", "s143-va": "", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1" }, "btn-s143",
+      "Prob. 6.a — 2 H en CD: XL = 0. El choke es un cable."),
+    p6b: p14({ "s143-val": "2", "s143-f": "25", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1" }, "btn-s143",
+      "Prob. 6.b — 2 H, 25 Hz → XL = 314 Ω."),
+    p6c: p14({ "s143-val": "2", "s143-f": "60", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1" }, "btn-s143",
+      "Prob. 6.c — 2 H, 60 Hz → XL = 754 Ω. Estator / LCL a red."),
+    p6d: p14({ "s143-val": "2", "s143-f": "2000", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1" }, "btn-s143",
+      "Prob. 6.d — 2 H, 2 kHz → XL = 25.1 kΩ."),
+    p6e: p14({ "s143-val": "2", "s143-f": "1e5", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1" }, "btn-s143",
+      "Prob. 6.e — 2 H, 100 kHz → XL = 1.26 MΩ. Un muro para el PWM."),
+    p7a: p14({ "s143-val": "20", "s143-f": "2", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "X1" }, "btn-s143",
+      "Prob. 7.a — XL = 20 Ω a 2 Hz → L = 1.59 H."),
+    p7b: p14({ "s143-val": "1000", "s143-f": "60", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "X1" }, "btn-s143",
+      "Prob. 7.b — XL = 1 kΩ a 60 Hz → L = 2.65 H."),
+    p7c: p14({ "s143-val": "5280", "s143-f": "1000", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "X1" }, "btn-s143",
+      "Prob. 7.c — XL = 5280 Ω a 1 kHz → L = 0.840 H."),
+    p8a: p14({ "s144-l": "10", "s144-c": "", "s144-f1": "0", "s144-f2": "20", "s144-fx": "", "s144-x": "50" }, { "s144-l-u": "1" }, "btn-s144",
+      "Prob. 8.a — 10 H, XL = 50 Ω → f = 0.796 Hz."),
+    p8b: p14({ "s144-l": "10", "s144-c": "", "s144-fx": "", "s144-x": "3770" }, { "s144-l-u": "1" }, "btn-s144",
+      "Prob. 8.b — 10 H, 3770 Ω → f = 60.0 Hz."),
+    p8c: p14({ "s144-l": "10", "s144-c": "", "s144-fx": "", "s144-x": "15700" }, { "s144-l-u": "1" }, "btn-s144",
+      "Prob. 8.c — 10 H, 15.7 kΩ → f = 250 Hz."),
+    p8d: p14({ "s144-l": "10", "s144-c": "", "s144-fx": "", "s144-x": "243" }, { "s144-l-u": "1" }, "btn-s144",
+      "Prob. 8.d — 10 H, 243 Ω → f = 3.87 Hz."),
+    p9a: p14({ "s143-val": "20", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "5", "s143-iph": "0" }, { "s143-el": "L", "s143-val-u": "X1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 9.a — XL = 20 Ω, i = 5 sen ωt → v = 100 sen(ωt + 90°) V."),
+    p9b: p14({ "s143-val": "20", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "0.4", "s143-iph": "60" }, { "s143-el": "L", "s143-val-u": "X1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 9.b — v = 8 sen(ωt + 150°) V."),
+    p9c: p14({ "s143-val": "20", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "-6", "s143-iph": "-30" }, { "s143-el": "L", "s143-val-u": "X1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 9.c — i = 6 sen(ωt + 150°). v = 120 sen(ωt + 240°) V."),
+    p9d: p14({ "s143-val": "20", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "3", "s143-iph": "10" }, { "s143-el": "L", "s143-val-u": "X1", "s143-ik": "cos" }, "btn-s143",
+      "Prob. 9.d — i = 3 sen(ωt + 100°). v = 60 sen(ωt + 190°) V."),
+    p10a: p14({ "s143-val": "0.1", "s143-f": "", "s143-w": "30", "s143-va": "", "s143-ia": "30", "s143-iph": "0" }, { "s143-el": "L", "s143-val-u": "L1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 10.a — 0.1 H, 30 sen 30t. XL = 3 Ω. v = 90 sen(30t + 90°) V."),
+    p10b: p14({ "s143-val": "0.1", "s143-f": "60", "s143-w": "377", "s143-va": "", "s143-ia": "0.006", "s143-iph": "0" }, { "s143-el": "L", "s143-val-u": "L1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 10.b — v = 0.226 sen(377t + 90°) V."),
+    p10c: p14({ "s143-val": "0.1", "s143-f": "", "s143-w": "400", "s143-va": "", "s143-ia": "5e-6", "s143-iph": "20" }, { "s143-el": "L", "s143-val-u": "L1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 10.c — v = 0.200 mV sen(400t + 110°)."),
+    p10d: p14({ "s143-val": "0.1", "s143-f": "", "s143-w": "20", "s143-va": "", "s143-ia": "-4", "s143-iph": "-70" }, { "s143-el": "L", "s143-val-u": "L1", "s143-ik": "cos" }, "btn-s143",
+      "Prob. 10.d — −4 cos(20t − 70°) = 4 sen(20t + 20°). v = 8 sen(20t + 110°) V."),
+    p11a: p14({ "s143-val": "50", "s143-f": "", "s143-w": "", "s143-va": "50", "s143-vph": "0", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "X1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 11.a — XL = 50 Ω, 50 sen ωt → i = 1 sen(ωt − 90°) A."),
+    p11b: p14({ "s143-val": "50", "s143-f": "", "s143-w": "", "s143-va": "30", "s143-vph": "20", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "X1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 11.b — i = 0.600 sen(ωt − 70°) A."),
+    p11c: p14({ "s143-val": "50", "s143-f": "", "s143-w": "", "s143-va": "40", "s143-vph": "10", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "X1", "s143-vk": "cos" }, "btn-s143",
+      "Prob. 11.c — 40 cos(ωt + 10°) = 40 sen(ωt + 100°). i = 0.800 sen(ωt + 10°) A."),
+    p11d: p14({ "s143-val": "50", "s143-f": "60", "s143-w": "377", "s143-va": "-80", "s143-vph": "40", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "X1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 11.d — −80 sen(377t + 40°) = 80 sen(377t − 140°). i = 1.60 sen(377t − 230°) A."),
+    p12a: p14({ "s143-val": "0.2", "s143-f": "", "s143-w": "60", "s143-va": "1.5", "s143-vph": "0", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 12.a — 0.2 H, 1.5 sen 60t. XL = 12 Ω. i = 0.125 sen(60t − 90°) A."),
+    p12b: p14({ "s143-val": "0.2", "s143-f": "", "s143-w": "1", "s143-va": "0.016", "s143-vph": "4", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 12.b — i = 0.080 sen(t − 86°) A."),
+    p12c: p14({ "s143-val": "0.2", "s143-f": "", "s143-w": "0.05", "s143-va": "-4.8", "s143-vph": "50", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 12.c — XL = 0.010 Ω. i grande: 480 sen(0.05t − 40°) A. ω diminuta."),
+    p12d: p14({ "s143-val": "0.2", "s143-f": "60", "s143-w": "377", "s143-va": "9e-3", "s143-vph": "360", "s143-ia": "" }, { "s143-el": "L", "s143-val-u": "L1", "s143-vk": "cos" }, "btn-s143",
+      "Prob. 12.d — 9 mV cos(377t). i = 0.119 mA sen(377t) (cos → +90°, L resta 90°)."),
+    p13a: p14({ "s143-val": "5", "s143-f": "0", "s143-w": "0", "s143-va": "", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6" }, "btn-s143",
+      "Prob. 13.a — 5 µF en CD: XC → ∞. El DC-link no deja pasar DC."),
+    p13b: p14({ "s143-val": "5", "s143-f": "60", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6" }, "btn-s143",
+      "Prob. 13.b — 5 µF, 60 Hz → XC = 531 Ω."),
+    p13c: p14({ "s143-val": "5", "s143-f": "120", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6" }, "btn-s143",
+      "Prob. 13.c — 5 µF, 120 Hz → XC = 265 Ω."),
+    p13d: p14({ "s143-val": "5", "s143-f": "1800", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6" }, "btn-s143",
+      "Prob. 13.d — 5 µF, 1.8 kHz → XC = 17.7 Ω."),
+    p13e: p14({ "s143-val": "5", "s143-f": "24000", "s143-w": "", "s143-va": "", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6" }, "btn-s143",
+      "Prob. 13.e — 5 µF, 24 kHz → XC = 1.33 Ω. Casi un corto para el PWM."),
+    p14a: p14({ "s144-l": "", "s144-c": "1", "s144-fx": "60", "s144-x": "250", "s144-f1": "10", "s144-f2": "200" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 14.a — XC = 250 Ω a 60 Hz → C = 10.6 µF. (El 14.a del libro usa el solucionador 14.4.)"),
+    p14b: p14({ "s144-l": "", "s144-c": "1", "s144-fx": "312", "s144-x": "55" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 14.b — XC = 55 Ω a 312 Hz → C = 9.27 µF."),
+    p14c: p14({ "s144-l": "", "s144-c": "1", "s144-fx": "25", "s144-x": "10" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 14.c — XC = 10 Ω a 25 Hz → C = 637 µF. Banco de un BESS."),
+    p15a: p14({ "s144-l": "", "s144-c": "50", "s144-fx": "", "s144-x": "342" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 15.a — 50 µF, XC = 342 Ω → f = 9.31 Hz."),
+    p15b: p14({ "s144-l": "", "s144-c": "50", "s144-fx": "", "s144-x": "684" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 15.b — 50 µF, 684 Ω → f = 4.65 Hz."),
+    p15c: p14({ "s144-l": "", "s144-c": "50", "s144-fx": "", "s144-x": "171" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 15.c — 50 µF, 171 Ω → f = 18.6 Hz."),
+    p15d: p14({ "s144-l": "", "s144-c": "50", "s144-fx": "", "s144-x": "2000" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 15.d — 50 µF, 2000 Ω → f = 1.59 Hz."),
+    p16a: p14({ "s143-val": "2.5", "s143-f": "", "s143-w": "", "s143-va": "100", "s143-vph": "0", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "X1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 16.a — XC = 2.5 Ω, 100 sen ωt → i = 40 sen(ωt + 90°) A."),
+    p16b: p14({ "s143-val": "2.5", "s143-f": "", "s143-w": "", "s143-va": "0.4", "s143-vph": "20", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "X1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 16.b — i = 0.160 sen(ωt + 110°) A."),
+    p16c: p14({ "s143-val": "2.5", "s143-f": "", "s143-w": "", "s143-va": "8", "s143-vph": "10", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "X1", "s143-vk": "cos" }, "btn-s143",
+      "Prob. 16.c — 8 cos(ωt + 10°) = 8 sen(ωt + 100°). i = 3.20 sen(ωt + 190°) A."),
+    p16d: p14({ "s143-val": "2.5", "s143-f": "", "s143-w": "", "s143-va": "-70", "s143-vph": "40", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "X1", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 16.d — −70 sen(ωt + 40°) = 70 sen(ωt − 140°). i = 28 sen(ωt − 50°) A."),
+    p17a: p14({ "s143-val": "1", "s143-f": "", "s143-w": "200", "s143-va": "30", "s143-vph": "0", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 17.a — 1 µF, 30 sen 200t. XC = 5 kΩ. i = 6.00 mA sen(200t + 90°)."),
+    p17b: p14({ "s143-val": "1", "s143-f": "60", "s143-w": "377", "s143-va": "90", "s143-vph": "0", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 17.b — i = 33.9 mA sen(377t + 90°)."),
+    p17c: p14({ "s143-val": "1", "s143-f": "", "s143-w": "374", "s143-va": "-120", "s143-vph": "30", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 17.c — −120 sen(374t + 30°) = 120 sen(374t − 150°). i = 44.9 mA sen(374t − 60°)."),
+    p17d: p14({ "s143-val": "1", "s143-f": "", "s143-w": "800", "s143-va": "70", "s143-vph": "-20", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-vk": "cos" }, "btn-s143",
+      "Prob. 17.d — 70 cos(800t − 20°) = 70 sen(800t + 70°). i = 56.0 mA sen(800t + 160°)."),
+    p18a: p14({ "s143-val": "10", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "50", "s143-iph": "0" }, { "s143-el": "C", "s143-val-u": "X1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 18.a — XC = 10 Ω, i = 50 sen ωt → v = 500 sen(ωt − 90°) V."),
+    p18b: p14({ "s143-val": "10", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "40", "s143-iph": "60" }, { "s143-el": "C", "s143-val-u": "X1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 18.b — v = 400 sen(ωt − 30°) V."),
+    p18c: p14({ "s143-val": "10", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "-6", "s143-iph": "-30" }, { "s143-el": "C", "s143-val-u": "X1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 18.c — v = 60 sen(ωt + 60°) V."),
+    p18d: p14({ "s143-val": "10", "s143-f": "", "s143-w": "", "s143-va": "", "s143-ia": "3", "s143-iph": "10" }, { "s143-el": "C", "s143-val-u": "X1", "s143-ik": "cos" }, "btn-s143",
+      "Prob. 18.d — i = 3 sen(ωt + 100°). v = 30 sen(ωt + 10°) V."),
+    p19a: p14({ "s143-val": "0.5", "s143-f": "", "s143-w": "300", "s143-va": "", "s143-ia": "0.20", "s143-iph": "0" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 19.a — 0.5 µF, 0.20 sen 300t. XC = 6.67 kΩ. v = 1.33 kV sen(300t − 90°)."),
+    p19b: p14({ "s143-val": "0.5", "s143-f": "60", "s143-w": "377", "s143-va": "", "s143-ia": "0.007", "s143-iph": "0" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 19.b — v = 37.1 sen(377t − 90°) V."),
+    p19c: p14({ "s143-val": "0.5", "s143-f": "", "s143-w": "754", "s143-va": "", "s143-ia": "0.048", "s143-iph": "0" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-ik": "cos" }, "btn-s143",
+      "Prob. 19.c — 0.048 cos 754t = 0.048 sen(754t + 90°). v = 127 sen(754t) V."),
+    p19d: p14({ "s143-val": "0.5", "s143-f": "", "s143-w": "1600", "s143-va": "", "s143-ia": "0.08", "s143-iph": "-80" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 19.d — v = 100 sen(1600t − 170°) V."),
+    p20a: p14({ "s143-val": "", "s143-f": "60", "s143-w": "377", "s143-va": "550", "s143-vph": "40", "s143-ia": "11", "s143-iph": "-50" }, { "s143-el": "auto", "s143-vk": "sin", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 20.a — v adelanta 90° → L. XL = 50 Ω, L = 0.133 H. Choke de un LCL 60 Hz."),
+    p20b: p14({ "s143-val": "", "s143-f": "", "s143-w": "754", "s143-va": "36", "s143-vph": "80", "s143-ia": "4", "s143-iph": "170" }, { "s143-el": "auto", "s143-vk": "sin", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 20.b — i adelanta 90° → C. XC = 9.00 Ω, C = 148 µF."),
+    p20c: p14({ "s143-val": "", "s143-f": "", "s143-w": "", "s143-va": "10.5", "s143-vph": "13", "s143-ia": "1.5", "s143-iph": "13" }, { "s143-el": "auto", "s143-vk": "sin", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 20.c — en fase → R = 7.00 Ω. Dump."),
+    p21a: p14({ "s143-val": "", "s143-f": "", "s143-w": "", "s143-va": "2000", "s143-vph": "0", "s143-ia": "5", "s143-iph": "90" }, { "s143-el": "auto", "s143-vk": "sin", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 21.a — 5 cos ωt = 5 sen(ωt + 90°). i adelanta 90° → C, XC = 400 Ω."),
+    p21b: p14({ "s143-val": "", "s143-f": "", "s143-w": "157", "s143-va": "80", "s143-vph": "150", "s143-ia": "2", "s143-iph": "60" }, { "s143-el": "auto", "s143-vk": "sin", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 21.b — v adelanta 90° → L. XL = 40 Ω, L = 0.255 H."),
+    p21c: p14({ "s143-val": "", "s143-f": "", "s143-w": "", "s143-va": "35", "s143-vph": "-20", "s143-ia": "7", "s143-iph": "-110" }, { "s143-el": "auto", "s143-vk": "sin", "s143-ik": "cos" }, "btn-s143",
+      "Prob. 21.c — 7 cos(ωt − 110°) = 7 sen(ωt − 20°). En fase → R = 5.00 Ω.")
+  },
+  "14-4": {
+    p22: p14({ "s144-l": "5", "s144-c": "", "s144-f1": "0", "s144-f2": "1e5", "s144-fx": "", "s144-x": "" }, { "s144-l-u": "1e-3" }, "btn-s144",
+      "Prob. 22 — XL de 5 mH, 0–100 kHz. Lineal: a 100 kHz, XL = 3.14 kΩ. LCL vs PWM."),
+    p23: p14({ "s144-l": "", "s144-c": "1", "s144-f1": "10", "s144-f2": "1e4", "s144-fx": "", "s144-x": "" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 23 — XC de 1 µF, 0–10 kHz. A 50 Hz ≈ 3.18 kΩ; a 10 kHz ≈ 15.9 Ω."),
+    p24: p14({ "s144-l": "", "s144-c": "1", "s144-f1": "10", "s144-f2": "400", "s144-fx": "", "s144-x": "2000" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 24 — 1 µF, XC = 2 kΩ → f = 79.6 Hz."),
+    p25: p14({ "s144-l": "1", "s144-c": "", "s144-f1": "1e3", "s144-f2": "1e4", "s144-fx": "5000", "s144-x": "10000" }, { "s144-l-u": "1" }, "btn-s144",
+      "Prob. 25 — XL = 10 kΩ a 5 kHz → L = 0.318 H."),
+    p26: p14({ "s144-l": "10", "s144-c": "1", "s144-f1": "100", "s144-f2": "5000", "s144-fx": "", "s144-x": "" }, { "s144-l-u": "1e-3", "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 26 — 1 µF y 10 mH: f = 1.59 kHz (resonancia del filtro)."),
+    p27: p14({ "s144-l": "2", "s144-c": "", "s144-f1": "1e4", "s144-f2": "1e5", "s144-fx": "5e4", "s144-x": "" }, { "s144-l-u": "1e-3" }, "btn-s144",
+      "Prob. 27 — 2 mH a 50 kHz: XL = 628 Ω. C = 5.07 nF para igualar XC. Snubber / filtro PWM.")
+  },
+  "14-5": {
+    p28a: p14({ "s145-va": "550", "s145-vph": "40", "s145-ia": "11", "s145-iph": "-50" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 28.a — L (θ = 90°). P = 0. El choke no factura."),
+    p28b: p14({ "s145-va": "36", "s145-vph": "80", "s145-ia": "4", "s145-iph": "170" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 28.b — C (θ = −90°). P = 0. El film no factura."),
+    p28c: p14({ "s145-va": "10.5", "s145-vph": "13", "s145-ia": "1.5", "s145-iph": "13" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 28.c — R. P = 7.88 W. El dump sí."),
+    p29a: p14({ "s145-va": "2000", "s145-vph": "0", "s145-ia": "5", "s145-iph": "90" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 29.a — C. P = 0."),
+    p29b: p14({ "s145-va": "80", "s145-vph": "150", "s145-ia": "2", "s145-iph": "60" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 29.b — L. P = 0."),
+    p29c: p14({ "s145-va": "35", "s145-vph": "-20", "s145-ia": "7", "s145-iph": "-20" }, { "s145-vk": "sin", "s145-ik": "cos" }, "btn-s145",
+      "Prob. 29.c — 7 cos(ωt−110°) está en fase. P = 122.5 W."),
+    p30a: p14({ "s145-va": "60", "s145-vph": "30", "s145-ia": "15", "s145-iph": "60" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 30.a — θ = −30°. P = 390 W, FP = 0.866 adelantado."),
+    p30b: p14({ "s145-va": "-50", "s145-vph": "-20", "s145-ia": "-2", "s145-iph": "40" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 30.b — ambos negativos = +180°. θ = −60°. P = 25.0 W, FP = 0.500 adelantado."),
+    p30c: p14({ "s145-va": "50", "s145-vph": "80", "s145-ia": "3", "s145-iph": "20" }, { "s145-vk": "sin", "s145-ik": "cos" }, "btn-s145",
+      "Prob. 30.c — 3 cos(ωt+20°) = 3 sen(ωt+110°). θ = −30°. P = 65.0 W, FP = 0.866 adelantado."),
+    p30d: p14({ "s145-va": "75", "s145-vph": "-5", "s145-ia": "0.08", "s145-iph": "-35" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 30.d — θ = +30°. P = 2.60 W, FP = 0.866 atrasado."),
+    p31: p14({ "s145-va": "48", "s145-vph": "40", "s145-ia": "8", "s145-iph": "40" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 31 — en fase, R = 6 Ω. P = Irms² R = 192 W = (Vm Im/2) cos0 = 192 W = Vrms Irms = 192 W. Las tres coinciden."),
+    p32a: p14({ "s145-va": "", "s145-ia": "", "s145-p": "100", "s145-vrms": "150", "s145-irms": "2" }, null, "btn-s145",
+      "Prob. 32 — S = 300 VA, FP = 0.333. Un inversor entregando 100 W con 300 VA de apariencia."),
+    p32b: p14({ "s145-p": "0", "s145-vrms": "150", "s145-irms": "2" }, null, "btn-s145",
+      "Prob. 32 (P = 0) — FP = 0. STATCOM puro / L o C ideales."),
+    p32c: p14({ "s145-p": "300", "s145-vrms": "150", "s145-irms": "2" }, null, "btn-s145",
+      "Prob. 32 (P = 300 W) — FP = 1. Todo resistivo: dump a plena carga."),
+    p33: p14({ "s1412-a": "50", "s1412-ph": "10", "s1412-f": "60", "s1412-rms": "", "s1412-pang": "" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 33 — v = 50 sen(ωt+10°), FP = 0.5 atrasado, P = 500 W. Vrms = 35.4 V. Irms = 28.3 A, Im = 40 A, φi = −50°. i = 40 sen(ωt − 50°)."),
+    p34: { selects: { "s145f-fig": "75" }, click: "btn-s145f", desc: "Prob. 34 — fig. 14.75. i = 10 sen(377t+20°) A. P = 150 W. 6 ciclos = 100 ms." },
+    p35: { selects: { "s145f-fig": "76" }, click: "btn-s145f", desc: "Prob. 35 — fig. 14.76. i = 2 sen(157t − 60°) A. L = 0.318 H. P = 0." },
+    p36: { selects: { "s145f-fig": "77" }, click: "btn-s145f", desc: "Prob. 36 — fig. 14.77. e = 1200 sen(377t − 110°) V. C = 6.63 µF. P = 0." }
+  },
+  "14-9": Object.fromEntries((() => {
+    const rec = (tag, a, b, desc) => [tag, p14({ "s149-re": String(a), "s149-im": String(b), "s149-mag": "", "s149-ang": "" }, null, "btn-s149", desc)];
+    const pol = (tag, m, p, desc) => [tag, p14({ "s149-re": "", "s149-im": "", "s149-mag": String(m), "s149-ang": String(p) }, null, "btn-s149", desc)];
+    return [
+      rec("p39a", 4, 3, "Prob. 39.a — 4+j3 = 5.00∠36.9°."),
+      rec("p39b", 2, 2, "Prob. 39.b — 2+j2 = 2.83∠45.0°."),
+      rec("p39c", 3.5, 16, "Prob. 39.c — 3.5+j16 = 16.4∠77.7°."),
+      rec("p39d", 100, 800, "Prob. 39.d — 100+j800 = 806∠82.9°."),
+      rec("p39e", 1000, 400, "Prob. 39.e — 1000+j400 = 1077∠21.8°."),
+      rec("p39f", 0.001, 0.0065, "Prob. 39.f — 0.001+j0.0065 = 6.58×10⁻³∠81.3°."),
+      rec("p39g", 7.6, -9, "Prob. 39.g — 7.6−j9 = 11.8∠−49.8°."),
+      rec("p39h", -8, 4, "Prob. 39.h — −8+j4 = 8.94∠153°."),
+      rec("p39i", -15, -60, "Prob. 39.i — −15−j60 = 61.8∠−104°."),
+      rec("p39j", 78, -65, "Prob. 39.j — 78−j65 = 101∠−39.8°."),
+      rec("p39k", -2400, 3600, "Prob. 39.k — −2400+j3600 = 4327∠124°."),
+      rec("p39l", 5e-3, -25e-3, "Prob. 39.l — 5 m − j25 m = 25.5×10⁻³∠−78.7°."),
+      pol("p40a", 6, 30, "Prob. 40.a — 6∠30° = 5.20+j3.00."),
+      pol("p40b", 40, 80, "Prob. 40.b — 40∠80° = 6.95+j39.4."),
+      pol("p40c", 7400, 70, "Prob. 40.c — 7400∠70° = 2531+j6953."),
+      pol("p40d", 4e-4, 8, "Prob. 40.d — 4×10⁻⁴∠8° = 3.96×10⁻⁴+j5.57×10⁻⁵."),
+      pol("p40e", 0.04, 80, "Prob. 40.e — 0.04∠80° = 6.95×10⁻³+j0.0394."),
+      pol("p40f", 0.0093, 23, "Prob. 40.f — 0.0093∠23° = 8.56×10⁻³+j3.63×10⁻³."),
+      pol("p40g", 65, 150, "Prob. 40.g — 65∠150° = −56.3+j32.5."),
+      pol("p40h", 1.2, 135, "Prob. 40.h — 1.2∠135° = −0.849+j0.849."),
+      pol("p40i", 500, 200, "Prob. 40.i — 500∠200° = −470−j171."),
+      pol("p40j", 6320, -35, "Prob. 40.j — 6320∠−35° = 5178−j3625."),
+      pol("p40k", 7.52, -125, "Prob. 40.k — 7.52∠−125° = −4.31−j6.16."),
+      pol("p40l", 0.008, 310, "Prob. 40.l — 0.008∠310° = 5.14×10⁻³−j6.13×10⁻³."),
+      rec("p41a", 1, 15, "Prob. 41.a — 1+j15 = 15.0∠86.2°."),
+      rec("p41b", 60, 5, "Prob. 41.b — 60+j5 = 60.2∠4.76°."),
+      rec("p41c", 0.01, 0.3, "Prob. 41.c — 0.01+j0.3 = 0.300∠88.1°."),
+      rec("p41d", 100, -2000, "Prob. 41.d — 100−j2000 = 2002∠−87.1°."),
+      rec("p41e", -5.6, 86, "Prob. 41.e — −5.6+j86 = 86.2∠93.7°."),
+      rec("p41f", -2.7, -38.6, "Prob. 41.f — −2.7−j38.6 = 38.7∠−94.0°."),
+      pol("p42a", 13, 5, "Prob. 42.a — 13∠5° = 12.95+j1.13."),
+      pol("p42b", 160, 87, "Prob. 42.b — 160∠87° = 8.37+j160."),
+      pol("p42c", 7e-6, 2, "Prob. 42.c — 7×10⁻⁶∠2° = 7.00×10⁻⁶+j2.44×10⁻⁷."),
+      pol("p42d", 8.7, 177, "Prob. 42.d — 8.7∠177° = −8.69+j0.455."),
+      pol("p42e", 76, -4, "Prob. 42.e — 76∠−4° = 75.8−j5.30."),
+      pol("p42f", 396, 265, "Prob. 42.f — 396∠265° = −34.5−j394.")
+    ];
+  })()),
+  "14-10": {
+    p43a: p14({ "s1410-a1": "4.2", "s1410-b1": "6.8", "s1410-m1": "", "s1410-p1": "", "s1410-a2": "7.6", "s1410-b2": "0.2", "s1410-m2": "", "s1410-p2": "", "s1410-a3": "", "s1410-b3": "" }, { "s1410-op": "+", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 43.a — (4.2+j6.8)+(7.6+j0.2) = 11.8+j7.00."),
+    p43b: p14({ "s1410-a1": "142", "s1410-b1": "7", "s1410-a2": "9.8", "s1410-b2": "42", "s1410-a3": "0.1", "s1410-b3": "0.9", "s1410-m1": "", "s1410-m2": "", "s1410-m3": "" }, { "s1410-op": "+", "s1410-op2": "+" }, "btn-s1410",
+      "Prob. 43.b — 151.9+j49.9."),
+    p43c: p14({ "s1410-a1": "4e-6", "s1410-b1": "76", "s1410-a2": "7.2e-7", "s1410-b2": "-5", "s1410-a3": "", "s1410-m1": "", "s1410-m2": "" }, { "s1410-op": "+", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 43.c — 4.72×10⁻⁶ + j71."),
+    p43d: p14({ "s1410-a1": "9.8", "s1410-b1": "6.2", "s1410-a2": "4.6", "s1410-b2": "4.6", "s1410-m1": "", "s1410-m2": "", "s1410-a3": "" }, { "s1410-op": "-", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 43.d — 5.20+j1.60."),
+    p43e: p14({ "s1410-a1": "167", "s1410-b1": "243", "s1410-a2": "-42.3", "s1410-b2": "-68", "s1410-m1": "", "s1410-m2": "", "s1410-a3": "" }, { "s1410-op": "-", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 43.e — 167+j243 − (−42.3−j68) = 209.3+j311."),
+    p43f: p14({ "s1410-a1": "-36", "s1410-b1": "78", "s1410-a2": "-4", "s1410-b2": "-6", "s1410-a3": "10.8", "s1410-b3": "-72", "s1410-m1": "", "s1410-m2": "", "s1410-m3": "" }, { "s1410-op": "-", "s1410-op2": "+" }, "btn-s1410",
+      "Prob. 43.f — (−36+j78)−(−4−j6)+(10.8−j72) = −21.2+j12."),
+    p43g: p14({ "s1410-a1": "", "s1410-b1": "", "s1410-m1": "6", "s1410-p1": "20", "s1410-a2": "", "s1410-b2": "", "s1410-m2": "8", "s1410-p2": "80", "s1410-a3": "" }, { "s1410-op": "+", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 43.g — 6∠20° + 8∠80° = 7.03+j9.94 = 12.2∠54.7°."),
+    p43h: p14({ "s1410-m1": "42", "s1410-p1": "45", "s1410-m2": "62", "s1410-p2": "60", "s1410-m3": "70", "s1410-p3": "120", "s1410-a1": "", "s1410-b1": "", "s1410-a2": "", "s1410-b2": "", "s1410-a3": "", "s1410-b3": "" }, { "s1410-op": "+", "s1410-op2": "-" }, "btn-s1410",
+      "Prob. 43.h — 42∠45°+62∠60°−70∠120° = 60.7−j5.15 = 60.9∠−4.85°."),
+    p44a: p14({ "s1410-a1": "2", "s1410-b1": "3", "s1410-a2": "6", "s1410-b2": "8", "s1410-m1": "", "s1410-m2": "", "s1410-a3": "" }, { "s1410-op": "*", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 44.a — (2+j3)(6+j8) = −12+j34."),
+    p44b: p14({ "s1410-a1": "7.8", "s1410-b1": "1", "s1410-a2": "4", "s1410-b2": "2", "s1410-a3": "7", "s1410-b3": "6", "s1410-m1": "", "s1410-m2": "", "s1410-m3": "" }, { "s1410-op": "*", "s1410-op2": "*" }, "btn-s1410",
+      "Prob. 44.b — (7.8+j1)(4+j2)(7+j6)."),
+    p44c: p14({ "s1410-a1": "0.002", "s1410-b1": "0.006", "s1410-a2": "-2", "s1410-b2": "2", "s1410-m1": "", "s1410-m2": "", "s1410-a3": "" }, { "s1410-op": "*", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 44.c — (0.002+j0.006)(−2+j2) = −0.016−j0.008."),
+    p44d: p14({ "s1410-a1": "400", "s1410-b1": "-200", "s1410-a2": "-0.01", "s1410-b2": "-0.5", "s1410-a3": "-1", "s1410-b3": "3", "s1410-m1": "", "s1410-m2": "", "s1410-m3": "" }, { "s1410-op": "*", "s1410-op2": "*" }, "btn-s1410",
+      "Prob. 44.d — (400−j200)(−0.01−j0.5)(−1+j3)."),
+    p44e: p14({ "s1410-m1": "2", "s1410-p1": "60", "s1410-m2": "4", "s1410-p2": "22", "s1410-a1": "", "s1410-b1": "", "s1410-a2": "", "s1410-b2": "", "s1410-a3": "" }, { "s1410-op": "*", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 44.e — 8∠82° = 1.11+j7.92."),
+    p44f: p14({ "s1410-m1": "6.9", "s1410-p1": "8", "s1410-m2": "7.2", "s1410-p2": "-72", "s1410-a1": "", "s1410-a2": "", "s1410-b1": "", "s1410-b2": "", "s1410-a3": "" }, { "s1410-op": "*", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 44.f — 49.7∠−64°."),
+    p44g: p14({ "s1410-m1": "0.002", "s1410-p1": "120", "s1410-m2": "0.5", "s1410-p2": "200", "s1410-m3": "40", "s1410-p3": "-60", "s1410-a1": "", "s1410-a2": "", "s1410-a3": "", "s1410-b1": "", "s1410-b2": "", "s1410-b3": "" }, { "s1410-op": "*", "s1410-op2": "*" }, "btn-s1410",
+      "Prob. 44.g — 0.040∠260°."),
+    p44h: p14({ "s1410-m1": "540", "s1410-p1": "-20", "s1410-m2": "-5", "s1410-p2": "180", "s1410-m3": "6.2", "s1410-p3": "0", "s1410-a1": "", "s1410-a2": "", "s1410-a3": "", "s1410-b1": "", "s1410-b2": "", "s1410-b3": "" }, { "s1410-op": "*", "s1410-op2": "*" }, "btn-s1410",
+      "Prob. 44.h — (−5∠180°) = 5∠0°. Producto 1.67×10⁴∠−20°."),
+    p45a: p14({ "s1410-m1": "42", "s1410-p1": "10", "s1410-m2": "7", "s1410-p2": "60", "s1410-a1": "", "s1410-a2": "", "s1410-b1": "", "s1410-b2": "", "s1410-a3": "" }, { "s1410-op": "/", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 45.a — 6.00∠−50°."),
+    p45b: p14({ "s1410-m1": "0.006", "s1410-p1": "120", "s1410-m2": "30", "s1410-p2": "-20", "s1410-a1": "", "s1410-a2": "", "s1410-b1": "", "s1410-b2": "", "s1410-a3": "" }, { "s1410-op": "/", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 45.b — 2.00×10⁻⁴∠140°."),
+    p45c: p14({ "s1410-m1": "4360", "s1410-p1": "-20", "s1410-m2": "40", "s1410-p2": "210", "s1410-a1": "", "s1410-a2": "", "s1410-b1": "", "s1410-b2": "", "s1410-a3": "" }, { "s1410-op": "/", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 45.c — 109∠−230° = 109∠130°."),
+    p45d: p14({ "s1410-m1": "650", "s1410-p1": "-80", "s1410-m2": "8.5", "s1410-p2": "360", "s1410-a1": "", "s1410-a2": "", "s1410-b1": "", "s1410-b2": "", "s1410-a3": "" }, { "s1410-op": "/", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 45.d — 76.5∠−80°."),
+    p45e: p14({ "s1410-a1": "8", "s1410-b1": "8", "s1410-a2": "2", "s1410-b2": "2", "s1410-m1": "", "s1410-m2": "", "s1410-a3": "" }, { "s1410-op": "/", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 45.e — 4.00∠0° = 4+j0."),
+    p45f: p14({ "s1410-a1": "8", "s1410-b1": "42", "s1410-a2": "-6", "s1410-b2": "60", "s1410-m1": "", "s1410-m2": "", "s1410-a3": "" }, { "s1410-op": "/", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 45.f — (8+j42)/(−6+j60)."),
+    p45g: p14({ "s1410-a1": "0.05", "s1410-b1": "0.25", "s1410-a2": "8", "s1410-b2": "-60", "s1410-m1": "", "s1410-m2": "", "s1410-a3": "" }, { "s1410-op": "/", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 45.g — (0.05+j0.25)/(8−j60)."),
+    p45h: p14({ "s1410-a1": "-4.5", "s1410-b1": "-6", "s1410-a2": "0.1", "s1410-b2": "-0.4", "s1410-m1": "", "s1410-m2": "", "s1410-a3": "" }, { "s1410-op": "/", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 45.h — (−4.5−j6)/(0.1−j0.4)."),
+    p46a: { selects: { "s1410s-fig": "46a" }, click: "btn-s1410s", desc: "Prob. 46.a — (10−j5)/1 = 10−j5." },
+    p46b: { selects: { "s1410s-fig": "46b" }, click: "btn-s1410s", desc: "Prob. 46.b — 8∠60° / (102+j100)." },
+    p46c: { selects: { "s1410s-fig": "46c" }, click: "btn-s1410s", desc: "Prob. 46.c — (6∠20°)(120∠−40°)(3+j4) / (2∠−30°)." },
+    p46d: { selects: { "s1410s-fig": "46d" }, click: "btn-s1410s", desc: "Prob. 46.d — (0.4∠60°)² (300∠40°) / (3+j9)." },
+    p46e: { selects: { "s1410s-fig": "46e" }, click: "btn-s1410s", desc: "Prob. 46.e — 1/(0.02∠10°)² · (2/j)³ · 1/(36−j30)." },
+    p47a: { selects: { "s1410s-fig": "47a" }, click: "btn-s1410s", desc: "Prob. 47.a — x = 4, y = 3." },
+    p47b: { selects: { "s1410s-fig": "47b" }, click: "btn-s1410s", desc: "Prob. 47.b — x = 40.0." },
+    p47c: { selects: { "s1410s-fig": "47c" }, click: "btn-s1410s", desc: "Prob. 47.c — (x,y) = (6,3) o (3,6)." },
+    p47d: { selects: { "s1410s-fig": "47d" }, click: "btn-s1410s", desc: "Prob. 47.d — θ = 30°." }
+  },
+  "14-12": {
+    p37: { selects: { "s1412f-fig": "78" }, click: "btn-s1412f", desc: "Prob. 37 — fig. 14.78. C1 ∥ C2, e = √2·100 sen(10⁴t+60°). i1, i2, is adelantan 90°." },
+    p38: { selects: { "s1412f-fig": "79" }, click: "btn-s1412f", desc: "Prob. 38 — fig. 14.79. L1 ∥ L2, is = √2·6 sen(10³t+30°). vs adelanta 90°; i1 = ¾ is." },
+    p48a: p14({ "s1412-a": "141.42", "s1412-ph": "30", "s1412-f": "60", "s1412-rms": "", "s1412-pang": "" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 48.a — √2·100 sen(ωt+30°) → 100∠30° V RMS. El √2 del libro ya es el pico de un 100 V rms."),
+    p48b: p14({ "s1412-a": "0.35355", "s1412-ph": "-40", "s1412-f": "25", "s1412-rms": "", "s1412-pang": "" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 48.b — √2·0.25 sen(157t−40°) → 0.250∠−40°."),
+    p48c: p14({ "s1412-a": "100", "s1412-ph": "-90", "s1412-f": "60", "s1412-rms": "", "s1412-pang": "" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 48.c — 100 sen(ωt−90°) → 70.7∠−90°."),
+    p48d: p14({ "s1412-a": "42", "s1412-ph": "0", "s1412-f": "60", "s1412-rms": "", "s1412-pang": "" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 48.d — 42 sen 377t → 29.7∠0°."),
+    p48e: p14({ "s1412-a": "6e-6", "s1412-ph": "0", "s1412-f": "60", "s1412-rms": "", "s1412-pang": "" }, { "s1412-k": "cos" }, "btn-s1412",
+      "Prob. 48.e — 6 µA cos ωt = 6 µA sen(ωt+90°) → 4.24 µA∠90°."),
+    p48f: p14({ "s1412-a": "3.6e-6", "s1412-ph": "-20", "s1412-f": "120", "s1412-rms": "", "s1412-pang": "" }, { "s1412-k": "cos" }, "btn-s1412",
+      "Prob. 48.f — 3.6 µA cos(754t−20°) = 3.6 µA sen(754t+70°) → 2.55 µA∠70°."),
+    p49a: p14({ "s1412-a": "", "s1412-ph": "", "s1412-f": "60", "s1412-rms": "40", "s1412-pang": "20" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 49.a — 40 A∠20° → i = 56.6 sen(377t+20°) A."),
+    p49b: p14({ "s1412-a": "", "s1412-f": "60", "s1412-rms": "120", "s1412-pang": "0" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 49.b — v = 170 sen 377t V. Red 120 V rms."),
+    p49c: p14({ "s1412-a": "", "s1412-f": "60", "s1412-rms": "8e-3", "s1412-pang": "120" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 49.c — i = 11.3 mA sen(377t+120°)."),
+    p49d: p14({ "s1412-a": "", "s1412-f": "60", "s1412-rms": "5", "s1412-pang": "90" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 49.d — v = 7.07 sen(377t+90°) V."),
+    p49e: p14({ "s1412-a": "", "s1412-f": "60", "s1412-rms": "1200", "s1412-pang": "-120" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 49.e — i = 1.70 kA sen(377t−120°). Un feeder de planta."),
+    p49f: p14({ "s1412-a": "", "s1412-f": "60", "s1412-rms": "4243", "s1412-pang": "-180" }, { "s1412-k": "sin" }, "btn-s1412",
+      "Prob. 49.f — 6000/√2 = 4243 V rms ∠−180° → v = 6000 sen(377t−180°) V."),
+    p50: { selects: { "s1412f-fig": "80" }, click: "btn-s1412f", desc: "Prob. 50 — fig. 14.80. va = e − vb (KVL)." },
+    p51: { selects: { "s1412f-fig": "81" }, click: "btn-s1412f", desc: "Prob. 51 — fig. 14.81. i1 = is − i2 (KCL)." },
+    p52: { selects: { "s1412f-fig": "82" }, click: "btn-s1412f", desc: "Prob. 52 — fig. 14.82. e = va + vb + vc." },
+    p53: { selects: { "s1412f-fig": "83" }, click: "btn-s1412f", desc: "Prob. 53 — fig. 14.83. is = i1 + 3 i2." }
+  },
+  "14-13": {
+    p54: p14({ "s143-val": "1", "s143-f": "200", "s143-w": "", "s143-va": "10", "s143-vph": "0", "s143-ia": "" }, { "s143-el": "C", "s143-val-u": "C1e-6", "s143-vk": "sin" }, "btn-s143",
+      "Prob. 54 — iC y vC a 0.2 kHz (el «PSpice» de 14.69, en el navegador). Dos ciclos: cambia f a 200 Hz y traza."),
+    p55: p14({ "s144-l": "", "s144-c": "1", "s144-f1": "100", "s144-f2": "1e5", "s144-fx": "", "s144-x": "" }, { "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 55 — |iC| ∝ f (XC baja). Fase de iC: +90° constante en un C ideal. 100 Hz–100 kHz."),
+    p56: p14({ "s1413-c": "0.1", "s1413-ls": "0.2", "s1413-rs": "2", "s1413-rp": "100" }, null, "btn-s1413",
+      "Prob. 56 — C = 0.1 µF, Ls = 0.2 µH, Rs = 2 MΩ, Rp = 100 MΩ. Capacitivo bajo ≈ 1.13 MHz."),
+    p57: p14({ "s142-a": "10", "s142-w": "377", "s142-ph": "0" }, { "s142-k": "sin" }, "btn-s142",
+      "Prob. 57 — el programa de la derivada es el solucionador 14.2."),
+    p58: p14({ "s143-val": "5", "s143-f": "60", "s143-w": "377", "s143-va": "", "s143-ia": "2", "s143-iph": "0" }, { "s143-el": "R", "s143-val-u": "R1", "s143-ik": "sin" }, "btn-s143",
+      "Prob. 58 — elige R, L o C; el solucionador 14.3 escribe v(t)."),
+    p59: p14({ "s144-l": "5", "s144-c": "1", "s144-f1": "10", "s144-f2": "1e5" }, { "s144-l-u": "1e-3", "s144-c-u": "1e-6" }, "btn-s144",
+      "Prob. 59 — XL(f) y XC(f) en el solucionador 14.4."),
+    p60: p14({ "s145-va": "60", "s145-vph": "30", "s145-ia": "15", "s145-iph": "60" }, { "s145-vk": "sin", "s145-ik": "sin" }, "btn-s145",
+      "Prob. 60 — P y FP: el solucionador 14.5."),
+    p61: p14({ "s1410-m1": "60", "s1410-p1": "20", "s1410-m2": "20", "s1410-p2": "0", "s1410-a1": "", "s1410-a2": "", "s1410-b1": "", "s1410-b2": "", "s1410-a3": "" }, { "s1410-op": "+", "s1410-op2": "" }, "btn-s1410",
+      "Prob. 61 — suma fasorial (z1+z2) y el 14.12 la pasa a senoidal. El print de Pascal, en el navegador.")
+  }
+});
+
+
 
