@@ -1102,3 +1102,170 @@ input[type="text"]:focus, input[type="number"]:focus, select:focus {
 
 [data-theme="dark"] .lead-v { color: #f5b7b1; }
 [data-theme="dark"] .lead-i { color: #aed6f1; }
+
+/* Chapter 1.0 — post reading column (Substack scale, site palette) */
+.story-lesson {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.25rem;
+  line-height: 1.7;
+  color: var(--text-dark);
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  background: var(--surface);
+  border-radius: 12px;
+  padding: 2.75rem 3rem 2.5rem;
+  margin: 0 auto 2.5rem;
+  max-width: 44rem;
+}
+
+.story-lesson h1 {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(2.1rem, 5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--text-dark);
+  margin: 0 0 1.35rem;
+}
+
+.story-lesson h2 {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1.55rem, 3.5vw, 2rem);
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  color: var(--text-dark);
+  margin: 2.75rem 0 1.15rem;
+}
+
+.story-lesson p {
+  margin: 0 0 1.35rem;
+  color: var(--text-dark);
+  font-size: inherit;
+}
+
+.story-lesson h1 + p {
+  font-size: 1.28rem;
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.55;
+  color: var(--text-medium);
+  margin: 0 0 1.5rem;
+}
+
+.story-lesson em {
+  font-style: italic;
+}
+
+.story-lesson strong {
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.story-lesson a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+.story-lesson a:hover,
+.story-lesson a:focus-visible {
+  color: var(--accent);
+}
+
+.story-lesson hr {
+  border: none;
+  height: 0;
+  border-top: 1px solid var(--border);
+  margin: 2.15rem 0 2rem;
+}
+
+.story-lesson ul {
+  margin: 0.15rem 0 1.5rem;
+  padding: 0 0 0 1.45rem;
+}
+
+.story-lesson li {
+  margin: 0 0 0.85rem;
+  padding-left: 0.15rem;
+}
+
+.story-lesson li::marker {
+  color: var(--text-dark);
+}
+
+.story-lesson li p {
+  margin: 0;
+}
+
+.story-lesson blockquote {
+  margin: 1.75rem 0 1.9rem;
+  padding: 0.1rem 0 0.1rem 1.15rem;
+  border-left: 3px solid var(--accent);
+  color: var(--text-dark);
+}
+
+.story-lesson blockquote p {
+  margin: 0;
+  color: var(--text-dark);
+}
+
+.story-lesson blockquote strong {
+  color: var(--text-dark);
+  font-weight: 700;
+}
+
+#taller-1-0,
+#taller-2-0 {
+  scroll-margin-top: 110px;
+}
+
+.story-bridge {
+  margin-top: 2.25rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+  font-size: 1.05rem;
+  color: var(--text-medium);
+}
+
+.story-skip {
+  margin: 0 0 1.75rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.story-skip a {
+  color: var(--primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.story-skip a:hover,
+.story-skip a:focus-visible {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .story-lesson {
+    font-size: 1.125rem;
+    padding: 1.6rem 1.25rem 1.4rem;
+    max-width: none;
+  }
+
+  .story-lesson h1 {
+    font-size: clamp(1.85rem, 8vw, 2.25rem);
+    margin-bottom: 1.15rem;
+  }
+
+  .story-lesson h1 + p {
+    font-size: 1.15rem;
+  }
+
+  .story-lesson h2 {
+    font-size: clamp(1.4rem, 6vw, 1.7rem);
+    margin-top: 2.25rem;
+  }
+}
