@@ -111,12 +111,17 @@ export const REQUIRED_FIELD_KEYS = Object.freeze([
 export const BATCH_SCOPE = Object.freeze({
   PILOT_8: "pilot-8",
   LOTE_9_24: "lote-9-24",
+  LOTE_25_48: "lote-25-48",
 });
 
 export const LOTE_9_24_SIZE = 16;
+export const LOTE_25_48_SIZE = 24;
 export const LOTE_CHUNK_SIZE = 4;
 export const BATCH_COVERAGE_THRESHOLD = 0.8;
+/** Next after 9–24 (13B). */
 export const NEXT_LOTE_RANGE = Object.freeze({ from: 25, to: 48, size: 24 });
+/** Next after 25–48 (13C). Size filled at runtime from remaining atlas. */
+export const LOTE_49_END_RANGE = Object.freeze({ from: 49, to: null, size: null });
 
 export const JOB_STATUS = Object.freeze({
   IDLE: "idle",

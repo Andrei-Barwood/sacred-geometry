@@ -12,9 +12,11 @@ export {
   REQUIRED_FIELD_KEYS,
   BATCH_SCOPE,
   LOTE_9_24_SIZE,
+  LOTE_25_48_SIZE,
   LOTE_CHUNK_SIZE,
   BATCH_COVERAGE_THRESHOLD,
   NEXT_LOTE_RANGE,
+  LOTE_49_END_RANGE,
   JOB_STATUS,
   LOCAL_SOURCE_MISSING_WARNING,
   emptyField,
@@ -28,16 +30,26 @@ export { enrichArchitecture } from "./enrich-architecture.js";
 export {
   runPilotEnrichmentBatch,
   runLote9to24EnrichmentBatch,
+  runLote25to48EnrichmentBatch,
   exportEnrichmentBatchJSON,
   isPilotArchitecture,
   PILOT_BATCH_SCOPE,
   LOTE_9_24_SCOPE,
+  LOTE_25_48_SCOPE,
   atlasStableOrder,
   selectNextAtlasSlice,
   selectLote9to24Templates,
   selectLote25to48Templates,
+  selectLote49toEndTemplates,
   loteCoverageReport,
 } from "./batch.js";
+export {
+  detectCrossRegionCatalogConflicts,
+  regionCoverageIndex,
+  CROSS_REGION_CATALOG_FIELDS,
+  logEnrichPerf,
+  summarizePerf,
+} from "./cross-region.js";
 export {
   getEnrichment,
   listEnrichments,

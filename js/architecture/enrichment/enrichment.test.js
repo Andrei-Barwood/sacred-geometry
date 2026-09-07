@@ -22,8 +22,11 @@ import {
   enrichArchitecture,
   runPilotEnrichmentBatch,
   runLote9to24EnrichmentBatch,
+  runLote25to48EnrichmentBatch,
   selectLote9to24Templates,
   selectLote25to48Templates,
+  selectLote49toEndTemplates,
+  detectCrossRegionCatalogConflicts,
   loteCoverageReport,
   snapshotCoreMetrics,
   coreMetricsEqual,
@@ -350,6 +353,132 @@ test("coverage report lists id, coverage, conflictos, stale, blocked", async () 
     assert.equal(typeof row.stale, "number");
     assert.equal(typeof row.blocked, "boolean");
   }
+});
+
+test("lote 25–48 is 24 ids after 1–24", () => {
+  const eight = selectPilotTemplates();
+  const loteB = selectLote9to24Templates();
+  const loteC = selectLote25to48Templates();
+  assert.equal(loteC.length, 24);
+  const prior = new Set([...eight, ...loteB].map((t) => t.id));
+  for (const t of loteC) {
+    assert.equal(prior.has(t.id), false);
+  }
+  const rest = selectLote49toEndTemplates();
+  assert.ok(rest.length >= 1);
+  for (const t of rest) {
+    assert.equal(loteC.some((x) => x.id === t.id), false);
+    assert.equal(prior.has(t.id), false);
+  }
+});
+
+test("24 new architectures in lote 25–48 fulfill the 13A contract", async () => {
+  clearEnrichments();
+  const batch = await runLote25to48EnrichmentBatch({ yield: false });
+  assert.equal(batch.format, ENRICHMENT_FORMAT);
+  assert.equal(batch.scope, "lote-25-48");
+  assert.equal(batch.count, 24);
+  assert.equal(batch.gates.ok, true);
+  assert.ok(batch.gates.coverage >= BATCH_COVERAGE_THRESHOLD);
+  assert.equal(batch.job.status, JOB_STATUS.DONE);
+  for (const rec of batch.records) {
+    const v = validateContract(rec);
+    assert.equal(v.ok, true, `${rec.architecture_id}: ${v.errors.join("; ")}`);
+    const keys = new Set(rec.fields.map((f) => f.key));
+    for (const k of REQUIRED_FIELD_KEYS) {
+      assert.equal(keys.has(k), true, `${rec.architecture_id} missing ${k}`);
+    }
+    const unknownValued = rec.fields.filter((f) => f.method === FIELD_METHOD.UNKNOWN && f.value != null);
+    assert.equal(unknownValued.length, 0);
+    const before = batch.snapshot_before.find((s) => s.id === rec.architecture_id);
+    const after = batch.snapshot_after.find((s) => s.id === rec.architecture_id);
+    assert.equal(coreMetricsEqual(before, after), true);
+  }
+  const freqFlag = (batch.cross_region_catalog_flags || []).find((f) => f.field === "frequencyHz");
+  assert.ok(freqFlag, "catalog must flag 50 vs 60 Hz across regions");
+  assert.equal(freqFlag.resolution, "unresolved");
+  assert.ok(freqFlag.regions.includes("R05"));
+  assert.ok(Array.isArray(batch.region_coverage_index));
+  assert.ok(batch.region_coverage_index.length >= 1);
+  assert.ok(batch.perf);
+  assert.equal(batch.perf.count, 24);
+  assert.ok(batch.next_lote.from === 49);
+});
+
+test("architectures 1–24 stay intact after lote 25–48", async () => {
+  clearEnrichments();
+  const eight = selectPilotTemplates();
+  const beforeJson = eight.map((t) => JSON.stringify(t));
+  const pilot = runPilotEnrichmentBatch({ templates: eight });
+  const loteB = await runLote9to24EnrichmentBatch({ yield: false });
+  const snap24 = Object.fromEntries(
+    [...pilot.records, ...loteB.records].map((r) => [r.architecture_id, JSON.stringify(r)])
+  );
+  const loteC = await runLote25to48EnrichmentBatch({ yield: false });
+  assert.equal(loteC.count, 24);
+  for (let i = 0; i < eight.length; i++) {
+    assert.equal(JSON.stringify(eight[i]), beforeJson[i]);
+  }
+  for (const id of Object.keys(snap24)) {
+    const rec = getEnrichment(id);
+    assert.ok(rec, `missing prior ${id}`);
+    assert.equal(JSON.stringify(rec), snap24[id]);
+  }
+  const progress = atlasEnrichmentProgress();
+  assert.equal(progress.enriched, 48);
+  assert.equal(progress.label, `48/${progress.total}`);
+});
+
+test("blocked architecture does not halt lote 25–48", async () => {
+  clearEnrichments();
+  const eight = selectPilotTemplates();
+  runPilotEnrichmentBatch({ templates: eight });
+  await runLote9to24EnrichmentBatch({ yield: false });
+  const loteC = selectLote25to48Templates();
+  const failId = loteC[3].id;
+  const batch = await runLote25to48EnrichmentBatch({
+    yield: false,
+    failAtId: (id) => id === failId,
+  });
+  assert.equal(batch.count, 24);
+  assert.ok(batch.blocked_ids.includes(failId));
+  const blocked = getEnrichment(failId);
+  assert.ok(blocked);
+  assert.equal(blocked.enrichment_status, ENRICHMENT_STATUS.BLOCKED);
+  const sibling = loteC.find((t) => t.id !== failId);
+  const sibRec = getEnrichment(sibling.id);
+  assert.ok(sibRec);
+  assert.notEqual(sibRec.enrichment_status, ENRICHMENT_STATUS.BLOCKED);
+  for (const t of eight) {
+    assert.ok(getEnrichment(t.id));
+    assert.notEqual(getEnrichment(t.id).batch_id, batch.batch_id);
+  }
+});
+
+test("perf smoke: lote 25–48 yields once per architecture", async () => {
+  clearEnrichments();
+  let ticks = 0;
+  const batch = await runLote25to48EnrichmentBatch({
+    yieldFn: async () => {
+      ticks += 1;
+    },
+  });
+  assert.equal(batch.count, 24);
+  assert.equal(ticks, 24);
+  assert.equal(batch.perf.yield_count, 24);
+  assert.ok(batch.perf.total_ms >= 0);
+  assert.equal(batch.perf.per_architecture.length, 24);
+});
+
+test("cross-region catalog detector flags frequency without resolving", () => {
+  const flags = detectCrossRegionCatalogConflicts();
+  const freq = flags.find((f) => f.field === "frequencyHz");
+  assert.ok(freq);
+  assert.equal(freq.kind, "cross_region_catalog");
+  assert.equal(freq.resolution, "unresolved");
+  const hz = new Set(freq.values.map((v) => v.value));
+  assert.ok(hz.has(50));
+  assert.ok(hz.has(60));
 });
 
 for (const step of queue) await step();

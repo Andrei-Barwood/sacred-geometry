@@ -87,6 +87,7 @@ export function runLoteQualityGates(records, options = {}) {
   const threshold = options.threshold ?? BATCH_COVERAGE_THRESHOLD;
   const failures = [];
   const missing_fields = [];
+  const blocked = [];
   let present = 0;
   let total = 0;
   let okRecords = 0;
@@ -98,6 +99,7 @@ export function runLoteQualityGates(records, options = {}) {
       coverage: 0,
       architecture_coverage: 0,
       missing_fields: [],
+      blocked: [],
       threshold,
     };
   }
@@ -118,8 +120,11 @@ export function runLoteQualityGates(records, options = {}) {
       }
     }
     if (record?.enrichment_status === ENRICHMENT_STATUS.BLOCKED) {
-      recordComplete = false;
-      failures.push(`${record.architecture_id}: blocked`);
+      blocked.push(record.architecture_id);
+      if (options.allowBlocked !== true) {
+        recordComplete = false;
+        failures.push(`${record.architecture_id}: blocked`);
+      }
     }
     if (recordComplete) okRecords += 1;
   }
@@ -142,6 +147,7 @@ export function runLoteQualityGates(records, options = {}) {
     coverage,
     architecture_coverage,
     missing_fields,
+    blocked,
     threshold,
   };
 }

@@ -151,6 +151,7 @@ import {
 import {
   runPilotEnrichmentBatch,
   runLote9to24EnrichmentBatch,
+  runLote25to48EnrichmentBatch,
   exportEnrichmentBatchJSON,
   getLastBatch,
   getLastJob,
@@ -501,6 +502,21 @@ export function createWorkbench() {
       if (job.status === JOB_STATUS.FAILED) return "failed";
       if (job.status === JOB_STATUS.DONE) return "done";
       return job.status;
+    },
+
+    get regionCoverageIndex() {
+      void this.enrichment.revision;
+      return this.enrichment.batch?.region_coverage_index || [];
+    },
+
+    get catalogCrossFlags() {
+      void this.enrichment.revision;
+      return this.enrichment.batch?.cross_region_catalog_flags || [];
+    },
+
+    get blockedEnrichmentIds() {
+      void this.enrichment.revision;
+      return this.enrichment.batch?.blocked_ids || [];
     },
 
     get detailTemplate() {
@@ -1488,6 +1504,49 @@ export function createWorkbench() {
       }
     },
 
+    async runLote25to48() {
+      if (this.enrichment.job?.status === JOB_STATUS.RUNNING) return;
+      this.enrichment.loading = true;
+      this.enrichment.error = null;
+      this.ui.bottomTab = "enrichment";
+      this.ui.announce = "Enriching lote 25–48…";
+      this.enrichment.job = {
+        status: JOB_STATUS.RUNNING,
+        scope: "lote-25-48",
+        progress: { done: 0, total: 24, chunk: 0 },
+      };
+      this.enrichment.revision += 1;
+      try {
+        const batch = await runLote25to48EnrichmentBatch({
+          onProgress: (progress, job) => {
+            this.enrichment.job = { ...job, progress };
+            this.enrichment.revision += 1;
+          },
+        });
+        this.enrichment.batch = batch;
+        this.enrichment.job = batch.job || getLastJob();
+        this.enrichment.revision += 1;
+        this.featured = featuredArchitectures(8).map(templateCardModel);
+        const progress = atlasEnrichmentProgress();
+        const blockedN = (batch.blocked_ids || []).length;
+        const gatePct = Math.round((batch.gates.coverage || 0) * 100);
+        if (batch.job?.status === JOB_STATUS.FAILED) {
+          this.enrichment.error = batch.job?.error || (batch.gates.failures || []).join(" | ");
+          this.ui.announce = `Lote 25–48 gate ${gatePct}%. Blocked ${blockedN} (lote continued). Atlas ${progress.label}.`;
+        } else {
+          this.ui.announce = `Lote 25–48 done. Atlas ${progress.label}. Gate ${gatePct}%. Blocked ${blockedN}. Next lote 49–end.`;
+        }
+        persistEnrichmentBatch(batch, this.enrichment.job).catch(() => {});
+      } catch (err) {
+        this.enrichment.job = getLastJob() || { status: JOB_STATUS.FAILED, error: String(err?.message || err) };
+        this.enrichment.error = String(err?.message || err);
+        this.ui.announce = this.enrichment.error;
+        this.enrichment.revision += 1;
+      } finally {
+        this.enrichment.loading = false;
+      }
+    },
+
     exportEnrichmentJSON() {
       const batch = this.enrichment.batch || getLastBatch();
       if (!batch) {
@@ -1495,9 +1554,11 @@ export function createWorkbench() {
         return;
       }
       const name =
-        batch.scope === "lote-9-24"
-          ? "sacred-architecture-enrichment-lote-9-24.json"
-          : "sacred-architecture-enrichment-pilot.json";
+        batch.scope === "lote-25-48"
+          ? "sacred-architecture-enrichment-lote-25-48.json"
+          : batch.scope === "lote-9-24"
+            ? "sacred-architecture-enrichment-lote-9-24.json"
+            : "sacred-architecture-enrichment-pilot.json";
       this._download(name, exportEnrichmentBatchJSON(batch));
     },
 

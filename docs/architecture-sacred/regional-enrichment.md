@@ -78,15 +78,15 @@ Same change-class policy as the Verified Data layer. No universal 30-day TTL.
 ## How to run
 
 1. Open the workbench Atlas → tab **Enrichment**.
-2. **Re-enrich pilot (8)**, then **Enrich lote 9–24**. Progress shows `24/N`.
+2. **Re-enrich pilot (8)**, then **Enrich lote 9–24**, then **Enrich lote 25–48**. Progress shows `48/N`.
 3. Filters: `batch_id`, coverage, conflictos, stale. The job is `running | done | failed` and does not lock the workbench.
 4. **Export JSON**.
 
-A failed lote rolls back every `architecture_id` in 9–24. The pilot of 8 is left untouched.
+A failed 9–24 lote rolls back every `architecture_id` in that lote. Lote 25–48 continues if one architecture is blocked. Architectures 1–24 are left untouched.
 
 `node js/architecture/enrichment/enrichment.test.js`
 
-Coverage report: `docs/architecture-sacred/regional-enrichment-lote-9-24.md`
+Coverage reports: `regional-enrichment-lote-9-24.md`, `regional-enrichment-lote-25-48.md`
 
 ## 13B checklist
 
@@ -99,3 +99,12 @@ Coverage report: `docs/architecture-sacred/regional-enrichment-lote-9-24.md`
 - [x] Keep country voltage lists off `primaryKV`
 - [x] Job `running/done/failed`; no half-writes; lote coverage gate ≥ 80% (required fields present, unknown allowed)
 - [x] Next lote = 25–48
+
+## 13C checklist
+
+- [x] Lote 25–48 (24 architectures). 1–24 intact.
+- [x] Cross-region catalog flags (same field, different region). Unresolved.
+- [x] Coverage index by region
+- [x] Perf log per architecture; yield per architecture (UI thread)
+- [x] Blocked architecture does not halt the lote
+- [x] Next lote = 49–end (62 remaining)
