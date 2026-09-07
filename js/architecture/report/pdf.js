@@ -38,7 +38,7 @@ function layout(printModel) {
   };
 
   addLine("ARQUITECTURA SAGRADA", 16, true, 4);
-  addLine("Informe técnico de arquitectura", 11, false, 10);
+  addLine(printModel.docTitle || "Informe técnico de arquitectura", 11, false, 10);
   addLine(`Proyecto: ${printModel.projectName}`, 10, false, 2);
   addLine(`Sitio: ${printModel.site || DATO_NO_DISPONIBLE}`, 10, false, 2);
   addLine(`Arquitectura / plantilla: ${printModel.sourceTemplateId || DATO_NO_DISPONIBLE}`, 10, false, 2);
@@ -144,20 +144,24 @@ function drawTable(doc, table, getTop, setTop, ensure) {
   setTop(getTop() + 6);
 }
 
-export function renderEngineeringReportPdf(reportModel, options = {}) {
-  const allow = reportExportAllowed(reportModel);
-  if (!allow.ok) return { ok: false, error: allow.message, bytes: null, filename: null, printModel: null };
-  const printModel = options.printModel || buildPrintModel(reportModel, { printedAt: options.printedAt || null });
+export function renderPrintModelPdf(printModel, options = {}) {
   const doc = layout(printModel);
   const bytes = doc.build();
   return {
     ok: true,
     bytes,
-    filename: stablePdfFilename(printModel, options),
+    filename: options.filename || stablePdfFilename(printModel, options),
     printModel,
     text: doc.textLog.join("\n"),
     error: null,
   };
+}
+
+export function renderEngineeringReportPdf(reportModel, options = {}) {
+  const allow = reportExportAllowed(reportModel);
+  if (!allow.ok) return { ok: false, error: allow.message, bytes: null, filename: null, printModel: null };
+  const printModel = options.printModel || buildPrintModel(reportModel, { printedAt: options.printedAt || null });
+  return renderPrintModelPdf(printModel, options);
 }
 
 export { REPORT_PDF_RENDERER_VERSION };

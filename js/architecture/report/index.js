@@ -4,5 +4,5 @@ export { renderEngineeringReportHTML, exportEngineeringReportHTML, REPORT_CSS } 
 export { sanitizeReportModel, reportExportAllowed } from "./sanitizer.js";
 export { buildDiagrams } from "./diagrams.js";
 export { buildPrintModel, contentHash, DATO_NO_DISPONIBLE, isUnknownValue, printCell, stablePdfFilename } from "./print-model.js";
-export { renderEngineeringReportPdf } from "./pdf.js";
+export { renderEngineeringReportPdf, renderPrintModelPdf } from "./pdf.js";
 export { extractPdfText } from "./pdf-writer.js";

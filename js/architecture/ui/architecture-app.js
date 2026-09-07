@@ -119,7 +119,24 @@ import {
   generateRevisionComparisonReport,
   renderEngineeringReportHTML,
   renderEngineeringReportPdf,
+  renderPrintModelPdf,
 } from "../report/index.js";
+import {
+  COMPARISON_GROUPS,
+  COMPARISON_THRESHOLD_DEFAULT,
+  ENTITY_KINDS,
+  NA,
+  buildComparison,
+  comparisonPrintModel,
+  comparisonToCsv,
+  deleteComparison,
+  emptySlot,
+  formatDeltaCell,
+  formatViewValue,
+  getComparison,
+  listComparisons,
+  saveComparison,
+} from "../compare/index.js";
 import {
   findVerifiedData,
   enrichProject,
@@ -275,6 +292,15 @@ export function createWorkbench() {
     },
     siteStatuses: SITE_STATUSES,
     restrictionTypes: RESTRICTION_TYPES,
+
+    compare: {
+      name: "Comparación",
+      savedId: null,
+      thresholdPct: COMPARISON_THRESHOLD_DEFAULT,
+      userFormula: "",
+      slots: [emptySlot(), emptySlot()],
+      cache: {},
+    },
 
     ui: {
       view: VIEW_MODES.SYSTEM,
@@ -852,6 +878,299 @@ export function createWorkbench() {
       this.ui.compareIds = toggleCompare(this.ui.compareIds, id, 3);
     },
 
+    get savedComparisons() {
+      return listComparisons(this.document);
+    },
+
+    get comparisonTable() {
+      const slots = (this.compare.slots || []).filter((s) => s && s.kind && s.id);
+      if (slots.length < 2) {
+        return {
+          ok: false,
+          error: "Seleccione 2 o 3 entidades.",
+          rows: [],
+          views: [],
+          warnings: [],
+          evidence: [],
+          engineMismatch: false,
+          thresholdPct: Number(this.compare.thresholdPct) || COMPARISON_THRESHOLD_DEFAULT,
+        };
+      }
+      const resolved = slots.map((s) => this._resolveCompareSlot(s));
+      return buildComparison(resolved, this._compareContext(), {
+        thresholdPct: Number(this.compare.thresholdPct),
+      });
+    },
+
+    get comparisonGroups() {
+      return COMPARISON_GROUPS;
+    },
+
+    comparisonRowsFor(groupId) {
+      return (this.comparisonTable.rows || []).filter((r) => r.group === groupId);
+    },
+
+    get comparisonDisplayRows() {
+      let last = null;
+      return (this.comparisonTable.rows || []).map((row) => {
+        const showGroup = row.group !== last;
+        last = row.group;
+        const g = COMPARISON_GROUPS.find((x) => x.id === row.group);
+        return { ...row, groupLabel: showGroup ? g?.label || row.group : "" };
+      });
+    },
+
+    get comparisonColCount() {
+      const n = this.comparisonTable.views?.length || 2;
+      return 2 + n + Math.max(0, n - 1);
+    },
+
+    get compareEntityKinds() {
+      return [
+        { id: ENTITY_KINDS.TEMPLATE, label: "Template (Atlas)" },
+        { id: ENTITY_KINDS.PROJECT, label: "Proyecto" },
+        { id: ENTITY_KINDS.SNAPSHOT, label: "Snapshot" },
+        { id: ENTITY_KINDS.SITE, label: "Sitio" },
+      ];
+    },
+
+    compareEntityOptions(kind) {
+      if (kind === ENTITY_KINDS.TEMPLATE) {
+        return architectureTemplates.map((t) => ({ id: t.id, label: `${t.name} (${t.id})` }));
+      }
+      if (kind === ENTITY_KINDS.PROJECT) {
+        const rows = (this.projectIndex || [])
+          .filter((p) => !p.archived)
+          .map((p) => ({ id: p.projectId, label: p.name }));
+        if (this.document?.projectId && !rows.some((r) => r.id === this.document.projectId)) {
+          rows.unshift({ id: this.document.projectId, label: `${this.title} (abierto)` });
+        }
+        return rows;
+      }
+      if (kind === ENTITY_KINDS.SNAPSHOT) {
+        return (this.document?.snapshots || []).map((s) => ({
+          id: s.snapshotId,
+          label: s.name || s.snapshotId,
+        }));
+      }
+      if (kind === ENTITY_KINDS.SITE) {
+        return this.geoSites.map((s) => ({ id: s.id, label: s.name || s.id }));
+      }
+      return [];
+    },
+
+    _compareContext() {
+      return {
+        projectDocument: this.document,
+        project: this.project,
+        projectsById: this.compare.cache,
+        siteEvaluations: this.geoEval?.evaluations || {},
+      };
+    },
+
+    _resolveCompareSlot(slot) {
+      const s = { ...slot };
+      if (s.kind === ENTITY_KINDS.PROJECT) {
+        if (s.id === this.document?.projectId) s.project = this.project;
+        else if (this.compare.cache[s.id]) s.project = this.compare.cache[s.id];
+      }
+      if (s.kind === ENTITY_KINDS.SNAPSHOT) {
+        s.snapshot = (this.document?.snapshots || []).find(
+          (x) => x.snapshotId === s.snapshotId || x.snapshotId === s.id
+        );
+      }
+      if (s.kind === ENTITY_KINDS.SITE) {
+        s.project = this.project;
+        s.siteId = s.siteId || s.id;
+      }
+      return s;
+    },
+
+    async _ensureCompareProject(projectId) {
+      if (!projectId || projectId === this.document?.projectId) return;
+      if (this.compare.cache[projectId]) return;
+      if (!this.store?.loadProject) return;
+      const loaded = await this.store.loadProject(projectId);
+      if (loaded?.ok && loaded.document) {
+        this.compare.cache = { ...this.compare.cache, [projectId]: loaded.document };
+      }
+    },
+
+    setCompareSlotKind(index, kind) {
+      const slots = this.compare.slots.map((s, i) => (i === index ? { ...emptySlot(), kind } : s));
+      this.compare.slots = slots;
+    },
+
+    async setCompareSlotId(index, id) {
+      const cur = this.compare.slots[index] || emptySlot();
+      const next = { ...cur, id };
+      if (cur.kind === ENTITY_KINDS.SNAPSHOT) next.snapshotId = id;
+      if (cur.kind === ENTITY_KINDS.SITE) next.siteId = id;
+      const slots = this.compare.slots.slice();
+      slots[index] = next;
+      this.compare.slots = slots;
+      if (cur.kind === ENTITY_KINDS.PROJECT && id) await this._ensureCompareProject(id);
+    },
+
+    addCompareSlot() {
+      if (this.compare.slots.length >= 3) return;
+      this.compare.slots = [...this.compare.slots, emptySlot()];
+    },
+
+    removeCompareSlot(index) {
+      if (this.compare.slots.length <= 2) return;
+      this.compare.slots = this.compare.slots.filter((_, i) => i !== index);
+    },
+
+    openCompareTab() {
+      this.ui.bottomTab = "compare";
+      this.scrollTo("wb-templates");
+    },
+
+    openCompareFromSelection() {
+      const ids = (this.ui.compareIds || []).slice(0, 3);
+      const slots = ids.map((id) => ({ ...emptySlot(), kind: ENTITY_KINDS.TEMPLATE, id }));
+      while (slots.length < 2) slots.push(emptySlot());
+      this.compare.slots = slots;
+      this.compare.savedId = null;
+      this.compare.name = ids.length ? `Templates ${ids.join(" / ")}` : "Comparación";
+      this.openCompareTab();
+    },
+
+    addSnapshotToCompare(snapshotId) {
+      let slots = this.compare.slots.slice();
+      let idx = slots.findIndex((s) => !s.kind || !s.id);
+      if (idx < 0 && slots.length < 3) {
+        slots = [...slots, emptySlot()];
+        idx = slots.length - 1;
+      }
+      if (idx < 0) idx = Math.min(1, slots.length - 1);
+      slots[idx] = {
+        ...emptySlot(),
+        kind: ENTITY_KINDS.SNAPSHOT,
+        id: snapshotId,
+        snapshotId,
+      };
+      this.compare.slots = slots;
+      this.ui.snapshotsOpen = false;
+      this.openCompareTab();
+    },
+
+    async addListedProjectToCompare(projectId) {
+      let slots = this.compare.slots.slice();
+      let idx = slots.findIndex((s) => !s.kind || !s.id);
+      if (idx < 0 && slots.length < 3) {
+        slots = [...slots, emptySlot()];
+        idx = slots.length - 1;
+      }
+      if (idx < 0) idx = Math.min(1, slots.length - 1);
+      slots[idx] = { ...emptySlot(), kind: ENTITY_KINDS.PROJECT, id: projectId };
+      this.compare.slots = slots;
+      await this._ensureCompareProject(projectId);
+      this.ui.projectsOpen = false;
+      this.openCompareTab();
+    },
+
+    async saveCurrentComparison() {
+      if (!this.project) {
+        this.ui.announce = "Abra un proyecto para guardar la comparación.";
+        return;
+      }
+      if (!this.document) this.document = createProjectDocument(this.project);
+      const filled = (this.compare.slots || []).filter((s) => s.kind && s.id);
+      if (filled.length < 2) {
+        this.ui.announce = "Seleccione 2 o 3 entidades antes de guardar.";
+        return;
+      }
+      const { document, comparison } = saveComparison(this.document, {
+        id: this.compare.savedId || undefined,
+        name: this.compare.name || "Comparación",
+        thresholdPct: Number(this.compare.thresholdPct),
+        userFormula: this.compare.userFormula || "",
+        slots: filled,
+      });
+      this.document = document;
+      this.compare.savedId = comparison.id;
+      this.ui.announce = `Comparación guardada: ${comparison.name}`;
+      await this.saveNow();
+    },
+
+    async reopenComparison(comparisonId) {
+      const rec = getComparison(this.document, comparisonId);
+      if (!rec) {
+        this.ui.announce = "No se encontró la comparación.";
+        return;
+      }
+      this.compare.savedId = rec.id;
+      this.compare.name = rec.name;
+      this.compare.thresholdPct = rec.thresholdPct;
+      this.compare.userFormula = rec.userFormula || "";
+      const slots = (rec.slots || []).map((s) => ({ ...emptySlot(), ...s }));
+      while (slots.length < 2) slots.push(emptySlot());
+      this.compare.slots = slots;
+      for (const s of slots) {
+        if (s.kind === ENTITY_KINDS.PROJECT && s.id) await this._ensureCompareProject(s.id);
+      }
+      this.openCompareTab();
+      this.ui.announce = `Comparación reabierta: ${rec.name}`;
+    },
+
+    async deleteSavedComparison(comparisonId) {
+      if (!this.document) return;
+      this.document = deleteComparison(this.document, comparisonId);
+      if (this.compare.savedId === comparisonId) this.compare.savedId = null;
+      this.ui.announce = "Comparación eliminada.";
+      await this.saveNow();
+    },
+
+    exportComparisonCsv() {
+      const table = this.comparisonTable;
+      if (!table.ok) {
+        this.ui.announce = table.error || "No hay comparación para exportar.";
+        return;
+      }
+      const csv = comparisonToCsv(table);
+      const date = nowIso().slice(0, 10);
+      const stem = String(this.compare.name || "comparacion")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "")
+        .slice(0, 40) || "comparacion";
+      this._download(`${stem}-${date}.csv`, csv, "text/csv");
+      this.ui.announce = "CSV de la tabla exportado.";
+    },
+
+    exportComparisonPdf() {
+      const table = this.comparisonTable;
+      if (!table.ok) {
+        this.ui.announce = table.error || "No hay comparación para exportar.";
+        return;
+      }
+      const print = comparisonPrintModel(table, {
+        name: this.compare.name || "Comparación",
+        comparisonId: this.compare.savedId || "comparison",
+        userFormula: this.compare.userFormula || "",
+        generatedAt: nowIso(),
+      });
+      const pdf = renderPrintModelPdf(print, { printedAt: nowIso() });
+      if (!pdf.ok) {
+        this.ui.announce = pdf.error || "No se pudo generar el PDF.";
+        return;
+      }
+      this._download(pdf.filename, pdf.bytes, "application/pdf");
+      this.ui.announce = `PDF ${pdf.filename}`;
+    },
+
+    formatCompareValue(v) {
+      return v == null || v === "" ? NA : v;
+    },
+
+    formatCompareDelta(d) {
+      return formatDeltaCell(d);
+    },
+
+    formatViewValue,
+
     onSearch(value) {
       this.ui.filters.search = value;
       this.ui.explorerPage = 1;
@@ -913,6 +1232,7 @@ export function createWorkbench() {
     },
 
     scrollTo(id) {
+      if (typeof document === "undefined") return;
       const el = document.getElementById(id);
       el?.scrollIntoView({ behavior: prefersReduced() ? "auto" : "smooth", block: "start" });
     },

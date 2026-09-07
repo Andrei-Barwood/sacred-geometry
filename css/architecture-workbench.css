@@ -998,6 +998,117 @@
   .wb-ev-grid { grid-template-columns: 1fr; }
 }
 
+.wb-compare {
+  padding-top: 0.5rem;
+}
+
+.wb-compare-slots {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+
+.wb-compare-slot {
+  border: 1px solid var(--arch-line);
+  border-radius: var(--arch-radius);
+  padding: 0.7rem;
+  background: var(--arch-panel);
+}
+
+.wb-compare-slot h3 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9rem;
+}
+
+.wb-compare-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  max-width: 100%;
+  margin: 0.75rem 0;
+  border: 1px solid var(--arch-line);
+  border-radius: var(--arch-radius);
+}
+
+.wb-compare-table {
+  width: max-content;
+  min-width: 640px;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.wb-compare-table th,
+.wb-compare-table td {
+  border-bottom: 1px solid var(--arch-line);
+  padding: 0.35rem 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.wb-compare-table th[scope="row"] {
+  white-space: normal;
+  min-width: 9rem;
+  font-weight: 600;
+}
+
+.wb-compare-group-lab {
+  display: block;
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--arch-muted);
+  font-weight: 800;
+}
+
+.wb-compare-table td.is-na,
+.wb-compare-table td.is-blocked {
+  color: var(--arch-muted);
+  font-style: italic;
+}
+
+.wb-compare-table td.is-hi,
+.wb-compare-table tr.is-hi-row td.is-hi {
+  background: rgba(23, 92, 211, 0.14);
+  box-shadow: inset 3px 0 0 var(--arch-notice);
+}
+
+.wb-compare-panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.wb-compare-panel h3 {
+  margin: 0 0 0.4rem;
+  font-size: 0.95rem;
+}
+
+.wb-compare-evidence {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.5rem;
+}
+
+.wb-compare-saved {
+  margin: 0.75rem 0;
+  padding: 0.5rem 0;
+  border-top: 1px solid var(--arch-line);
+}
+
+@media (max-width: 768px) {
+  .wb-compare-slots {
+    grid-template-columns: 1fr;
+  }
+  .wb-compare-table-wrap {
+    overflow-x: auto;
+  }
+  .wb-compare-table {
+    min-width: 720px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .arch-node.is-starting .arch-shape-fill,
   .wb-svg * {

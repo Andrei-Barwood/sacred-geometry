@@ -109,6 +109,7 @@ export function createProjectDocument(workbench, extras = {}) {
     scenarios: extras.scenarios || [scenario],
     activeScenarioId: extras.activeScenarioId || scenario.id,
     snapshots: extras.snapshots || [],
+    comparisons: extras.comparisons || [],
     provenance: cloneValue(workbench?.provenance || {}),
     acceptedEvidence: cloneValue(workbench?.acceptedEvidence || extras.acceptedEvidence || {}),
     evidenceHistory: cloneValue(workbench?.evidenceHistory || extras.evidenceHistory || []),
@@ -226,6 +227,7 @@ export function normalizeProjectDocument(doc) {
     src.activeScenarioId = src.scenarios[0].id;
   }
   if (!Array.isArray(src.snapshots)) src.snapshots = [];
+  if (!Array.isArray(src.comparisons)) src.comparisons = [];
   src.provenance = src.provenance || {};
   src.acceptedEvidence = src.acceptedEvidence || {};
   src.evidenceHistory = Array.isArray(src.evidenceHistory) ? src.evidenceHistory : [];

@@ -110,6 +110,30 @@
         downloadPdf() {},
         downloadPdfFromSnapshot() {},
         downloadListedProjectPdf() {},
+        compare: { name: 'Comparación', savedId: null, thresholdPct: 5, userFormula: '', slots: [] },
+        comparisonTable: { ok: false, rows: [], views: [], warnings: [], evidence: [], engineMismatch: false },
+        comparisonGroups: [],
+        savedComparisons: [],
+        compareEntityKinds: [],
+        compareEntityOptions() { return []; },
+        comparisonRowsFor() { return []; },
+        comparisonDisplayRows: [],
+        comparisonColCount: 4,
+        setCompareSlotKind() {},
+        setCompareSlotId() {},
+        addCompareSlot() {},
+        removeCompareSlot() {},
+        openCompareTab() {},
+        openCompareFromSelection() {},
+        addListedProjectToCompare() {},
+        addSnapshotToCompare() {},
+        saveCurrentComparison() {},
+        reopenComparison() {},
+        deleteSavedComparison() {},
+        exportComparisonCsv() {},
+        exportComparisonPdf() {},
+        formatCompareValue() { return 'N/A'; },
+        formatCompareDelta() { return 'N/A'; },
         onEnrichmentFilter() {},
         enrichment: { loading: false, batch: null, error: null, job: null, filters: {} },
         enrichmentRows: [],
@@ -239,6 +263,7 @@
             <button type="button" class="wb-btn" @click="$store.workbench.newProject()">New</button>
             <button type="button" class="wb-btn" @click="$store.workbench.openProjects()">Projects</button>
             <button type="button" class="wb-btn" @click="$store.workbench.ui.bottomTab = 'templates'; $store.workbench.scrollTo('wb-templates')">Templates</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.openCompareTab()">Compare</button>
             <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.saveNow()">Save</button>
             <button type="button" class="wb-btn" @click="$store.workbench.duplicate()">Duplicate</button>
             <button type="button" class="wb-btn" @click="$store.workbench.takeSnapshot()">Snapshot</button>
@@ -993,6 +1018,7 @@
               <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'evidence' }" @click="$store.workbench.ui.bottomTab = 'evidence'">Verified data</button>
               <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'calculators' }" @click="$store.workbench.ui.bottomTab = 'calculators'">Diagnostics</button>
               <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'assumptions' }" @click="$store.workbench.ui.bottomTab = 'assumptions'">Assumptions</button>
+              <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'compare' }" @click="$store.workbench.ui.bottomTab = 'compare'">Compare</button>
             </div>
 
             <div x-show="$store.workbench.ui.bottomTab === 'templates'">
@@ -1095,6 +1121,9 @@
                 <button type="button" class="wb-btn" @click="$store.workbench.clearFilters()">Clear</button>
               </div>
               <p class="wb-meta"><span x-text="$store.workbench.pagedTemplates.total"></span> templates · page <span x-text="$store.workbench.pagedTemplates.page"></span>/<span x-text="$store.workbench.pagedTemplates.pages"></span> · compare <span x-text="$store.workbench.ui.compareIds.length"></span>/3</p>
+              <div class="wb-row-actions" x-show="$store.workbench.ui.compareIds.length >= 2">
+                <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.openCompareFromSelection()">Open comparison</button>
+              </div>
               <template x-if="!$store.workbench.templateCards.length">
                 <p class="wb-empty">No matching templates.</p>
               </template>
@@ -1302,6 +1331,149 @@
                 <template x-for="(a, i) in ($store.workbench.project.assumptions || [])" :key="i"><li x-text="a"></li></template>
               </ul>
             </div>
+
+            <div x-show="$store.workbench.ui.bottomTab === 'compare'" class="wb-compare">
+              <p class="wb-note">Comparación cara a cara. <strong>No se recomienda ni se clasifica un ganador.</strong> El resaltado marca un delta por encima del umbral que usted configura (5% por defecto) o una diferencia cualitativa. No hay score compuesto. Si quiere un score, escriba su fórmula — se muestra, no se evalúa.</p>
+              <div class="wb-issue" data-sev="WARNING" x-show="$store.workbench.comparisonTable.engineMismatch">
+                <span class="wb-sev">HIGH</span>
+                <p>Motores distintos: no comparable en rigor. Deltas de campos derivados bloqueados.</p>
+              </div>
+
+              <div class="wb-compare-slots">
+                <template x-for="(slot, idx) in $store.workbench.compare.slots" :key="'cmp-slot-'+idx">
+                  <article class="wb-compare-slot">
+                    <h3><span x-text="idx === 0 ? 'Slot 1 · baseline' : 'Slot ' + (idx + 1)"></span></h3>
+                    <div class="wb-field">
+                      <label>Tipo</label>
+                      <select :value="slot.kind" @change="$store.workbench.setCompareSlotKind(idx, $event.target.value)">
+                        <option value="">—</option>
+                        <template x-for="k in $store.workbench.compareEntityKinds" :key="k.id">
+                          <option :value="k.id" x-text="k.label"></option>
+                        </template>
+                      </select>
+                    </div>
+                    <div class="wb-field">
+                      <label>Entidad</label>
+                      <select :value="slot.id" @change="$store.workbench.setCompareSlotId(idx, $event.target.value)">
+                        <option value="">—</option>
+                        <template x-for="opt in $store.workbench.compareEntityOptions(slot.kind)" :key="opt.id">
+                          <option :value="opt.id" x-text="opt.label"></option>
+                        </template>
+                      </select>
+                    </div>
+                    <p class="wb-meta" x-show="slot.kind === 'site' && !($store.workbench.geoSites || []).length">Sitio requiere arquitectura anclada en el proyecto abierto.</p>
+                    <button type="button" class="wb-btn" x-show="idx > 1" @click="$store.workbench.removeCompareSlot(idx)">Quitar slot</button>
+                  </article>
+                </template>
+              </div>
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn" x-show="$store.workbench.compare.slots.length < 3" @click="$store.workbench.addCompareSlot()">Añadir slot</button>
+              </div>
+
+              <div class="wb-filters">
+                <div class="wb-field">
+                  <label for="wb-cmp-name">Nombre</label>
+                  <input id="wb-cmp-name" type="text" :value="$store.workbench.compare.name" @input="$store.workbench.compare.name = $event.target.value">
+                </div>
+                <div class="wb-field">
+                  <label for="wb-cmp-th">Umbral de resaltado (%)</label>
+                  <input id="wb-cmp-th" type="number" min="0" step="0.5" :value="$store.workbench.compare.thresholdPct" @input="$store.workbench.compare.thresholdPct = Number($event.target.value)">
+                </div>
+                <div class="wb-field" style="grid-column: 1 / -1">
+                  <label for="wb-cmp-formula">Fórmula del usuario (opcional, no se evalúa)</label>
+                  <input id="wb-cmp-formula" type="text" :value="$store.workbench.compare.userFormula" @input="$store.workbench.compare.userFormula = $event.target.value" placeholder="Ej. (PV_A − PV_B) / peak_A — visible, nunca calculada por el workbench">
+                </div>
+              </div>
+              <p class="wb-meta" x-show="$store.workbench.compare.userFormula">Fórmula visible: <span x-text="$store.workbench.compare.userFormula"></span></p>
+
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.saveCurrentComparison()">Guardar comparación</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.exportComparisonCsv()">Export CSV</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.exportComparisonPdf()">Export PDF</button>
+              </div>
+
+              <template x-if="$store.workbench.savedComparisons.length">
+                <div class="wb-compare-saved">
+                  <h3>Guardadas en este proyecto</h3>
+                  <template x-for="rec in $store.workbench.savedComparisons" :key="rec.id">
+                    <div class="wb-row-actions">
+                      <span class="wb-meta" x-text="rec.name + ' · ' + rec.slots.length + ' slots'"></span>
+                      <button type="button" class="wb-btn" @click="$store.workbench.reopenComparison(rec.id)">Reabrir</button>
+                      <button type="button" class="wb-btn" @click="$store.workbench.deleteSavedComparison(rec.id)">Eliminar</button>
+                    </div>
+                  </template>
+                </div>
+              </template>
+
+              <p class="wb-empty" x-show="!$store.workbench.comparisonTable.ok" x-text="$store.workbench.comparisonTable.error || 'Seleccione 2 o 3 entidades.'"></p>
+
+              <template x-if="$store.workbench.comparisonTable.ok">
+                <div>
+                  <div class="wb-compare-table-wrap">
+                    <table class="wb-compare-table">
+                      <thead>
+                        <tr>
+                          <th>Campo</th>
+                          <th>Ud.</th>
+                          <template x-for="(v, vi) in $store.workbench.comparisonTable.views" :key="'h-'+vi">
+                            <th x-text="v.label"></th>
+                          </template>
+                          <template x-for="(v, vi) in $store.workbench.comparisonTable.views.slice(1)" :key="'hd-'+vi">
+                            <th x-text="'Δ vs ' + $store.workbench.comparisonTable.views[0].label"></th>
+                          </template>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template x-for="row in $store.workbench.comparisonDisplayRows" :key="row.id">
+                          <tr :class="{ 'is-hi-row': row.highlight }">
+                            <th scope="row">
+                              <span class="wb-compare-group-lab" x-show="row.groupLabel" x-text="row.groupLabel"></span>
+                              <span x-text="row.label"></span>
+                            </th>
+                            <td x-text="row.unit || '—'"></td>
+                            <template x-for="(val, vi) in row.values" :key="row.id+'-v-'+vi">
+                              <td :class="{ 'is-na': val === 'N/A', 'is-hi': row.highlight && vi > 0 && row.deltas[vi - 1] && row.deltas[vi - 1].highlight }" x-text="$store.workbench.formatCompareValue(val)"></td>
+                            </template>
+                            <template x-for="(d, di) in row.deltas" :key="row.id+'-d-'+di">
+                              <td :class="{ 'is-hi': d.highlight, 'is-blocked': d.blocked, 'is-na': d.na }" x-text="$store.workbench.formatCompareDelta(d)"></td>
+                            </template>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="wb-compare-panels">
+                    <section class="wb-compare-panel">
+                      <h3>Warnings unidos</h3>
+                      <p class="wb-empty" x-show="!($store.workbench.comparisonTable.warnings || []).length">Sin warnings.</p>
+                      <template x-for="w in $store.workbench.comparisonTable.warnings" :key="w.code">
+                        <div class="wb-issue" :data-sev="w.level === 'HIGH' ? 'WARNING' : 'NOTICE'">
+                          <span class="wb-sev" x-text="w.level || 'WARNING'"></span>
+                          <p><strong x-text="w.code"></strong> — <span x-text="w.message"></span>
+                            <span class="wb-meta" x-text="(w.slots || []).join(', ')"></span>
+                          </p>
+                        </div>
+                      </template>
+                    </section>
+                    <section class="wb-compare-panel">
+                      <h3>Evidence coverage</h3>
+                      <div class="wb-compare-evidence">
+                        <template x-for="(e, ei) in $store.workbench.comparisonTable.evidence" :key="'ev-'+ei">
+                          <article class="wb-tcard">
+                            <h3 x-text="e.label"></h3>
+                            <p class="wb-meta">Coverage <span x-text="e.coverage == null ? 'N/A' : e.coverage"></span></p>
+                            <p class="wb-meta">Conflictos <span x-text="e.conflicts == null ? 'N/A' : e.conflicts"></span></p>
+                            <p class="wb-meta">Stale <span x-text="e.stale == null ? 'N/A' : e.stale"></span></p>
+                            <p class="wb-meta">Estado <span x-text="e.status || 'N/A'"></span></p>
+                          </article>
+                        </template>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </template>
+            </div>
           </section>
         </div>
       </template>
@@ -1365,6 +1537,7 @@
           </p>
           <div class="wb-row-actions">
             <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.requestOpenProject(row.projectId)">Open</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.addListedProjectToCompare(row.projectId)">Comparar</button>
             <button type="button" class="wb-btn" @click="$store.workbench.downloadListedProjectPdf(row.projectId)">Descargar PDF</button>
             <button type="button" class="wb-btn" @click="$store.workbench.deleteListedProject(row.projectId)">Delete</button>
           </div>
@@ -1389,6 +1562,7 @@
           <p class="wb-meta" x-text="snap.note"></p>
           <div class="wb-row-actions">
             <button type="button" class="wb-btn" @click="$store.workbench.restoreSnapshot(snap.snapshotId)">Restore</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.addSnapshotToCompare(snap.snapshotId)">Comparar</button>
             <button type="button" class="wb-btn" @click="$store.workbench.downloadPdfFromSnapshot(snap.snapshotId)">Descargar PDF</button>
             <button type="button" class="wb-btn" @click="$store.workbench.newFromSnapshot(snap.snapshotId)">New project from snapshot</button>
           </div>

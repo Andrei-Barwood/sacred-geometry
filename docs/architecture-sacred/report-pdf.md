@@ -42,3 +42,7 @@ node js/architecture/report/pdf.test.js
 ```
 
 Rebuilds the fixture from `createSample6kWProject()` + `generateEngineeringReport`. Asserts electrical table values, unknown yield, warnings, and hash stability. To refresh after a Report Model change, just re-run the file — there is no binary fixture to check in.
+
+## Comparison PDF (Prompt 15)
+
+The comparison workbench reuses `renderPrintModelPdf` with a different view-model (`comparisonPrintModel`). Same writer, no electrical/BTC/fit math, no ranking. See `docs/architecture-sacred/comparison.md`.

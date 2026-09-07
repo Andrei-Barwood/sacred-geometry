@@ -34,6 +34,7 @@ import {
 } from "./index.js";
 import { migrations } from "./migrations.js";
 import { LIMITS } from "./schema.js";
+import { saveComparison, getComparison } from "../compare/index.js";
 
 let passed = 0;
 let failed = 0;
@@ -400,6 +401,32 @@ test("same root format for 6 kW and utility", () => {
   assert.equal(a.schemaVersion, b.schemaVersion);
   assert.ok(a.architecture.loads);
   assert.ok(b.architecture.bess);
+});
+
+test("saved comparison round-trips on the project document", async () => {
+  const wb = createSample6kWProject();
+  const tA = architectureTemplates[0];
+  const tB = architectureTemplates[1];
+  let doc = createProjectDocument(wb);
+  assert.ok(Array.isArray(doc.comparisons));
+  const saved = saveComparison(doc, {
+    name: "A vs B",
+    thresholdPct: 7,
+    slots: [
+      { kind: "template", id: tA.id },
+      { kind: "template", id: tB.id },
+    ],
+  });
+  doc = saved.document;
+  const store = await createProjectStore({ backend: createMemoryBackend() });
+  const wrote = await store.saveProject(doc);
+  assert.equal(wrote.ok, true, wrote.error);
+  const loaded = await store.loadProject(wrote.document.projectId);
+  const rec = getComparison(loaded.document, saved.comparison.id);
+  assert.ok(rec);
+  assert.equal(rec.thresholdPct, 7);
+  assert.equal(rec.slots.length, 2);
+  assert.equal(rec.slots[0].id, tA.id);
 });
 
 test("accepted evidence metadata persists and cache is separate", async () => {

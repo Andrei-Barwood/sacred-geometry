@@ -47,7 +47,7 @@ Event listeners only patch state. They do not contain `P/V` or `Energy × Tariff
 | Left | Overview, Loads, Generation, BESS, Substation, Grid, Feeders, Economics, Site, Assumptions. Sections follow architecture mode. |
 | Center | SYSTEM (electrical diagram) and SACRED (same graph, radial composition). Native SVG. |
 | Right | Summary, Energy, Capacity, Economics, Validation. Metrics are contextual. |
-| Bottom | Template explorer, diagnostics, assumptions. |
+| Bottom | Template explorer, enrichment, verified data, diagnostics, assumptions, **Compare**. |
 
 Modes (`load-installation`, `generation-plant`, `substation`, `hybrid-microgrid`) hide panels. They share the same state and units.
 
@@ -57,7 +57,7 @@ Modes (`load-installation`, `generation-plant`, `substation`, `hybrid-microgrid`
 2. Details dialog inspects a template **without** loading it.
 3. Load template: `structuredClone` into project state, record `sourceTemplateId`, mark conceptual assumptions, run calc + validation.
 4. Editing the project never writes back to `templates.js` or the in-memory catalog.
-5. Compare checkboxes (max 3) are reserved for a later comparison phase.
+5. Compare checkboxes (max 3) open the Compare tab (`openCompareFromSelection`). Comparison is mapping-only: no ranking, no composite score. See `docs/architecture-sacred/comparison.md`.
 
 Samples:
 

@@ -394,6 +394,27 @@ test("atlas explorer filters by batch_id, coverage, conflictos, stale", () => {
   clearEnrichments();
 });
 
+test("workbench opens comparison from template selection without ranking", () => {
+  const wb = createWorkbench();
+  wb.startZero();
+  const a = architectureTemplates.find((t) => t.generation?.pv?.dcMWp != null);
+  const b = architectureTemplates.find(
+    (t) => t.id !== a.id && t.generation?.pv?.dcMWp != null && t.generation.pv.dcMWp !== a.generation.pv.dcMWp
+  );
+  wb.ui.compareIds = [a.id, b.id];
+  wb.openCompareFromSelection();
+  assert.equal(wb.ui.bottomTab, "compare");
+  assert.equal(wb.compare.slots.length >= 2, true);
+  assert.equal(wb.compare.slots[0].kind, "template");
+  assert.equal(wb.compare.slots[0].id, a.id);
+  assert.equal(wb.comparisonTable.ok, true);
+  assert.equal(wb.comparisonTable.views.length, 2);
+  const dc = wb.comparisonTable.rows.find((r) => r.id === "pvDcMWp");
+  assert.equal(dc.values[0], a.generation.pv.dcMWp);
+  assert.equal(dc.values[1], b.generation.pv.dcMWp);
+  assert.ok(wb.comparisonTable.rows.every((r) => !("winner" in r) && !("score" in r)));
+});
+
 test("N-1 graph redundancy payload distinguishes MW and MVA", () => {
   const t = architectureTemplates.find(
     (x) => x.substation?.redundancyMode === "N-1" && x.substation.enabled
