@@ -19,7 +19,8 @@ resolveScenario()          (persistence)
             │
             ├── Workbench preview
             ├── Print (browser)
-            └── Self-contained HTML export
+            ├── Self-contained HTML export
+            └── Native PDF (`buildPrintModel` → `renderEngineeringReportPdf`)
 ```
 
 `generateEngineeringReport` does not mutate the project, autosave, change the active scenario, or fix errors.

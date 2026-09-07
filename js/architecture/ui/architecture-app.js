@@ -104,6 +104,7 @@ import {
   importProjectJSON,
   loadPreferences,
   newId,
+  nowIso,
   patchPreferences,
   projectFromSnapshot,
   renameScenario,
@@ -117,6 +118,7 @@ import {
   generateEngineeringReport,
   generateRevisionComparisonReport,
   renderEngineeringReportHTML,
+  renderEngineeringReportPdf,
 } from "../report/index.js";
 import {
   findVerifiedData,
@@ -1120,9 +1122,12 @@ export function createWorkbench() {
       this._download(exp.filename, exp.json);
     },
 
-    _download(filename, text) {
+    _download(filename, data, mime) {
       if (typeof document === "undefined") return;
-      const blob = new Blob([text], { type: "application/json" });
+      const type =
+        mime ||
+        (data instanceof Uint8Array ? "application/pdf" : "application/json");
+      const blob = new Blob([data], { type });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -1306,7 +1311,95 @@ export function createWorkbench() {
         this.ui.announce = exp.error;
         return;
       }
-      this._download(exp.filename, exp.html);
+      this._download(exp.filename, exp.html, "text/html");
+    },
+
+    downloadPdf() {
+      if (!this.project) {
+        this.ui.announce = "Abra un proyecto para descargar el PDF.";
+        return;
+      }
+      if (!this.document) this.document = createProjectDocument(this.project);
+      this.document = updateDocumentFromWorkbench(this.document, this.project);
+      const r = addSnapshot(this.document, { name: "PDF", note: "pdf-render" });
+      this.document = r.document;
+      this.document.lastPdfSnapshotId = r.snapshot.snapshotId;
+      this._markDirty();
+      const pdf = this._pdfFromDocument(this.document, r.snapshot.snapshotId);
+      if (!pdf.ok) {
+        this.ui.announce = pdf.error || "No se pudo generar el PDF.";
+        return;
+      }
+      this._download(pdf.filename, pdf.bytes, "application/pdf");
+      this.ui.announce = `PDF ${pdf.filename}`;
+      this.saveNow();
+    },
+
+    downloadPdfFromSnapshot(snapshotId) {
+      if (!this.document) return;
+      const pdf = this._pdfFromDocument(this.document, snapshotId);
+      if (!pdf.ok) {
+        this.ui.announce = pdf.error || "No se pudo generar el PDF.";
+        return;
+      }
+      this._download(pdf.filename, pdf.bytes, "application/pdf");
+      this.ui.announce = `PDF ${pdf.filename}`;
+    },
+
+    async downloadListedProjectPdf(projectId) {
+      if (!this.store) return;
+      const loaded = await this.store.loadProject(projectId);
+      if (!loaded?.ok || !loaded.document) {
+        this.ui.announce = "No se pudo abrir el proyecto.";
+        return;
+      }
+      const doc = loaded.document;
+      let working = doc;
+      if (!working.lastPdfSnapshotId || !(working.snapshots || []).some((s) => s.snapshotId === working.lastPdfSnapshotId)) {
+        const r = addSnapshot(working, { name: "PDF", note: "pdf-render" });
+        working = r.document;
+        working.lastPdfSnapshotId = r.snapshot.snapshotId;
+        if (this.store.saveProject) await this.store.saveProject(working);
+      }
+      const pdf = this._pdfFromDocument(working, working.lastPdfSnapshotId);
+      if (!pdf.ok) {
+        this.ui.announce = pdf.error || "No se pudo generar el PDF.";
+        return;
+      }
+      this._download(pdf.filename, pdf.bytes, "application/pdf");
+      this.ui.announce = `PDF ${pdf.filename}`;
+    },
+
+    _pdfFromDocument(doc, snapshotId) {
+      const snap = (doc.snapshots || []).find((s) => s.snapshotId === snapshotId);
+      const source = snap
+        ? {
+            ...doc,
+            architecture: snap.payload.architecture,
+            scenarios: snap.payload.scenarios,
+            activeScenarioId: snap.payload.activeScenarioId,
+            provenance: snap.payload.provenance || {},
+            acceptedEvidence: snap.payload.acceptedEvidence || {},
+            evidenceHistory: snap.payload.evidenceHistory || [],
+            dismissedEvidence: snap.payload.dismissedEvidence || {},
+            geospatial: snap.payload.geospatial,
+            lastPdfSnapshotId: snapshotId,
+          }
+        : doc;
+      const model = generateEngineeringReport(source, {
+        reportMode: "detailed",
+        includeEconomics: true,
+        includeSacredView: true,
+        includeValidation: true,
+        includeProvenance: true,
+        includeVerifiedSources: true,
+        includeSite: true,
+        language: "es",
+        snapshotId,
+        snapshotMeta: { snapshotId },
+      });
+      this.reportModel = model;
+      return renderEngineeringReportPdf(model, { printedAt: nowIso() });
     },
 
     compareSnapshotReport() {

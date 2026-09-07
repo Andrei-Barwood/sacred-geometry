@@ -104,6 +104,12 @@
         exportEnrichmentJSON() {},
         exportAtlasJSON() {},
         exportAtlasCSV() {},
+        generateReport() {},
+        printReport() {},
+        exportReportHtml() {},
+        downloadPdf() {},
+        downloadPdfFromSnapshot() {},
+        downloadListedProjectPdf() {},
         onEnrichmentFilter() {},
         enrichment: { loading: false, batch: null, error: null, job: null, filters: {} },
         enrichmentRows: [],
@@ -1359,6 +1365,7 @@
           </p>
           <div class="wb-row-actions">
             <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.requestOpenProject(row.projectId)">Open</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.downloadListedProjectPdf(row.projectId)">Descargar PDF</button>
             <button type="button" class="wb-btn" @click="$store.workbench.deleteListedProject(row.projectId)">Delete</button>
           </div>
         </article>
@@ -1382,6 +1389,7 @@
           <p class="wb-meta" x-text="snap.note"></p>
           <div class="wb-row-actions">
             <button type="button" class="wb-btn" @click="$store.workbench.restoreSnapshot(snap.snapshotId)">Restore</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.downloadPdfFromSnapshot(snap.snapshotId)">Descargar PDF</button>
             <button type="button" class="wb-btn" @click="$store.workbench.newFromSnapshot(snap.snapshotId)">New project from snapshot</button>
           </div>
         </article>
@@ -1523,6 +1531,7 @@
       </div>
       <div class="wb-row-actions">
         <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.generateReport()">Generate preview</button>
+        <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.downloadPdf()">Descargar PDF</button>
         <button type="button" class="wb-btn" @click="$store.workbench.printReport()">Print</button>
         <button type="button" class="wb-btn" @click="$store.workbench.exportReportHtml()">Export HTML</button>
         <button type="button" class="wb-btn" @click="$store.workbench.compareSnapshotReport()">Revision comparison</button>

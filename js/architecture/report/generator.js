@@ -39,6 +39,7 @@ import { REPORT_GENERATOR_VERSION, reportStatusLabel, t } from "./i18n.js";
 import { buildDiagrams } from "./diagrams.js";
 import { sanitizeReportModel } from "./sanitizer.js";
 import { buildVerifiedReportModel, cite } from "../data/report-citations.js";
+import { evaluateGeospatial } from "../geo/index.js";
 
 export const DEFAULT_REPORT_OPTIONS = Object.freeze({
   reportMode: "standard",
@@ -596,10 +597,12 @@ function siteSection(ctx, opts) {
   if (!opts.includeSite) return { id: "site", included: false };
   const site = getSiteView(workbench, derived);
   if (site.empty && !site.country) return { id: "site", included: false };
+  const fit = workbench.site?.regionalFitScore ?? workbench.regionalization?.regionalFitScore ?? null;
   const rows = [
     ["Country", site.country || "—"],
     ["Region", site.region || "—"],
     ["Subregion", site.subregion || "—"],
+    ["Regional fit score", isDisplayableNumber(fit) ? formatNumber(fit, 0) : "—"],
     ["Climate", site.climate || "—"],
     ["Terrain", site.terrain || "—"],
     ["Dust", site.dust || "—"],
@@ -620,6 +623,55 @@ function siteSection(ctx, opts) {
     tables: [{ id: "site", caption: "Regional context", columns: ["Parameter", "Value"], rows }],
     notes: [t(lang, "siteNote")],
     suitability: { preferred: site.preferred || [], avoid: site.avoid || [], investigate: site.investigate || [] },
+  };
+}
+
+function geoSection(ctx, opts) {
+  if (!opts.includeSite) return { id: "geo", included: false };
+  const geo = ctx.workbench?.geospatial;
+  const sites = geo?.sites || [];
+  const restrictions = geo?.restrictions || [];
+  if (!sites.length && !restrictions.length && !geo?.gridNetwork) return { id: "geo", included: false };
+  const ev = evaluateGeospatial(geo, ctx.workbench);
+  const tables = [];
+  if (sites.length) {
+    tables.push({
+      id: "geo-sites",
+      caption: "Candidate sites",
+      columns: ["Name", "Lat", "Lng", "Status", "Region", "Proximity"],
+      rows: sites.map((s) => {
+        const e = ev.evaluations?.[s.id];
+        const prox = e?.proximity;
+        const proxText = prox?.clase
+          ? prox.distancia_km != null
+            ? `${prox.clase} (${prox.distancia_km} km)`
+            : prox.clase
+          : "—";
+        return [
+          s.name || s.id || "—",
+          s.lat != null ? String(s.lat) : "—",
+          s.lng != null ? String(s.lng) : "—",
+          s.status || "—",
+          s.region || "—",
+          proxText,
+        ];
+      }),
+    });
+  }
+  if (restrictions.length) {
+    tables.push({
+      id: "geo-rest",
+      caption: "Restrictions",
+      columns: ["Name", "Type", "Severity"],
+      rows: restrictions.map((r) => [r.name || r.id || "—", r.type || "—", r.severity || "—"]),
+    });
+  }
+  return {
+    id: "geo",
+    titleKey: "geo",
+    included: tables.length > 0,
+    tables,
+    notes: ev.warnings || [],
   };
 }
 
@@ -875,6 +927,7 @@ export function generateEngineeringReport(source, options = {}) {
     economicsSection(ctx, opts),
     scenarioSection(ctx, opts, document),
     siteSection(ctx, opts),
+    geoSection(ctx, opts),
     validationSection(ctx, opts),
     assumptionsSection(ctx, opts),
     verifiedSourcesSection(ctx, opts, verified),
@@ -923,6 +976,7 @@ export function generateEngineeringReport(source, options = {}) {
       status: metaStatus,
       statusLabel: reportStatusLabel(metaStatus, lang),
       snapshot: snapshotMeta,
+      snapshotId: snapshotMeta?.snapshotId || options.snapshotId || document?.lastPdfSnapshotId || null,
       sourceRevision: options.sourceRevision || document?.updatedAt || null,
     },
     projectMetadata: {
@@ -931,6 +985,8 @@ export function generateEngineeringReport(source, options = {}) {
       projectIdShort: abbreviateId(document?.projectId || workbench.metadata?.id),
       authorAlias: workbench.metadata?.authorAlias || document?.metadata?.authorAlias || null,
       conceptual: true,
+      sourceTemplateId: workbench.sourceTemplateId || document?.architecture?.sourceTemplateId || document?.metadata?.sourceTemplateId || null,
+      snapshotId: snapshotMeta?.snapshotId || options.snapshotId || document?.lastPdfSnapshotId || null,
     },
     executiveSummary: buildExecutiveSummary(ctx),
     architectureSummary: architecture,

@@ -1,6 +1,7 @@
 /** Report copy. Technical terms (BESS, PV, MWp, MVA, N-1) stay untranslated. */
 
 export const REPORT_GENERATOR_VERSION = "1.0.0";
+export const REPORT_PDF_RENDERER_VERSION = "1.0.0";
 
 const EN = {
   title: "ARQUITECTURA SAGRADA",
@@ -69,6 +70,9 @@ const EN = {
   performed: "Performed",
   notPerformed: "Not performed",
   sitePending: "Pending",
+  geo: "Site / geospatial",
+  regionalFit: "Regional fit",
+  datoNoDisponible: "Not available",
 };
 
 const ES = {
@@ -133,6 +137,9 @@ const ES = {
   performed: "Realizado",
   notPerformed: "No realizado",
   sitePending: "Pendiente",
+  geo: "Sitio / geoespacial",
+  regionalFit: "Ajuste regional",
+  datoNoDisponible: "Dato no disponible",
 };
 
 export function t(lang, key) {

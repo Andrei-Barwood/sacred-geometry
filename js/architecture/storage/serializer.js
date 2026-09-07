@@ -230,6 +230,7 @@ export function normalizeProjectDocument(doc) {
   src.acceptedEvidence = src.acceptedEvidence || {};
   src.evidenceHistory = Array.isArray(src.evidenceHistory) ? src.evidenceHistory : [];
   src.dismissedEvidence = src.dismissedEvidence || {};
+  src.lastPdfSnapshotId = src.lastPdfSnapshotId || src.metadata?.lastPdfSnapshotId || null;
   src.geospatial = src.geospatial || { sites: [], activeSiteId: null, restrictions: [], gridNetwork: null };
   if (!Array.isArray(src.geospatial.sites)) src.geospatial.sites = [];
   if (!Array.isArray(src.geospatial.restrictions)) src.geospatial.restrictions = [];
