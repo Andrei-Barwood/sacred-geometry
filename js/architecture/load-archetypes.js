@@ -1,0 +1,110 @@
+/**
+ * Perfiles de carga agregados (MW). No son viviendas 6 kW escaladas.
+ */
+
+export const LOAD_ARCHETYPES = Object.freeze({
+  LOAD_WATER_PUMPING: {
+    id: "LOAD_WATER_PUMPING",
+    dominant: "motor",
+    characteristics: ["high cyclic load", "motor starts", "day/night variation"],
+    transients: ["pump-start"],
+    seasonalKeys: ["irrigationSeason", "hotSeason"],
+  },
+  LOAD_DESALINATION: {
+    id: "LOAD_DESALINATION",
+    dominant: "continuous-industrial",
+    characteristics: ["high base load", "large motor loads", "critical process loads"],
+    transients: ["pump-start", "compressor-start"],
+    seasonalKeys: [],
+  },
+  LOAD_MINING: {
+    id: "LOAD_MINING",
+    dominant: "motor-industrial",
+    characteristics: ["conveyors", "crushing", "pumping", "cyclic motors"],
+    transients: ["conveyor-start", "motor-start"],
+    seasonalKeys: [],
+  },
+  LOAD_URBAN: {
+    id: "LOAD_URBAN",
+    dominant: "mixed",
+    characteristics: ["mixed urban", "cooling-sensitive"],
+    transients: ["transformer-energization"],
+    seasonalKeys: ["hotSeason", "mildSeason"],
+  },
+  LOAD_AGRICULTURE: {
+    id: "LOAD_AGRICULTURE",
+    dominant: "seasonal motor load",
+    characteristics: ["irrigation", "seasonal motors"],
+    transients: ["pump-start"],
+    seasonalKeys: ["irrigationSeason"],
+  },
+  LOAD_CRITICAL_INFRASTRUCTURE: {
+    id: "LOAD_CRITICAL_INFRASTRUCTURE",
+    dominant: "critical continuous load",
+    characteristics: ["high critical share", "backup required"],
+    transients: ["compressor-start"],
+    seasonalKeys: [],
+  },
+  LOAD_REMOTE_SETTLEMENT: {
+    id: "LOAD_REMOTE_SETTLEMENT",
+    dominant: "mixed residential/service",
+    characteristics: ["mixed service", "modest motors"],
+    transients: ["motor-start"],
+    seasonalKeys: [],
+  },
+  LOAD_INDUSTRIAL: {
+    id: "LOAD_INDUSTRIAL",
+    dominant: "motor",
+    characteristics: ["process motors", "high load factor"],
+    transients: ["motor-start", "process-start"],
+    seasonalKeys: [],
+  },
+  LOAD_PORT_LOGISTICS: {
+    id: "LOAD_PORT_LOGISTICS",
+    dominant: "motor",
+    characteristics: ["conveyors", "cranes", "cyclic peaks"],
+    transients: ["conveyor-start", "motor-start"],
+    seasonalKeys: [],
+  },
+  LOAD_TELECOM: {
+    id: "LOAD_TELECOM",
+    dominant: "electronic",
+    characteristics: ["high load factor", "critical electronics"],
+    transients: [],
+    seasonalKeys: [],
+  },
+  LOAD_UTILITY_AUX: {
+    id: "LOAD_UTILITY_AUX",
+    dominant: "auxiliary",
+    characteristics: ["plant auxiliaries", "export is generation not load"],
+    transients: ["transformer-energization"],
+    seasonalKeys: [],
+  },
+  LOAD_BULK: {
+    id: "LOAD_BULK",
+    dominant: "base",
+    characteristics: ["through-power", "not a settlement"],
+    transients: ["transformer-energization"],
+    seasonalKeys: [],
+  },
+});
+
+export const APPLICATION_TO_LOAD = Object.freeze({
+  "water-pumping": "LOAD_WATER_PUMPING",
+  desalination: "LOAD_DESALINATION",
+  mining: "LOAD_MINING",
+  "urban-distribution": "LOAD_URBAN",
+  agriculture: "LOAD_AGRICULTURE",
+  "critical-infrastructure": "LOAD_CRITICAL_INFRASTRUCTURE",
+  "remote-settlement": "LOAD_REMOTE_SETTLEMENT",
+  telecommunications: "LOAD_TELECOM",
+  industrial: "LOAD_INDUSTRIAL",
+  port: "LOAD_PORT_LOGISTICS",
+  airport: "LOAD_PORT_LOGISTICS",
+  logistics: "LOAD_PORT_LOGISTICS",
+  "utility-generation": "LOAD_UTILITY_AUX",
+  "renewable-collector": "LOAD_UTILITY_AUX",
+  "bulk-power": "LOAD_BULK",
+  tourism: "LOAD_REMOTE_SETTLEMENT",
+  "rural-distribution": "LOAD_AGRICULTURE",
+});
