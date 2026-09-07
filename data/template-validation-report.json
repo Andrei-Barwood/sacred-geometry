@@ -1,0 +1,27 @@
+{
+  "templateCount": 110,
+  "validCount": 110,
+  "invalidCount": 0,
+  "warningCount": 76,
+  "highWarnings": 10,
+  "mediumWarnings": 66,
+  "lowWarnings": 0,
+  "averageQualityScore": 97.91,
+  "minQualityScore": 88,
+  "maxQualityScore": 100,
+  "duplicateCount": 0,
+  "nearDuplicateCount": 0,
+  "featuredProblems": [
+    "S-AFG-S04-001"
+  ],
+  "errorsByCode": {},
+  "warningsByCode": {
+    "HIGH_SEASONAL": 9,
+    "N1_PEAK": 43,
+    "WEAK_NO_STRATEGY": 10,
+    "PEAK_OVER_UTIL": 7,
+    "WEAK_NO_GFM": 7
+  },
+  "invalid": [],
+  "elapsedMs": 19
+}
