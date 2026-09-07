@@ -258,7 +258,12 @@ export function enrichArchitecture(template, options = {}) {
   const gates = runQualityGates(record, before, after);
   if (!gates.ok) {
     record.enrichment_status = ENRICHMENT_STATUS.BLOCKED;
-    record.warnings = [...record.warnings, ...gates.failures.map((f) => `GATE: ${f}`)];
+    record.blocked_reason = gates.failures.join("; ");
+    record.warnings = [
+      ...record.warnings,
+      `blocked_reason: ${record.blocked_reason}`,
+      ...gates.failures.map((f) => `GATE: ${f}`),
+    ];
   }
 
   return {

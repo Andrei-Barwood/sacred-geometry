@@ -4,7 +4,10 @@
  */
 
 export const ENRICHMENT_FORMAT = "sacred-architecture-enrichment-batch";
+export const ENRICHMENT_ATLAS_FORMAT = "sacred-architecture-enrichment-atlas";
 export const ENRICHMENT_SCHEMA_VERSION = 1;
+/** v1 required keys are frozen. Optional annotations may exist; readers ignore unknown keys. */
+export const SCHEMA_FROZEN_V1 = true;
 
 export const ENRICHMENT_STATUS = Object.freeze({
   PENDING: "pending",
@@ -112,11 +115,14 @@ export const BATCH_SCOPE = Object.freeze({
   PILOT_8: "pilot-8",
   LOTE_9_24: "lote-9-24",
   LOTE_25_48: "lote-25-48",
+  LOTE_49_END: "lote-49-end",
+  REENRICH_REGION: "reenrich-region",
 });
 
 export const LOTE_9_24_SIZE = 16;
 export const LOTE_25_48_SIZE = 24;
 export const LOTE_CHUNK_SIZE = 4;
+export const SUBLOTE_SIZE = 16;
 export const BATCH_COVERAGE_THRESHOLD = 0.8;
 /** Next after 9–24 (13B). */
 export const NEXT_LOTE_RANGE = Object.freeze({ from: 25, to: 48, size: 24 });
@@ -177,6 +183,7 @@ export function emptyRecord(partial = {}) {
     last_enriched_at: partial.last_enriched_at || null,
     batch_id: partial.batch_id || null,
     regional_fit: partial.regional_fit === undefined ? null : partial.regional_fit,
+    blocked_reason: partial.blocked_reason === undefined ? null : partial.blocked_reason,
   };
 }
 

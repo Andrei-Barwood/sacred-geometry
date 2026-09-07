@@ -4,6 +4,7 @@
 
 import { architectureTemplates } from "../templates.js";
 import { COUNTRIES } from "../template-constants.js";
+import { REGION_IDS } from "../regional-profiles.js";
 import {
   ARCHITECTURE_MODES,
   BTC_DISPLAY,
@@ -152,7 +153,12 @@ import {
   runPilotEnrichmentBatch,
   runLote9to24EnrichmentBatch,
   runLote25to48EnrichmentBatch,
+  runLote49toEndEnrichmentBatch,
+  reenrichRegion,
   exportEnrichmentBatchJSON,
+  atlasCoverageDashboard,
+  exportEnrichedAtlasJSON,
+  exportEnrichedAtlasCSV,
   getLastBatch,
   getLastJob,
   enrichmentBadge,
@@ -227,6 +233,7 @@ export function createWorkbench() {
     loadStates: Object.values(LOAD_STATES),
     presets: listLoadPresets(),
     countries: Object.entries(COUNTRIES).map(([code, v]) => ({ code, name: v.name })),
+    regionIds: REGION_IDS,
     configLabels: CONFIG_LABELS,
 
     started: false,
@@ -262,6 +269,7 @@ export function createWorkbench() {
       revision: 0,
       job: null,
       filters: { batch_id: "", coverage: "", conflicts: "", stale: "" },
+      regionId: "R01",
     },
     siteStatuses: SITE_STATUSES,
     restrictionTypes: RESTRICTION_TYPES,
@@ -517,6 +525,11 @@ export function createWorkbench() {
     get blockedEnrichmentIds() {
       void this.enrichment.revision;
       return this.enrichment.batch?.blocked_ids || [];
+    },
+
+    get atlasDashboard() {
+      void this.enrichment.revision;
+      return atlasCoverageDashboard();
     },
 
     get detailTemplate() {
@@ -1547,6 +1560,73 @@ export function createWorkbench() {
       }
     },
 
+    async runLote49toEnd() {
+      if (this.enrichment.job?.status === JOB_STATUS.RUNNING) return;
+      this.enrichment.loading = true;
+      this.enrichment.error = null;
+      this.ui.bottomTab = "enrichment";
+      this.ui.announce = "Enriching lote 49–end…";
+      this.enrichment.job = {
+        status: JOB_STATUS.RUNNING,
+        scope: "lote-49-end",
+        progress: { done: 0, total: 62, chunk: 0, sublote: 0, sublotes: 4 },
+      };
+      this.enrichment.revision += 1;
+      try {
+        const batch = await runLote49toEndEnrichmentBatch({
+          onProgress: (progress, job) => {
+            this.enrichment.job = { ...job, progress };
+            this.enrichment.revision += 1;
+          },
+        });
+        this.enrichment.batch = batch;
+        this.enrichment.job = batch.job || getLastJob();
+        this.enrichment.revision += 1;
+        this.featured = featuredArchitectures(8).map(templateCardModel);
+        const dash = atlasCoverageDashboard();
+        const blockedN = (batch.blocked_ids || []).length;
+        this.ui.announce = `Lote 49–end ${batch.job?.status}. Atlas ${dash.enriched}/${dash.total}. complete ${dash.complete} · partial ${dash.partial} · blocked ${blockedN}. Schema v1 frozen.`;
+        persistEnrichmentBatch(batch, this.enrichment.job).catch(() => {});
+      } catch (err) {
+        this.enrichment.job = getLastJob() || { status: JOB_STATUS.FAILED, error: String(err?.message || err) };
+        this.enrichment.error = String(err?.message || err);
+        this.ui.announce = this.enrichment.error;
+        this.enrichment.revision += 1;
+      } finally {
+        this.enrichment.loading = false;
+      }
+    },
+
+    async runReenrichRegion(regionId) {
+      if (this.enrichment.job?.status === JOB_STATUS.RUNNING) return;
+      const rid = regionId || this.enrichment.regionId || "";
+      if (!rid) {
+        this.ui.announce = "Pick a region_id to re-enrich.";
+        return;
+      }
+      this.enrichment.loading = true;
+      this.ui.bottomTab = "enrichment";
+      this.ui.announce = `Re-enriching region ${rid}…`;
+      try {
+        const batch = await reenrichRegion(rid, {
+          onProgress: (progress, job) => {
+            this.enrichment.job = { ...job, progress };
+            this.enrichment.revision += 1;
+          },
+        });
+        this.enrichment.batch = batch;
+        this.enrichment.job = batch.job;
+        this.enrichment.revision += 1;
+        this.ui.announce = `Region ${rid} re-enriched (${batch.count}). Stale uses retrieved_at vs kind thresholds.`;
+        persistEnrichmentBatch(batch, this.enrichment.job).catch(() => {});
+      } catch (err) {
+        this.enrichment.error = String(err?.message || err);
+        this.ui.announce = this.enrichment.error;
+      } finally {
+        this.enrichment.loading = false;
+      }
+    },
+
     exportEnrichmentJSON() {
       const batch = this.enrichment.batch || getLastBatch();
       if (!batch) {
@@ -1554,12 +1634,34 @@ export function createWorkbench() {
         return;
       }
       const name =
-        batch.scope === "lote-25-48"
-          ? "sacred-architecture-enrichment-lote-25-48.json"
-          : batch.scope === "lote-9-24"
-            ? "sacred-architecture-enrichment-lote-9-24.json"
-            : "sacred-architecture-enrichment-pilot.json";
+        batch.scope === "lote-49-end"
+          ? "sacred-architecture-enrichment-lote-49-end.json"
+          : batch.scope === "lote-25-48"
+            ? "sacred-architecture-enrichment-lote-25-48.json"
+            : batch.scope === "lote-9-24"
+              ? "sacred-architecture-enrichment-lote-9-24.json"
+              : "sacred-architecture-enrichment-pilot.json";
       this._download(name, exportEnrichmentBatchJSON(batch));
+    },
+
+    exportAtlasJSON() {
+      const exp = exportEnrichedAtlasJSON();
+      if (!exp.ok) {
+        this.ui.announce = `Atlas JSON blocked: privacy token (${exp.privacy_hits.join(", ")}).`;
+        return;
+      }
+      this._download("sacred-architecture-enrichment-atlas.json", exp.json);
+      this.ui.announce = `Exported ${exp.payload.records.length} enrichment records (JSON).`;
+    },
+
+    exportAtlasCSV() {
+      const exp = exportEnrichedAtlasCSV();
+      if (!exp.ok) {
+        this.ui.announce = `Atlas CSV blocked: privacy token (${exp.privacy_hits.join(", ")}).`;
+        return;
+      }
+      this._download("sacred-architecture-enrichment-atlas.csv", exp.csv);
+      this.ui.announce = "Exported enrichment atlas CSV.";
     },
 
     get geoSites() {

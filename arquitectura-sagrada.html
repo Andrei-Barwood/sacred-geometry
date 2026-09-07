@@ -99,7 +99,11 @@
         reenrichPilot() {},
         runLote9to24() {},
         runLote25to48() {},
+        runLote49toEnd() {},
+        runReenrichRegion() {},
         exportEnrichmentJSON() {},
+        exportAtlasJSON() {},
+        exportAtlasCSV() {},
         onEnrichmentFilter() {},
         enrichment: { loading: false, batch: null, error: null, job: null, filters: {} },
         enrichmentRows: [],
@@ -108,7 +112,9 @@
         enrichmentJobLabel: "No job",
         regionCoverageIndex: [],
         catalogCrossFlags: [],
-        blockedEnrichmentIds: []
+        blockedEnrichmentIds: [],
+        atlasDashboard: { total: 0, complete: 0, partial: 0, blocked: 0, pending: 0 },
+        regionIds: []
       });
     });
   </script>
@@ -202,7 +208,7 @@
           <button type="button" class="wb-btn" @click="$store.workbench.startSample6()" x-text="$store.workbench.sample6kWName"></button>
           <button type="button" class="wb-btn" @click="$store.workbench.startLargeScale()">Large-scale PV + BESS + substation</button>
         </p>
-        <p class="wb-meta">Atlas enrichment <strong x-text="$store.workbench.atlasProgress.label"></strong> · next lote 49–end</p>
+        <p class="wb-meta">Atlas enrichment <strong x-text="$store.workbench.atlasProgress.label"></strong></p>
         <h2>Featured Architectures</h2>
         <div class="wb-tgrid">
           <template x-for="card in $store.workbench.featured" :key="card.id">
@@ -1111,7 +1117,7 @@
             </div>
 
             <div x-show="$store.workbench.ui.bottomTab === 'enrichment'" class="wb-enrichment">
-              <p class="wb-note">Progressive Regional Enrichment — contract 13A. Lotes 9–24 and 25–48. Does not rewrite templates.js. Power, energy, BESS, MVA and BTC are not recalculated. Cross-region catalog flags are not resolved. Next lote = 49–end.</p>
+              <p class="wb-note">Progressive Regional Enrichment — contract 13A frozen v1. Atlas 49–end closes the catalog. Does not rewrite templates.js. Prompt 14 can read records as-is.</p>
               <div class="wb-enr-progress" role="status">
                 <p class="wb-meta">Atlas <strong x-text="$store.workbench.atlasProgress.label"></strong> · job <span class="wb-badge" :data-job="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status" x-text="$store.workbench.enrichmentJobLabel"></span></p>
                 <div class="wb-enr-bar" :aria-valuenow="$store.workbench.atlasProgress.enriched" :aria-valuemax="$store.workbench.atlasProgress.total">
@@ -1121,8 +1127,11 @@
               <div class="wb-row-actions">
                 <button type="button" class="wb-btn" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.reenrichPilot()">Re-enrich pilot (8)</button>
                 <button type="button" class="wb-btn" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runLote9to24()">Enrich lote 9–24</button>
-                <button type="button" class="wb-btn wb-btn--primary" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runLote25to48()">Enrich lote 25–48</button>
-                <button type="button" class="wb-btn" :disabled="!$store.workbench.enrichment.batch" @click="$store.workbench.exportEnrichmentJSON()">Export JSON</button>
+                <button type="button" class="wb-btn" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runLote25to48()">Enrich lote 25–48</button>
+                <button type="button" class="wb-btn wb-btn--primary" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runLote49toEnd()">Enrich lote 49–end</button>
+                <button type="button" class="wb-btn" :disabled="!$store.workbench.enrichment.batch" @click="$store.workbench.exportEnrichmentJSON()">Export batch JSON</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.exportAtlasJSON()">Export atlas JSON</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.exportAtlasCSV()">Export atlas CSV</button>
                 <span class="wb-meta" x-text="$store.workbench.enrichment.batch ? ('last ' + $store.workbench.enrichment.batch.scope + ' · ' + $store.workbench.enrichment.batch.count + ' records') : 'No batch yet'"></span>
               </div>
               <div class="wb-filters wb-filters--enr">
@@ -1155,6 +1164,30 @@
                 </div>
               </div>
               <p class="wb-empty" x-show="$store.workbench.enrichment.error" x-text="$store.workbench.enrichment.error"></p>
+              <div class="wb-enr-dash" x-show="$store.workbench.atlasDashboard.total">
+                <h3>Atlas coverage</h3>
+                <p class="wb-meta">
+                  <strong x-text="$store.workbench.atlasDashboard.enriched + '/' + $store.workbench.atlasDashboard.total"></strong>
+                  · complete <span x-text="$store.workbench.atlasDashboard.complete + ' (' + $store.workbench.atlasDashboard.pct_complete + '%)'"></span>
+                  · partial <span x-text="$store.workbench.atlasDashboard.partial + ' (' + $store.workbench.atlasDashboard.pct_partial + '%)'"></span>
+                  · blocked <span x-text="$store.workbench.atlasDashboard.blocked + ' (' + $store.workbench.atlasDashboard.pct_blocked + '%)'"></span>
+                  · pending <span x-text="$store.workbench.atlasDashboard.pending"></span>
+                </p>
+                <p class="wb-meta">
+                  evidence media <span x-text="Math.round(($store.workbench.atlasDashboard.mean_evidence_coverage || 0) * 100) + '%'"></span>
+                  · conflictos abiertos <span x-text="$store.workbench.atlasDashboard.open_conflicts"></span>
+                  · stale fields <span x-text="$store.workbench.atlasDashboard.stale_fields"></span>
+                  · schema <span x-text="$store.workbench.atlasDashboard.schema_frozen_v1 ? 'v1 frozen' : 'open'"></span>
+                </p>
+                <div class="wb-row-actions">
+                  <label class="wb-field">Region
+                    <select :value="$store.workbench.enrichment.regionId" @change="$store.workbench.enrichment.regionId = $event.target.value">
+                      <template x-for="rid in $store.workbench.regionIds" :key="'re-'+rid"><option :value="rid" x-text="rid"></option></template>
+                    </select>
+                  </label>
+                  <button type="button" class="wb-btn" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runReenrichRegion()">Re-enrich region</button>
+                </div>
+              </div>
               <div class="wb-enr-extra" x-show="$store.workbench.regionCoverageIndex.length">
                 <h3>Coverage by region</h3>
                 <div class="wb-ev-grid">
@@ -1169,7 +1202,7 @@
                 <p class="wb-meta" x-show="$store.workbench.blockedEnrichmentIds.length">Blocked: <span x-text="$store.workbench.blockedEnrichmentIds.join(', ')"></span></p>
               </div>
               <template x-if="!$store.workbench.enrichmentRows.length && !($store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running')">
-                <p class="wb-empty">Run the pilot (8), lote 9–24, then lote 25–48. A running job does not lock the workbench. One blocked architecture does not halt the lote.</p>
+                <p class="wb-empty">Run pilot (8), 9–24, 25–48, then 49–end. Jobs yield so the workbench stays usable. Blocked rows keep an explicit reason.</p>
               </template>
               <div class="wb-ev-grid">
                 <template x-for="row in $store.workbench.enrichmentRows" :key="row.architecture_id">

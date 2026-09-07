@@ -23,6 +23,13 @@ import {
   runPilotEnrichmentBatch,
   runLote9to24EnrichmentBatch,
   runLote25to48EnrichmentBatch,
+  runLote49toEndEnrichmentBatch,
+  reenrichRegion,
+  SCHEMA_FROZEN_V1,
+  atlasCoverageDashboard,
+  exportEnrichedAtlasJSON,
+  exportEnrichedAtlasCSV,
+  chunkTemplates,
   selectLote9to24Templates,
   selectLote25to48Templates,
   selectLote49toEndTemplates,
@@ -479,6 +486,110 @@ test("cross-region catalog detector flags frequency without resolving", () => {
   const hz = new Set(freq.values.map((v) => v.value));
   assert.ok(hz.has(50));
   assert.ok(hz.has(60));
+});
+
+test("lote 49–end covers remaining atlas in sublotes of 16", () => {
+  assert.equal(SCHEMA_FROZEN_V1, true);
+  const rest = selectLote49toEndTemplates();
+  assert.ok(rest.length >= 48);
+  assert.equal(8 + 16 + 24 + rest.length, architectureTemplates.length);
+  assert.ok(architectureTemplates.length >= 96);
+  const chunks = chunkTemplates(rest, 16);
+  assert.ok(chunks.length >= 4);
+  assert.ok(chunks.slice(0, -1).every((c) => c.length === 16));
+});
+
+test("49–end enriches remaining rows under the 13A contract", async () => {
+  clearEnrichments();
+  const batch = await runLote49toEndEnrichmentBatch({ yield: false });
+  assert.equal(batch.scope, "lote-49-end");
+  assert.ok(batch.count >= 48);
+  assert.equal(batch.gates.ok, true);
+  assert.ok(batch.gates.coverage >= BATCH_COVERAGE_THRESHOLD);
+  assert.equal(batch.schema_frozen_v1, true);
+  assert.ok(batch.perf.sublotes >= 4);
+  for (const rec of batch.records) {
+    const v = validateContract(rec);
+    assert.equal(v.ok, true, `${rec.architecture_id}: ${v.errors.join("; ")}`);
+    if (rec.enrichment_status === ENRICHMENT_STATUS.BLOCKED) {
+      assert.ok(rec.blocked_reason, `${rec.architecture_id} blocked without reason`);
+    }
+  }
+});
+
+test("regression: 1–48 intact and every atlas row has enrichment_status", async () => {
+  clearEnrichments();
+  const eight = selectPilotTemplates();
+  const pilot = runPilotEnrichmentBatch({ templates: eight });
+  const b = await runLote9to24EnrichmentBatch({ yield: false });
+  const c = await runLote25to48EnrichmentBatch({ yield: false });
+  const snap = Object.fromEntries(
+    [...pilot.records, ...b.records, ...c.records].map((r) => [r.architecture_id, JSON.stringify(r)])
+  );
+  const d = await runLote49toEndEnrichmentBatch({ yield: false });
+  assert.ok(d.count >= 48);
+  for (const id of Object.keys(snap)) {
+    assert.equal(JSON.stringify(getEnrichment(id)), snap[id], `mutated prior ${id}`);
+  }
+  const progress = atlasEnrichmentProgress();
+  assert.equal(progress.enriched, architectureTemplates.length);
+  assert.ok(progress.enriched >= 96);
+  for (const t of architectureTemplates) {
+    const rec = getEnrichment(t.id);
+    assert.ok(rec, `missing ${t.id}`);
+    assert.ok(["pending", "partial", "complete", "blocked"].includes(rec.enrichment_status));
+  }
+  const sampleIds = [
+    eight[0].id,
+    selectLote9to24Templates()[0].id,
+    selectLote25to48Templates()[0].id,
+    selectLote49toEndTemplates()[0].id,
+  ];
+  for (const id of sampleIds) {
+    assert.equal(validateContract(getEnrichment(id)).ok, true);
+  }
+  const dash = atlasCoverageDashboard();
+  assert.equal(dash.total, architectureTemplates.length);
+  assert.equal(dash.enriched, architectureTemplates.length);
+  assert.equal(dash.pending, 0);
+  assert.equal(dash.complete + dash.partial + dash.blocked, dash.enriched);
+  assert.equal(dash.schema_frozen_v1, true);
+  for (const row of dash.blocked_list) {
+    assert.ok(row.reason && row.reason !== "blocked without explicit reason");
+  }
+});
+
+test("atlas export JSON+CSV has no PII and is round-trip readable", async () => {
+  clearEnrichments();
+  runPilotEnrichmentBatch();
+  await runLote9to24EnrichmentBatch({ yield: false });
+  const jsonExp = exportEnrichedAtlasJSON();
+  assert.equal(jsonExp.ok, true, String(jsonExp.privacy_hits));
+  const parsed = JSON.parse(jsonExp.json);
+  assert.equal(parsed.format, "sacred-architecture-enrichment-atlas");
+  assert.equal(parsed.schema_frozen_v1, true);
+  assert.ok(parsed.records.length >= 24);
+  assert.ok(parsed.dashboard);
+  const csvExp = exportEnrichedAtlasCSV();
+  assert.equal(csvExp.ok, true, String(csvExp.privacy_hits));
+  assert.match(csvExp.csv, /architecture_id,region_id,template_id,enrichment_status/);
+  assert.equal(csvExp.csv.includes("@"), false);
+});
+
+test("re-enrich region overwrites only that region", async () => {
+  clearEnrichments();
+  runPilotEnrichmentBatch();
+  const before = getEnrichment("G-MRT-G03-001");
+  const otherBefore = JSON.stringify(getEnrichment("G-EGY-G06-001"));
+  assert.ok(before);
+  assert.ok(otherBefore);
+  const batch = await reenrichRegion("R01", { yield: false });
+  assert.ok(batch.count >= 1);
+  assert.equal(batch.scope, "reenrich-region");
+  const after = getEnrichment("G-MRT-G03-001");
+  assert.ok(after);
+  assert.notEqual(after.batch_id, before.batch_id);
+  assert.equal(JSON.stringify(getEnrichment("G-EGY-G06-001")), otherBefore);
 });
 
 for (const step of queue) await step();

@@ -1,6 +1,8 @@
 export {
   ENRICHMENT_FORMAT,
+  ENRICHMENT_ATLAS_FORMAT,
   ENRICHMENT_SCHEMA_VERSION,
+  SCHEMA_FROZEN_V1,
   ENRICHMENT_STATUS,
   FIELD_METHOD,
   CONFLICT_RESOLUTION,
@@ -14,6 +16,7 @@ export {
   LOTE_9_24_SIZE,
   LOTE_25_48_SIZE,
   LOTE_CHUNK_SIZE,
+  SUBLOTE_SIZE,
   BATCH_COVERAGE_THRESHOLD,
   NEXT_LOTE_RANGE,
   LOTE_49_END_RANGE,
@@ -31,18 +34,25 @@ export {
   runPilotEnrichmentBatch,
   runLote9to24EnrichmentBatch,
   runLote25to48EnrichmentBatch,
+  runLote49toEndEnrichmentBatch,
+  reenrichRegion,
   exportEnrichmentBatchJSON,
   isPilotArchitecture,
   PILOT_BATCH_SCOPE,
   LOTE_9_24_SCOPE,
   LOTE_25_48_SCOPE,
+  LOTE_49_END_SCOPE,
   atlasStableOrder,
   selectNextAtlasSlice,
   selectLote9to24Templates,
   selectLote25to48Templates,
   selectLote49toEndTemplates,
+  priorEnrichedIds,
+  chunkTemplates,
   loteCoverageReport,
 } from "./batch.js";
+export { atlasCoverageDashboard, blockedReasonOf } from "./dashboard.js";
+export { exportEnrichedAtlasJSON, exportEnrichedAtlasCSV } from "./export-atlas.js";
 export {
   detectCrossRegionCatalogConflicts,
   regionCoverageIndex,

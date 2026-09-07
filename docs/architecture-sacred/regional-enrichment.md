@@ -108,3 +108,12 @@ Coverage reports: `regional-enrichment-lote-9-24.md`, `regional-enrichment-lote-
 - [x] Perf log per architecture; yield per architecture (UI thread)
 - [x] Blocked architecture does not halt the lote
 - [x] Next lote = 49–end (62 remaining)
+
+## 13D checklist
+
+- [x] Lote 49–end in sublotes of 16. Atlas ≥96, every row has `enrichment_status`.
+- [x] Global coverage dashboard (complete / partial / blocked / freshness / open conflicts / mean evidence)
+- [x] Atlas export JSON + CSV, no PII
+- [x] Schema v1 frozen
+- [x] Blocked rows carry `blocked_reason`
+- [x] Ops note: re-enrich a region; how stale is marked (`enrichment-ops.md`)
