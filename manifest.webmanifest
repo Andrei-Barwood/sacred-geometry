@@ -1,0 +1,19 @@
+{
+  "name": "Arquitectura Sagrada",
+  "short_name": "Arquitectura",
+  "description": "Workbench conceptual de arquitecturas eléctricas. No es ingeniería certificada.",
+  "start_url": "/arquitectura-sagrada.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#F1F1F1",
+  "theme_color": "#325394",
+  "lang": "es",
+  "icons": [
+    {
+      "src": "/favicon.jpeg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any"
+    }
+  ]
+}

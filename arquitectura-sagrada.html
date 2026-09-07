@@ -6,6 +6,8 @@
   <meta name="description" content="Arquitectura Sagrada — workbench conceptual de arquitecturas eléctricas para cargas, generación, almacenamiento y transformación.">
   <title>Arquitectura Sagrada — Kirtan Teg Singh</title>
   <link rel="icon" href="favicon.jpeg" type="image/jpeg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#325394">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/architecture-workbench.css">
   <script>
@@ -39,7 +41,7 @@
         sections: [],
         configLabels: {},
         modes: {},
-        ui: { view: 'system', btcDisplay: 'both', configSection: 'overview', resultsSection: 'summary', bottomTab: 'templates', filters: {}, facets: {}, compareIds: [], templateOpen: false, announce: '' },
+        ui: { view: 'system', btcDisplay: 'both', configSection: 'overview', resultsSection: 'summary', bottomTab: 'templates', filters: {}, facets: {}, compareIds: [], templateOpen: false, announce: '', screen: 'start', offline: false, ioOpen: false, privacyOpen: false },
         graph: { nodes: [], edges: [], flow: null },
         presets: [],
         countries: [],
@@ -134,6 +136,11 @@
         exportComparisonPdf() {},
         formatCompareValue() { return 'N/A'; },
         formatCompareDelta() { return 'N/A'; },
+        navItems: [],
+        goScreen() {},
+        wipeProjectEvidence() {},
+        openIo() {},
+        openPrivacy() {},
         onEnrichmentFilter() {},
         enrichment: { loading: false, batch: null, error: null, job: null, filters: {} },
         enrichmentRows: [],
@@ -216,6 +223,21 @@
         <p class="wb-lead" x-text="$store.workbench.lead"></p>
         <p class="wb-disclaimer" x-text="$store.workbench.disclaimer"></p>
       </section>
+
+      <nav class="wb-appnav" aria-label="Arquitectura Sagrada">
+        <template x-for="item in $store.workbench.navItems" :key="item.id">
+          <button type="button" class="wb-appnav-btn"
+            :class="{ 'is-active': $store.workbench.ui.screen === item.id }"
+            :aria-current="$store.workbench.ui.screen === item.id ? 'page' : false"
+            :title="item.hint"
+            @click="$store.workbench.goScreen(item.id)"
+            x-text="item.label"></button>
+        </template>
+        <button type="button" class="wb-appnav-btn" @click="$store.workbench.openIo()">Import / Export</button>
+        <button type="button" class="wb-appnav-btn" @click="$store.workbench.openPrivacy()">Privacidad</button>
+      </nav>
+      <p class="wb-offline" x-show="$store.workbench.ui.offline" role="status">Sin red. El último proyecto se lee desde este navegador. Los tiles del mapa OSM no funcionan offline.</p>
+      <p class="wb-meta wb-kbd-hint">Teclado: 1 Atlas · 2 Sitio · 3 Workbench · 4 Comparación · 5 Reports · 6 Enrichment · 7 Proyecto · Esc cierra paneles.</p>
 
       <!-- START SCREEN -->
       <section class="wb-start" x-show="$store.workbench.showStart" x-cloak>
@@ -778,7 +800,7 @@
                   <div class="wb-geo-list">
                     <h3>Candidate sites</h3>
                     <template x-if="!$store.workbench.geoSites.length">
-                      <p class="wb-empty">sin sitios</p>
+                      <p class="wb-empty">Sin sitios. Añade uno en el formulario o importa GeoJSON/CSV. Next: carga red si hay feeders.</p>
                     </template>
                     <ul class="wb-geo-ul">
                       <template x-for="s in $store.workbench.geoSites" :key="s.id">
@@ -1237,7 +1259,7 @@
                 <p class="wb-meta" x-show="$store.workbench.blockedEnrichmentIds.length">Blocked: <span x-text="$store.workbench.blockedEnrichmentIds.join(', ')"></span></p>
               </div>
               <template x-if="!$store.workbench.enrichmentRows.length && !($store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running')">
-                <p class="wb-empty">Run pilot (8), 9–24, 25–48, then 49–end. Jobs yield so the workbench stays usable. Blocked rows keep an explicit reason.</p>
+                <p class="wb-empty">Run pilot (8), 9–24, 25–48, then 49–end. Jobs yield so the workbench stays usable. Blocked rows keep an explicit reason. Next: enriquece lote si coverage es baja; no se recalcula en el render.</p>
               </template>
               <div class="wb-ev-grid">
                 <template x-for="row in $store.workbench.enrichmentRows" :key="row.architecture_id">
@@ -1405,7 +1427,11 @@
                 </div>
               </template>
 
-              <p class="wb-empty" x-show="!$store.workbench.comparisonTable.ok" x-text="$store.workbench.comparisonTable.error || 'Seleccione 2 o 3 entidades.'"></p>
+              <p class="wb-empty" x-show="!$store.workbench.comparisonTable.ok">
+                <span x-text="$store.workbench.comparisonTable.error || 'Seleccione 2 o 3 entidades.'"></span>
+                Next: <button type="button" class="wb-btn" @click="$store.workbench.goScreen('atlas')">elige templates en Atlas</button>
+                o <button type="button" class="wb-btn" @click="$store.workbench.goScreen('project')">abre otro proyecto</button>.
+              </p>
 
               <template x-if="$store.workbench.comparisonTable.ok">
                 <div>
@@ -1673,6 +1699,53 @@
           </div>
         </div>
       </template>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.ioOpen" x-cloak @click.self="$store.workbench.ui.ioOpen = false" role="dialog" aria-modal="true" aria-label="Import and export">
+    <div class="wb-dialog">
+      <h2>Import / Export</h2>
+      <p class="wb-note">Checklist v1. Import inválido muestra error y no tumba la pestaña. Exports bloquean PII (email, rutas, nombres locales).</p>
+      <h3>Import</h3>
+      <ul>
+        <li>Proyecto JSON (límite 5 MB, JSON.parse, sin eval)</li>
+        <li>Sitios GeoJSON / CSV (WGS84, mismo límite)</li>
+      </ul>
+      <div class="wb-row-actions">
+        <label class="wb-btn">Proyecto JSON<input type="file" accept="application/json,.json" class="wb-file-input" @change="$store.workbench.onImportFile($event)" aria-label="Import project JSON"></label>
+        <label class="wb-btn">Sitios GeoJSON/CSV<input type="file" accept=".geojson,.json,.csv,application/geo+json,text/csv" class="wb-file-input" @change="$store.workbench.onGeoFile($event)" aria-label="Import sites"></label>
+      </div>
+      <h3>Export</h3>
+      <div class="wb-row-actions">
+        <button type="button" class="wb-btn" @click="$store.workbench.exportNow()">Proyecto JSON</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportGeoJSON()">Sitios GeoJSON</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportGeoCSV()">Sitios CSV</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportAtlasJSON()">Atlas enriquecido JSON</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportAtlasCSV()">Atlas enriquecido CSV</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.downloadPdf()">PDF del report</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportComparisonCsv()">Comparación CSV</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportComparisonPdf()">Comparación PDF</button>
+      </div>
+      <p class="wb-meta">Snapshot: use Snapshots → Descargar PDF. El PDF no se cachea en el Service Worker.</p>
+      <button type="button" class="wb-btn" @click="$store.workbench.ui.ioOpen = false">Close</button>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.privacyOpen" x-cloak @click.self="$store.workbench.ui.privacyOpen = false" role="dialog" aria-modal="true" aria-label="Privacy">
+    <div class="wb-dialog">
+      <h2>Privacidad y datos locales</h2>
+      <p class="wb-note">Todo vive en este navegador (IndexedDB + localStorage). No hay cuenta. Exports se escanean contra email, rutas y PII de plantilla.</p>
+      <ul>
+        <li><strong>Qué se guarda:</strong> proyecto, escenarios, snapshots, comparaciones, evidencias aceptadas, sitios, registros de enrichment del atlas.</li>
+        <li><strong>Borrar proyecto:</strong> Projects → Delete. Irreversible en este dispositivo.</li>
+        <li><strong>Borrar evidencias:</strong> quita accepted/dismissed/history del proyecto abierto. El atlas enrichment no se borra.</li>
+        <li><strong>Mapa:</strong> tiles OSM salen de la red; no se fingen offline.</li>
+      </ul>
+      <div class="wb-row-actions">
+        <button type="button" class="wb-btn" @click="$store.workbench.wipeProjectEvidence()">Borrar evidencias del proyecto</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.openProjects()">Gestionar proyectos</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.ui.privacyOpen = false">Close</button>
+      </div>
     </div>
   </div>
 

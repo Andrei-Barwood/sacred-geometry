@@ -5,18 +5,102 @@
 
 /* global self, clients */
 
-const SW_VERSION = 'push-v1';
+const SW_VERSION = 'arch-v16';
+const SHELL_CACHE = `sacred-arch-shell-${SW_VERSION}`;
+const ASSET_CACHE = `sacred-arch-assets-${SW_VERSION}`;
 
-// Activa de inmediato la nueva versión del SW
+const SHELL = [
+  '/arquitectura-sagrada.html',
+  '/offline-architecture.html',
+  '/css/style.css',
+  '/css/architecture-workbench.css',
+  '/manifest.webmanifest',
+  '/favicon.jpeg',
+];
+
+function isPdfRequest(request, url) {
+  if (url.pathname.toLowerCase().endsWith('.pdf')) return true;
+  const accept = request.headers.get('accept') || '';
+  if (accept.includes('application/pdf')) return true;
+  return false;
+}
+
+function isOsmTile(url) {
+  return url.hostname === 'tile.openstreetmap.org';
+}
+
 self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(SHELL_CACHE).then((cache) => cache.addAll(SHELL).catch(() => undefined))
+  );
   self.skipWaiting();
-  console.log(`[sw] install ${SW_VERSION}`);
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
-  console.log(`[sw] activate ${SW_VERSION}`);
+  event.waitUntil(
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(
+        keys
+          .filter((k) => k !== SHELL_CACHE && k !== ASSET_CACHE && k.startsWith('sacred-arch-'))
+          .map((k) => caches.delete(k))
+      );
+      await self.clients.claim();
+    })()
+  );
 });
+
+self.addEventListener('fetch', (event) => {
+  const req = event.request;
+  if (req.method !== 'GET') return;
+  const url = new URL(req.url);
+  if (url.protocol === 'blob:' || url.protocol === 'data:') return;
+  if (isPdfRequest(req, url)) return;
+  if (isOsmTile(url)) return;
+
+  if (url.origin !== self.location.origin) return;
+
+  if (
+    url.pathname.endsWith('/arquitectura-sagrada.html') ||
+    url.pathname === '/arquitectura-sagrada.html'
+  ) {
+    event.respondWith(networkFirst(req, SHELL_CACHE, '/offline-architecture.html'));
+    return;
+  }
+
+  if (/\.(css|js|webmanifest|jpeg|jpg|png|svg)$/i.test(url.pathname)) {
+    event.respondWith(staleWhileRevalidate(req, ASSET_CACHE));
+  }
+});
+
+async function networkFirst(request, cacheName, fallbackPath) {
+  try {
+    const fresh = await fetch(request);
+    const cache = await caches.open(cacheName);
+    cache.put(request, fresh.clone());
+    return fresh;
+  } catch {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    if (fallbackPath) {
+      const fb = await caches.match(fallbackPath);
+      if (fb) return fb;
+    }
+    throw new Error('offline');
+  }
+}
+
+async function staleWhileRevalidate(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  const network = fetch(request)
+    .then((res) => {
+      if (res && res.ok) cache.put(request, res.clone());
+      return res;
+    })
+    .catch(() => cached);
+  return cached || network;
+}
 
 /**
  * Evento push: el servidor de push del navegador entrega el payload cifrado;

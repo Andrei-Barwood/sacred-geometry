@@ -103,6 +103,7 @@ import {
   exportProjectJSON,
   importProjectJSON,
   loadPreferences,
+  LIMITS,
   newId,
   nowIso,
   patchPreferences,
@@ -110,9 +111,11 @@ import {
   renameScenario,
   resolveScenario,
   restoreSnapshotInto,
+  scanPrivacyBlob,
   setActiveScenario,
   updateDocumentFromWorkbench,
 } from "../storage/index.js";
+import { NAV_ITEMS, SCREENS, archHash, parseArchHash } from "./routes.js";
 import {
   exportEngineeringReportHTML,
   generateEngineeringReport,
@@ -352,7 +355,13 @@ export function createWorkbench() {
         language: "en",
         scenarioId: null,
       },
+      screen: SCREENS.START,
+      offline: typeof navigator !== "undefined" ? navigator.onLine === false : false,
+      ioOpen: false,
+      privacyOpen: false,
     },
+
+    navItems: NAV_ITEMS,
 
     _timer: null,
     _autosaveTimer: null,
@@ -379,7 +388,12 @@ export function createWorkbench() {
       this.evidence.debug = typeof window !== "undefined" && window.__SACRED_EVIDENCE_DEBUG__ === true;
       this.enrichment.batch = getLastBatch();
       this.enrichment.job = getLastJob();
-      this._persistReady = this._initPersistence();
+      this._bindOnline();
+      this._registerSw();
+      this._persistReady = this._initPersistence().then(() => {
+        this.applyHash(true);
+        this._bindHash();
+      });
     },
 
     applyThemeFromApp() {
@@ -609,6 +623,8 @@ export function createWorkbench() {
     startZero() {
       const r = startFromZero();
       this._setProject(r.project, r.baseline);
+      this.ui.screen = SCREENS.WORKBENCH;
+      this.pushHash(SCREENS.WORKBENCH);
     },
 
     startSample6() {
@@ -631,6 +647,8 @@ export function createWorkbench() {
       }
       this.ui.bottomTab = "templates";
       this.ui.startOpen = false;
+      this.ui.screen = SCREENS.ATLAS;
+      this.pushHash(SCREENS.ATLAS);
       this.scrollTo("wb-templates");
     },
 
@@ -1023,8 +1041,7 @@ export function createWorkbench() {
     },
 
     openCompareTab() {
-      this.ui.bottomTab = "compare";
-      this.scrollTo("wb-templates");
+      this.goScreen(SCREENS.COMPARE);
     },
 
     openCompareFromSelection() {
@@ -1136,8 +1153,9 @@ export function createWorkbench() {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")
         .slice(0, 40) || "comparacion";
-      this._download(`${stem}-${date}.csv`, csv, "text/csv");
-      this.ui.announce = "CSV de la tabla exportado.";
+      if (this._guardExportText(csv, `${stem}-${date}.csv`, "text/csv")) {
+        this.ui.announce = "CSV de la tabla exportado.";
+      }
     },
 
     exportComparisonPdf() {
@@ -1218,9 +1236,26 @@ export function createWorkbench() {
     },
 
     onKeydown(ev) {
+      const tag = ev.target?.tagName;
+      const typing = tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT" || ev.target?.isContentEditable;
       if (ev.key === "Escape") {
         if (this.ui.templateOpen) {
           this.closeTemplate();
+          ev.preventDefault();
+        } else if (this.ui.ioOpen) {
+          this.ui.ioOpen = false;
+          ev.preventDefault();
+        } else if (this.ui.privacyOpen) {
+          this.ui.privacyOpen = false;
+          ev.preventDefault();
+        } else if (this.ui.reportOpen) {
+          this.ui.reportOpen = false;
+          ev.preventDefault();
+        } else if (this.ui.projectsOpen) {
+          this.ui.projectsOpen = false;
+          ev.preventDefault();
+        } else if (this.ui.snapshotsOpen) {
+          this.ui.snapshotsOpen = false;
           ev.preventDefault();
         } else if (this.ui.selectedNodeId || this.ui.graphFocus) {
           this.clearGraphSelection();
@@ -1228,7 +1263,152 @@ export function createWorkbench() {
         } else if (this.ui.configDrawer) {
           this.ui.configDrawer = false;
         }
+        return;
       }
+      if (typing || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+      const map = {
+        1: SCREENS.ATLAS,
+        2: SCREENS.MAP,
+        3: SCREENS.WORKBENCH,
+        4: SCREENS.COMPARE,
+        5: SCREENS.REPORTS,
+        6: SCREENS.ENRICHMENT,
+        7: SCREENS.PROJECT,
+      };
+      if (map[ev.key]) {
+        this.goScreen(map[ev.key]);
+        ev.preventDefault();
+      }
+    },
+
+    _bindOnline() {
+      if (typeof window === "undefined") return;
+      const sync = () => {
+        this.ui.offline = navigator.onLine === false;
+        if (this.ui.offline) {
+          this.ui.announce = "Sin red. El último proyecto sigue en este navegador. El mapa OSM no funciona offline.";
+        }
+      };
+      window.addEventListener("online", sync);
+      window.addEventListener("offline", sync);
+      sync();
+    },
+
+    _registerSw() {
+      if (typeof navigator === "undefined" || !navigator.serviceWorker) return;
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    },
+
+    _bindHash() {
+      if (typeof window === "undefined") return;
+      window.addEventListener("hashchange", () => {
+        if (this._hashSilent) {
+          this._hashSilent = false;
+          return;
+        }
+        this.applyHash(false);
+      });
+    },
+
+    pushHash(screen, id) {
+      if (typeof window === "undefined") return;
+      const next = archHash({ screen, id });
+      if (window.location.hash === next || (next === "#/" && (!window.location.hash || window.location.hash === "#"))) return;
+      this._hashSilent = true;
+      window.location.hash = next;
+    },
+
+    goScreen(screen, id = null) {
+      this.ui.screen = screen;
+      if (screen === SCREENS.ATLAS) {
+        this.ui.bottomTab = "templates";
+        if (!this.started) this.browseTemplates();
+        else this.scrollTo("wb-templates");
+        if (id) this.openTemplate(id);
+      } else if (screen === SCREENS.MAP) {
+        this._ensureProject();
+        this.ui.view = VIEW_MODES.MAP;
+        this.setView(VIEW_MODES.MAP);
+        if (id) {
+          this.ui.geoSelectedId = id;
+          this._refreshGeoMap();
+        }
+      } else if (screen === SCREENS.WORKBENCH) {
+        this._ensureProject();
+        this.ui.view = VIEW_MODES.SYSTEM;
+      } else if (screen === SCREENS.COMPARE) {
+        this._ensureProject();
+        this.ui.bottomTab = "compare";
+        this.scrollTo("wb-templates");
+        if (id) this.reopenComparison(id);
+      } else if (screen === SCREENS.REPORTS) {
+        this._ensureProject();
+        this.openReport();
+      } else if (screen === SCREENS.ENRICHMENT) {
+        if (!this.started) this.browseTemplates();
+        this.ui.bottomTab = "enrichment";
+        this.scrollTo("wb-templates");
+      } else if (screen === SCREENS.PROJECT) {
+        if (id) this.requestOpenProject(id);
+        else this.openProjects();
+      } else if (screen === SCREENS.SNAPSHOT) {
+        this._ensureProject();
+        this.ui.snapshotsOpen = true;
+      } else {
+        this.ui.screen = SCREENS.START;
+      }
+      this.pushHash(screen, id);
+    },
+
+    _ensureProject() {
+      if (this.project) return;
+      const r = startFromZero();
+      this._setProject(r.project, r.baseline);
+    },
+
+    async applyHash(fromInit) {
+      if (typeof window === "undefined") return;
+      const { screen, id } = parseArchHash(window.location.hash);
+      if (fromInit && screen === SCREENS.START && this.ui.resumeProjectId && !id) return;
+      if (screen === SCREENS.PROJECT && id) {
+        await this.openProject(id);
+        this.ui.screen = SCREENS.WORKBENCH;
+        return;
+      }
+      if (screen === SCREENS.START) {
+        this.ui.screen = SCREENS.START;
+        return;
+      }
+      this.goScreen(screen, id);
+    },
+
+    wipeProjectEvidence() {
+      if (!this.project) return;
+      this.project.acceptedEvidence = {};
+      this.project.evidenceHistory = [];
+      this.project.dismissedEvidence = {};
+      this.evidence = emptyEvidenceState();
+      this._refresh(false);
+      this.ui.announce = "Evidencias del proyecto borradas en este navegador.";
+      this.ui.privacyOpen = false;
+    },
+
+    openIo() {
+      this.ui.ioOpen = true;
+    },
+
+    openPrivacy() {
+      this.ui.privacyOpen = true;
+    },
+
+    _guardExportText(text, filename, mime) {
+      const scan = scanPrivacyBlob(text);
+      if (scan.length) {
+        this.ui.announce = `Export blocked: ${scan.join(", ")}. Remove private content first.`;
+        return false;
+      }
+      this._download(filename, text, mime);
+      return true;
     },
 
     scrollTo(id) {
@@ -2190,15 +2370,24 @@ export function createWorkbench() {
     onGeoFile(ev) {
       const file = ev.target?.files?.[0];
       if (!file) return;
+      if (file.size > LIMITS.maxImportBytes) {
+        this.ui.announce = "File exceeds the import size limit.";
+        ev.target.value = "";
+        return;
+      }
       const kind = /\.csv$/i.test(file.name) ? "csv" : "geojson";
       const reader = new FileReader();
       reader.onload = () => {
-        const r = importIntoGeospatial(this._geoState(), String(reader.result || ""), kind);
-        this._geoMutate(r);
-        this.ui.announce = r.ok
-          ? `Imported ${r.added?.length || 0} site(s). ${r.skipped?.length || 0} skipped.`
-          : r.error || "Import failed.";
-        if (this._geoMap) this._geoMap.fitSites(this.geoSites);
+        try {
+          const r = importIntoGeospatial(this._geoState(), String(reader.result || ""), kind);
+          this._geoMutate(r);
+          this.ui.announce = r.ok
+            ? `Imported ${r.added?.length || 0} site(s). ${r.skipped?.length || 0} skipped.`
+            : r.error || "Import failed.";
+          if (this._geoMap) this._geoMap.fitSites(this.geoSites);
+        } catch (err) {
+          this.ui.announce = String(err?.message || "Import failed.");
+        }
       };
       reader.readAsText(file);
       ev.target.value = "";
@@ -2206,11 +2395,11 @@ export function createWorkbench() {
 
     exportGeoJSON() {
       const json = JSON.stringify(sitesToGeoJSON(this.project.geospatial, this.project, this.geoEval.evaluations), null, 2);
-      this._download("sacred-architecture-sites.geojson", json);
+      this._guardExportText(json, "sacred-architecture-sites.geojson", "application/geo+json");
     },
 
     exportGeoCSV() {
-      this._download("sacred-architecture-sites.csv", sitesToCSV(this.geoSites));
+      this._guardExportText(sitesToCSV(this.geoSites), "sacred-architecture-sites.csv", "text/csv");
     },
 
     setGeoLayer(name, on) {

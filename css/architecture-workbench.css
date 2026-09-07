@@ -1109,6 +1109,78 @@
   }
 }
 
+.wb-appnav {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0.4rem 0 0.6rem;
+  border-bottom: 1px solid var(--arch-line);
+  margin-bottom: 0.5rem;
+}
+
+.wb-appnav-btn {
+  flex: 0 0 auto;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--arch-line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-dark);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.wb-appnav-btn.is-active {
+  border-color: var(--primary);
+  box-shadow: inset 0 0 0 1px var(--primary);
+  font-weight: 600;
+}
+
+.wb-appnav-btn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.wb-offline {
+  background: rgba(181, 71, 8, 0.12);
+  border-left: 4px solid var(--arch-warning);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.wb-kbd-hint {
+  margin: 0.25rem 0 0.75rem;
+}
+
+.wb-badge::after {
+  content: none;
+}
+
+@media (max-width: 768px) {
+  .wb-btn,
+  .wb-tab,
+  .wb-cta,
+  .wb-geo-item {
+    min-height: 44px;
+  }
+  .wb-toolbar,
+  .wb-projectbar {
+    top: auto;
+  }
+  .wb-appnav {
+    margin-left: -0.25rem;
+    margin-right: -0.25rem;
+    padding-left: 0.25rem;
+  }
+  .wb-kbd-hint { display: none; }
+  .wb-file-input {
+    min-height: 44px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .arch-node.is-starting .arch-shape-fill,
   .wb-svg * {

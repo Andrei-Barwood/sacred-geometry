@@ -87,6 +87,16 @@ test("duplicates within 50 m are skipped", () => {
   assert.ok(d.meters < 50);
 });
 
+test("oversized GeoJSON/CSV import is a recoverable error, not a throw", () => {
+  const huge = "x".repeat(5 * 1024 * 1024 + 10);
+  const gj = parseSitesGeoJSON(huge);
+  assert.equal(gj.ok, false);
+  assert.match(gj.error, /size limit/i);
+  const csv = parseSitesCSV(huge);
+  assert.equal(csv.ok, false);
+  assert.match(csv.error, /size limit/i);
+});
+
 test("CSV import + GeoJSON/CSV round trip", () => {
   const csv = sitesToCSV([
     createSite({ name: "P1", lat: 24.1, lng: 55.2, region: "Arabian Peninsula", landUse: "desert" }),

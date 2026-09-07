@@ -75,6 +75,13 @@ export function createMapView(container, options = {}) {
   }
 
   function renderTiles() {
+    const offline = typeof navigator !== "undefined" && navigator.onLine === false;
+    if (offline) {
+      tiles.innerHTML = "";
+      err.hidden = false;
+      err.textContent = EMPTY_WARNINGS.TILE_ERROR;
+      return;
+    }
     const w = container.clientWidth || 400;
     const h = container.clientHeight || 280;
     const z = Math.max(2, Math.min(18, Math.round(state.z)));

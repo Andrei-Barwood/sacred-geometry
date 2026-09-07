@@ -55,6 +55,7 @@ import {
 } from "./format.js";
 import { PROVENANCE, SAMPLE_6KW_ID } from "./constants.js";
 import { createWorkbench } from "./architecture-app.js";
+import { archHash, parseArchHash, SCREENS } from "./routes.js";
 
 let passed = 0;
 let failed = 0;
@@ -392,6 +393,18 @@ test("atlas explorer filters by batch_id, coverage, conflictos, stale", () => {
   const conflicts = filterTemplates({ ...emptyFilters(), conflicts: "yes" });
   assert.ok(conflicts.some((t) => t.id === sample.id));
   clearEnrichments();
+});
+
+test("deep link hash round-trips project, site, snapshot, comparison", () => {
+  const cmp = archHash({ screen: SCREENS.COMPARE, id: "c1" });
+  assert.equal(cmp, "#/compare/c1");
+  const parsed = parseArchHash(cmp);
+  assert.equal(parsed.screen, SCREENS.COMPARE);
+  assert.equal(parsed.id, "c1");
+  assert.equal(parseArchHash("#/project/abc-def").screen, SCREENS.PROJECT);
+  assert.equal(parseArchHash("#/map/s1").id, "s1");
+  assert.equal(parseArchHash("#/snapshot/snap-9").screen, SCREENS.SNAPSHOT);
+  assert.equal(parseArchHash("").screen, SCREENS.START);
 });
 
 test("workbench opens comparison from template selection without ranking", () => {

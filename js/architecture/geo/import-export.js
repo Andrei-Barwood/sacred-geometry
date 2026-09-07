@@ -1,4 +1,5 @@
 import { stripDangerousKeys } from "../storage/sanitizer.js";
+import { LIMITS } from "../storage/schema.js";
 import { DUPLICATE_METERS, EMPTY_WARNINGS, MAX_GRID_FEATURES, MAX_RESTRICTIONS, MAX_SITES } from "./constants.js";
 import { detectCrs, haversineMeters } from "./geometry.js";
 import { createSite } from "./site-model.js";
@@ -26,6 +27,9 @@ function featureLngLat(feature) {
 export function parseSitesGeoJSON(textOrObj, existing = []) {
   let obj = textOrObj;
   if (typeof textOrObj === "string") {
+    if (textOrObj.length > LIMITS.maxImportBytes) {
+      return { ok: false, error: "File exceeds the import size limit.", sites: [], skipped: [], restrictions: [], gridNetwork: null };
+    }
     try {
       obj = JSON.parse(textOrObj);
     } catch {
@@ -116,7 +120,11 @@ function splitCsvLine(line) {
 }
 
 export function parseSitesCSV(text, existing = []) {
-  const lines = String(text || "")
+  const raw = String(text || "");
+  if (raw.length > LIMITS.maxImportBytes) {
+    return { ok: false, error: "File exceeds the import size limit.", sites: [], skipped: [] };
+  }
+  const lines = raw
     .replace(/^\uFEFF/, "")
     .split(/\r?\n/)
     .filter((l) => l.trim());

@@ -4,6 +4,8 @@ Interactive workbench for **Arquitectura Sagrada**. It consumes the existing sou
 
 Page: `arquitectura-sagrada.html`
 
+v1 close: `docs/architecture-sacred/v1.md`. Deep links `#/atlas`, `#/map`, `#/workbench`, `#/compare`, `#/reports`, `#/enrichment`, `#/project/:id`.
+
 This is a conceptual engineering workbench. It is not engineering-certified, regulatory-compliant, or construction-ready.
 
 ## State architecture

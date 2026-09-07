@@ -49,6 +49,6 @@ export const EMPTY_WARNINGS = Object.freeze({
   NO_SITES: "sin sitios",
   NO_RESTRICTIONS: "sin cobertura",
   INCOMPLETE_GRID: "dato de red incompleto",
-  TILE_ERROR: "Map tiles unavailable.",
+  TILE_ERROR: "Tiles OSM requieren red. Sitios y restricciones siguen en el proyecto; el mapa base no se finge offline.",
   NOT_WGS84: "Coordinates must be WGS84 (EPSG:4326) longitude/latitude.",
 });
