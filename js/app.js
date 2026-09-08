@@ -11,6 +11,7 @@ import {
   mountInlineAnimation as mountP5InlineAnimation,
   unmountInlineAnimation as unmountP5InlineAnimation
 } from './cover-animations.js';
+import { mountZonahedronBanner } from './zonahedron-banner.js';
 
 function registerAppStore() {
   // If Alpine isn't ready yet, bail (we'll be called again on alpine:init)
@@ -64,6 +65,9 @@ function registerAppStore() {
       
       // Set up periodic check for phrase updates (every minute)
       this.startCloudPhraseCheck();
+
+      const banner = document.getElementById('arch-banner-stage');
+      if (banner) mountZonahedronBanner(banner);
     },
     
     toggleMobileMenu() {
