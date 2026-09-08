@@ -5,7 +5,7 @@
 
 /* global self, clients */
 
-const SW_VERSION = 'arch-v16-repair-portal';
+const SW_VERSION = 'arch-v16-pdf-download';
 const SHELL_CACHE = `sacred-arch-shell-${SW_VERSION}`;
 const ASSET_CACHE = `sacred-arch-assets-${SW_VERSION}`;
 

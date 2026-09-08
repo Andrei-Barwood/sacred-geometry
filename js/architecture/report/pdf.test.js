@@ -17,6 +17,9 @@ import {
   extractPdfText,
   DATO_NO_DISPONIBLE,
   contentHash,
+  asDownloadBlob,
+  sanitizeDownloadName,
+  triggerBrowserDownload,
 } from "./index.js";
 
 let passed = 0;
@@ -172,6 +175,19 @@ test("empty project PDF still builds", () => {
   const pdf = renderEngineeringReportPdf(model, { printedAt: null });
   assert.equal(pdf.ok, true);
   assert.ok(pdf.bytes.length > 200);
+});
+
+test("download helper keeps PDF byte length in the Blob", () => {
+  const model = fixtureModel();
+  const pdf = renderEngineeringReportPdf(model, { printedAt: null });
+  const blob = asDownloadBlob(pdf.bytes, "application/pdf");
+  assert.equal(blob.size, pdf.bytes.length);
+  assert.equal(blob.type, "application/pdf");
+  assert.equal(sanitizeDownloadName("a/b:c.pdf"), "a-b-c.pdf");
+  const dl = triggerBrowserDownload(pdf.filename, pdf.bytes, "application/pdf");
+  assert.equal(dl.ok, true);
+  assert.equal(dl.blob.size, pdf.bytes.length);
+  assert.match(dl.filename, /\.pdf$/);
 });
 
 console.log(`\nPDF tests: ${passed} passed, ${failed} failed`);

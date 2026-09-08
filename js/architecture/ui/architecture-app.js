@@ -130,6 +130,7 @@ import {
   renderEngineeringReportHTML,
   renderEngineeringReportPdf,
   renderPrintModelPdf,
+  triggerBrowserDownload,
 } from "../report/index.js";
 import {
   COMPARISON_GROUPS,
@@ -379,6 +380,8 @@ export function createWorkbench() {
       offline: typeof navigator !== "undefined" ? navigator.onLine === false : false,
       ioOpen: false,
       privacyOpen: false,
+      pdfHref: null,
+      pdfFilename: "",
     },
 
     navItems: NAV_ITEMS,
@@ -1191,24 +1194,29 @@ export function createWorkbench() {
     },
 
     exportComparisonPdf() {
-      const table = this.comparisonTable;
-      if (!table.ok) {
-        this.ui.announce = table.error || "No hay comparación para exportar.";
-        return;
+      try {
+        const table = this.comparisonTable;
+        if (!table.ok) {
+          this.ui.announce = table.error || "No hay comparación para exportar.";
+          return;
+        }
+        const print = comparisonPrintModel(table, {
+          name: this.compare.name || "Comparación",
+          comparisonId: this.compare.savedId || "comparison",
+          userFormula: this.compare.userFormula || "",
+          generatedAt: nowIso(),
+        });
+        const pdf = renderPrintModelPdf(print, { printedAt: nowIso() });
+        if (!pdf.ok) {
+          this.ui.announce = pdf.error || "No se pudo generar el PDF de comparación.";
+          return;
+        }
+        if (this._download(pdf.filename, pdf.bytes, "application/pdf")) {
+          this.ui.announce = `PDF listo: ${pdf.filename}. Si no baja, use «Guardar PDF».`;
+        }
+      } catch (err) {
+        this.ui.announce = `Error PDF comparación: ${err.message || err}`;
       }
-      const print = comparisonPrintModel(table, {
-        name: this.compare.name || "Comparación",
-        comparisonId: this.compare.savedId || "comparison",
-        userFormula: this.compare.userFormula || "",
-        generatedAt: nowIso(),
-      });
-      const pdf = renderPrintModelPdf(print, { printedAt: nowIso() });
-      if (!pdf.ok) {
-        this.ui.announce = pdf.error || "No se pudo generar el PDF.";
-        return;
-      }
-      this._download(pdf.filename, pdf.bytes, "application/pdf");
-      this.ui.announce = `PDF ${pdf.filename}`;
     },
 
     formatCompareValue(v) {
@@ -1666,18 +1674,27 @@ export function createWorkbench() {
     },
 
     _download(filename, data, mime) {
-      if (typeof document === "undefined") return;
-      const type =
-        mime ||
-        (data instanceof Uint8Array ? "application/pdf" : "application/json");
-      const blob = new Blob([data], { type });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      a.rel = "noopener";
-      a.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1500);
+      if (this.ui.pdfHref) {
+        try { URL.revokeObjectURL(this.ui.pdfHref); } catch { /* ignore */ }
+        this.ui.pdfHref = null;
+        this.ui.pdfFilename = "";
+      }
+      const result = triggerBrowserDownload(filename, data, mime);
+      if (!result.ok) {
+        this.ui.announce = result.error || "No se pudo descargar el archivo.";
+        return false;
+      }
+      if (result.href) {
+        this.ui.pdfHref = result.href;
+        this.ui.pdfFilename = result.filename;
+        setTimeout(() => {
+          if (this.ui.pdfHref === result.href) {
+            try { URL.revokeObjectURL(result.href); } catch { /* ignore */ }
+            this.ui.pdfHref = null;
+          }
+        }, 120000);
+      }
+      return true;
     },
 
     onImportFile(ev) {
@@ -1859,59 +1876,80 @@ export function createWorkbench() {
     },
 
     downloadPdf() {
-      if (!this.project) {
-        this.ui.announce = "Abra un proyecto para descargar el PDF.";
-        return;
+      try {
+        if (!this.project) {
+          this.ui.announce = "Abra un proyecto para descargar el PDF.";
+          return;
+        }
+        if (!this.document) this.document = createProjectDocument(this.project);
+        this.document = updateDocumentFromWorkbench(this.document, this.project);
+        const r = addSnapshot(this.document, { name: "PDF", note: "pdf-render" });
+        this.document = r.document;
+        this.document.lastPdfSnapshotId = r.snapshot.snapshotId;
+        this._markDirty();
+        const pdf = this._pdfFromDocument(this.document, r.snapshot.snapshotId);
+        if (!pdf.ok) {
+          this.ui.announce = pdf.error || "No se pudo generar el PDF.";
+          return;
+        }
+        if (this._download(pdf.filename, pdf.bytes, "application/pdf")) {
+          this.ui.announce = `PDF listo: ${pdf.filename}. Si no baja, use «Guardar PDF».`;
+        }
+        this.saveNow();
+      } catch (err) {
+        this.ui.announce = `Error al generar PDF: ${err.message || err}`;
       }
-      if (!this.document) this.document = createProjectDocument(this.project);
-      this.document = updateDocumentFromWorkbench(this.document, this.project);
-      const r = addSnapshot(this.document, { name: "PDF", note: "pdf-render" });
-      this.document = r.document;
-      this.document.lastPdfSnapshotId = r.snapshot.snapshotId;
-      this._markDirty();
-      const pdf = this._pdfFromDocument(this.document, r.snapshot.snapshotId);
-      if (!pdf.ok) {
-        this.ui.announce = pdf.error || "No se pudo generar el PDF.";
-        return;
-      }
-      this._download(pdf.filename, pdf.bytes, "application/pdf");
-      this.ui.announce = `PDF ${pdf.filename}`;
-      this.saveNow();
     },
 
     downloadPdfFromSnapshot(snapshotId) {
-      if (!this.document) return;
-      const pdf = this._pdfFromDocument(this.document, snapshotId);
-      if (!pdf.ok) {
-        this.ui.announce = pdf.error || "No se pudo generar el PDF.";
-        return;
+      try {
+        if (!this.document) {
+          this.ui.announce = "No hay documento para este snapshot.";
+          return;
+        }
+        const pdf = this._pdfFromDocument(this.document, snapshotId);
+        if (!pdf.ok) {
+          this.ui.announce = pdf.error || "No se pudo generar el PDF.";
+          return;
+        }
+        if (this._download(pdf.filename, pdf.bytes, "application/pdf")) {
+          this.ui.announce = `PDF listo: ${pdf.filename}. Si no baja, use «Guardar PDF».`;
+        }
+      } catch (err) {
+        this.ui.announce = `Error PDF snapshot: ${err.message || err}`;
       }
-      this._download(pdf.filename, pdf.bytes, "application/pdf");
-      this.ui.announce = `PDF ${pdf.filename}`;
     },
 
     async downloadListedProjectPdf(projectId) {
-      if (!this.store) return;
-      const loaded = await this.store.loadProject(projectId);
-      if (!loaded?.ok || !loaded.document) {
-        this.ui.announce = "No se pudo abrir el proyecto.";
-        return;
+      try {
+        if (!this.store) {
+          this.ui.announce = "Almacenamiento local no disponible.";
+          return;
+        }
+        const loaded = await this.store.loadProject(projectId);
+        if (!loaded?.ok || !loaded.document) {
+          this.ui.announce = "No se pudo abrir el proyecto.";
+          return;
+        }
+        const doc = loaded.document;
+        let working = doc;
+        if (!working.lastPdfSnapshotId || !(working.snapshots || []).some((s) => s.snapshotId === working.lastPdfSnapshotId)) {
+          const r = addSnapshot(working, { name: "PDF", note: "pdf-render" });
+          working = r.document;
+          working.lastPdfSnapshotId = r.snapshot.snapshotId;
+          if (this.store.saveProject) await this.store.saveProject(working);
+        }
+        const pdf = this._pdfFromDocument(working, working.lastPdfSnapshotId);
+        if (!pdf.ok) {
+          this.ui.announce = pdf.error || "No se pudo generar el PDF.";
+          return;
+        }
+        if (this._download(pdf.filename, pdf.bytes, "application/pdf")) {
+          this.ui.announce = `PDF listo: ${pdf.filename}. Si no baja, use «Guardar PDF».`;
+        }
+      } catch (err) {
+        this.ui.announce = `Error PDF proyecto: ${err.message || err}`;
       }
-      const doc = loaded.document;
-      let working = doc;
-      if (!working.lastPdfSnapshotId || !(working.snapshots || []).some((s) => s.snapshotId === working.lastPdfSnapshotId)) {
-        const r = addSnapshot(working, { name: "PDF", note: "pdf-render" });
-        working = r.document;
-        working.lastPdfSnapshotId = r.snapshot.snapshotId;
-        if (this.store.saveProject) await this.store.saveProject(working);
-      }
-      const pdf = this._pdfFromDocument(working, working.lastPdfSnapshotId);
-      if (!pdf.ok) {
-        this.ui.announce = pdf.error || "No se pudo generar el PDF.";
-        return;
-      }
-      this._download(pdf.filename, pdf.bytes, "application/pdf");
-      this.ui.announce = `PDF ${pdf.filename}`;
     },
 
     _pdfFromDocument(doc, snapshotId) {

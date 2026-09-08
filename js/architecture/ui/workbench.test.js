@@ -408,6 +408,14 @@ test("deep link hash round-trips project, site, snapshot, comparison", () => {
   assert.equal(parseArchHash("").screen, SCREENS.START);
 });
 
+test("workbench PDF exporters announce success without a DOM", () => {
+  const wb = createWorkbench();
+  wb.startZero();
+  wb.downloadPdf();
+  assert.match(wb.ui.announce, /PDF listo|Guardar PDF/);
+  assert.equal(wb.ui.pdfHref, null);
+});
+
 test("data sources are plain rows Alpine can iterate; only one dialog at a time", () => {
   const wb = createWorkbench();
   wb.openSources();

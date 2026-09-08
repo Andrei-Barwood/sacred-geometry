@@ -43,7 +43,7 @@
         sections: [],
         configLabels: {},
         modes: {},
-        ui: { view: 'system', btcDisplay: 'both', configSection: 'overview', resultsSection: 'summary', bottomTab: 'templates', filters: {}, facets: {}, compareIds: [], templateOpen: false, announce: '', screen: 'start', offline: false, ioOpen: false, privacyOpen: false },
+        ui: { view: 'system', btcDisplay: 'both', configSection: 'overview', resultsSection: 'summary', bottomTab: 'templates', filters: {}, facets: {}, compareIds: [], templateOpen: false, announce: '', screen: 'start', offline: false, ioOpen: false, privacyOpen: false, pdfHref: null, pdfFilename: '' },
         graph: { nodes: [], edges: [], flow: null },
         presets: [],
         countries: [],
@@ -220,6 +220,10 @@
   <main id="main-content">
     <div class="wb" x-data>
       <div class="wb-live" aria-live="polite" x-text="$store.workbench.ui.announce"></div>
+      <p class="wb-note" x-show="$store.workbench.ui.pdfHref" x-cloak>
+        <a class="wb-btn wb-btn--primary" :href="$store.workbench.ui.pdfHref" :download="$store.workbench.ui.pdfFilename" target="_blank" rel="noopener">Guardar PDF</a>
+        <span x-text="$store.workbench.ui.pdfFilename"></span>
+      </p>
 
       <section class="wb-hero">
         <p class="wb-kicker" x-text="$store.workbench.subtitle"></p>

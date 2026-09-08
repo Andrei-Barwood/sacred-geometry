@@ -6,3 +6,4 @@ export { buildDiagrams } from "./diagrams.js";
 export { buildPrintModel, contentHash, DATO_NO_DISPONIBLE, isUnknownValue, printCell, stablePdfFilename } from "./print-model.js";
 export { renderEngineeringReportPdf, renderPrintModelPdf } from "./pdf.js";
 export { extractPdfText } from "./pdf-writer.js";
+export { asDownloadBlob, sanitizeDownloadName, triggerBrowserDownload } from "./download.js";
