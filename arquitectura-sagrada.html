@@ -266,8 +266,9 @@
         <p class="wb-meta">Atlas enrichment <strong x-text="$store.workbench.atlasProgress.label"></strong></p>
         <h2>Casos comunes (24)</h2>
         <p class="wb-note">Arranques kW–cientos de kW: vivienda, clínica, riego, taller, hotel, EV. Conceptuales, no certificados. El atlas de 110 plantas grandes sigue abajo en Templates.</p>
-        <div class="wb-tgrid">
-          <template x-for="card in $store.workbench.commonCases" :key="'cc-'+card.id">
+        <p class="wb-empty" x-show="!($store.workbench.commonCases && $store.workbench.commonCases.length)">No hay casos comunes cargados. Recargue la página.</p>
+        <div class="wb-tgrid" x-show="$store.workbench.commonCases && $store.workbench.commonCases.length">
+          <template x-for="card in $store.workbench.commonCases" :key="card.id">
             <article class="wb-tcard">
               <h3 x-text="card.name"></h3>
               <p class="wb-meta"><span x-text="card.country"></span> · <span x-text="card.region"></span></p>

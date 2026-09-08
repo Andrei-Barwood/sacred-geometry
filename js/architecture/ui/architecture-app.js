@@ -274,6 +274,7 @@ export function createWorkbench() {
     graphSummary: "",
     graphTree: { Generation: [], Storage: [], Transformation: [], Distribution: [], Loads: [], Grid: [] },
     featured: [],
+    commonCases: [],
     largeScaleId: null,
     document: null,
     store: null,
@@ -384,6 +385,7 @@ export function createWorkbench() {
     init() {
       this.ui.facets = explorerFacets();
       this.featured = featuredArchitectures(8).map(templateCardModel);
+      this.commonCases = commonCaseArchitectures().map(templateCardModel);
       this.largeScaleId = largeScaleSampleId();
       this.applyThemeFromApp();
       this.prefs = loadPreferences();
@@ -551,10 +553,6 @@ export function createWorkbench() {
     get atlasProgress() {
       void this.enrichment.revision;
       return atlasEnrichmentProgress();
-    },
-
-    get commonCases() {
-      return commonCaseArchitectures().map(templateCardModel);
     },
 
     get enrichmentBatchIds() {
