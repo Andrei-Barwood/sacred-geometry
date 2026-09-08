@@ -67,6 +67,8 @@
         formatN() { return '—'; },
         formatBTC() { return null; },
         formatSats() { return null; },
+        btcTicker: { line: '—', freshness: 'empty', freshnessLabel: 'sin spot' },
+        refreshBtcQuote() {},
         displayValue() { return ''; },
         provenance() { return null; },
         techOn() { return false; },
@@ -336,6 +338,11 @@
                   <option value="sats">SATS</option>
                 </select>
               </label>
+              <div class="wb-btc-ticker" :data-fresh="$store.workbench.btcTicker.freshness" title="Spot informativo. No entra al motor ENERGY × tarifa.">
+                <span class="wb-btc-ticker-line" x-text="$store.workbench.btcTicker.line"></span>
+                <span class="wb-badge" :data-fresh="$store.workbench.btcTicker.freshness" x-text="$store.workbench.btcTicker.freshnessLabel"></span>
+                <button type="button" class="wb-btn" :disabled="$store.workbench.evidence.btcLoading" @click="$store.workbench.refreshBtcQuote()">Actualizar spot</button>
+              </div>
             </div>
           </div>
 
@@ -706,7 +713,8 @@
                 <div class="wb-field"><label>Currency</label><input :value="$store.workbench.project.economics.currency || ''" @change="$store.workbench.patch('economics.currency', $event.target.value || null)"></div>
                 <p class="wb-meta" x-show="$store.workbench.project.economics.btcPriceRetrievedAt">BTC price retrieved <span x-text="$store.workbench.project.economics.btcPriceRetrievedAt"></span></p>
                 <button type="button" class="wb-btn" :disabled="$store.workbench.evidence.btcLoading" @click="$store.workbench.refreshBtc()">Refresh BTC price</button>
-                <p class="wb-note">Live Bitcoin price is a conversion input only. It is not applied until you accept a candidate. Offline/manual price still works.</p>
+                <p class="wb-note">El spot (CoinGecko) es <strong>informativo</strong>. ENERGY × tarifa usa BTC/kWh o sats/kWh del proyecto. Aceptar el candidato solo escribe fiat/BTC para convertir tarifas fiat. No hay librería de trading.</p>
+                <p class="wb-meta" x-show="$store.workbench.btcTicker.satsLine" x-text="$store.workbench.btcTicker.satsLine"></p>
                 <template x-if="!$store.workbench.project.economics.tariffMode && $store.workbench.project.economics.btcPerKWh == null && $store.workbench.project.economics.satsPerKWh == null">
                   <p class="wb-empty">No tariff entered.</p>
                 </template>
@@ -966,6 +974,8 @@
                     <p class="wb-meta">Energy / day <span x-text="$store.workbench.formatN($store.workbench.economics.value.energyDay, 2) + ' kWh'"></span></p>
                     <p class="wb-meta">Energy / month <span x-text="$store.workbench.formatN($store.workbench.economics.value.energyMonth, 2) + ' kWh'"></span></p>
                     <p class="wb-meta">Energy / year <span x-text="$store.workbench.formatN($store.workbench.economics.value.energyYear, 1) + ' kWh'"></span></p>
+                    <p class="wb-btc-equiv" x-show="$store.workbench.btcTicker.monthFiatLabel" x-text="$store.workbench.btcTicker.monthFiatLabel"></p>
+                    <p class="wb-meta" x-show="$store.workbench.btcTicker.satsLine" x-text="$store.workbench.btcTicker.satsLine"></p>
                     <template x-if="$store.workbench.ui.btcDisplay !== 'sats'">
                       <div>
                         <p>BTC / day <span x-text="$store.workbench.formatBTC($store.workbench.economics.value.btcDay)"></span></p>

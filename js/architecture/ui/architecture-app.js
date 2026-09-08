@@ -117,6 +117,12 @@ import {
 } from "../storage/index.js";
 import { NAV_ITEMS, SCREENS, archHash, parseArchHash } from "./routes.js";
 import {
+  btcTickerModel,
+  emptyBtcQuote,
+  quoteFromEvidence,
+  shouldRefreshQuote,
+} from "./btc-ticker.js";
+import {
   exportEngineeringReportHTML,
   generateEngineeringReport,
   generateRevisionComparisonReport,
@@ -362,6 +368,7 @@ export function createWorkbench() {
     },
 
     navItems: NAV_ITEMS,
+    btcQuote: emptyBtcQuote(),
 
     _timer: null,
     _autosaveTimer: null,
@@ -388,11 +395,13 @@ export function createWorkbench() {
       this.evidence.debug = typeof window !== "undefined" && window.__SACRED_EVIDENCE_DEBUG__ === true;
       this.enrichment.batch = getLastBatch();
       this.enrichment.job = getLastJob();
+      if (this.prefs.lastBtcQuote?.price) this.btcQuote = { ...emptyBtcQuote(), ...this.prefs.lastBtcQuote };
       this._bindOnline();
       this._registerSw();
       this._persistReady = this._initPersistence().then(() => {
         this.applyHash(true);
         this._bindHash();
+        this.refreshBtcQuote({ silent: true, auto: true });
       });
     },
 
@@ -419,6 +428,13 @@ export function createWorkbench() {
 
     get economics() {
       return getEconomicResults(this.project, this.derived);
+    },
+
+    get btcTicker() {
+      return btcTickerModel(this.btcQuote, this.economics, {
+        offline: this.ui.offline,
+        loading: this.evidence?.btcLoading === true,
+      });
     },
 
     get validation() {
@@ -1983,20 +1999,54 @@ export function createWorkbench() {
       this.ui.announce = `Kept current ${parameter}. Evidence remains in cache.`;
     },
 
-    async refreshBtc() {
-      if (!this.project) return;
+    async refreshBtcQuote(options = {}) {
+      const silent = options.silent === true;
+      const auto = options.auto === true;
+      if (auto && !shouldRefreshQuote(this.btcQuote)) return;
+      if (typeof navigator !== "undefined" && navigator.onLine === false) {
+        if (!silent) this.ui.announce = "Sin red. El último spot BTC en caché, si existe, sigue visible.";
+        return;
+      }
       this.evidence.btcLoading = true;
       try {
         const provider = createBitcoinProvider({ live: true });
-        const currency = this.project.economics?.currency || "USD";
+        const currency = this.project?.economics?.currency || this.btcQuote?.currency || "USD";
         const result = await provider.fetchEvidence({ parameter: "fiatPerBTC", currency });
         if (!result.ok || !result.evidence?.length) {
-          this.ui.announce = result.error === "currency-mismatch" || /currency/i.test(result.error || "")
-            ? "Currency conversion required."
-            : "Bitcoin price unavailable. Manual price still works.";
-          return;
+          this.btcQuote = {
+            ...this.btcQuote,
+            status: "error",
+            error: result.error || "unavailable",
+          };
+          if (!silent) {
+            this.ui.announce =
+              result.error === "currency-mismatch" || /currency/i.test(result.error || "")
+                ? "Currency conversion required."
+                : "Bitcoin price unavailable. Manual price still works.";
+          }
+          return null;
         }
-        this.evidence.candidates.fiatPerBTC = result.evidence.map((ev) => ({
+        const ev = result.evidence[0];
+        this.btcQuote = quoteFromEvidence(ev, currency);
+        this.prefs = patchPreferences({ lastBtcQuote: this.btcQuote });
+        if (!silent) {
+          this.ui.announce = `Spot BTC ${ev.normalizedValue} ${ev.unit} (${ev.retrievedAt}). Informativo: no cambia ENERGY × tarifa hasta que acepte el candidato.`;
+        }
+        return ev;
+      } catch {
+        this.btcQuote = { ...this.btcQuote, status: "error", error: "unavailable" };
+        if (!silent) this.ui.announce = "Bitcoin price unavailable. Manual price still works.";
+        return null;
+      } finally {
+        this.evidence.btcLoading = false;
+      }
+    },
+
+    async refreshBtc() {
+      const ev = await this.refreshBtcQuote({ silent: false });
+      if (!ev || !this.project) return;
+      this.evidence.candidates.fiatPerBTC = [
+        {
           parameter: "fiatPerBTC",
           currentValue: this.project.economics?.fiatPerBTC ?? null,
           currentProvenance: this.project.provenance?.["economics.fiatPerBTC"] || "user-input",
@@ -2005,14 +2055,9 @@ export function createWorkbench() {
           evidence: ev,
           recommended: true,
           recommendationReason: "Manual Bitcoin refresh. Fast-changing. Not persisted as timeless current price.",
-        }));
-        this.ui.bottomTab = "evidence";
-        this.ui.announce = `Bitcoin candidate ${result.evidence[0].normalizedValue} ${result.evidence[0].unit} at ${result.evidence[0].retrievedAt}. Accept to apply.`;
-      } catch {
-        this.ui.announce = "Bitcoin price unavailable. Manual price still works.";
-      } finally {
-        this.evidence.btcLoading = false;
-      }
+        },
+      ];
+      this.ui.bottomTab = "evidence";
     },
 
     async checkEvidenceUpdates() {

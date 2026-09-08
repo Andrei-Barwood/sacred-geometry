@@ -26,6 +26,7 @@ const TESTS = [
   ["13 Enrichment", "js/architecture/enrichment/enrichment.test.js"],
   ["14 PDF", "js/architecture/report/pdf.test.js"],
   ["15 Comparison", "js/architecture/compare/compare.test.js"],
+  ["16 BTC ticker (display)", "js/architecture/ui/btc-ticker.test.js"],
   ["16 Contracts", "js/architecture/v1/contracts.test.js"],
   ["16 Perf", "js/architecture/v1/perf.test.js"],
 ];

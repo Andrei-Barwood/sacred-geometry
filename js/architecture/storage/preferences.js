@@ -12,6 +12,7 @@ export const DEFAULT_PREFERENCES = Object.freeze({
   lastOpenFailed: false,
   decoration: "GEOMETRIC",
   schemaVersion: 1,
+  lastBtcQuote: null,
 });
 
 export function loadPreferences(storage) {

@@ -1155,6 +1155,32 @@
   margin: 0.25rem 0 0.75rem;
 }
 
+.wb-btc-ticker {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+}
+
+.wb-btc-ticker-line {
+  font-weight: 600;
+}
+
+.wb-badge[data-fresh="fresh"] { color: var(--arch-ok); }
+.wb-badge[data-fresh="stale"] { color: var(--arch-warning); }
+.wb-badge[data-fresh="expired"],
+.wb-badge[data-fresh="error"],
+.wb-badge[data-fresh="offline"] { color: var(--arch-error); }
+.wb-badge[data-fresh="empty"] { color: var(--arch-muted); }
+
+.wb-btc-equiv {
+  margin: 0.35rem 0;
+  font-size: 0.9rem;
+  color: var(--text-medium);
+}
+
 .wb-badge::after {
   content: none;
 }
