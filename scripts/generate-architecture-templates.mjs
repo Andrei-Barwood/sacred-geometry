@@ -71,7 +71,7 @@ function r2(n) {
   return Math.round(n * 1000) / 1000;
 }
 
-function expand(seed) {
+export function expand(seed) {
   const country = COUNTRIES[seed.iso];
   const env = ENVIRONMENTS[seed.env];
   const shape = SHAPES[seed.app];
@@ -238,6 +238,7 @@ function expand(seed) {
     ],
     warnings: [],
     tags: seed.tags || [],
+    commonCase: seed.commonCase === true,
     qualityScore: 0,
   };
 
@@ -577,4 +578,6 @@ function main() {
   if (rejected.length) console.log(rejected);
 }
 
-main();
+const isMain =
+  process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.argv[1]);
+if (isMain) main();

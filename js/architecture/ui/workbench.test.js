@@ -39,6 +39,7 @@ import { buildArchitectureGraph } from "./architecture-graph.js";
 import {
   emptyFilters,
   featuredArchitectures,
+  commonCaseArchitectures,
   filterTemplates,
   templateCardModel,
 } from "./template-explorer.js";
@@ -405,6 +406,15 @@ test("deep link hash round-trips project, site, snapshot, comparison", () => {
   assert.equal(parseArchHash("#/map/s1").id, "s1");
   assert.equal(parseArchHash("#/snapshot/snap-9").screen, SCREENS.SNAPSHOT);
   assert.equal(parseArchHash("").screen, SCREENS.START);
+});
+
+test("24 common-case templates are listed and loadable", () => {
+  const list = commonCaseArchitectures();
+  assert.equal(list.length, 24);
+  const r = loadTemplateById(list[0].id);
+  assert.equal(r.ok, true);
+  assert.equal(r.project.sourceTemplateId, list[0].id);
+  assert.ok(r.project.loads.profile.peakLoadMW <= 0.5);
 });
 
 test("workbench opens comparison from template selection without ranking", () => {

@@ -34,6 +34,7 @@
         started: false,
         project: null,
         featured: [],
+        commonCases: [],
         summary: [],
         energy: { rows: [] },
         economics: { ok: false, breakdown: [] },
@@ -263,6 +264,23 @@
           <button type="button" class="wb-btn" @click="$store.workbench.startLargeScale()">Large-scale PV + BESS + substation</button>
         </p>
         <p class="wb-meta">Atlas enrichment <strong x-text="$store.workbench.atlasProgress.label"></strong></p>
+        <h2>Casos comunes (24)</h2>
+        <p class="wb-note">Arranques kW–cientos de kW: vivienda, clínica, riego, taller, hotel, EV. Conceptuales, no certificados. El atlas de 110 plantas grandes sigue abajo en Templates.</p>
+        <div class="wb-tgrid">
+          <template x-for="card in $store.workbench.commonCases" :key="'cc-'+card.id">
+            <article class="wb-tcard">
+              <h3 x-text="card.name"></h3>
+              <p class="wb-meta"><span x-text="card.country"></span> · <span x-text="card.region"></span></p>
+              <p class="wb-meta"><span x-text="card.family"></span> · <span x-text="card.application"></span></p>
+              <p class="wb-meta">Grid <span x-text="card.gridMode"></span> · Peak <span x-text="card.peakLoad"></span> MW</p>
+              <p class="wb-meta">Gen <span x-text="card.generation"></span> · BESS <span x-text="card.bess"></span></p>
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn" @click="$store.workbench.openTemplate(card.id)">Details</button>
+                <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.loadTemplate(card.id)">Load template</button>
+              </div>
+            </article>
+          </template>
+        </div>
         <h2>Featured Architectures</h2>
         <div class="wb-tgrid">
           <template x-for="card in $store.workbench.featured" :key="card.id">
@@ -1150,6 +1168,7 @@
                 <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.filters.offGrid === true" @change="$store.workbench.onFilter('offGrid', $event.target.checked ? true : '')"> Off-grid</label>
                 <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.filters.weakGrid === true" @change="$store.workbench.onFilter('weakGrid', $event.target.checked ? true : '')"> Weak-grid</label>
                 <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.filters.featured" @change="$store.workbench.onFilter('featured', $event.target.checked)"> Featured</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.filters.commonCase" @change="$store.workbench.onFilter('commonCase', $event.target.checked)"> Casos comunes (24)</label>
                 <button type="button" class="wb-btn" @click="$store.workbench.clearFilters()">Clear</button>
               </div>
               <p class="wb-meta"><span x-text="$store.workbench.pagedTemplates.total"></span> templates · page <span x-text="$store.workbench.pagedTemplates.page"></span>/<span x-text="$store.workbench.pagedTemplates.pages"></span> · compare <span x-text="$store.workbench.ui.compareIds.length"></span>/3</p>

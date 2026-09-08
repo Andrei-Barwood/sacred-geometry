@@ -2,9 +2,12 @@
  * Arquitectura Sagrada — stored conceptual templates.
  * Electrical architecture from Prompt 4; regionalization from Prompt 5.
  * Do not randomize at runtime.
+ * Atlas core (110) plus 24 common-case kW-scale starters.
  */
 
-export const architectureTemplates = Object.freeze([
+import { commonCaseTemplates } from "./common-templates.js";
+
+const ATLAS_CORE = [
   {
     "id": "G-MRT-G03-001",
     "name": "Utility bifacial PV tracker — utility generation — interior desert · Mauritania",
@@ -22875,6 +22878,8 @@ export const architectureTemplates = Object.freeze([
     },
     "diversityContribution": 96
   }
-]);
+];
 
+export const architectureTemplates = Object.freeze([...ATLAS_CORE, ...commonCaseTemplates]);
 export const TEMPLATE_COUNT = architectureTemplates.length;
+export { commonCaseTemplates, COMMON_CASE_COUNT } from "./common-templates.js";

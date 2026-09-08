@@ -71,6 +71,7 @@ import {
   explorerFacets,
   featuredArchitectures,
   filterTemplates,
+  commonCaseArchitectures,
   largeScaleSampleId,
   paginate,
   templateCardModel,
@@ -550,6 +551,10 @@ export function createWorkbench() {
     get atlasProgress() {
       void this.enrichment.revision;
       return atlasEnrichmentProgress();
+    },
+
+    get commonCases() {
+      return commonCaseArchitectures().map(templateCardModel);
     },
 
     get enrichmentBatchIds() {

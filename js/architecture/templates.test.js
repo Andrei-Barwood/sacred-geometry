@@ -112,6 +112,21 @@ test("featured between 12 and 16 inclusive is preferred but at least 12", () => 
   assert.ok(n >= 12, `featured ${n}`);
 });
 
+test("24 common-case starters exist, unique, viable, kW-to-low-MW", () => {
+  const common = architectureTemplates.filter((t) => t.commonCase === true);
+  assert.equal(common.length, 24);
+  const ids = new Set(common.map((t) => t.id));
+  assert.equal(ids.size, 24);
+  for (const t of common) {
+    assert.match(t.id, /-C\d{2}$/);
+    assert.equal(t.conceptual, true);
+    assert.equal(t.featured, false);
+    assert.ok(t.loadProfile.peakLoadMW <= 0.5, t.id);
+    const v = validateTemplateViability(t);
+    assert.equal(v.ok, true, `${t.id} ${JSON.stringify(v.errors)}`);
+  }
+});
+
 test("scale diversity", () => {
   const bands = new Set(architectureTemplates.map((t) => t.loadProfile.scaleBand));
   assert.ok(bands.size >= 5, [...bands].join(","));

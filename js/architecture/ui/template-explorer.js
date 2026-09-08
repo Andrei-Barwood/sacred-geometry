@@ -102,6 +102,7 @@ export function emptyFilters() {
     offGrid: "",
     weakGrid: "",
     featured: false,
+    commonCase: false,
     batch_id: "",
     coverage: "",
     conflicts: "",
@@ -135,6 +136,9 @@ export function filterTemplates(filters = emptyFilters(), options = {}) {
     }
     if (filters.featured) {
       if (t.featured !== true) continue;
+    }
+    if (filters.commonCase) {
+      if (t.commonCase !== true) continue;
     }
     if (filters.batch_id || filters.coverage || filters.conflicts || filters.stale) {
       if (!matchesEnrichmentFilters(t.id, {
@@ -227,6 +231,10 @@ export function featuredArchitectures(limit = 8) {
     }
   }
   return out;
+}
+
+export function commonCaseArchitectures() {
+  return architectureTemplates.filter((t) => t.commonCase === true);
 }
 
 export function largeScaleSampleId() {

@@ -2,8 +2,9 @@
 
 Conceptual dataset for Arquitectura Sagrada. Country is geographic context, not a grid-code claim.
 
-- Total templates: **110**
+- Total templates: **134** (110 atlas + 24 common-case kW starters)
 - Featured: 16
+- Common cases: 24
 - Rejected candidates: 0
 
 ## By family
