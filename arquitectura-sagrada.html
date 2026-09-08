@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Arquitectura Sagrada — workbench conceptual de arquitecturas eléctricas para cargas, generación, almacenamiento y transformación.">
+  <title>Arquitectura Sagrada — Kirtan Teg Singh</title>
+  <link rel="icon" href="favicon.jpeg" type="image/jpeg">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#325394">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/architecture-workbench.css">
+  <script>
+    document.addEventListener('alpine:init', () => {
+      Alpine.store('app', Alpine.store('app') || {
+        __placeholder: true,
+        mobileMenuOpen: false,
+        darkMode: false,
+        currentView: 'list',
+        selectedFilter: 'All',
+        filteredPosts: [],
+        selectedPost: null,
+        comments: {},
+        commentLoading: {},
+        init() {}
+      });
+      Alpine.store('workbench', Alpine.store('workbench') || {
+        __placeholder: true,
+        name: 'ARQUITECTURA SAGRADA',
+        subtitle: '',
+        lead: '',
+        disclaimer: '',
+        showStart: true,
+        started: false,
+        project: null,
+        featured: [],
+        commonCases: [],
+        sourceRows: [],
+        summary: [],
+        energy: { rows: [] },
+        economics: { ok: false, breakdown: [] },
+        validation: { errors: [], warnings: [], notices: [], assumptions: [] },
+        sections: [],
+        configLabels: {},
+        modes: {},
+        ui: { view: 'system', btcDisplay: 'both', configSection: 'overview', resultsSection: 'summary', bottomTab: 'templates', filters: {}, facets: {}, compareIds: [], templateOpen: false, announce: '', screen: 'start', offline: false, ioOpen: false, privacyOpen: false },
+        graph: { nodes: [], edges: [], flow: null },
+        presets: [],
+        countries: [],
+        scenarios: [],
+        loadStates: [],
+        transientTypes: [],
+        loadRows: [],
+        templateCards: [],
+        pagedTemplates: { items: [], page: 1, pages: 1, total: 0 },
+        site: { preferred: [], avoid: [], investigate: [] },
+        bessDerived: {},
+        substationDerived: {},
+        gridDefs: {},
+        init() {},
+        onKeydown() {},
+        startZero() {},
+        browseTemplates() {},
+        startSample6() {},
+        startLargeScale() {},
+        loadTemplate() {},
+        openTemplate() {},
+        closeTemplate() {},
+        formatN() { return '—'; },
+        formatBTC() { return null; },
+        formatSats() { return null; },
+        btcTicker: { line: '—', freshness: 'empty', freshnessLabel: 'sin spot' },
+        refreshBtcQuote() {},
+        displayValue() { return ''; },
+        provenance() { return null; },
+        techOn() { return false; },
+        findVerified() {},
+        acceptCandidate() {},
+        keepCandidate() {},
+        refreshBtc() {},
+        checkEvidenceUpdates() {},
+        openSources() {},
+        evidence: { loading: false, candidates: {}, conflicts: [], unresolved: [], updates: [], coverage: null, intelligence: null, sources: [] },
+        evidenceRows: [],
+        evidenceCoverageLabel: '—',
+        geoSites: [],
+        geoWarnings: [],
+        geoSelected: null,
+        geoSelectedEval: null,
+        geoDraft: {},
+        siteStatuses: [],
+        addGeoSiteFromDraft() {},
+        activateGeoSite() {},
+        evaluateArchitectureAtSite() {},
+        exportGeoJSON() {},
+        exportGeoCSV() {},
+        onGeoFile() {},
+        bindGeoMap() {},
+        setGeoLayer() {},
+        deleteGeoSite() {},
+        setGeoStatus() {},
+        patchGeoSite() {},
+        addGeoNote() {},
+        linkAcceptedEvidenceToSite() {},
+        reenrichPilot() {},
+        runLote9to24() {},
+        runLote25to48() {},
+        runLote49toEnd() {},
+        runReenrichRegion() {},
+        exportEnrichmentJSON() {},
+        exportAtlasJSON() {},
+        exportAtlasCSV() {},
+        generateReport() {},
+        printReport() {},
+        exportReportHtml() {},
+        downloadPdf() {},
+        downloadPdfFromSnapshot() {},
+        downloadListedProjectPdf() {},
+        compare: { name: 'Comparación', savedId: null, thresholdPct: 5, userFormula: '', slots: [] },
+        comparisonTable: { ok: false, rows: [], views: [], warnings: [], evidence: [], engineMismatch: false },
+        comparisonGroups: [],
+        savedComparisons: [],
+        compareEntityKinds: [],
+        compareEntityOptions() { return []; },
+        comparisonRowsFor() { return []; },
+        comparisonDisplayRows: [],
+        comparisonColCount: 4,
+        setCompareSlotKind() {},
+        setCompareSlotId() {},
+        addCompareSlot() {},
+        removeCompareSlot() {},
+        openCompareTab() {},
+        openCompareFromSelection() {},
+        addListedProjectToCompare() {},
+        addSnapshotToCompare() {},
+        saveCurrentComparison() {},
+        reopenComparison() {},
+        deleteSavedComparison() {},
+        exportComparisonCsv() {},
+        exportComparisonPdf() {},
+        formatCompareValue() { return 'N/A'; },
+        formatCompareDelta() { return 'N/A'; },
+        navItems: [],
+        goScreen() {},
+        wipeProjectEvidence() {},
+        openIo() {},
+        openPrivacy() {},
+        onEnrichmentFilter() {},
+        enrichment: { loading: false, batch: null, error: null, job: null, filters: {} },
+        enrichmentRows: [],
+        atlasProgress: { enriched: 0, total: 0, label: "0/0" },
+        enrichmentBatchIds: [],
+        enrichmentJobLabel: "No job",
+        regionCoverageIndex: [],
+        catalogCrossFlags: [],
+        blockedEnrichmentIds: [],
+        atlasDashboard: { total: 0, complete: 0, partial: 0, blocked: 0, pending: 0 },
+        regionIds: []
+      });
+    });
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.x/dist/cdn.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/architecture/ui/architecture-app.js"></script>
+</head>
+<body class="no-js workbench-page" x-data="{}" x-init="Alpine.store('app')?.init?.(); Alpine.store('workbench')?.init?.()" @keydown.window="Alpine.store('workbench')?.onKeydown($event)">
+  <div id="js-required-overlay" aria-live="polite">
+    <div class="js-required-inner">
+      <h1>Por favor, habilite JavaScript</h1>
+      <p>Este sitio requiere JavaScript para funcionar. Habilítelo en la configuración de su navegador y recargue la página.</p>
+      <p class="js-required-gurmukhi">ਆਜ਼ਾਦੀ ਦੂਜਿਆਂ ਦੀ ਚੀਜ਼ ਵਿੱਚ ਝਾਤੀ ਮਾਰਨ ਨਹੀਂ। ਇਹ ਲਈ ਨਹੀਂ ਜਾ ਸਕਦੀ, ਸਿਰਫ਼ ਦਿੱਤੀ ਜਾ ਸਕਦੀ ਹੈ।</p>
+    </div>
+  </div>
+  <script>document.body.classList.remove('no-js');</script>
+  <a href="#main-content" class="skip-link">Saltar al contenido principal</a>
+
+  <header x-data="{ scrolled: false }" x-effect="scrolled = window.scrollY > 50" :class="{ 'scrolled': scrolled }">
+    <div class="header-content">
+      <a href="index.html" class="logo">Kirtan Teg Singh</a>
+      <nav class="desktop-nav">
+        <ul>
+          <li><a href="index.html">Inicio</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="discography.html">Discografía</a></li>
+          <li><a href="biography.html">Biografía</a></li>
+          <li><a href="tarot.html">Nube</a></li>
+          <li><a href="game.html">Arcade</a></li>
+          <li><a href="arquitectura-sagrada.html" class="active" title="Arquitectura Sagrada">Arquitectura</a></li>
+          <li><a href="maeth/aemaeth.html">Maeth / Aemaeth</a></li>
+          <li>
+            <button @click="Alpine.store('app').toggleDarkMode()" class="dark-mode-toggle" aria-label="Alternar modo oscuro">
+              <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
+            </button>
+          </li>
+        </ul>
+      </nav>
+      <button class="hamburger" @click="Alpine.store('app').toggleMobileMenu()" :class="{ 'active': Alpine.store('app').mobileMenuOpen }" aria-label="Menú de navegación">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+    <div class="mobile-menu" x-show="Alpine.store('app').mobileMenuOpen" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-x-full" x-transition:enter-end="opacity-100 translate-x-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 translate-x-0" x-transition:leave-end="opacity-0 translate-x-full">
+      <ul>
+        <li><a href="index.html" @click="Alpine.store('app').toggleMobileMenu()">Inicio</a></li>
+        <li><a href="blog.html" @click="Alpine.store('app').toggleMobileMenu()">Blog</a></li>
+        <li><a href="discography.html" @click="Alpine.store('app').toggleMobileMenu()">Discografía</a></li>
+        <li><a href="biography.html" @click="Alpine.store('app').toggleMobileMenu()">Biografía</a></li>
+        <li><a href="tarot.html" @click="Alpine.store('app').toggleMobileMenu()">Nube</a></li>
+        <li><a href="game.html" @click="Alpine.store('app').toggleMobileMenu()">Arcade</a></li>
+        <li><a href="arquitectura-sagrada.html" class="active" @click="Alpine.store('app').toggleMobileMenu()">Arquitectura Sagrada</a></li>
+        <li><a href="maeth/aemaeth.html" @click="Alpine.store('app').toggleMobileMenu()">Maeth / Aemaeth</a></li>
+        <li>
+          <button @click="Alpine.store('app').toggleDarkMode()" class="dark-mode-toggle" aria-label="Alternar modo oscuro">
+            <span x-text="Alpine.store('app').darkMode ? '☀️' : '🌙'"></span>
+          </button>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <div class="wb" x-data>
+      <div class="wb-live" aria-live="polite" x-text="$store.workbench.ui.announce"></div>
+
+      <section class="wb-hero">
+        <p class="wb-kicker" x-text="$store.workbench.subtitle"></p>
+        <h1 x-text="$store.workbench.name"></h1>
+        <p class="wb-lead" x-text="$store.workbench.lead"></p>
+        <p class="wb-disclaimer" x-text="$store.workbench.disclaimer"></p>
+      </section>
+
+      <nav class="wb-appnav" aria-label="Arquitectura Sagrada">
+        <template x-for="item in $store.workbench.navItems" :key="item.id">
+          <button type="button" class="wb-appnav-btn"
+            :class="{ 'is-active': $store.workbench.ui.screen === item.id }"
+            :aria-current="$store.workbench.ui.screen === item.id ? 'page' : false"
+            :title="item.hint"
+            @click="$store.workbench.goScreen(item.id)"
+            x-text="item.label"></button>
+        </template>
+        <button type="button" class="wb-appnav-btn" @click="$store.workbench.openIo()">Import / Export</button>
+        <button type="button" class="wb-appnav-btn" @click="$store.workbench.openPrivacy()">Privacidad</button>
+      </nav>
+      <p class="wb-offline" x-show="$store.workbench.ui.offline" role="status">Sin red. El último proyecto se lee desde este navegador. Los tiles del mapa OSM no funcionan offline.</p>
+      <p class="wb-meta wb-kbd-hint">Teclado: 1 Atlas · 2 Sitio · 3 Workbench · 4 Comparación · 5 Reports · 6 Enrichment · 7 Proyecto · Esc cierra paneles.</p>
+
+      <!-- START SCREEN -->
+      <section class="wb-start" x-show="$store.workbench.showStart" x-cloak>
+        <div class="wb-start-actions">
+          <button type="button" class="wb-cta" @click="$store.workbench.startZero()">
+            <h2>Start from zero</h2>
+            <p>Empty conceptual project. Unknown values stay null until you define them.</p>
+          </button>
+          <button type="button" class="wb-cta" @click="$store.workbench.browseTemplates()">
+            <h2>Browse templates</h2>
+            <p>Inspect the atlas, then load a clone. The catalog is never mutated.</p>
+          </button>
+        </div>
+        <p class="wb-note" x-show="$store.workbench.ui.resumeProjectId">
+          Resume last project?
+          <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.resumeLast()">Open last project</button>
+        </p>
+        <p class="wb-meta">
+          Samples:
+          <button type="button" class="wb-btn" @click="$store.workbench.startSample6()" x-text="$store.workbench.sample6kWName"></button>
+          <button type="button" class="wb-btn" @click="$store.workbench.startLargeScale()">Large-scale PV + BESS + substation</button>
+        </p>
+        <p class="wb-meta">Atlas enrichment <strong x-text="$store.workbench.atlasProgress.label"></strong></p>
+        <h2>Casos comunes (24)</h2>
+        <p class="wb-note">Arranques kW–cientos de kW: vivienda, clínica, riego, taller, hotel, EV. Conceptuales, no certificados. El atlas de 110 plantas grandes sigue abajo en Templates.</p>
+        <p class="wb-empty" x-show="!($store.workbench.commonCases && $store.workbench.commonCases.length)">No hay casos comunes cargados. Recargue la página.</p>
+        <div class="wb-tgrid" x-show="$store.workbench.commonCases && $store.workbench.commonCases.length">
+          <template x-for="card in $store.workbench.commonCases" :key="card.id">
+            <article class="wb-tcard">
+              <h3 x-text="card.name"></h3>
+              <p class="wb-meta"><span x-text="card.country"></span> · <span x-text="card.region"></span></p>
+              <p class="wb-meta"><span x-text="card.family"></span> · <span x-text="card.application"></span></p>
+              <p class="wb-meta">Grid <span x-text="card.gridMode"></span> · Peak <span x-text="card.peakLoad"></span> MW</p>
+              <p class="wb-meta">Gen <span x-text="card.generation"></span> · BESS <span x-text="card.bess"></span></p>
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn" @click="$store.workbench.openTemplate(card.id)">Details</button>
+                <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.loadTemplate(card.id)">Load template</button>
+              </div>
+            </article>
+          </template>
+        </div>
+        <h2>Featured Architectures</h2>
+        <div class="wb-tgrid">
+          <template x-for="card in $store.workbench.featured" :key="card.id">
+            <article class="wb-tcard">
+              <h3 x-text="card.name"></h3>
+              <p class="wb-meta"><span x-text="card.country"></span> · <span x-text="card.region"></span></p>
+              <p class="wb-meta"><span x-text="card.family"></span> · <span x-text="card.application"></span></p>
+              <p class="wb-meta">Grid <span x-text="card.gridMode"></span> · Score <span x-text="card.qualityScore"></span></p>
+              <p class="wb-badge" x-show="card.enrichment && card.enrichment.status !== 'pending'" :data-enr="card.enrichment && card.enrichment.status" x-text="card.enrichment && card.enrichment.label"></p>
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn" @click="$store.workbench.openTemplate(card.id)">Details</button>
+                <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.loadTemplate(card.id)">Load template</button>
+              </div>
+            </article>
+          </template>
+        </div>
+      </section>
+
+      <template x-if="!$store.workbench.showStart && $store.workbench.project">
+        <div>
+          <div class="wb-toolbar" role="toolbar" aria-label="Workbench">
+            <button type="button" class="wb-btn" @click="$store.workbench.newProject()">New</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.openProjects()">Projects</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.ui.bottomTab = 'templates'; $store.workbench.scrollTo('wb-templates')">Templates</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.openCompareTab()">Compare</button>
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.saveNow()">Save</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.duplicate()">Duplicate</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.takeSnapshot()">Snapshot</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.reset()">Reset</button>
+            <label class="wb-btn" style="display:inline-flex;align-items:center;cursor:pointer">
+              Import
+              <input type="file" accept="application/json,.json" class="wb-file-input" @change="$store.workbench.onImportFile($event)" aria-label="Import project JSON">
+            </label>
+            <button type="button" class="wb-btn" @click="$store.workbench.exportNow()">Export</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.validateNow()">Validate</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.findVerified()">Find verified data</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.openSources()">Data sources</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.openReport()">Report</button>
+            <span class="wb-meta" x-text="$store.workbench.saveLabel" :data-save="$store.workbench.saveStatus"></span>
+            <button type="button" class="wb-btn wb-config-mobile" @click="$store.workbench.ui.configDrawer = !$store.workbench.ui.configDrawer">Configuration</button>
+          </div>
+
+          <div class="wb-projectbar">
+            <div>
+              <strong x-text="$store.workbench.title"></strong>
+              <span class="wb-meta"> · <span x-text="$store.workbench.modes[$store.workbench.project.mode]"></span>
+                <template x-if="$store.workbench.project.sourceTemplateId">
+                  <span> · source <span x-text="$store.workbench.project.sourceTemplateId"></span></span>
+                </template>
+              </span>
+            </div>
+            <div class="wb-row-actions">
+              <label class="wb-check">Scenario
+                <select :value="$store.workbench.document && $store.workbench.document.activeScenarioId" @change="$store.workbench.setWorkbenchScenario($event.target.value)" aria-label="Active scenario">
+                  <template x-for="sc in $store.workbench.documentScenarios" :key="sc.id">
+                    <option :value="sc.id" x-text="sc.name"></option>
+                  </template>
+                </select>
+              </label>
+              <button type="button" class="wb-btn" @click="$store.workbench.addWorkbenchScenario()">New scenario</button>
+              <button type="button" class="wb-btn" @click="$store.workbench.ui.snapshotsOpen = true">Snapshots</button>
+              <label class="wb-check">View
+                <select :value="$store.workbench.ui.view" @change="$store.workbench.setView($event.target.value)" aria-label="Architecture view">
+                  <option value="system">SYSTEM</option>
+                  <option value="sacred">SACRED</option>
+                  <option value="map">MAP</option>
+                </select>
+              </label>
+              <label class="wb-check">BTC
+                <select :value="$store.workbench.ui.btcDisplay" @change="$store.workbench.setBtcDisplay($event.target.value)" aria-label="Bitcoin display unit">
+                  <option value="both">BOTH</option>
+                  <option value="btc">BTC</option>
+                  <option value="sats">SATS</option>
+                </select>
+              </label>
+              <div class="wb-btc-ticker" :data-fresh="$store.workbench.btcTicker.freshness" title="Spot informativo. No entra al motor ENERGY × tarifa.">
+                <span class="wb-btc-ticker-line" x-text="$store.workbench.btcTicker.line"></span>
+                <span class="wb-badge" :data-fresh="$store.workbench.btcTicker.freshness" x-text="$store.workbench.btcTicker.freshnessLabel"></span>
+                <button type="button" class="wb-btn" :disabled="$store.workbench.evidence.btcLoading" @click="$store.workbench.refreshBtcQuote()">Actualizar spot</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="wb-workspace">
+            <!-- LEFT: configuration -->
+            <aside class="wb-panel wb-left" :class="{ 'is-open': $store.workbench.ui.configDrawer }" id="wb-config">
+              <h2>Configuration</h2>
+              <div class="wb-tabs" role="tablist" aria-label="Configuration sections">
+                <template x-for="sec in $store.workbench.sections" :key="sec">
+                  <button type="button" class="wb-tab" role="tab"
+                    :aria-selected="$store.workbench.ui.configSection === sec"
+                    :class="{ 'is-active': $store.workbench.ui.configSection === sec }"
+                    @click="$store.workbench.ui.configSection = sec"
+                    x-text="$store.workbench.configLabels[sec]"></button>
+                </template>
+              </div>
+
+              <!-- OVERVIEW -->
+              <div id="wb-section-overview" x-show="$store.workbench.ui.configSection === 'overview'">
+                <div class="wb-field">
+                  <label for="wb-name">Project Name</label>
+                  <input id="wb-name" type="text" :value="$store.workbench.project.metadata.name" @change="$store.workbench.patch('metadata.name', $event.target.value)">
+                </div>
+                <div class="wb-field">
+                  <label for="wb-mode">Architecture Mode</label>
+                  <select id="wb-mode" :value="$store.workbench.project.mode" @change="$store.workbench.setMode($event.target.value)">
+                    <option value="load-installation">Load Installation</option>
+                    <option value="generation-plant">Generation Plant</option>
+                    <option value="substation">Substation</option>
+                    <option value="hybrid-microgrid">Hybrid / Microgrid</option>
+                  </select>
+                </div>
+                <div class="wb-field">
+                  <label>Template Source</label>
+                  <input type="text" :value="$store.workbench.project.sourceTemplateId || '—'" readonly>
+                </div>
+                <div class="wb-field">
+                  <label for="wb-country">Country</label>
+                  <select id="wb-country" :value="$store.workbench.project.country || ''" @change="$store.workbench.patch('country', $event.target.value || null); $store.workbench.patch('countryName', ($event.target.selectedOptions[0] && $event.target.selectedOptions[0].text) || null)">
+                    <option value="">—</option>
+                    <template x-for="c in $store.workbench.countries" :key="c.code">
+                      <option :value="c.code" x-text="c.name"></option>
+                    </template>
+                  </select>
+                </div>
+                <div class="wb-field">
+                  <label for="wb-region">Region</label>
+                  <input id="wb-region" type="text" :value="$store.workbench.project.region || ''" @change="$store.workbench.patch('region', $event.target.value || null)">
+                </div>
+                <div class="wb-field">
+                  <label for="wb-app">Application</label>
+                  <input id="wb-app" type="text" :value="$store.workbench.project.metadata.application || ''" @change="$store.workbench.patch('metadata.application', $event.target.value || null)">
+                </div>
+                <div class="wb-field">
+                  <label>Environment</label>
+                  <input type="text" :value="($store.workbench.project.site.environment && $store.workbench.project.site.environment.climate) || ''" readonly>
+                </div>
+                <div class="wb-field">
+                  <label>Grid Mode</label>
+                  <input type="text" :value="$store.workbench.project.grid.mode || ''" readonly>
+                </div>
+                <div class="wb-field">
+                  <label>Scale</label>
+                  <input type="text" :value="$store.workbench.scale || '—'" readonly>
+                </div>
+              </div>
+
+              <!-- LOADS -->
+              <div id="wb-section-loads" x-show="$store.workbench.ui.configSection === 'loads'">
+                <div class="wb-field">
+                  <label for="wb-scenario">Operating scenario</label>
+                  <select id="wb-scenario" :value="$store.workbench.project.scenario.id" @change="$store.workbench.applyScenario($event.target.value)">
+                    <template x-for="s in $store.workbench.scenarios" :key="s.id">
+                      <option :value="s.id" x-text="s.name"></option>
+                    </template>
+                  </select>
+                </div>
+                <p class="wb-note" x-text="$store.workbench.overlapNote"></p>
+                <h3>Aggregated load profile</h3>
+                <template x-for="key in ['baseLoadMW','averageLoadMW','peakLoadMW','criticalLoadMW','motorLoadMW','cyclicLoadMW','thermalLoadMW','interruptibleLoadMW','standbyLoadMW','loadFactor']" :key="key">
+                  <div class="wb-field">
+                    <label :for="'wb-lp-'+key">
+                      <span x-text="key.replace('MW',' MW').replace('loadFactor','Load factor')"></span>
+                      <span class="wb-badge" data-prov="conceptual-assumption" title="conceptual-assumption">ASSUMPTION</span>
+                    </label>
+                    <div class="wb-unit">
+                      <input :id="'wb-lp-'+key" inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.loads.profile[key])" @change="$store.workbench.patchNumber('loads.profile.'+key, $event.target.value)">
+                      <span x-text="key === 'loadFactor' ? '—' : 'MW'"></span>
+                    </div>
+                  </div>
+                </template>
+                <div class="wb-field">
+                  <label for="wb-dom">Dominant load type</label>
+                  <input id="wb-dom" type="text" :value="$store.workbench.project.loads.profile.dominantLoadType || ''" @change="$store.workbench.patch('loads.profile.dominantLoadType', $event.target.value || null)">
+                </div>
+
+                <h3>Detailed loads</h3>
+                <div class="wb-row-actions">
+                  <button type="button" class="wb-btn" @click="$store.workbench.addBlankLoad()">Add load</button>
+                  <template x-for="p in $store.workbench.presets" :key="p.id">
+                    <button type="button" class="wb-btn" @click="$store.workbench.addPreset(p.id)" x-text="p.label"></button>
+                  </template>
+                </div>
+                <template x-if="!$store.workbench.loadRows.length">
+                  <p class="wb-empty">No detailed loads. Add a preset or use the aggregated profile.</p>
+                </template>
+                <div class="wb-table-wrap" x-show="$store.workbench.loadRows.length">
+                  <table class="wb-table">
+                    <thead>
+                      <tr>
+                        <th>Name</th><th>Qty</th><th>Type</th><th>Nominal W</th><th>V</th><th>Duty</th><th>State</th><th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template x-for="row in $store.workbench.loadRows" :key="row.id">
+                        <tr>
+                          <td data-label="Name"><input :value="row.name" @change="$store.workbench.patchLoad(row.id, 'name', $event.target.value)" :aria-label="'Name '+row.id"></td>
+                          <td data-label="Quantity"><input inputmode="decimal" :value="$store.workbench.displayValue(row.quantity)" @change="$store.workbench.patchLoadNumber(row.id, 'quantity', $event.target.value)" aria-label="Quantity"></td>
+                          <td data-label="Type" x-text="row.type"></td>
+                          <td data-label="Nominal W"><input inputmode="decimal" :value="$store.workbench.displayValue(row.nominalW)" @change="$store.workbench.patchLoadNumber(row.id, 'nominalPowerW', $event.target.value)" aria-label="Nominal W"></td>
+                          <td data-label="Voltage V"><input inputmode="decimal" :value="$store.workbench.displayValue(row.voltageV)" @change="$store.workbench.patchLoadNumber(row.id, 'voltageV', $event.target.value)" aria-label="Voltage V"></td>
+                          <td data-label="Duty"><input inputmode="decimal" :value="$store.workbench.displayValue(row.duty)" @change="$store.workbench.patchLoadNumber(row.id, 'dutyCycle', $event.target.value)" aria-label="Duty cycle"></td>
+                          <td data-label="State">
+                            <select :value="row.state" @change="$store.workbench.setLoadState(row.id, $event.target.value)" aria-label="Load state">
+                              <template x-for="st in $store.workbench.loadStates" :key="st"><option :value="st" x-text="st"></option></template>
+                            </select>
+                          </td>
+                          <td data-label="Actions" class="wb-row-actions">
+                            <button type="button" class="wb-btn" @click="$store.workbench.ui.expandedLoadId = $store.workbench.ui.expandedLoadId === row.id ? null : row.id">Edit</button>
+                            <button type="button" class="wb-btn" @click="$store.workbench.dupLoad(row.id)">Duplicate</button>
+                            <button type="button" class="wb-btn" @click="$store.workbench.patchLoad(row.id, 'enabled', !row.enabled)" x-text="row.enabled ? 'Disable' : 'Enable'"></button>
+                            <button type="button" class="wb-btn" @click="$store.workbench.removeLoad(row.id)">Delete</button>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+
+                <h3>Transient events</h3>
+                <button type="button" class="wb-btn" @click="$store.workbench.addTransient()">Add event</button>
+                <template x-if="!($store.workbench.project.transients || []).length">
+                  <p class="wb-empty">No transient events.</p>
+                </template>
+                <template x-for="ev in $store.workbench.project.transients" :key="ev.id">
+                  <div class="wb-card">
+                    <div class="wb-field"><label>Name</label><input :value="ev.name" @change="$store.workbench.patchTransient(ev.id, 'name', $event.target.value)"></div>
+                    <div class="wb-field">
+                      <label>Type</label>
+                      <select :value="ev.type" @change="$store.workbench.patchTransient(ev.id, 'type', $event.target.value)">
+                        <template x-for="t in $store.workbench.transientTypes" :key="t"><option :value="t" x-text="t"></option></template>
+                      </select>
+                    </div>
+                    <div class="wb-field"><label>Running current A</label><input inputmode="decimal" :value="$store.workbench.displayValue(ev.runningCurrentA)" @change="$store.workbench.patchTransient(ev.id, 'runningCurrentA', Number($event.target.value) || null)"></div>
+                    <div class="wb-field"><label>Starting current A</label><input inputmode="decimal" :value="$store.workbench.displayValue(ev.startingCurrentA)" @change="$store.workbench.patchTransient(ev.id, 'startingCurrentA', Number($event.target.value) || null)"></div>
+                    <div class="wb-field"><label>Starting multiple</label><input inputmode="decimal" :value="$store.workbench.displayValue(ev.startingMultiple)" @change="$store.workbench.patchTransient(ev.id, 'startingMultiple', Number($event.target.value) || null)"></div>
+                    <div class="wb-field"><label>Duration s</label><input inputmode="decimal" :value="$store.workbench.displayValue(ev.durationSeconds)" @change="$store.workbench.patchTransient(ev.id, 'durationSeconds', Number($event.target.value) || null)"></div>
+                    <button type="button" class="wb-btn" @click="$store.workbench.removeTransient(ev.id)">Delete</button>
+                  </div>
+                </template>
+              </div>
+
+              <!-- GENERATION -->
+              <div id="wb-section-generation" x-show="$store.workbench.ui.configSection === 'generation'">
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.techOn('pv')" @change="$store.workbench.toggleTech('pv', $event.target.checked)"> PV</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.techOn('wind')" @change="$store.workbench.toggleTech('wind', $event.target.checked)"> Wind</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.techOn('diesel')" @change="$store.workbench.toggleTech('diesel', $event.target.checked)"> Diesel / Backup</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.techOn('other')" @change="$store.workbench.toggleTech('other', $event.target.checked)"> Other</label>
+
+                <template x-if="$store.workbench.techOn('pv')">
+                  <div>
+                    <h3>PV</h3>
+                    <div class="wb-field">
+                      <label for="wb-dc">DC
+                        <span class="wb-badge" :data-prov="($store.workbench.provenance('generation.pv.dcMWp') || {}).code || 'user-input'" x-text="($store.workbench.provenance('generation.pv.dcMWp') || {}).label || 'USER'"></span>
+                      </label>
+                      <div class="wb-unit"><input id="wb-dc" inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.generation.pv && $store.workbench.project.generation.pv.dcMWp)" @change="$store.workbench.patchNumber('generation.pv.dcMWp', $event.target.value)"><span>MWp</span></div>
+                    </div>
+                    <div class="wb-field">
+                      <label for="wb-ac">AC</label>
+                      <div class="wb-unit"><input id="wb-ac" inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.generation.pv && $store.workbench.project.generation.pv.acMW)" @change="$store.workbench.patchNumber('generation.pv.acMW', $event.target.value)"><span>MW</span></div>
+                    </div>
+                    <div class="wb-field">
+                      <label for="wb-mount">Mounting</label>
+                      <select id="wb-mount" :value="($store.workbench.project.generation.pv && $store.workbench.project.generation.pv.mounting) || ''" @change="$store.workbench.patch('generation.pv.mounting', $event.target.value || null)">
+                        <option value="">—</option>
+                        <option value="fixed-tilt">Fixed tilt</option>
+                        <option value="single-axis">Single-axis tracker</option>
+                      </select>
+                    </div>
+                    <label class="wb-check"><input type="checkbox" :checked="$store.workbench.project.generation.pv && $store.workbench.project.generation.pv.bifacial" @change="$store.workbench.patch('generation.pv.bifacial', $event.target.checked)"> Bifacial</label>
+                    <div class="wb-field">
+                      <label for="wb-emethod">Energy calculation method</label>
+                      <select id="wb-emethod" :value="$store.workbench.project.generation.energyCalculationMethod" @change="$store.workbench.setEnergyMethod($event.target.value)">
+                        <option value="specific-yield">Specific yield</option>
+                        <option value="capacity-factor">Capacity factor</option>
+                      </select>
+                    </div>
+                    <div class="wb-field">
+                      <label for="wb-yield">Specific yield
+                        <span class="wb-badge" data-prov="future-site-study" title="Requires a real site study">SITE STUDY</span>
+                      </label>
+                      <div class="wb-unit">
+                        <input id="wb-yield" inputmode="decimal"
+                          :disabled="$store.workbench.project.generation.energyCalculationMethod !== 'specific-yield'"
+                          :value="$store.workbench.displayValue($store.workbench.project.generation.pv && $store.workbench.project.generation.pv.specificYieldKWhPerKWpYear)"
+                          @change="$store.workbench.patchNumber('generation.pv.specificYieldKWhPerKWpYear', $event.target.value)">
+                        <span>kWh/kWp·y</span>
+                      </div>
+                    </div>
+                    <div class="wb-field">
+                      <label for="wb-cf">Capacity factor <span class="wb-meta" x-show="$store.workbench.project.generation.energyCalculationMethod === 'specific-yield'">(informational)</span></label>
+                      <input id="wb-cf" inputmode="decimal"
+                        :disabled="$store.workbench.project.generation.energyCalculationMethod !== 'capacity-factor'"
+                        :value="$store.workbench.displayValue($store.workbench.project.generation.pv && $store.workbench.project.generation.pv.capacityFactor)"
+                        @change="$store.workbench.patchNumber('generation.pv.capacityFactor', $event.target.value)">
+                    </div>
+                    <div class="wb-field">
+                      <label for="wb-loss">Losses</label>
+                      <div class="wb-unit"><input id="wb-loss" inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.generation.pv && $store.workbench.project.generation.pv.lossesPercent)" @change="$store.workbench.patchNumber('generation.pv.lossesPercent', $event.target.value)"><span>%</span></div>
+                    </div>
+                    <p class="wb-meta">DC/AC ratio: <strong x-text="$store.workbench.formatN($store.workbench.energy.dcAcRatio, 3)"></strong></p>
+                    <p class="wb-meta">Annual energy: <strong x-text="$store.workbench.energy.annualMWh != null ? $store.workbench.formatN($store.workbench.energy.annualMWh, 1) + ' MWh' : '—'"></strong></p>
+                  </div>
+                </template>
+                <template x-if="$store.workbench.techOn('wind')">
+                  <div>
+                    <h3>Wind</h3>
+                    <div class="wb-field"><label>Rated</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.generation.wind && $store.workbench.project.generation.wind.ratedMW)" @change="$store.workbench.patchNumber('generation.wind.ratedMW', $event.target.value)"><span>MW</span></div></div>
+                  </div>
+                </template>
+                <template x-if="$store.workbench.techOn('diesel')">
+                  <div>
+                    <h3>Diesel / Backup</h3>
+                    <div class="wb-field"><label>Rated</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.generation.diesel && $store.workbench.project.generation.diesel.ratedMW)" @change="$store.workbench.patchNumber('generation.diesel.ratedMW', $event.target.value)"><span>MW</span></div></div>
+                  </div>
+                </template>
+              </div>
+
+              <!-- BESS -->
+              <div id="wb-section-bess" x-show="$store.workbench.ui.configSection === 'bess'">
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.project.bess.enabled" @change="$store.workbench.patch('bess.enabled', $event.target.checked)"> Enabled</label>
+                <template x-if="!$store.workbench.project.bess.enabled">
+                  <p class="wb-empty">No BESS configured.</p>
+                </template>
+                <template x-if="$store.workbench.project.bess.enabled">
+                  <div>
+                    <div class="wb-field"><label for="wb-bp">Power</label><div class="wb-unit"><input id="wb-bp" inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.bess.powerMW)" @change="$store.workbench.patchNumber('bess.powerMW', $event.target.value)"><span>MW</span></div></div>
+                    <div class="wb-field"><label for="wb-be">Energy</label><div class="wb-unit"><input id="wb-be" inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.bess.energyMWh)" @change="$store.workbench.patchNumber('bess.energyMWh', $event.target.value)"><span>MWh</span></div></div>
+                    <div class="wb-field">
+                      <label for="wb-bd">Duration (override)
+                        <span class="wb-badge" data-prov="calculated">CALCULATED</span>
+                      </label>
+                      <div class="wb-unit"><input id="wb-bd" inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.bess.durationHours)" @change="$store.workbench.patchNumber('bess.durationHours', $event.target.value)"><span>h</span></div>
+                    </div>
+                    <p class="wb-meta">Derived duration: <strong x-text="$store.workbench.bessDerived.durationHours != null ? $store.workbench.formatN($store.workbench.bessDerived.durationHours, 2) + ' h' : '—'"></strong></p>
+                    <div class="wb-field"><label>Round-trip efficiency</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.bess.roundTripEfficiency)" @change="$store.workbench.patchNumber('bess.roundTripEfficiency', $event.target.value)"></div>
+                    <div class="wb-field"><label>Usable DoD</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.bess.usableDoD)" @change="$store.workbench.patchNumber('bess.usableDoD', $event.target.value)"></div>
+                    <p class="wb-meta">Usable energy: <span x-text="$store.workbench.bessDerived.usableEnergyMWh != null ? $store.workbench.formatN($store.workbench.bessDerived.usableEnergyMWh, 2) + ' MWh' : '—'"></span></p>
+                    <p class="wb-meta">Delivered energy: <span x-text="$store.workbench.bessDerived.deliveredEnergyMWh != null ? $store.workbench.formatN($store.workbench.bessDerived.deliveredEnergyMWh, 2) + ' MWh' : '—'"></span></p>
+                  </div>
+                </template>
+              </div>
+
+              <!-- SUBSTATION -->
+              <div id="wb-section-substation" x-show="$store.workbench.ui.configSection === 'substation'">
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.project.substation.enabled" @change="$store.workbench.patch('substation.enabled', $event.target.checked)"> Enabled</label>
+                <template x-if="$store.workbench.project.substation.enabled">
+                  <div>
+                    <div class="wb-field"><label>Primary</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.substation.primaryKV)" @change="$store.workbench.patchNumber('substation.primaryKV', $event.target.value)"><span>kV</span></div></div>
+                    <div class="wb-field"><label>Secondary</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.substation.secondaryKV)" @change="$store.workbench.patchNumber('substation.secondaryKV', $event.target.value)"><span>kV</span></div></div>
+                    <div class="wb-field"><label>Tertiary</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.substation.tertiaryKV)" @change="$store.workbench.patchNumber('substation.tertiaryKV', $event.target.value)"><span>kV</span></div></div>
+                    <div class="wb-field"><label>Transformer count</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.substation.transformerCount)" @change="$store.workbench.patchNumber('substation.transformerCount', $event.target.value)"></div>
+                    <div class="wb-field"><label>Transformer</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.substation.transformerMVA)" @change="$store.workbench.patchNumber('substation.transformerMVA', $event.target.value)"><span>MVA</span></div></div>
+                    <div class="wb-field"><label>Power factor</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.substation.powerFactor)" @change="$store.workbench.patchNumber('substation.powerFactor', $event.target.value)"></div>
+                    <div class="wb-field"><label>Utilization</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.substation.utilizationFactor)" @change="$store.workbench.patchNumber('substation.utilizationFactor', $event.target.value)"></div>
+                    <div class="wb-field"><label>Topology</label><input :value="$store.workbench.project.substation.topology || ''" @change="$store.workbench.patch('substation.topology', $event.target.value || null)"></div>
+                    <div class="wb-field"><label>Bus configuration</label><input :value="$store.workbench.project.substation.busConfiguration || ''" @change="$store.workbench.patch('substation.busConfiguration', $event.target.value || null)"></div>
+                    <div class="wb-field">
+                      <label for="wb-red">Redundancy mode</label>
+                      <select id="wb-red" :value="$store.workbench.project.substation.redundancyMode || ''" @change="$store.workbench.patch('substation.redundancyMode', $event.target.value || null)">
+                        <option value="">—</option>
+                        <option value="N">N</option>
+                        <option value="N-1">N-1</option>
+                        <option value="N+1">N+1</option>
+                      </select>
+                    </div>
+                    <p class="wb-meta">Total installed: <span x-text="$store.workbench.substationDerived.transformerTotalMVA != null ? $store.workbench.formatN($store.workbench.substationDerived.transformerTotalMVA, 1) + ' MVA' : '—'"></span></p>
+                    <p class="wb-meta">Approx active capacity: <span x-text="$store.workbench.substationDerived.activeCapacityMW != null ? $store.workbench.formatN($store.workbench.substationDerived.activeCapacityMW, 1) + ' MW' : '—'"></span></p>
+                    <p class="wb-meta">Operational capacity: <span x-text="$store.workbench.substationDerived.operationalCapacityMW != null ? $store.workbench.formatN($store.workbench.substationDerived.operationalCapacityMW, 1) + ' MW' : '—'"></span></p>
+                    <template x-if="$store.workbench.project.substation.redundancyMode === 'N-1'">
+                      <div class="wb-n1">
+                        <div><div class="k">NORMAL CAPACITY</div><div class="v" x-text="$store.workbench.substationDerived.activeCapacityMW != null ? $store.workbench.formatN($store.workbench.substationDerived.activeCapacityMW, 1) + ' MW' : '—'"></div></div>
+                        <div><div class="k">N-1 AVAILABLE CAPACITY</div><div class="v" x-text="$store.workbench.substationDerived.nMinusOneCapacityMW != null ? $store.workbench.formatN($store.workbench.substationDerived.nMinusOneCapacityMW, 1) + ' MW' : '—'"></div></div>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+
+              <!-- GRID -->
+              <div id="wb-section-grid" x-show="$store.workbench.ui.configSection === 'grid'">
+                <div class="wb-field">
+                  <label for="wb-gm">Grid mode</label>
+                  <select id="wb-gm" :value="$store.workbench.project.grid.mode" @change="$store.workbench.patch('grid.mode', $event.target.value)">
+                    <option value="grid-connected">Grid-connected</option>
+                    <option value="weak-grid">Weak-grid</option>
+                    <option value="off-grid">Off-grid</option>
+                    <option value="islandable">Islandable</option>
+                  </select>
+                </div>
+                <p class="wb-note" x-text="$store.workbench.gridDefs[$store.workbench.project.grid.mode]"></p>
+                <p class="wb-meta">Nominal frequency <span x-text="$store.workbench.project.grid.frequencyHz != null ? $store.workbench.project.grid.frequencyHz + ' Hz' : '—'"></span>
+                  <span x-text="$store.workbench.provenanceLabel($store.workbench.provenance('grid.frequencyHz') && $store.workbench.provenance('grid.frequencyHz').code)"></span>
+                </p>
+                <p class="wb-note">National voltage lists never replace project connection voltage. Grid strength is a site/connection-point assumption.</p>
+                <div class="wb-field">
+                  <label>Grid strength</label>
+                  <select :value="$store.workbench.project.grid.strength || ''" @change="$store.workbench.patch('grid.strength', $event.target.value || null)">
+                    <option value="">—</option>
+                    <option value="strong">strong</option>
+                    <option value="medium">medium</option>
+                    <option value="weak">weak</option>
+                  </select>
+                </div>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.project.grid.importAllowed" @change="$store.workbench.patch('grid.importAllowed', $event.target.checked)"> Import allowed</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.project.grid.exportAllowed" @change="$store.workbench.patch('grid.exportAllowed', $event.target.checked)"> Export allowed</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.project.grid.backupAvailable" @change="$store.workbench.patch('grid.backupAvailable', $event.target.checked)"> Backup available</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.project.grid.islandable" @change="$store.workbench.patch('grid.islandable', $event.target.checked)"> Islandable</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.project.grid.blackStartRequired" @change="$store.workbench.patch('grid.blackStartRequired', $event.target.checked)"> Black-start required</label>
+              </div>
+
+              <!-- FEEDERS -->
+              <div id="wb-section-feeders" x-show="$store.workbench.ui.configSection === 'feeders'">
+                <p class="wb-note" x-text="$store.workbench.voltageDropNote"></p>
+                <button type="button" class="wb-btn" @click="$store.workbench.addFeeder()">Add feeder</button>
+                <template x-if="!($store.workbench.project.feeders || []).length">
+                  <p class="wb-empty">No feeders configured.</p>
+                </template>
+                <template x-for="(f, i) in $store.workbench.project.feeders" :key="i">
+                  <div class="wb-card">
+                    <div class="wb-field"><label>Name</label><input :value="f.name" @change="$store.workbench.patchFeeder(i, 'name', $event.target.value)"></div>
+                    <div class="wb-field"><label>Voltage</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue(f.voltageKV)" @change="$store.workbench.patchFeederNumber(i, 'voltageKV', $event.target.value)"><span>kV</span></div></div>
+                    <div class="wb-field"><label>Role</label><input :value="f.role || ''" @change="$store.workbench.patchFeeder(i, 'role', $event.target.value)"></div>
+                    <div class="wb-field"><label>Length</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue(f.lengthKM)" @change="$store.workbench.patchFeederNumber(i, 'lengthKM', $event.target.value)"><span>km</span></div></div>
+                    <div class="wb-field"><label>Estimated load</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue(f.estimatedLoadMW)" @change="$store.workbench.patchFeederNumber(i, 'estimatedLoadMW', $event.target.value)"><span>MW</span></div></div>
+                    <div class="wb-field"><label>Losses</label><div class="wb-unit"><input inputmode="decimal" :value="$store.workbench.displayValue(f.lossesPercent)" @change="$store.workbench.patchFeederNumber(i, 'lossesPercent', $event.target.value)"><span>%</span></div></div>
+                    <button type="button" class="wb-btn" @click="$store.workbench.removeFeeder(i)">Delete</button>
+                  </div>
+                </template>
+              </div>
+
+              <!-- ECONOMICS -->
+              <div id="wb-section-economics" x-show="$store.workbench.ui.configSection === 'economics'">
+                <div class="wb-field">
+                  <label for="wb-tm">Tariff mode</label>
+                  <select id="wb-tm" :value="$store.workbench.project.economics.tariffMode || ''" @change="$store.workbench.patch('economics.tariffMode', $event.target.value || null)">
+                    <option value="">—</option>
+                    <option value="btc">BTC/kWh</option>
+                    <option value="sats">sats/kWh</option>
+                    <option value="fiat-converted">Fiat converted</option>
+                  </select>
+                </div>
+                <div class="wb-field"><label>BTC/kWh</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.economics.btcPerKWh)" @change="$store.workbench.patchNumber('economics.btcPerKWh', $event.target.value)"></div>
+                <div class="wb-field"><label>sats/kWh</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.economics.satsPerKWh)" @change="$store.workbench.patchNumber('economics.satsPerKWh', $event.target.value)"></div>
+                <div class="wb-field"><label>Fiat/kWh (optional)</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.economics.fiatPerKWh)" @change="$store.workbench.patchNumber('economics.fiatPerKWh', $event.target.value)"></div>
+                <div class="wb-field"><label>Fiat/BTC (optional)</label><input inputmode="decimal" :value="$store.workbench.displayValue($store.workbench.project.economics.fiatPerBTC)" @change="$store.workbench.patchNumber('economics.fiatPerBTC', $event.target.value)"></div>
+                <div class="wb-field"><label>Currency</label><input :value="$store.workbench.project.economics.currency || ''" @change="$store.workbench.patch('economics.currency', $event.target.value || null)"></div>
+                <p class="wb-meta" x-show="$store.workbench.project.economics.btcPriceRetrievedAt">BTC price retrieved <span x-text="$store.workbench.project.economics.btcPriceRetrievedAt"></span></p>
+                <button type="button" class="wb-btn" :disabled="$store.workbench.evidence.btcLoading" @click="$store.workbench.refreshBtc()">Refresh BTC price</button>
+                <p class="wb-note">El spot (CoinGecko) es <strong>informativo</strong>. ENERGY × tarifa usa BTC/kWh o sats/kWh del proyecto. Aceptar el candidato solo escribe fiat/BTC para convertir tarifas fiat. No hay librería de trading.</p>
+                <p class="wb-meta" x-show="$store.workbench.btcTicker.satsLine" x-text="$store.workbench.btcTicker.satsLine"></p>
+                <template x-if="!$store.workbench.project.economics.tariffMode && $store.workbench.project.economics.btcPerKWh == null && $store.workbench.project.economics.satsPerKWh == null">
+                  <p class="wb-empty">No tariff entered.</p>
+                </template>
+              </div>
+
+              <!-- SITE -->
+              <div id="wb-section-site" x-show="$store.workbench.ui.configSection === 'site'">
+                <p class="wb-note">Conceptual regional profile below. Candidate coordinates live on the MAP view.</p>
+                <p class="wb-meta">Active geospatial site: <span x-text="$store.workbench.site.activeSiteName || 'none'"></span> · context <span x-text="$store.workbench.site.geoContext"></span></p>
+                <button type="button" class="wb-btn" @click="$store.workbench.setView('map')">Open map</button>
+                <template x-if="$store.workbench.site.empty">
+                  <p class="wb-empty" x-text="$store.workbench.site.empty"></p>
+                </template>
+                <p class="wb-meta">Country: <span x-text="$store.workbench.site.country || '—'"></span></p>
+                <p class="wb-meta">Region: <span x-text="$store.workbench.site.region || '—'"></span></p>
+                <p class="wb-meta">Subregion: <span x-text="$store.workbench.site.subregion || '—'"></span></p>
+                <p class="wb-meta">Climate: <span x-text="$store.workbench.site.climate || '—'"></span></p>
+                <p class="wb-meta">Terrain: <span x-text="$store.workbench.site.terrain || '—'"></span></p>
+                <p class="wb-meta">Dust: <span x-text="$store.workbench.site.dust || '—'"></span></p>
+                <p class="wb-meta">Soiling: <span x-text="$store.workbench.site.soiling || '—'"></span></p>
+                <p class="wb-meta">Salinity: <span x-text="$store.workbench.site.salinity || '—'"></span></p>
+                <p class="wb-meta">Humidity: <span x-text="$store.workbench.site.humidity || '—'"></span></p>
+                <p class="wb-meta">Corrosion: <span x-text="$store.workbench.site.corrosion || '—'"></span></p>
+                <p class="wb-meta">Flood: <span x-text="$store.workbench.site.floodRisk || '—'"></span></p>
+                <p class="wb-meta">Heat: <span x-text="$store.workbench.site.heatRisk || '—'"></span></p>
+                <p class="wb-meta">Dune: <span x-text="$store.workbench.site.duneRisk || '—'"></span></p>
+                <p class="wb-meta">Access: <span x-text="$store.workbench.site.accessDifficulty || '—'"></span></p>
+                <p class="wb-meta">Water: <span x-text="$store.workbench.site.waterAvailability || '—'"></span></p>
+                <div class="wb-suit">
+                  <div><h3>Preferred</h3><ul><template x-for="x in $store.workbench.site.preferred" :key="x"><li x-text="x"></li></template></ul><p class="wb-empty" x-show="!($store.workbench.site.preferred || []).length">None listed.</p></div>
+                  <div><h3>Avoid</h3><ul><template x-for="x in $store.workbench.site.avoid" :key="x"><li x-text="x"></li></template></ul><p class="wb-empty" x-show="!($store.workbench.site.avoid || []).length">None listed.</p></div>
+                  <div><h3>Investigate</h3><ul><template x-for="x in $store.workbench.site.investigate" :key="x"><li x-text="x"></li></template></ul><p class="wb-empty" x-show="!($store.workbench.site.investigate || []).length">None listed.</p></div>
+                </div>
+              </div>
+
+              <!-- ASSUMPTIONS -->
+              <div id="wb-section-assumptions" x-show="$store.workbench.ui.configSection === 'assumptions'">
+                <template x-if="!($store.workbench.project.assumptions || []).length">
+                  <p class="wb-empty">No listed assumptions.</p>
+                </template>
+                <ul>
+                  <template x-for="(a, i) in $store.workbench.project.assumptions" :key="i">
+                    <li x-text="a"></li>
+                  </template>
+                </ul>
+              </div>
+            </aside>
+
+            <!-- CENTER visualization -->
+            <section class="wb-panel wb-viz" aria-label="Architecture visualization">
+              <div class="wb-tabs">
+                <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.view === 'system' }" @click="$store.workbench.setView('system')">SYSTEM</button>
+                <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.view === 'sacred' }" @click="$store.workbench.setView('sacred')">SACRED</button>
+                <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.view === 'map' }" @click="$store.workbench.setView('map')">MAP</button>
+              </div>
+              <div class="wb-row-actions" style="margin-bottom:0.4rem">
+                <label class="wb-check">Decoration
+                  <select :value="$store.workbench.ui.graphDecoration" @change="$store.workbench.setDecoration($event.target.value)" aria-label="Sacred decoration level">
+                    <option value="MINIMAL">MINIMAL</option>
+                    <option value="GEOMETRIC">GEOMETRIC</option>
+                    <option value="FULL">FULL</option>
+                  </select>
+                </label>
+                <label class="wb-check" x-show="$store.workbench.ui.view === 'sacred'">Sacred layout
+                  <select :value="$store.workbench.ui.sacredMode" @change="$store.workbench.setSacredMode($event.target.value)" aria-label="Sacred layout mode">
+                    <option value="CONCENTRIC">CONCENTRIC</option>
+                    <option value="RADIAL">RADIAL</option>
+                  </select>
+                </label>
+                <button type="button" class="wb-btn" @click="$store.workbench.toggleGraphFocus()" :disabled="!$store.workbench.ui.selectedNodeId">Focus node</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.ui.legendOpen = !$store.workbench.ui.legendOpen">Legend</button>
+              </div>
+              <p class="wb-empty" x-show="$store.workbench.graphError" x-text="$store.workbench.graphError"></p>
+              <svg class="wb-svg architecture-graph" x-show="$store.workbench.ui.view === 'system'" x-ref="sys" x-init="$store.workbench.bindSvg($el, $store.workbench._svg.sacred)" role="img" aria-label="Conceptual electrical architecture"></svg>
+              <svg class="wb-svg architecture-graph" x-show="$store.workbench.ui.view === 'sacred'" x-ref="sacred" x-init="$store.workbench.bindSvg($store.workbench._svg.system, $el)" role="img" aria-label="Sacred geometry composition of the architecture"></svg>
+
+              <div class="wb-geo" x-show="$store.workbench.ui.view === 'map'" x-cloak>
+                <p class="wb-note">Geospatial siting intelligence. Not a detailed engineering GIS. No power-flow or voltage-drop.</p>
+                <template x-for="w in $store.workbench.geoWarnings" :key="w">
+                  <p class="wb-empty" x-text="w"></p>
+                </template>
+                <div class="wb-geo-layers" role="group" aria-label="Map layers">
+                  <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.geoLayers.sitios" @change="$store.workbench.setGeoLayer('sitios', $event.target.checked)"> Sites</label>
+                  <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.geoLayers.red" @change="$store.workbench.setGeoLayer('red', $event.target.checked)"> Grid</label>
+                  <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.geoLayers.restricciones" @change="$store.workbench.setGeoLayer('restricciones', $event.target.checked)"> Restrictions</label>
+                  <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.geoLayers.evidencia" @change="$store.workbench.setGeoLayer('evidencia', $event.target.checked)"> Evidence</label>
+                  <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.geoLayers.cobertura" @change="$store.workbench.setGeoLayer('cobertura', $event.target.checked)"> Coverage</label>
+                </div>
+                <div class="wb-geo-layout">
+                  <div class="wb-geo-map-host" id="wb-geo-map" x-init="$store.workbench.bindGeoMap($el)" role="img" aria-label="Project site map"></div>
+                  <div class="wb-geo-list">
+                    <h3>Candidate sites</h3>
+                    <template x-if="!$store.workbench.geoSites.length">
+                      <p class="wb-empty">Sin sitios. Añade uno en el formulario o importa GeoJSON/CSV. Next: carga red si hay feeders.</p>
+                    </template>
+                    <ul class="wb-geo-ul">
+                      <template x-for="s in $store.workbench.geoSites" :key="s.id">
+                        <li>
+                          <button type="button" class="wb-geo-item" :class="{ 'is-on': $store.workbench.ui.geoSelectedId === s.id }" @click="$store.workbench.ui.geoSelectedId = s.id; $store.workbench._refreshGeoMap()">
+                            <strong x-text="s.name"></strong>
+                            <span class="wb-meta" x-text="s.status + ' · ' + (s.lat != null ? s.lat.toFixed(4) + ', ' + s.lng.toFixed(4) : 'no coords')"></span>
+                          </button>
+                        </li>
+                      </template>
+                    </ul>
+                    <div class="wb-row-actions">
+                      <label class="wb-btn" style="display:inline-flex;align-items:center;cursor:pointer">
+                        Import GeoJSON/CSV
+                        <input type="file" accept=".geojson,.json,.csv,application/geo+json,text/csv" class="wb-file-input" @change="$store.workbench.onGeoFile($event)" aria-label="Import sites GeoJSON or CSV">
+                      </label>
+                      <button type="button" class="wb-btn" @click="$store.workbench.exportGeoJSON()">Export GeoJSON</button>
+                      <button type="button" class="wb-btn" @click="$store.workbench.exportGeoCSV()">Export CSV</button>
+                    </div>
+                  </div>
+                </div>
+                <form class="wb-geo-form" @submit.prevent="$store.workbench.addGeoSiteFromDraft()">
+                  <h3>Add site</h3>
+                  <div class="wb-filters">
+                    <div class="wb-field"><label>Name</label><input x-model="$store.workbench.geoDraft.name" required></div>
+                    <div class="wb-field"><label>Latitude</label><input inputmode="decimal" x-model="$store.workbench.geoDraft.lat" required></div>
+                    <div class="wb-field"><label>Longitude</label><input inputmode="decimal" x-model="$store.workbench.geoDraft.lng" required></div>
+                    <div class="wb-field"><label>Region</label><input x-model="$store.workbench.geoDraft.region"></div>
+                    <div class="wb-field"><label>Comuna</label><input x-model="$store.workbench.geoDraft.comuna"></div>
+                    <div class="wb-field"><label>Land use</label><input x-model="$store.workbench.geoDraft.landUse"></div>
+                    <div class="wb-field"><label>Owner / notes</label><input x-model="$store.workbench.geoDraft.owner"></div>
+                  </div>
+                  <button type="submit" class="wb-btn wb-btn--primary">Create site</button>
+                </form>
+                <div class="wb-geo-card" x-show="$store.workbench.geoSelected">
+                  <h3>Site file</h3>
+                  <p class="wb-meta"><span x-text="$store.workbench.geoSelected && $store.workbench.geoSelected.name"></span> · <span x-text="$store.workbench.geoSelected && $store.workbench.geoSelected.status"></span></p>
+                  <p class="wb-meta">Evidence coverage <strong x-text="$store.workbench.geoSelectedEval && $store.workbench.geoSelectedEval.coverage ? $store.workbench.geoSelectedEval.coverage.percent + ' %' : '—'"></strong></p>
+                  <p class="wb-meta">Grid proximity <strong x-text="$store.workbench.geoSelectedEval && $store.workbench.geoSelectedEval.proximity ? $store.workbench.geoSelectedEval.proximity.clase : 'desconocida'"></strong>
+                    <span x-show="$store.workbench.geoSelectedEval && $store.workbench.geoSelectedEval.proximity && $store.workbench.geoSelectedEval.proximity.distancia_km != null" x-text="' · ' + $store.workbench.geoSelectedEval.proximity.distancia_km + ' km'"></span>
+                  </p>
+                  <p class="wb-note" x-show="$store.workbench.geoSelectedEval && $store.workbench.geoSelectedEval.proximity && $store.workbench.geoSelectedEval.proximity.warning" x-text="$store.workbench.geoSelectedEval.proximity.warning"></p>
+                  <h4>Restrictions</h4>
+                  <template x-if="!($store.workbench.geoSelectedEval && $store.workbench.geoSelectedEval.restrictions && $store.workbench.geoSelectedEval.restrictions.length)">
+                    <p class="wb-empty">sin cobertura</p>
+                  </template>
+                  <ul>
+                    <template x-for="r in ($store.workbench.geoSelectedEval && $store.workbench.geoSelectedEval.restrictions) || []" :key="r.id">
+                      <li><span x-text="r.severity"></span> · <span x-text="r.type"></span> · <span x-text="r.name"></span> · source <span x-text="r.source || '—'"></span></li>
+                    </template>
+                  </ul>
+                  <div class="wb-row-actions">
+                    <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.activateGeoSite($store.workbench.geoSelected.id)">Set active</button>
+                    <button type="button" class="wb-btn" @click="$store.workbench.evaluateArchitectureAtSite($store.workbench.geoSelected.id)">Evaluate architecture here</button>
+                    <button type="button" class="wb-btn" @click="$store.workbench.linkAcceptedEvidenceToSite($store.workbench.geoSelected.id)">Link verified data</button>
+                    <button type="button" class="wb-btn" @click="$store.workbench.deleteGeoSite($store.workbench.geoSelected.id)">Delete</button>
+                  </div>
+                  <label class="wb-check">Status
+                    <select :value="$store.workbench.geoSelected && $store.workbench.geoSelected.status" @change="$store.workbench.setGeoStatus($store.workbench.geoSelected.id, $event.target.value)">
+                      <template x-for="st in $store.workbench.siteStatuses" :key="st"><option :value="st" x-text="st"></option></template>
+                    </select>
+                  </label>
+                </div>
+              </div>
+              <p class="wb-meta" x-show="$store.workbench.graph.flow">Grid flow (conceptual): <strong x-text="$store.workbench.graph.flow"></strong></p>
+              <p class="wb-note" x-show="$store.workbench.ui.view === 'sacred'">Sacred layout changes geometry only; electrical topology remains unchanged.</p>
+              <p class="wb-disclaimer" x-text="$store.workbench.graphSummary"></p>
+              <div class="wb-legend" x-show="$store.workbench.ui.legendOpen">
+                <span><i class="wb-swatch gen"></i> Generation</span>
+                <span><i class="wb-swatch bess"></i> Storage</span>
+                <span><i class="wb-swatch xf"></i> Transformation</span>
+                <span><i class="wb-swatch hv"></i> HV / grid</span>
+                <span><i class="wb-swatch mv"></i> MV / feeder</span>
+                <span><i class="wb-swatch ld"></i> Load</span>
+                <span>solid = existing · dashed = future / backup · ! = validation</span>
+              </div>
+              <template x-if="$store.workbench.selectedDetails">
+                <div class="wb-card">
+                  <div class="k" x-text="$store.workbench.selectedDetails.type + ' · ' + $store.workbench.selectedDetails.id"></div>
+                  <template x-for="row in $store.workbench.selectedDetails.rows" :key="row.label">
+                    <p class="wb-meta"><span x-text="row.label"></span>: <strong x-text="row.value"></strong>
+                      <span class="wb-badge" x-show="row.provenance" :data-prov="row.provenance" x-text="row.provenance"></span>
+                    </p>
+                  </template>
+                  <button type="button" class="wb-btn" x-show="$store.workbench.selectedDetails.validation && $store.workbench.selectedDetails.validation.errors && $store.workbench.selectedDetails.validation.errors.length" @click="$store.workbench.ui.resultsSection = 'validation'">Open validation</button>
+                </div>
+              </template>
+              <div class="wb-tree" aria-label="Architecture tree">
+                <template x-for="sec in ['Generation','Storage','Transformation','Distribution','Loads','Grid']" :key="sec">
+                  <div x-show="($store.workbench.graphTree[sec] || []).length">
+                    <h4 x-text="sec"></h4>
+                    <ul>
+                      <template x-for="(item, i) in $store.workbench.graphTree[sec]" :key="sec + i">
+                        <li x-text="item"></li>
+                      </template>
+                    </ul>
+                  </div>
+                </template>
+              </div>
+            </section>
+
+            <!-- RIGHT results -->
+            <aside class="wb-panel" aria-label="Results">
+              <div class="wb-tabs" role="tablist">
+                <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.resultsSection === 'summary' }" @click="$store.workbench.ui.resultsSection = 'summary'">Summary</button>
+                <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.resultsSection === 'energy' }" @click="$store.workbench.ui.resultsSection = 'energy'">Energy</button>
+                <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.resultsSection === 'capacity' }" @click="$store.workbench.ui.resultsSection = 'capacity'">Capacity</button>
+                <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.resultsSection === 'economics' }" @click="$store.workbench.ui.resultsSection = 'economics'">Economics</button>
+                <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.resultsSection === 'validation' }" @click="$store.workbench.ui.resultsSection = 'validation'">Validation</button>
+              </div>
+
+              <div x-show="$store.workbench.ui.resultsSection === 'summary'">
+                <template x-if="!$store.workbench.summary.length">
+                  <p class="wb-empty">No contextual metrics yet.</p>
+                </template>
+                <div class="wb-cards">
+                  <template x-for="c in $store.workbench.summary" :key="c.id">
+                    <div class="wb-card">
+                      <div class="k" x-text="c.label"></div>
+                      <div class="v" x-text="c.value"></div>
+                      <div class="wb-meta" x-text="c.extra || c.note || ''"></div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <div x-show="$store.workbench.ui.resultsSection === 'energy'">
+                <p class="wb-meta">Month: <strong x-text="$store.workbench.energy.monthKWh != null ? $store.workbench.formatN($store.workbench.energy.monthKWh, 1) + ' kWh' : '—'"></strong></p>
+                <p class="wb-meta">Year: <strong x-text="$store.workbench.energy.annualKWh != null ? $store.workbench.formatN($store.workbench.energy.annualKWh, 1) + ' kWh' : ($store.workbench.energy.annualMWh != null ? $store.workbench.formatN($store.workbench.energy.annualMWh, 1) + ' MWh' : '—')"></strong></p>
+                <template x-if="!$store.workbench.energy.rows.length">
+                  <p class="wb-empty">No detailed energy rows. Aggregated or generation energy appears when calculable.</p>
+                </template>
+                <template x-for="row in $store.workbench.energy.rows" :key="row.id">
+                  <div class="wb-card">
+                    <div class="k" x-text="row.name"></div>
+                    <div class="v" x-text="row.monthKWh != null ? $store.workbench.formatN(row.monthKWh, 1) + ' kWh/month' : '—'"></div>
+                    <div class="wb-meta" x-text="row.status ? 'Status: ' + row.status : ''"></div>
+                  </div>
+                </template>
+              </div>
+
+              <div x-show="$store.workbench.ui.resultsSection === 'capacity'">
+                <template x-if="$store.workbench.project.substation.enabled">
+                  <div>
+                    <p class="wb-meta">Installed: <span x-text="$store.workbench.substationDerived.transformerTotalMVA != null ? $store.workbench.formatN($store.workbench.substationDerived.transformerTotalMVA, 1) + ' MVA' : '—'"></span></p>
+                    <p class="wb-meta">Active: <span x-text="$store.workbench.substationDerived.activeCapacityMW != null ? $store.workbench.formatN($store.workbench.substationDerived.activeCapacityMW, 1) + ' MW' : '—'"></span></p>
+                  </div>
+                </template>
+                <template x-if="!$store.workbench.project.substation.enabled">
+                  <p class="wb-empty">No substation configured.</p>
+                </template>
+                <template x-if="$store.workbench.project.bess.enabled">
+                  <p class="wb-meta">BESS duration <span x-text="$store.workbench.bessDerived.durationHours != null ? $store.workbench.formatN($store.workbench.bessDerived.durationHours, 2) + ' h' : '—'"></span></p>
+                </template>
+              </div>
+
+              <div x-show="$store.workbench.ui.resultsSection === 'economics'">
+                <template x-if="!$store.workbench.economics.ok">
+                  <p class="wb-empty" x-text="$store.workbench.economics.message || 'Energy is required to calculate cost.'"></p>
+                </template>
+                <template x-if="$store.workbench.economics.ok">
+                  <div>
+                    <p class="wb-meta">Energy / day <span x-text="$store.workbench.formatN($store.workbench.economics.value.energyDay, 2) + ' kWh'"></span></p>
+                    <p class="wb-meta">Energy / month <span x-text="$store.workbench.formatN($store.workbench.economics.value.energyMonth, 2) + ' kWh'"></span></p>
+                    <p class="wb-meta">Energy / year <span x-text="$store.workbench.formatN($store.workbench.economics.value.energyYear, 1) + ' kWh'"></span></p>
+                    <p class="wb-btc-equiv" x-show="$store.workbench.btcTicker.monthFiatLabel" x-text="$store.workbench.btcTicker.monthFiatLabel"></p>
+                    <p class="wb-meta" x-show="$store.workbench.btcTicker.satsLine" x-text="$store.workbench.btcTicker.satsLine"></p>
+                    <template x-if="$store.workbench.ui.btcDisplay !== 'sats'">
+                      <div>
+                        <p>BTC / day <span x-text="$store.workbench.formatBTC($store.workbench.economics.value.btcDay)"></span></p>
+                        <p>BTC / month <span x-text="$store.workbench.economics.value.displayMonthBTC"></span></p>
+                        <p>BTC / year <span x-text="$store.workbench.formatBTC($store.workbench.economics.value.btcYear)"></span></p>
+                      </div>
+                    </template>
+                    <template x-if="$store.workbench.ui.btcDisplay !== 'btc'">
+                      <div>
+                        <p>sats / day <span x-text="$store.workbench.formatSats($store.workbench.economics.value.satsDay)"></span></p>
+                        <p>sats / month <span x-text="$store.workbench.economics.value.displayMonthSats"></span></p>
+                        <p>sats / year <span x-text="$store.workbench.formatSats($store.workbench.economics.value.satsYear)"></span></p>
+                      </div>
+                    </template>
+                    <template x-if="$store.workbench.economics.breakdown.length">
+                      <div class="wb-table-wrap">
+                        <table class="wb-table">
+                          <thead><tr><th>Load</th><th>kWh/month</th><th>Share %</th><th>BTC/month</th><th>sats/month</th></tr></thead>
+                          <tbody>
+                            <template x-for="b in $store.workbench.economics.breakdown" :key="b.id">
+                              <tr>
+                                <td data-label="Load" x-text="b.name"></td>
+                                <td data-label="kWh/month" x-text="$store.workbench.formatN(b.energyKWh, 1)"></td>
+                                <td data-label="Share %" x-text="$store.workbench.formatN(b.shareOfTotalEnergyPercent, 1)"></td>
+                                <td data-label="BTC/month" x-text="$store.workbench.formatBTC(b.monthBTC)"></td>
+                                <td data-label="sats/month" x-text="$store.workbench.formatSats(b.monthSats)"></td>
+                              </tr>
+                            </template>
+                          </tbody>
+                        </table>
+                      </div>
+                    </template>
+                  </div>
+                </template>
+              </div>
+
+              <div x-show="$store.workbench.ui.resultsSection === 'validation'">
+                <p>Quality score: <strong x-text="$store.workbench.validation.qualityScore != null ? Math.round($store.workbench.validation.qualityScore) : '—'"></strong></p>
+                <template x-if="!$store.workbench.validation.errors.length && !$store.workbench.validation.warnings.length">
+                  <p class="wb-empty">No validation errors.</p>
+                </template>
+                <template x-for="issue in $store.workbench.validation.errors" :key="issue.code + issue.message">
+                  <div class="wb-issue" data-sev="ERROR">
+                    <span class="wb-sev" aria-label="Error">ERROR</span>
+                    <span x-text="issue.icon" aria-hidden="true"></span>
+                    <p x-text="issue.message"></p>
+                    <p class="wb-meta" x-show="issue.code === 'BESS_DURATION'">Suggested correction: set durationHours = energyMWh / powerMW. Not applied automatically.</p>
+                    <button type="button" class="wb-btn" @click="$store.workbench.goToIssue(issue)">Go to <span x-text="issue.section"></span></button>
+                  </div>
+                </template>
+                <template x-for="issue in $store.workbench.validation.warnings" :key="issue.code + issue.message">
+                  <div class="wb-issue" data-sev="WARNING">
+                    <span class="wb-sev" aria-label="Warning">WARNING</span>
+                    <p x-text="issue.message"></p>
+                    <p class="wb-meta" x-show="issue.code === 'BESS_DURATION'">Suggested correction: set durationHours = energyMWh / powerMW. Not applied automatically.</p>
+                  </div>
+                </template>
+                <template x-for="issue in $store.workbench.validation.notices" :key="issue.code + issue.message">
+                  <div class="wb-issue" data-sev="NOTICE"><span class="wb-sev" aria-label="Notice">NOTICE</span><p x-text="issue.message"></p></div>
+                </template>
+                <template x-for="issue in $store.workbench.validation.assumptions" :key="issue.code + (issue.message || '')">
+                  <div class="wb-issue" data-sev="ASSUMPTION"><span class="wb-sev" aria-label="Assumption">ASSUMPTION</span><p x-text="issue.message"></p></div>
+                </template>
+              </div>
+            </aside>
+          </div>
+
+          <section class="wb-bottom wb-panel" id="wb-templates">
+            <div class="wb-tabs">
+              <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'templates' }" @click="$store.workbench.ui.bottomTab = 'templates'">Template explorer</button>
+              <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'enrichment' }" @click="$store.workbench.ui.bottomTab = 'enrichment'">Enrichment</button>
+              <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'evidence' }" @click="$store.workbench.ui.bottomTab = 'evidence'">Verified data</button>
+              <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'calculators' }" @click="$store.workbench.ui.bottomTab = 'calculators'">Diagnostics</button>
+              <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'assumptions' }" @click="$store.workbench.ui.bottomTab = 'assumptions'">Assumptions</button>
+              <button type="button" class="wb-tab" :class="{ 'is-active': $store.workbench.ui.bottomTab === 'compare' }" @click="$store.workbench.ui.bottomTab = 'compare'">Compare</button>
+            </div>
+
+            <div x-show="$store.workbench.ui.bottomTab === 'templates'">
+              <div class="wb-filters">
+                <div class="wb-field"><label for="wb-q">Search</label><input id="wb-q" type="search" :value="$store.workbench.ui.filters.search" @input="$store.workbench.onSearch($event.target.value)" placeholder="Name, country, application…"></div>
+                <div class="wb-field"><label>Country</label>
+                  <select :value="$store.workbench.ui.filters.country" @change="$store.workbench.onFilter('country', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="c in $store.workbench.ui.facets.countries" :key="c.code"><option :value="c.code" x-text="c.name"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Region</label>
+                  <select :value="$store.workbench.ui.filters.region" @change="$store.workbench.onFilter('region', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="r in $store.workbench.ui.facets.regions" :key="r"><option :value="r" x-text="r"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Family</label>
+                  <select :value="$store.workbench.ui.filters.family" @change="$store.workbench.onFilter('family', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="f in $store.workbench.ui.facets.families" :key="f.code"><option :value="f.code" x-text="f.name"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Application</label>
+                  <select :value="$store.workbench.ui.filters.application" @change="$store.workbench.onFilter('application', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="a in $store.workbench.ui.facets.applications" :key="a"><option :value="a" x-text="a"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Environment</label>
+                  <select :value="$store.workbench.ui.filters.environment" @change="$store.workbench.onFilter('environment', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="e in $store.workbench.ui.facets.environments" :key="e"><option :value="e" x-text="e"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Grid mode</label>
+                  <select :value="$store.workbench.ui.filters.gridMode" @change="$store.workbench.onFilter('gridMode', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="g in $store.workbench.ui.facets.gridModes" :key="g"><option :value="g" x-text="g"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Scale</label>
+                  <select :value="$store.workbench.ui.filters.scale" @change="$store.workbench.onFilter('scale', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="s in $store.workbench.ui.facets.scales" :key="s"><option :value="s" x-text="s"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Voltage class</label>
+                  <select :value="$store.workbench.ui.filters.voltageClass" @change="$store.workbench.onFilter('voltageClass', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="v in $store.workbench.ui.facets.voltageClasses" :key="v"><option :value="v" x-text="v"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Generation</label>
+                  <select :value="$store.workbench.ui.filters.generationType" @change="$store.workbench.onFilter('generationType', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="g in $store.workbench.ui.facets.generationTypes" :key="g"><option :value="g" x-text="g"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>BESS</label>
+                  <select :value="$store.workbench.ui.filters.bess" @change="$store.workbench.onFilter('bess', $event.target.value)">
+                    <option value="">All</option>
+                    <option value="yes">With BESS</option>
+                    <option value="no">Without BESS</option>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Batch</label>
+                  <select :value="$store.workbench.ui.filters.batch_id" @change="$store.workbench.onFilter('batch_id', $event.target.value)">
+                    <option value="">All batches</option>
+                    <template x-for="id in $store.workbench.enrichmentBatchIds" :key="id"><option :value="id" x-text="id.slice(0, 8)"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Coverage</label>
+                  <select :value="$store.workbench.ui.filters.coverage" @change="$store.workbench.onFilter('coverage', $event.target.value)">
+                    <option value="">All</option>
+                    <option value="high">≥ 50%</option>
+                    <option value="low">&lt; 50%</option>
+                    <option value="pending">Pending</option>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Conflictos</label>
+                  <select :value="$store.workbench.ui.filters.conflicts" @change="$store.workbench.onFilter('conflicts', $event.target.value)">
+                    <option value="">All</option>
+                    <option value="yes">With conflicts</option>
+                    <option value="no">No conflicts</option>
+                  </select>
+                </div>
+                <div class="wb-field"><label>Stale</label>
+                  <select :value="$store.workbench.ui.filters.stale" @change="$store.workbench.onFilter('stale', $event.target.value)">
+                    <option value="">All</option>
+                    <option value="yes">Stale</option>
+                    <option value="no">Fresh</option>
+                  </select>
+                </div>
+              </div>
+              <div class="wb-row-actions">
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.filters.offGrid === true" @change="$store.workbench.onFilter('offGrid', $event.target.checked ? true : '')"> Off-grid</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.filters.weakGrid === true" @change="$store.workbench.onFilter('weakGrid', $event.target.checked ? true : '')"> Weak-grid</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.filters.featured" @change="$store.workbench.onFilter('featured', $event.target.checked)"> Featured</label>
+                <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.filters.commonCase" @change="$store.workbench.onFilter('commonCase', $event.target.checked)"> Casos comunes (24)</label>
+                <button type="button" class="wb-btn" @click="$store.workbench.clearFilters()">Clear</button>
+              </div>
+              <p class="wb-meta"><span x-text="$store.workbench.pagedTemplates.total"></span> templates · page <span x-text="$store.workbench.pagedTemplates.page"></span>/<span x-text="$store.workbench.pagedTemplates.pages"></span> · compare <span x-text="$store.workbench.ui.compareIds.length"></span>/3</p>
+              <div class="wb-row-actions" x-show="$store.workbench.ui.compareIds.length >= 2">
+                <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.openCompareFromSelection()">Open comparison</button>
+              </div>
+              <template x-if="!$store.workbench.templateCards.length">
+                <p class="wb-empty">No matching templates.</p>
+              </template>
+              <div class="wb-tgrid">
+                <template x-for="card in $store.workbench.templateCards" :key="card.id">
+                  <article class="wb-tcard">
+                    <h3 x-text="card.name"></h3>
+                    <p class="wb-meta"><span x-text="card.country"></span> / <span x-text="card.region"></span></p>
+                    <p class="wb-meta"><span x-text="card.family"></span> · <span x-text="card.application"></span></p>
+                    <p class="wb-meta">Grid <span x-text="card.gridMode"></span> · Peak <span x-text="card.peakLoad"></span> MW</p>
+                    <p class="wb-meta">Gen <span x-text="card.generation"></span> · BESS <span x-text="card.bess"></span></p>
+                    <p class="wb-meta"><span x-text="card.voltage"></span> · score <span x-text="card.qualityScore"></span> · warnings <span x-text="card.warningsCount"></span></p>
+                    <p class="wb-badge" x-show="card.enrichment && card.enrichment.status !== 'pending'" :data-enr="card.enrichment && card.enrichment.status" x-text="card.enrichment && card.enrichment.label"></p>
+                    <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.compareIds.includes(card.id)" @change="$store.workbench.toggleCompare(card.id)"> Compare</label>
+                    <div class="wb-row-actions">
+                      <button type="button" class="wb-btn" @click="$store.workbench.openTemplate(card.id)">Details</button>
+                      <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.loadTemplate(card.id)">Load template</button>
+                    </div>
+                  </article>
+                </template>
+              </div>
+              <div class="wb-row-actions" style="margin-top:0.75rem">
+                <button type="button" class="wb-btn" :disabled="$store.workbench.pagedTemplates.page <= 1" @click="$store.workbench.setPage($store.workbench.pagedTemplates.page - 1)">Previous</button>
+                <button type="button" class="wb-btn" :disabled="$store.workbench.pagedTemplates.page >= $store.workbench.pagedTemplates.pages" @click="$store.workbench.setPage($store.workbench.pagedTemplates.page + 1)">Next</button>
+              </div>
+            </div>
+
+            <div x-show="$store.workbench.ui.bottomTab === 'enrichment'" class="wb-enrichment">
+              <p class="wb-note">Progressive Regional Enrichment — contract 13A frozen v1. Atlas 49–end closes the catalog. Does not rewrite templates.js. Prompt 14 can read records as-is.</p>
+              <div class="wb-enr-progress" role="status">
+                <p class="wb-meta">Atlas <strong x-text="$store.workbench.atlasProgress.label"></strong> · job <span class="wb-badge" :data-job="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status" x-text="$store.workbench.enrichmentJobLabel"></span></p>
+                <div class="wb-enr-bar" :aria-valuenow="$store.workbench.atlasProgress.enriched" :aria-valuemax="$store.workbench.atlasProgress.total">
+                  <span :style="'width:' + ($store.workbench.atlasProgress.total ? Math.round(100 * $store.workbench.atlasProgress.enriched / $store.workbench.atlasProgress.total) : 0) + '%'"></span>
+                </div>
+              </div>
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.reenrichPilot()">Re-enrich pilot (8)</button>
+                <button type="button" class="wb-btn" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runLote9to24()">Enrich lote 9–24</button>
+                <button type="button" class="wb-btn" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runLote25to48()">Enrich lote 25–48</button>
+                <button type="button" class="wb-btn wb-btn--primary" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runLote49toEnd()">Enrich lote 49–end</button>
+                <button type="button" class="wb-btn" :disabled="!$store.workbench.enrichment.batch" @click="$store.workbench.exportEnrichmentJSON()">Export batch JSON</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.exportAtlasJSON()">Export atlas JSON</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.exportAtlasCSV()">Export atlas CSV</button>
+                <span class="wb-meta" x-text="$store.workbench.enrichment.batch ? ('last ' + $store.workbench.enrichment.batch.scope + ' · ' + $store.workbench.enrichment.batch.count + ' records') : 'No batch yet'"></span>
+              </div>
+              <div class="wb-filters wb-filters--enr">
+                <div class="wb-field"><label>batch_id</label>
+                  <select :value="$store.workbench.enrichment.filters.batch_id" @change="$store.workbench.onEnrichmentFilter('batch_id', $event.target.value)">
+                    <option value="">All</option>
+                    <template x-for="id in $store.workbench.enrichmentBatchIds" :key="'enr-'+id"><option :value="id" x-text="id.slice(0, 8)"></option></template>
+                  </select>
+                </div>
+                <div class="wb-field"><label>coverage</label>
+                  <select :value="$store.workbench.enrichment.filters.coverage" @change="$store.workbench.onEnrichmentFilter('coverage', $event.target.value)">
+                    <option value="">All</option>
+                    <option value="high">≥ 50%</option>
+                    <option value="low">&lt; 50%</option>
+                  </select>
+                </div>
+                <div class="wb-field"><label>conflictos</label>
+                  <select :value="$store.workbench.enrichment.filters.conflicts" @change="$store.workbench.onEnrichmentFilter('conflicts', $event.target.value)">
+                    <option value="">All</option>
+                    <option value="yes">With conflicts</option>
+                    <option value="no">No conflicts</option>
+                  </select>
+                </div>
+                <div class="wb-field"><label>stale</label>
+                  <select :value="$store.workbench.enrichment.filters.stale" @change="$store.workbench.onEnrichmentFilter('stale', $event.target.value)">
+                    <option value="">All</option>
+                    <option value="yes">Stale</option>
+                    <option value="no">Fresh</option>
+                  </select>
+                </div>
+              </div>
+              <p class="wb-empty" x-show="$store.workbench.enrichment.error" x-text="$store.workbench.enrichment.error"></p>
+              <div class="wb-enr-dash" x-show="$store.workbench.atlasDashboard.total">
+                <h3>Atlas coverage</h3>
+                <p class="wb-meta">
+                  <strong x-text="$store.workbench.atlasDashboard.enriched + '/' + $store.workbench.atlasDashboard.total"></strong>
+                  · complete <span x-text="$store.workbench.atlasDashboard.complete + ' (' + $store.workbench.atlasDashboard.pct_complete + '%)'"></span>
+                  · partial <span x-text="$store.workbench.atlasDashboard.partial + ' (' + $store.workbench.atlasDashboard.pct_partial + '%)'"></span>
+                  · blocked <span x-text="$store.workbench.atlasDashboard.blocked + ' (' + $store.workbench.atlasDashboard.pct_blocked + '%)'"></span>
+                  · pending <span x-text="$store.workbench.atlasDashboard.pending"></span>
+                </p>
+                <p class="wb-meta">
+                  evidence media <span x-text="Math.round(($store.workbench.atlasDashboard.mean_evidence_coverage || 0) * 100) + '%'"></span>
+                  · conflictos abiertos <span x-text="$store.workbench.atlasDashboard.open_conflicts"></span>
+                  · stale fields <span x-text="$store.workbench.atlasDashboard.stale_fields"></span>
+                  · schema <span x-text="$store.workbench.atlasDashboard.schema_frozen_v1 ? 'v1 frozen' : 'open'"></span>
+                </p>
+                <div class="wb-row-actions">
+                  <label class="wb-field">Region
+                    <select :value="$store.workbench.enrichment.regionId" @change="$store.workbench.enrichment.regionId = $event.target.value">
+                      <template x-for="rid in $store.workbench.regionIds" :key="'re-'+rid"><option :value="rid" x-text="rid"></option></template>
+                    </select>
+                  </label>
+                  <button type="button" class="wb-btn" :disabled="$store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running'" @click="$store.workbench.runReenrichRegion()">Re-enrich region</button>
+                </div>
+              </div>
+              <div class="wb-enr-extra" x-show="$store.workbench.regionCoverageIndex.length">
+                <h3>Coverage by region</h3>
+                <div class="wb-ev-grid">
+                  <template x-for="reg in $store.workbench.regionCoverageIndex" :key="reg.region_id">
+                    <p class="wb-meta"><strong x-text="reg.region_id"></strong> · n <span x-text="reg.n"></span> · fields <span x-text="reg.field_coverage == null ? '—' : Math.round(reg.field_coverage * 100) + '%'"></span> · evidence <span x-text="reg.mean_evidence_coverage == null ? '—' : Math.round(reg.mean_evidence_coverage * 100) + '%'"></span> · blocked <span x-text="reg.blocked"></span></p>
+                  </template>
+                </div>
+                <h3 x-show="$store.workbench.catalogCrossFlags.length">Cross-region catalog flags</h3>
+                <template x-for="flag in $store.workbench.catalogCrossFlags" :key="flag.id">
+                  <p class="wb-note"><span x-text="flag.field"></span> · <span x-text="(flag.regions || []).join(', ')"></span> · <span x-text="flag.resolution"></span> — not resolved</p>
+                </template>
+                <p class="wb-meta" x-show="$store.workbench.blockedEnrichmentIds.length">Blocked: <span x-text="$store.workbench.blockedEnrichmentIds.join(', ')"></span></p>
+              </div>
+              <template x-if="!$store.workbench.enrichmentRows.length && !($store.workbench.enrichment.job && $store.workbench.enrichment.job.status === 'running')">
+                <p class="wb-empty">Run pilot (8), 9–24, 25–48, then 49–end. Jobs yield so the workbench stays usable. Blocked rows keep an explicit reason. Next: enriquece lote si coverage es baja; no se recalcula en el render.</p>
+              </template>
+              <div class="wb-ev-grid">
+                <template x-for="row in $store.workbench.enrichmentRows" :key="row.architecture_id">
+                  <article class="wb-ev-card">
+                    <h4 x-text="row.architecture_id"></h4>
+                    <p class="wb-badge" :data-enr="row.enrichment_status" x-text="row.enrichment_status"></p>
+                    <p class="wb-meta">Region <span x-text="row.region_id || '—'"></span> · site <span x-text="row.site_id || 'none'"></span> · batch <span x-text="row.batch_id ? row.batch_id.slice(0, 8) : '—'"></span></p>
+                    <p>Coverage <strong x-text="row.coveragePct + '%'"></strong> · conflicts <strong x-text="row.conflictN"></strong> · stale <strong x-text="row.staleN"></strong> · blocked <strong x-text="row.blocked ? 'yes' : 'no'"></strong></p>
+                    <p class="wb-meta">Fit <span x-text="row.regional_fit && row.regional_fit.score != null ? row.regional_fit.score : '—'"></span> · fields <span x-text="(row.fields || []).length"></span> · last <span x-text="row.last_enriched_at"></span></p>
+                    <template x-for="c in (row.conflicts || []).slice(0, 3)" :key="c.id">
+                      <p class="wb-note"><span x-text="c.field"></span>: <span x-text="c.resolution"></span> — not auto-resolved</p>
+                    </template>
+                    <template x-for="w in (row.warnings || []).slice(0, 2)" :key="w">
+                      <p class="wb-meta" x-text="w"></p>
+                    </template>
+                  </article>
+                </template>
+              </div>
+            </div>
+
+            <div x-show="$store.workbench.ui.bottomTab === 'evidence'" class="wb-evidence">
+              <p class="wb-note">External data never overwrites the project until you accept a candidate. Validation “plausible” is not VERIFIED.</p>
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn wb-btn--primary" :disabled="$store.workbench.evidence.loading" @click="$store.workbench.findVerified()">Find verified data</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.checkEvidenceUpdates()">Check for updates</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.openSources()">Data sources</button>
+                <span class="wb-meta" x-text="$store.workbench.evidence.loading ? 'Loading…' : $store.workbench.evidenceCoverageLabel"></span>
+              </div>
+              <p class="wb-empty" x-show="$store.workbench.evidence.error" x-text="$store.workbench.evidence.error"></p>
+
+              <h3>Project values &amp; candidates</h3>
+              <template x-if="!$store.workbench.evidenceRows.length && !$store.workbench.evidence.loading">
+                <p class="wb-empty">No candidates yet. Press Find verified data. Templates stay conceptual.</p>
+              </template>
+              <div class="wb-ev-grid">
+                <template x-for="row in $store.workbench.evidenceRows" :key="(row.evidence && row.evidence.evidenceId) || row.parameter">
+                  <article class="wb-ev-card">
+                    <h4 x-text="row.parameter"></h4>
+                    <p class="wb-meta">Current: <strong x-text="row.currentValue == null ? '—' : row.currentValue"></strong> <span x-text="row.currentUnit || ''"></span> · <span x-text="$store.workbench.provenanceLabel(row.currentProvenance) || row.currentProvenance"></span></p>
+                    <p>Candidate: <strong x-text="row.candidateValue == null ? '—' : row.candidateValue"></strong> <span x-text="row.candidateUnit || ''"></span></p>
+                    <p class="wb-meta">Scope <span x-text="row.evidence && row.evidence.granularity"></span> · Retrieved <span x-text="row.evidence && row.evidence.retrievedAt"></span> · Confidence <span x-text="row.evidence && row.evidence.confidence"></span>/100</p>
+                    <p class="wb-meta" x-show="row.differencePercent != null">Difference <span x-text="(row.differencePercent > 0 ? '+' : '') + $store.workbench.formatN(row.differencePercent, 1) + ' %'"></span></p>
+                    <p class="wb-note" x-show="row.recommended" x-text="row.recommendationReason"></p>
+                    <p class="wb-note" x-show="row.blockedReason" x-text="row.blockedReason"></p>
+                    <p class="wb-meta" x-text="row.evidence && row.evidence.sourceTitle"></p>
+                    <div class="wb-row-actions">
+                      <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.acceptCandidate(row.parameter, row.evidence.evidenceId)">Accept candidate</button>
+                      <button type="button" class="wb-btn" @click="$store.workbench.keepCandidate(row.parameter, row.evidence.evidenceId)">Keep current</button>
+                    </div>
+                  </article>
+                </template>
+              </div>
+
+              <h3>Conflicts</h3>
+              <template x-if="!($store.workbench.evidence.conflicts && $store.workbench.evidence.conflicts.length)">
+                <p class="wb-empty">No conflicts in the current lookup.</p>
+              </template>
+              <template x-for="c in $store.workbench.evidence.conflicts" :key="(c.evidenceIds || []).join('-')">
+                <p class="wb-note"><strong x-text="c.conflictType"></strong> · <span x-text="c.parameter"></span> — <span x-text="c.explanation"></span></p>
+              </template>
+
+              <h3>Pending site studies</h3>
+              <template x-for="u in $store.workbench.evidence.unresolved" :key="u.parameter">
+                <p class="wb-meta"><span x-text="u.parameter"></span> — <span x-text="u.reason"></span> <span x-text="u.note || ''"></span></p>
+              </template>
+
+              <h3>Stale / cached</h3>
+              <p class="wb-meta" x-show="$store.workbench.evidence.updates && $store.workbench.evidence.updates.length">Update check does not apply values.</p>
+              <template x-for="u in $store.workbench.evidence.updates" :key="u.parameter">
+                <p class="wb-meta"><span x-text="u.parameter"></span> · <span x-text="u.result"></span></p>
+              </template>
+
+              <h3>Regional intelligence</h3>
+              <p class="wb-note">Verified facts with sources. Separate from conceptual regional profiles.</p>
+              <template x-if="$store.workbench.evidence.intelligence">
+                <div>
+                  <p class="wb-meta">Country <span x-text="$store.workbench.evidence.intelligence.country || '—'"></span> · available <span x-text="($store.workbench.evidence.intelligence.available || []).length"></span> · pending <span x-text="($store.workbench.evidence.intelligence.pending || []).length"></span></p>
+                </div>
+              </template>
+            </div>
+
+            <div x-show="$store.workbench.ui.bottomTab === 'calculators'">
+              <p class="wb-meta">Diagnostics come from the calculation and validation engines. Inrush is demand-only and is never billed as energy.</p>
+              <template x-if="$store.workbench.derived.installation && $store.workbench.derived.installation.ok">
+                <p>Steady demand <span x-text="$store.workbench.formatN($store.workbench.derived.installation.value.runningPowerKW, 3)"></span> kW · connected <span x-text="$store.workbench.formatN($store.workbench.derived.installation.value.connectedPowerKW, 3)"></span> kW</p>
+              </template>
+            </div>
+
+            <div x-show="$store.workbench.ui.bottomTab === 'assumptions'">
+              <ul>
+                <template x-for="(a, i) in ($store.workbench.project.assumptions || [])" :key="i"><li x-text="a"></li></template>
+              </ul>
+            </div>
+
+            <div x-show="$store.workbench.ui.bottomTab === 'compare'" class="wb-compare">
+              <p class="wb-note">Comparación cara a cara. <strong>No se recomienda ni se clasifica un ganador.</strong> El resaltado marca un delta por encima del umbral que usted configura (5% por defecto) o una diferencia cualitativa. No hay score compuesto. Si quiere un score, escriba su fórmula — se muestra, no se evalúa.</p>
+              <div class="wb-issue" data-sev="WARNING" x-show="$store.workbench.comparisonTable.engineMismatch">
+                <span class="wb-sev">HIGH</span>
+                <p>Motores distintos: no comparable en rigor. Deltas de campos derivados bloqueados.</p>
+              </div>
+
+              <div class="wb-compare-slots">
+                <template x-for="(slot, idx) in $store.workbench.compare.slots" :key="'cmp-slot-'+idx">
+                  <article class="wb-compare-slot">
+                    <h3><span x-text="idx === 0 ? 'Slot 1 · baseline' : 'Slot ' + (idx + 1)"></span></h3>
+                    <div class="wb-field">
+                      <label>Tipo</label>
+                      <select :value="slot.kind" @change="$store.workbench.setCompareSlotKind(idx, $event.target.value)">
+                        <option value="">—</option>
+                        <template x-for="k in $store.workbench.compareEntityKinds" :key="k.id">
+                          <option :value="k.id" x-text="k.label"></option>
+                        </template>
+                      </select>
+                    </div>
+                    <div class="wb-field">
+                      <label>Entidad</label>
+                      <select :value="slot.id" @change="$store.workbench.setCompareSlotId(idx, $event.target.value)">
+                        <option value="">—</option>
+                        <template x-for="opt in $store.workbench.compareEntityOptions(slot.kind)" :key="opt.id">
+                          <option :value="opt.id" x-text="opt.label"></option>
+                        </template>
+                      </select>
+                    </div>
+                    <p class="wb-meta" x-show="slot.kind === 'site' && !($store.workbench.geoSites || []).length">Sitio requiere arquitectura anclada en el proyecto abierto.</p>
+                    <button type="button" class="wb-btn" x-show="idx > 1" @click="$store.workbench.removeCompareSlot(idx)">Quitar slot</button>
+                  </article>
+                </template>
+              </div>
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn" x-show="$store.workbench.compare.slots.length < 3" @click="$store.workbench.addCompareSlot()">Añadir slot</button>
+              </div>
+
+              <div class="wb-filters">
+                <div class="wb-field">
+                  <label for="wb-cmp-name">Nombre</label>
+                  <input id="wb-cmp-name" type="text" :value="$store.workbench.compare.name" @input="$store.workbench.compare.name = $event.target.value">
+                </div>
+                <div class="wb-field">
+                  <label for="wb-cmp-th">Umbral de resaltado (%)</label>
+                  <input id="wb-cmp-th" type="number" min="0" step="0.5" :value="$store.workbench.compare.thresholdPct" @input="$store.workbench.compare.thresholdPct = Number($event.target.value)">
+                </div>
+                <div class="wb-field" style="grid-column: 1 / -1">
+                  <label for="wb-cmp-formula">Fórmula del usuario (opcional, no se evalúa)</label>
+                  <input id="wb-cmp-formula" type="text" :value="$store.workbench.compare.userFormula" @input="$store.workbench.compare.userFormula = $event.target.value" placeholder="Ej. (PV_A − PV_B) / peak_A — visible, nunca calculada por el workbench">
+                </div>
+              </div>
+              <p class="wb-meta" x-show="$store.workbench.compare.userFormula">Fórmula visible: <span x-text="$store.workbench.compare.userFormula"></span></p>
+
+              <div class="wb-row-actions">
+                <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.saveCurrentComparison()">Guardar comparación</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.exportComparisonCsv()">Export CSV</button>
+                <button type="button" class="wb-btn" @click="$store.workbench.exportComparisonPdf()">Export PDF</button>
+              </div>
+
+              <template x-if="$store.workbench.savedComparisons.length">
+                <div class="wb-compare-saved">
+                  <h3>Guardadas en este proyecto</h3>
+                  <template x-for="rec in $store.workbench.savedComparisons" :key="rec.id">
+                    <div class="wb-row-actions">
+                      <span class="wb-meta" x-text="rec.name + ' · ' + rec.slots.length + ' slots'"></span>
+                      <button type="button" class="wb-btn" @click="$store.workbench.reopenComparison(rec.id)">Reabrir</button>
+                      <button type="button" class="wb-btn" @click="$store.workbench.deleteSavedComparison(rec.id)">Eliminar</button>
+                    </div>
+                  </template>
+                </div>
+              </template>
+
+              <p class="wb-empty" x-show="!$store.workbench.comparisonTable.ok">
+                <span x-text="$store.workbench.comparisonTable.error || 'Seleccione 2 o 3 entidades.'"></span>
+                Next: <button type="button" class="wb-btn" @click="$store.workbench.goScreen('atlas')">elige templates en Atlas</button>
+                o <button type="button" class="wb-btn" @click="$store.workbench.goScreen('project')">abre otro proyecto</button>.
+              </p>
+
+              <template x-if="$store.workbench.comparisonTable.ok">
+                <div>
+                  <div class="wb-compare-table-wrap">
+                    <table class="wb-compare-table">
+                      <thead>
+                        <tr>
+                          <th>Campo</th>
+                          <th>Ud.</th>
+                          <template x-for="(v, vi) in $store.workbench.comparisonTable.views" :key="'h-'+vi">
+                            <th x-text="v.label"></th>
+                          </template>
+                          <template x-for="(v, vi) in $store.workbench.comparisonTable.views.slice(1)" :key="'hd-'+vi">
+                            <th x-text="'Δ vs ' + $store.workbench.comparisonTable.views[0].label"></th>
+                          </template>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <template x-for="row in $store.workbench.comparisonDisplayRows" :key="row.id">
+                          <tr :class="{ 'is-hi-row': row.highlight }">
+                            <th scope="row">
+                              <span class="wb-compare-group-lab" x-show="row.groupLabel" x-text="row.groupLabel"></span>
+                              <span x-text="row.label"></span>
+                            </th>
+                            <td x-text="row.unit || '—'"></td>
+                            <template x-for="(val, vi) in row.values" :key="row.id+'-v-'+vi">
+                              <td :class="{ 'is-na': val === 'N/A', 'is-hi': row.highlight && vi > 0 && row.deltas[vi - 1] && row.deltas[vi - 1].highlight }" x-text="$store.workbench.formatCompareValue(val)"></td>
+                            </template>
+                            <template x-for="(d, di) in row.deltas" :key="row.id+'-d-'+di">
+                              <td :class="{ 'is-hi': d.highlight, 'is-blocked': d.blocked, 'is-na': d.na }" x-text="$store.workbench.formatCompareDelta(d)"></td>
+                            </template>
+                          </tr>
+                        </template>
+                      </tbody>
+                    </table>
+                  </div>
+
+                  <div class="wb-compare-panels">
+                    <section class="wb-compare-panel">
+                      <h3>Warnings unidos</h3>
+                      <p class="wb-empty" x-show="!($store.workbench.comparisonTable.warnings || []).length">Sin warnings.</p>
+                      <template x-for="w in $store.workbench.comparisonTable.warnings" :key="w.code">
+                        <div class="wb-issue" :data-sev="w.level === 'HIGH' ? 'WARNING' : 'NOTICE'">
+                          <span class="wb-sev" x-text="w.level || 'WARNING'"></span>
+                          <p><strong x-text="w.code"></strong> — <span x-text="w.message"></span>
+                            <span class="wb-meta" x-text="(w.slots || []).join(', ')"></span>
+                          </p>
+                        </div>
+                      </template>
+                    </section>
+                    <section class="wb-compare-panel">
+                      <h3>Evidence coverage</h3>
+                      <div class="wb-compare-evidence">
+                        <template x-for="(e, ei) in $store.workbench.comparisonTable.evidence" :key="'ev-'+ei">
+                          <article class="wb-tcard">
+                            <h3 x-text="e.label"></h3>
+                            <p class="wb-meta">Coverage <span x-text="e.coverage == null ? 'N/A' : e.coverage"></span></p>
+                            <p class="wb-meta">Conflictos <span x-text="e.conflicts == null ? 'N/A' : e.conflicts"></span></p>
+                            <p class="wb-meta">Stale <span x-text="e.stale == null ? 'N/A' : e.stale"></span></p>
+                            <p class="wb-meta">Estado <span x-text="e.status || 'N/A'"></span></p>
+                          </article>
+                        </template>
+                      </div>
+                    </section>
+                  </div>
+                </div>
+              </template>
+            </div>
+          </section>
+        </div>
+      </template>
+    </div>
+  </main>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.templateOpen" x-cloak @click.self="$store.workbench.closeTemplate()" role="dialog" aria-modal="true" aria-labelledby="wb-td-title">
+    <div class="wb-dialog" id="wb-template-detail">
+      <template x-if="$store.workbench.detailTemplate">
+        <div>
+          <h2 id="wb-td-title" x-text="$store.workbench.detailTemplate.overview.name"></h2>
+          <p class="wb-meta"><span x-text="$store.workbench.detailTemplate.overview.country"></span> · <span x-text="$store.workbench.detailTemplate.overview.region"></span> · <span x-text="$store.workbench.detailTemplate.overview.subregion"></span></p>
+          <h3>Overview</h3>
+          <p x-text="$store.workbench.detailTemplate.template.description"></p>
+          <h3>Electrical</h3>
+          <p class="wb-meta">Peak <span x-text="$store.workbench.detailTemplate.template.loadProfile && $store.workbench.detailTemplate.template.loadProfile.peakLoadMW"></span> MW · Grid <span x-text="$store.workbench.detailTemplate.overview.grid"></span></p>
+          <h3>Generation</h3>
+          <p class="wb-meta" x-text="$store.workbench.detailTemplate.card.generation"></p>
+          <h3>Storage</h3>
+          <p class="wb-meta" x-text="$store.workbench.detailTemplate.card.bess"></p>
+          <h3>Substation</h3>
+          <p class="wb-meta" x-text="$store.workbench.detailTemplate.card.voltage"></p>
+          <h3>Environment</h3>
+          <p class="wb-meta" x-text="$store.workbench.detailTemplate.overview.environment"></p>
+          <h3>Assumptions</h3>
+          <ul>
+            <template x-for="(a, i) in ($store.workbench.detailTemplate.template.assumptions || [])" :key="i"><li x-text="a"></li></template>
+          </ul>
+          <h3>Warnings</h3>
+          <p class="wb-meta">Validation warnings: <span x-text="$store.workbench.detailTemplate.card.warningsCount"></span> · score <span x-text="$store.workbench.detailTemplate.card.qualityScore"></span></p>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.loadTemplate($store.workbench.detailTemplate.template.id)">Load template</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.closeTemplate()">Close</button>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.projectsOpen" x-cloak @click.self="$store.workbench.ui.projectsOpen = false" role="dialog" aria-modal="true" aria-label="My projects">
+    <div class="wb-dialog">
+      <h2>My projects</h2>
+      <div class="wb-row-actions">
+        <input type="search" :value="$store.workbench.ui.projectSearch" @input="$store.workbench.ui.projectSearch = $event.target.value" placeholder="Search name, tags, region…" aria-label="Search projects">
+        <select :value="$store.workbench.ui.projectSort" @change="$store.workbench.ui.projectSort = $event.target.value" aria-label="Sort projects">
+          <option value="updated">Recently updated</option>
+          <option value="name">Name</option>
+          <option value="created">Created</option>
+          <option value="mode">Architecture type</option>
+        </select>
+      </div>
+      <template x-if="!$store.workbench.listedProjects.length">
+        <p class="wb-empty">No saved projects yet.</p>
+      </template>
+      <template x-for="row in $store.workbench.listedProjects" :key="row.projectId">
+        <article class="wb-tcard">
+          <h3 x-text="row.name"></h3>
+          <p class="wb-meta"><span x-text="row.mode"></span> · <span x-text="row.country || '—'"></span> · <span x-text="row.sourceTemplateId || 'no template'"></span></p>
+          <p class="wb-meta">Updated <span x-text="row.updatedAt"></span>
+            · <span x-text="row.lastValidationStatus ? (row.lastValidationStatus.valid ? 'Valid' : 'Errors') : 'Incomplete'"></span>
+          </p>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.requestOpenProject(row.projectId)">Open</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.addListedProjectToCompare(row.projectId)">Comparar</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.downloadListedProjectPdf(row.projectId)">Descargar PDF</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.deleteListedProject(row.projectId)">Delete</button>
+          </div>
+        </article>
+      </template>
+      <button type="button" class="wb-btn" @click="$store.workbench.ui.projectsOpen = false">Close</button>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.snapshotsOpen" x-cloak @click.self="$store.workbench.ui.snapshotsOpen = false" role="dialog" aria-modal="true" aria-label="Snapshots">
+    <div class="wb-dialog">
+      <h2>Snapshots</h2>
+      <p class="wb-meta">Immutable photographs of architecture and scenarios. Restoring keeps this project ID.</p>
+      <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.takeSnapshot()">Create snapshot</button>
+      <template x-if="!($store.workbench.document && $store.workbench.document.snapshots && $store.workbench.document.snapshots.length)">
+        <p class="wb-empty">No snapshots yet.</p>
+      </template>
+      <template x-for="snap in ($store.workbench.document && $store.workbench.document.snapshots) || []" :key="snap.snapshotId">
+        <article class="wb-tcard">
+          <h3 x-text="snap.name"></h3>
+          <p class="wb-meta" x-text="snap.createdAt"></p>
+          <p class="wb-meta" x-text="snap.note"></p>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn" @click="$store.workbench.restoreSnapshot(snap.snapshotId)">Restore</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.addSnapshotToCompare(snap.snapshotId)">Comparar</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.downloadPdfFromSnapshot(snap.snapshotId)">Descargar PDF</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.newFromSnapshot(snap.snapshotId)">New project from snapshot</button>
+          </div>
+        </article>
+      </template>
+      <template x-if="$store.workbench.snapshotDiff">
+        <div>
+          <h3>Diff</h3>
+          <template x-for="cat in Object.keys($store.workbench.snapshotDiff.groups)" :key="cat">
+            <div>
+              <h4 x-text="cat"></h4>
+              <template x-for="row in $store.workbench.snapshotDiff.groups[cat]" :key="row.path">
+                <p class="wb-meta" x-text="row.text"></p>
+              </template>
+            </div>
+          </template>
+        </div>
+      </template>
+      <button type="button" class="wb-btn" @click="$store.workbench.ui.snapshotsOpen = false">Close</button>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.importPreview" x-cloak role="dialog" aria-modal="true" aria-label="Import preview">
+    <div class="wb-dialog">
+      <h2>Import preview</h2>
+      <p class="wb-empty" x-show="$store.workbench.ui.importPreview && $store.workbench.ui.importPreview.error" x-text="$store.workbench.ui.importPreview && $store.workbench.ui.importPreview.error"></p>
+      <template x-if="$store.workbench.ui.importPreview && !$store.workbench.ui.importPreview.error">
+        <div>
+          <p><strong x-text="$store.workbench.ui.importPreview.name"></strong></p>
+          <p class="wb-meta">Schema <span x-text="$store.workbench.ui.importPreview.schemaVersion"></span> · <span x-text="$store.workbench.ui.importPreview.architectureType"></span></p>
+          <p class="wb-meta">Template <span x-text="$store.workbench.ui.importPreview.sourceTemplate || '—'"></span></p>
+          <p class="wb-meta">Scenarios <span x-text="$store.workbench.ui.importPreview.scenarios"></span> · Snapshots <span x-text="$store.workbench.ui.importPreview.snapshots"></span></p>
+          <p class="wb-note" x-show="$store.workbench.ui.importCollision">A project with this ID already exists locally.</p>
+          <template x-for="w in $store.workbench.ui.importPreview.warnings || []" :key="w"><p class="wb-note" x-text="w"></p></template>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" x-show="!$store.workbench.ui.importCollision" @click="$store.workbench.confirmImport()">Import</button>
+            <button type="button" class="wb-btn" x-show="$store.workbench.ui.importCollision" @click="$store.workbench.confirmImport('copy')">Import as copy</button>
+            <button type="button" class="wb-btn" x-show="$store.workbench.ui.importCollision" @click="$store.workbench.confirmImport('replace')">Replace existing</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.ui.importPreview = null">Cancel</button>
+          </div>
+        </div>
+      </template>
+      <button type="button" class="wb-btn" x-show="$store.workbench.ui.importPreview && $store.workbench.ui.importPreview.error" @click="$store.workbench.ui.importPreview = null">Close</button>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.dialog" x-cloak role="dialog" aria-modal="true" aria-label="Confirm">
+    <div class="wb-dialog">
+      <template x-if="$store.workbench.ui.dialog && $store.workbench.ui.dialog.kind === 'delete'">
+        <div>
+          <h2>Delete project?</h2>
+          <p>This cannot be undone. Architecture, scenarios and snapshots will be removed from this browser.</p>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.confirmDialog('confirm')">Delete</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.ui.dialog = null">Cancel</button>
+          </div>
+        </div>
+      </template>
+      <template x-if="$store.workbench.ui.dialog && $store.workbench.ui.dialog.kind === 'switch'">
+        <div>
+          <h2>Unsaved changes</h2>
+          <p>Save before opening another project?</p>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.confirmDialog('save')">Save and open</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.confirmDialog('discard')">Discard and open</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.ui.dialog = null">Cancel</button>
+          </div>
+        </div>
+      </template>
+      <template x-if="$store.workbench.ui.dialog && $store.workbench.ui.dialog.kind === 'template'">
+        <div>
+          <h2>Load template</h2>
+          <p>Do not silently replace the current project.</p>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.confirmDialog('new')">Create new project from template</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.confirmDialog('replace')">Replace current architecture</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.ui.dialog = null">Cancel</button>
+          </div>
+        </div>
+      </template>
+      <template x-if="$store.workbench.ui.dialog && $store.workbench.ui.dialog.kind === 'restore'">
+        <div>
+          <h2>Restore snapshot?</h2>
+          <p>A snapshot of the current state will be taken first. Project ID stays the same.</p>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.confirmDialog('confirm')">Restore</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.ui.dialog = null">Cancel</button>
+          </div>
+        </div>
+      </template>
+      <template x-if="$store.workbench.ui.dialog && $store.workbench.ui.dialog.kind === 'import-collision'">
+        <div>
+          <h2>Project ID already exists</h2>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.confirmDialog('copy')">Import as copy</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.confirmDialog('replace')">Replace existing</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.ui.dialog = null">Cancel</button>
+          </div>
+        </div>
+      </template>
+      <template x-if="$store.workbench.ui.dialog && $store.workbench.ui.dialog.kind === 'stale-evidence'">
+        <div>
+          <h2>Accept stale evidence?</h2>
+          <p>This record is stale. Accepting it will be marked explicitly. Dates remain visible.</p>
+          <div class="wb-row-actions">
+            <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.confirmDialog('confirm')">Accept stale</button>
+            <button type="button" class="wb-btn" @click="$store.workbench.ui.dialog = null">Cancel</button>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.ioOpen" x-cloak @click.self="$store.workbench.ui.ioOpen = false" role="dialog" aria-modal="true" aria-label="Import and export">
+    <div class="wb-dialog">
+      <h2>Import / Export</h2>
+      <p class="wb-note">Checklist v1. Import inválido muestra error y no tumba la pestaña. Exports bloquean PII (email, rutas, nombres locales).</p>
+      <h3>Import</h3>
+      <ul>
+        <li>Proyecto JSON (límite 5 MB, JSON.parse, sin eval)</li>
+        <li>Sitios GeoJSON / CSV (WGS84, mismo límite)</li>
+      </ul>
+      <div class="wb-row-actions">
+        <label class="wb-btn">Proyecto JSON<input type="file" accept="application/json,.json" class="wb-file-input" @change="$store.workbench.onImportFile($event)" aria-label="Import project JSON"></label>
+        <label class="wb-btn">Sitios GeoJSON/CSV<input type="file" accept=".geojson,.json,.csv,application/geo+json,text/csv" class="wb-file-input" @change="$store.workbench.onGeoFile($event)" aria-label="Import sites"></label>
+      </div>
+      <h3>Export</h3>
+      <div class="wb-row-actions">
+        <button type="button" class="wb-btn" @click="$store.workbench.exportNow()">Proyecto JSON</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportGeoJSON()">Sitios GeoJSON</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportGeoCSV()">Sitios CSV</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportAtlasJSON()">Atlas enriquecido JSON</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportAtlasCSV()">Atlas enriquecido CSV</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.downloadPdf()">PDF del report</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportComparisonCsv()">Comparación CSV</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportComparisonPdf()">Comparación PDF</button>
+      </div>
+      <p class="wb-meta">Snapshot: use Snapshots → Descargar PDF. El PDF no se cachea en el Service Worker.</p>
+      <button type="button" class="wb-btn" @click="$store.workbench.ui.ioOpen = false">Close</button>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.privacyOpen" x-cloak @click.self="$store.workbench.ui.privacyOpen = false" role="dialog" aria-modal="true" aria-label="Privacy">
+    <div class="wb-dialog">
+      <h2>Privacidad y datos locales</h2>
+      <p class="wb-note">Todo vive en este navegador (IndexedDB + localStorage). No hay cuenta. Exports se escanean contra email, rutas y PII de plantilla.</p>
+      <ul>
+        <li><strong>Qué se guarda:</strong> proyecto, escenarios, snapshots, comparaciones, evidencias aceptadas, sitios, registros de enrichment del atlas.</li>
+        <li><strong>Borrar proyecto:</strong> Projects → Delete. Irreversible en este dispositivo.</li>
+        <li><strong>Borrar evidencias:</strong> quita accepted/dismissed/history del proyecto abierto. El atlas enrichment no se borra.</li>
+        <li><strong>Mapa:</strong> tiles OSM salen de la red; no se fingen offline.</li>
+      </ul>
+      <div class="wb-row-actions">
+        <button type="button" class="wb-btn" @click="$store.workbench.wipeProjectEvidence()">Borrar evidencias del proyecto</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.openProjects()">Gestionar proyectos</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.ui.privacyOpen = false">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.reportOpen" x-cloak role="dialog" aria-modal="true" aria-label="Technical report">
+    <div class="wb-dialog wb-dialog--report">
+      <h2>Technical report</h2>
+      <p class="wb-note" x-show="$store.workbench.reportStale">Project changed since this report was generated. <button type="button" class="wb-btn" @click="$store.workbench.regenerateReport()">Regenerate</button></p>
+      <div class="wb-filters">
+        <div class="wb-field"><label>Mode</label>
+          <select :value="$store.workbench.ui.reportOptions.reportMode" @change="$store.workbench.ui.reportOptions.reportMode = $event.target.value">
+            <option value="summary">SUMMARY</option>
+            <option value="standard">STANDARD</option>
+            <option value="detailed">DETAILED</option>
+          </select>
+        </div>
+        <div class="wb-field"><label>Scenario</label>
+          <select :value="$store.workbench.ui.reportOptions.scenarioId || ''" @change="$store.workbench.ui.reportOptions.scenarioId = $event.target.value || null">
+            <option value="">Active</option>
+            <template x-for="sc in $store.workbench.documentScenarios" :key="sc.id">
+              <option :value="sc.id" x-text="sc.name"></option>
+            </template>
+          </select>
+        </div>
+        <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.reportOptions.includeEconomics" @change="$store.workbench.ui.reportOptions.includeEconomics = $event.target.checked"> Economics</label>
+        <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.reportOptions.includeSacredView" @change="$store.workbench.ui.reportOptions.includeSacredView = $event.target.checked"> Sacred view</label>
+        <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.reportOptions.includeValidation" @change="$store.workbench.ui.reportOptions.includeValidation = $event.target.checked"> Validation</label>
+        <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.reportOptions.includeProvenance" @change="$store.workbench.ui.reportOptions.includeProvenance = $event.target.checked"> Provenance</label>
+        <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.reportOptions.includeVerifiedSources !== false" @change="$store.workbench.ui.reportOptions.includeVerifiedSources = $event.target.checked"> Verified sources</label>
+        <label class="wb-check"><input type="checkbox" :checked="$store.workbench.ui.reportOptions.includeScenarios" @change="$store.workbench.ui.reportOptions.includeScenarios = $event.target.checked"> Scenarios</label>
+      </div>
+      <div class="wb-row-actions">
+        <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.generateReport()">Generate preview</button>
+        <button type="button" class="wb-btn wb-btn--primary" @click="$store.workbench.downloadPdf()">Descargar PDF</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.printReport()">Print</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.exportReportHtml()">Export HTML</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.compareSnapshotReport()">Revision comparison</button>
+        <button type="button" class="wb-btn" @click="$store.workbench.ui.reportOpen = false">Close</button>
+      </div>
+      <div class="wb-report-preview" x-show="$store.workbench.reportHtml" x-html="$store.workbench.reportHtml"></div>
+    </div>
+  </div>
+
+  <div class="wb-dialog-backdrop" x-show="$store.workbench.ui.sourcesOpen" x-cloak role="dialog" aria-modal="true" aria-label="Data sources" @click.self="$store.workbench.ui.sourcesOpen = false">
+    <div class="wb-dialog">
+      <h2>Data sources</h2>
+      <p class="wb-note">Registered sources only. Listing a source is not an endorsement. Authority tier is not absolute truth.</p>
+      <p class="wb-empty" x-show="!($store.workbench.sourceRows && $store.workbench.sourceRows.length)">No hay fuentes registradas en memoria. Recargue la página.</p>
+      <div class="wb-table-wrap" x-show="$store.workbench.sourceRows && $store.workbench.sourceRows.length">
+      <table class="wb-sources-table">
+        <thead><tr><th>Id</th><th>Organization</th><th>Category</th><th>Tier</th><th>License</th></tr></thead>
+        <tbody>
+          <template x-for="s in $store.workbench.sourceRows" :key="s.id">
+            <tr>
+              <td data-label="Id" x-text="s.id"></td>
+              <td data-label="Organization" x-text="s.organization"></td>
+              <td data-label="Category" x-text="s.category"></td>
+              <td data-label="Tier" x-text="s.authorityTier"></td>
+              <td data-label="License" x-text="s.license || '—'"></td>
+            </tr>
+          </template>
+        </tbody>
+      </table>
+      </div>
+      <button type="button" class="wb-btn" @click="$store.workbench.ui.sourcesOpen = false">Close</button>
+    </div>
+  </div>
+
+  <footer>
+    <p>Kirtan Teg Singh and The Gurdwara Ensemble 2026 Ⓒ</p>
+    <p><a href="https://www.youtube.com/@kirtantegsingh" target="_blank" title="YouTube">YouTube</a></p>
+  </footer>
+</body>
+</html>

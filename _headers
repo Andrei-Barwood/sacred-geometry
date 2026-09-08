@@ -1,0 +1,23 @@
+# Cloudflare Pages — Arquitectura Sagrada v1
+# CSP is scoped to the workbench only. A site-wide policy would block
+# Firebase comments, MathJax, YouTube embeds and p5 on the portal.
+
+/arquitectura-sagrada.html
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https://tile.openstreetmap.org; connect-src 'self' https://api.coingecko.com; worker-src 'self'; manifest-src 'self'
+
+/offline-architecture.html
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Frame-Options: DENY
+  Content-Security-Policy: default-src 'self'; base-uri 'self'; form-action 'self'; object-src 'none'; frame-ancestors 'none'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; worker-src 'self'
+
+/sw.js
+  Cache-Control: no-cache
+
+/*.pdf
+  Cache-Control: no-store
+  X-Content-Type-Options: nosniff
