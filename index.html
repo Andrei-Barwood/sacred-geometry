@@ -8,6 +8,7 @@
   <title>Kirtan Teg Singh</title>
   <link rel="icon" href="favicon.jpeg" type="image/jpeg">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/concord-tv-banner.css">
   <script>
     // Ensure Alpine expressions never crash even if app.js (module) loads after Alpine initializes.
     document.addEventListener('alpine:init', () => {
@@ -27,6 +28,7 @@
   </script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.x/dist/cdn.min.js"></script>
   <script type="module" src="js/app.js"></script>
+  <script type="module" src="js/concord-monitor-widget.js"></script>
 </head>
 <body class="no-js" x-data="{ }" x-init="Alpine.store('app')?.init?.()">
   <div id="js-required-overlay" aria-live="polite">
@@ -113,10 +115,35 @@
 
   <!-- Main Content -->
   <main id="main-content">
-    <a class="arch-banner" href="arquitectura-sagrada.html" aria-label="Arquitectura Sagrada">
-      <div class="arch-banner-stage" id="arch-banner-stage"></div>
-      <span class="arch-banner-label">Arquitectura Sagrada</span>
-    </a>
+    <!-- Banner Televisivo // Monitor de Actividad Gallente-Guristas -->
+    <aside id="concord-tv-banner" class="concord-tv-banner" aria-label="Monitor de Actividad Gallente-Guristas">
+      <div class="tv-banner-left">
+        <div class="tv-badge tv-badge--live" id="tv-status-pill">
+          <span class="tv-rec-dot"></span>
+          <span class="tv-badge-text" id="tv-badge-mode">EN VIVO</span>
+        </div>
+        <span class="tv-channel-tag">DED // EJE GALLENTE-GURISTAS</span>
+      </div>
+
+      <div class="tv-banner-center">
+        <div class="tv-headline-wrapper">
+          <div id="tv-headline-content" class="tv-headline-content">
+            <span class="tv-alert-tag">[ALERTA OMEGA]</span> Cargando telemetría subespacial de New Eden...
+          </div>
+        </div>
+      </div>
+
+      <div class="tv-banner-right">
+        <button id="tv-audio-toggle" class="tv-btn tv-audio-btn" title="Alternar audio táctico" aria-label="Alternar audio">
+          <span id="tv-audio-icon">🔇</span>
+        </button>
+        <button id="tv-open-pod-btn" class="tv-btn tv-expand-btn" aria-label="Abrir Pod de Inteligencia">
+          <span class="tv-btn-text-full">POD DE INTELIGENCIA</span>
+          <span class="tv-btn-text-short">POD</span>
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+        </button>
+      </div>
+    </aside>
 
     <!-- Hero Section -->
     <section class="hero">
