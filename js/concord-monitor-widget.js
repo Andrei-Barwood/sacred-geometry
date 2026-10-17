@@ -4,12 +4,13 @@
 // ==========================================================================
 
 // Initial Historical Archive of Activity Monitor Updates
+// Initial Historical Archive of Activity Monitor Updates (Events from 2 days ago: 15 Octubre 2026)
 const HISTORICAL_ARCHIVE = [
   {
     id: "hist-01",
     source: "eve_online",
-    time: "HACE 14m",
-    timestamp: "2026-10-17T15:10:00Z",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T22:45:00Z",
     system: "Villore",
     region: "Essence",
     sec: 0.8,
@@ -18,16 +19,16 @@ const HISTORICAL_ARCHIVE = [
     faction: "Gallente Federation",
     severity: "BETA",
     ggci: 76,
-    cargo: ["Worm Blueprint", "Exile Booster"],
-    text: "Fondos reservados del Senado Federal desviados hacia intermediarios de Venal.",
+    cargo: ["Planos de Worm", "Exile Booster"],
+    text: "Desvío de fondos reservados del Senado Federal hacia intermediarios de Venal documentado hace dos días.",
     val: "480,000,000 ISK",
     valNum: 480000000
   },
   {
     id: "hist-02",
     source: "galaxy_conquest",
-    time: "HACE 38m",
-    timestamp: "2026-10-17T14:46:00Z",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T20:15:00Z",
     system: "H-PA29",
     region: "Venal",
     sec: -0.2,
@@ -36,16 +37,16 @@ const HISTORICAL_ARCHIVE = [
     faction: "Guristas Pirates",
     severity: "OMEGA",
     ggci: 94,
-    cargo: ["Gecko (Guristas Heavy Drone)", "Rattlesnake Blueprint"],
-    text: "Transporte encubierto neutralizado con planos militares de Gila y componentes de salto.",
+    cargo: ["Gecko (Super-Dron Pesado)", "Planos Militares de Gila"],
+    text: "Transporte logístico clandestino interceptado en territorio anárquico con tecnología militar sustraída de astilleros Gallente.",
     val: "1,850,000,000 ISK",
     valNum: 1850000000
   },
   {
     id: "hist-03",
     source: "eve_online",
-    time: "HACE 1h",
-    timestamp: "2026-10-17T14:24:00Z",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T18:30:00Z",
     system: "Tama",
     region: "The Citadel",
     sec: 0.3,
@@ -54,16 +55,16 @@ const HISTORICAL_ARCHIVE = [
     faction: "Gallente Federation",
     severity: "BETA",
     ggci: 68,
-    cargo: ["Drop Booster", "Genetically Enhanced Livestock"],
-    text: "Escaramuza fronteriza con mercenarios Gallente operando bajo bandera de conveniencia pirata.",
+    cargo: ["Drop Booster Militar", "Ganado Modificado Genéticamente"],
+    text: "Escaramuza en corredor fronterizo con mercenarios de la Federación operando bajo bandera de conveniencia pirata.",
     val: "920,000,000 ISK",
     valNum: 920000000
   },
   {
     id: "hist-04",
     source: "eve_echoes",
-    time: "HACE 2h",
-    timestamp: "2026-10-17T13:24:00Z",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T16:10:00Z",
     system: "Nourvukaiken",
     region: "Lonetrek",
     sec: 0.6,
@@ -73,51 +74,33 @@ const HISTORICAL_ARCHIVE = [
     severity: "BETA",
     ggci: 74,
     cargo: ["Drop Booster (140 unidades)", "Crash Booster"],
-    text: "Decomiso aduanero de cargamento con estimulantes neuronales prohibidos por CONCORD.",
+    text: "Incautación aduanera de narcóticos sintéticos de grado militar procedentes de laboratorios clandestinos de Placid.",
     val: "310,000,000 ISK",
     valNum: 310000000
   },
   {
     id: "hist-05",
     source: "eve_market",
-    time: "HACE 4h",
-    timestamp: "2026-10-17T11:24:00Z",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T14:40:00Z",
     system: "Dodixie",
     region: "Sinq Laison",
     sec: 0.9,
-    ship: "Rattlesnake",
-    corp: "Bolsa Comercial de Dodixie",
+    ship: "Ishtar",
+    corp: "Creodron Logistics Asset Mgmt",
     faction: "Gallente Federation",
     severity: "OMEGA",
-    ggci: 91,
-    cargo: ["Licitación de 12x Cascos Rattlesnake"],
-    text: "Licitación clandestina detectada en libro de órdenes ESI por cascos de asalto Guristas.",
-    val: "2,400,000,000 ISK",
-    valNum: 2400000000
+    ggci: 92,
+    cargo: ["Matriz Neural de Infiltración", "Quafe Ultra"],
+    text: "Auditoría aduanera de CONCORD detectó compra anónima de cruceros pesados con certificados de registro adulterados.",
+    val: "2,720,000,000 ISK",
+    valNum: 2720000000
   },
   {
     id: "hist-06",
-    source: "eve_online",
-    time: "HACE 6h",
-    timestamp: "2026-10-17T09:24:00Z",
-    system: "Nennamaila",
-    region: "Black Rise",
-    sec: 0.4,
-    ship: "Tayra",
-    corp: "Duvolle Laboratories",
-    faction: "Gallente Federation",
-    severity: "ALPHA",
-    ggci: 52,
-    cargo: ["Componentes de Drones Avanzados"],
-    text: "Tránsito de convoy logístico de Duvolle Laboratories en espacio disputado de facciones.",
-    val: "160,000,000 ISK",
-    valNum: 160000000
-  },
-  {
-    id: "hist-07",
     source: "galaxy_conquest",
-    time: "HACE 8h",
-    timestamp: "2026-10-17T07:24:00Z",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T11:20:00Z",
     system: "Y-4CFK",
     region: "Venal",
     sec: -0.5,
@@ -126,16 +109,16 @@ const HISTORICAL_ARCHIVE = [
     faction: "Guristas Pirates",
     severity: "OMEGA",
     ggci: 98,
-    cargo: ["Planos de Clonación Ilegal", "Slaves", "Gecko Super-Drones"],
-    text: "Espacio no regulado sin oficinas CONCORD ni presencia de margen de 3s o 19s. Complejo industrial clandestino de Korako 'The Rabbit' Kosakami.",
+    cargo: ["Planos de Clonación Ilegal", "Slaves", "Superdrones Gecko"],
+    text: "Avistamiento del titán insignia de Korako 'The Rabbit' Kosakami en complejo sin presencia ni jurisdicción CONCORD.",
     val: "8,900,000,000 ISK",
     valNum: 8900000000
   },
   {
-    id: "hist-08",
+    id: "hist-07",
     source: "eve_online",
-    time: "HACE 10h",
-    timestamp: "2026-10-17T05:24:00Z",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T09:15:00Z",
     system: "Ostingele",
     region: "Placid",
     sec: 0.2,
@@ -145,15 +128,15 @@ const HISTORICAL_ARCHIVE = [
     severity: "BETA",
     ggci: 69,
     cargo: ["Exile Booster", "Transmisores Clandestinos"],
-    text: "Sector de baja seguridad (0.2). CONCORD no mantiene patrullas de persecución activa, permitiendo el trasvase de estimulantes hacia intermediarios piratas.",
+    text: "Sector fronterizo de baja seguridad sin patrullas de CONCORD; detectado trasvase nocturno de estimulantes hacia piratas.",
     val: "740,000,000 ISK",
     valNum: 740000000
   },
   {
-    id: "hist-09",
+    id: "hist-08",
     source: "eve_market",
-    time: "HACE 12h",
-    timestamp: "2026-10-17T03:24:00Z",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T06:50:00Z",
     system: "Caille",
     region: "Essence",
     sec: 0.9,
@@ -163,9 +146,45 @@ const HISTORICAL_ARCHIVE = [
     severity: "ALPHA",
     ggci: 46,
     cargo: ["Drones de Asalto Civil", "Quafe Ultra"],
-    text: "Alta seguridad federal con tiempo de respuesta de CONCORD garantizado en 6 segundos. Se detectaron transacciones no declaradas en el Senado.",
+    text: "Transferencia no declarada de acorazados en la capital cultural; tiempo de respuesta policial garantizado en 6 segundos.",
     val: "1,250,000,000 ISK",
     valNum: 1250000000
+  },
+  {
+    id: "hist-09",
+    source: "eve_online",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T04:25:00Z",
+    system: "Nennamaila",
+    region: "Black Rise",
+    sec: 0.4,
+    ship: "Tayra",
+    corp: "Duvolle Laboratories",
+    faction: "Gallente Federation",
+    severity: "ALPHA",
+    ggci: 52,
+    cargo: ["Componentes de Drones Avanzados"],
+    text: "Intervención de carguero industrial en zona de guerra faccional transportando circuitería militar hacia espacio Caldari.",
+    val: "160,000,000 ISK",
+    valNum: 160000000
+  },
+  {
+    id: "hist-10",
+    source: "eve_market",
+    time: "HACE 2 DÍAS (15 OCT)",
+    timestamp: "2026-10-15T01:40:00Z",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: 0.9,
+    ship: "Rattlesnake",
+    corp: "Bolsa Comercial de Dodixie",
+    faction: "Gallente Federation",
+    severity: "OMEGA",
+    ggci: 91,
+    cargo: ["Licitación Clandestina de 12x Cascos Rattlesnake"],
+    text: "Detección en el libro de órdenes bursátil de Sinq Laison de un desvío masivo de cascos de acorazados pesados.",
+    val: "2,400,000,000 ISK",
+    valNum: 2400000000
   }
 ];
 
@@ -176,43 +195,351 @@ const BREAKING_LIVE_ALERT = {
   text: "Intercepción de cargamento masivo de drones Guristas y estimulantes neuronales. Transferencia clandestina vinculada a filiales de Creodron. GGCI: 94% (Flagrante)."
 };
 
-// Procedural Market Orders for ESI Tab
+// Procedural ESI Market Audit Data with 48-Hour Historical Depth (15 Oct - 17 Oct 2026)
 const MARKET_AUDIT_DATA = [
+  // --- HOY: 17 DE OCTUBRE 2026 (0h a 17h previas) ---
   {
-    hub: "Dodixie (Gallente)",
-    item: "Gila (Crucero Pirata)",
+    id: "mkt-01",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Gila (Crucero de Asalto Pirata Guristas)",
     type: "Compra (Buy Order)",
     vol: "24 unidades",
     price: "348,000,000 ISK",
     total: "8.35 B ISK",
-    status: "SOSPECHOSO // DESVÍO DE FLOTA"
+    totalNum: 8352000000,
+    status: "CRÍTICO // DESVÍO DE FLOTA MILITAR",
+    buyer: "Frontier Paramilitary Broker",
+    dayPeriod: "today",
+    dayLabel: "HOY · 17 OCT",
+    timeAgo: "HACE 45 MIN",
+    timestamp: "2026-10-17T16:35:00Z",
+    notes: "Orden anónima cubierta por subcontrata del Senado. Se detectaron saltos de transporte hacia el corredor de Placid."
   },
   {
-    hub: "Dodixie (Gallente)",
-    item: "Gecko (Super-Dron)",
+    id: "mkt-02",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Gecko (Super-Dron de Combate Ilegal)",
     type: "Compra (Buy Order)",
     vol: "150 unidades",
     price: "185,000,000 ISK",
     total: "27.75 B ISK",
-    status: "CRÍTICO // MONOPOLIO NEGRO"
+    totalNum: 27750000000,
+    status: "ALERTA OMEGA // MONOPOLIO NEGRO",
+    buyer: "Creodron Unofficial Shell Corp",
+    dayPeriod: "today",
+    dayLabel: "HOY · 17 OCT",
+    timeAgo: "HACE 3 HORAS",
+    timestamp: "2026-10-17T14:10:00Z",
+    notes: "Adquisición masiva por cuenta con firma electrónica apócrifa vinculada a sindicatos de contrabando en Venal."
   },
   {
-    hub: "Villore (Senado)",
-    item: "Drop Booster (Combat Narcotic)",
+    id: "mkt-03",
+    hub: "Villore VI - Federal Senate Bureau Assembly",
+    system: "Villore",
+    region: "Essence",
+    sec: "0.8",
+    item: "Quafe Ultra & Neuro-Stimulants (Grado Militar)",
+    type: "Compra (Buy Order)",
+    vol: "1,200 contenedores",
+    price: "2,500,000 ISK",
+    total: "3.00 B ISK",
+    totalNum: 3000000000,
+    status: "INVESTIGACIÓN // FONDOS RESERVADOS",
+    buyer: "Senatorial Advisory Caucus Liaison",
+    dayPeriod: "today",
+    dayLabel: "HOY · 17 OCT",
+    timeAgo: "HACE 6 HORAS",
+    timestamp: "2026-10-17T11:25:00Z",
+    notes: "Desvío de estimulantes de combate bajo la etiqueta de provisiones protocolares del Senado Gallente."
+  },
+  {
+    id: "mkt-04",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Caldari Navy Antimatter Charges",
+    type: "Compra (Buy Order)",
+    vol: "250,000 unidades",
+    price: "4,480 ISK",
+    total: "1.12 B ISK",
+    totalNum: 1120000000,
+    status: "CONTRABANDO // MUNICIÓN RESTRINGIDA",
+    buyer: "Sinq Laison Free Haulers Assoc.",
+    dayPeriod: "today",
+    dayLabel: "HOY · 17 OCT",
+    timeAgo: "HACE 8 HORAS",
+    timestamp: "2026-10-17T08:40:00Z",
+    notes: "Cargamento comprado a granel sin manifiesto aduanero; destino probable a naves corsarias en Black Rise."
+  },
+  {
+    id: "mkt-05",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Megathron Navy Issue (Acorazados de la Armada)",
     type: "Venta (Sell Order)",
-    vol: "500 dosis",
+    vol: "4 cascos",
+    price: "1,150,000,000 ISK",
+    total: "4.60 B ISK",
+    totalNum: 4600000000,
+    status: "DESVÍO // LIQUIDACIÓN DE ARSENAL FEDERAL",
+    buyer: "Roden Maritime Subsidiary",
+    dayPeriod: "today",
+    dayLabel: "HOY · 17 OCT",
+    timeAgo: "HACE 14 HORAS",
+    timestamp: "2026-10-17T03:15:00Z",
+    notes: "Venta fuera de registro oficial efectuada en horas de baja actividad del mercado bursátil."
+  },
+
+  // --- AYER: 16 DE OCTUBRE 2026 (18h a 35h previas) ---
+  {
+    id: "mkt-06",
+    hub: "Villore VI - Federal Senate Bureau Assembly",
+    system: "Villore",
+    region: "Essence",
+    sec: "0.8",
+    item: "Drop Booster (Combat Narcotic Clandestino)",
+    type: "Venta (Sell Order)",
+    vol: "500 dosis purificadas",
     price: "38,500,000 ISK",
     total: "19.25 B ISK",
-    status: "ALERTA // CONSUMO OLIGÁRQUICO"
+    totalNum: 19250000000,
+    status: "ALERTA // CONSUMO OLIGÁRQUICO",
+    buyer: "Federal Intelligence Office Proxy",
+    dayPeriod: "yesterday",
+    dayLabel: "AYER · 16 OCT",
+    timeAgo: "HACE 18 HORAS",
+    timestamp: "2026-10-16T22:50:00Z",
+    notes: "Lote confiscado en Placid que reapareció en el libro de órdenes corporativo de Villore."
   },
   {
-    hub: "Jita 4-4 (Caldari)",
-    item: "Rattlesnake (Acorazado)",
+    id: "mkt-07",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Faction Drone Transceivers (Creodron)",
+    type: "Compra (Buy Order)",
+    vol: "65 unidades",
+    price: "120,000,000 ISK",
+    total: "7.80 B ISK",
+    totalNum: 7800000000,
+    status: "TRANSFERENCIA ILEGAL A VENAL",
+    buyer: "Shadow Assembly Co.",
+    dayPeriod: "yesterday",
+    dayLabel: "AYER · 16 OCT",
+    timeAgo: "HACE 23 HORAS",
+    timestamp: "2026-10-16T18:30:00Z",
+    notes: "Componentes para enjambres autónomos no tripulados exportados mediante transportes clase Occator."
+  },
+  {
+    id: "mkt-08",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Worm (Fragata de Asalto Guristas)",
+    type: "Compra (Buy Order)",
+    vol: "18 unidades",
+    price: "160,000,000 ISK",
+    total: "2.88 B ISK",
+    totalNum: 2880000000,
+    status: "LICITACIÓN FALSA // TESTAFERROS",
+    buyer: "Gallente Frontier Explorations Inc.",
+    dayPeriod: "yesterday",
+    dayLabel: "AYER · 16 OCT",
+    timeAgo: "HACE 26 HORAS",
+    timestamp: "2026-10-16T15:15:00Z",
+    notes: "Facturación a nombre de una empresa fantasma de prospección minera con sede en Solitude."
+  },
+  {
+    id: "mkt-09",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Pithum C-Type Medium Shield Booster",
+    type: "Compra (Buy Order)",
+    vol: "32 unidades",
+    price: "140,000,000 ISK",
+    total: "4.48 B ISK",
+    totalNum: 4480000000,
+    status: "BLANQUEO DE BOTÍN PIRATA",
+    buyer: "Sinq Laison Exchange LLC",
+    dayPeriod: "yesterday",
+    dayLabel: "AYER · 16 OCT",
+    timeAgo: "HACE 30 HORAS",
+    timestamp: "2026-10-16T11:45:00Z",
+    notes: "Módulos de tecnología Guristas procedentes de incursiones en The Citadel integrados a la bolsa comercial."
+  },
+  {
+    id: "mkt-10",
+    hub: "Villore VI - Federal Senate Bureau Assembly",
+    system: "Villore",
+    region: "Essence",
+    sec: "0.8",
+    item: "ORE Heavy Mining Laser BPC (Copias de Planos)",
+    type: "Venta (Sell Order)",
+    vol: "8 copias de alta pureza",
+    price: "320,000,000 ISK",
+    total: "2.56 B ISK",
+    totalNum: 2560000000,
+    status: "PATENTES ROBADAS DE OUTER RING",
+    buyer: "Outer Essence Mining Syndicate",
+    dayPeriod: "yesterday",
+    dayLabel: "AYER · 16 OCT",
+    timeAgo: "HACE 34 HORAS",
+    timestamp: "2026-10-16T07:20:00Z",
+    notes: "Propiedad intelectual extraída de laboratorios periféricos transferida a intermediarios senatoriales."
+  },
+
+  // --- HACE 2 DÍAS: 15 DE OCTUBRE 2026 (36h a 48h previas a la hora actual) ---
+  {
+    id: "mkt-11",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Ishtar (Crucero Pesado de Asalto T2)",
+    type: "Compra (Buy Order)",
+    vol: "8 unidades",
+    price: "340,000,000 ISK",
+    total: "2.72 B ISK",
+    totalNum: 2720000000,
+    status: "DOCUMENTACIÓN ADUANERA ADULTERADA",
+    buyer: "Creodron Logistics Asset Mgmt",
+    dayPeriod: "two_days_ago",
+    dayLabel: "HACE 2 DÍAS · 15 OCT",
+    timeAgo: "HACE 41 HORAS",
+    timestamp: "2026-10-15T23:40:00Z",
+    notes: "Cruceros de primera línea equipados con sistemas de hackeo desclasificados sin pase de aduana DED."
+  },
+  {
+    id: "mkt-12",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "'Dread Guristas' Warp Scrambler",
+    type: "Compra (Buy Order)",
+    vol: "20 unidades",
+    price: "180,000,000 ISK",
+    total: "3.60 B ISK",
+    totalNum: 3600000000,
+    status: "INTERDICCIÓN PIRATA RESTRINGIDA",
+    buyer: "Federal Customs Clearing Broker",
+    dayPeriod: "two_days_ago",
+    dayLabel: "HACE 2 DÍAS · 15 OCT",
+    timeAgo: "HACE 45 HORAS",
+    timestamp: "2026-10-15T20:15:00Z",
+    notes: "Dispositivos de interferencia de motores de salto adquiridos bajo falsa exención de seguridad nacional."
+  },
+  {
+    id: "mkt-13",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Federation Navy 100MN Afterburner",
+    type: "Compra (Buy Order)",
+    vol: "25 unidades",
+    price: "150,000,000 ISK",
+    total: "3.75 B ISK",
+    totalNum: 3750000000,
+    status: "SUMINISTRO TÁCTICO NO DECLARADO",
+    buyer: "Placid Defense Auxiliaries",
+    dayPeriod: "two_days_ago",
+    dayLabel: "HACE 2 DÍAS · 15 OCT",
+    timeAgo: "HACE 47 HORAS",
+    timestamp: "2026-10-15T18:30:00Z",
+    notes: "Piezas de propulsión militar reservadas para naves de guerra entregadas a operadores sin licencia."
+  },
+  {
+    id: "mkt-14",
+    hub: "Dodixie IX - Moon 20 - Federation Navy Assembly Plant",
+    system: "Dodixie",
+    region: "Sinq Laison",
+    sec: "0.9",
+    item: "Neurovisual Input Matrix Interstellar Tech",
+    type: "Compra (Buy Order)",
+    vol: "90 conjuntos",
+    price: "65,000,000 ISK",
+    total: "5.85 B ISK",
+    totalNum: 5850000000,
+    status: "INICIO DEL CICLO DE COMPRAS (48H)",
+    buyer: "Kosakami Clandestine Syndicate",
+    dayPeriod: "two_days_ago",
+    dayLabel: "HACE 2 DÍAS · 15 OCT",
+    timeAgo: "HACE 48 HORAS",
+    timestamp: "2026-10-15T17:30:00Z",
+    notes: "Primera transacción anómala detectada al comienzo de la ventana de 48 horas bajo la auditoría DED."
+  },
+
+  // --- CONTRASTE JITA 4-4 (CALDARI) SPOT ---
+  {
+    id: "mkt-jita-01",
+    hub: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+    system: "Jita",
+    region: "The Forge",
+    sec: "0.9",
+    item: "Rattlesnake (Acorazado Pirata Guristas)",
     type: "Venta (Sell Order)",
     vol: "8 unidades",
     price: "1,150,000,000 ISK",
     total: "9.20 B ISK",
-    status: "MONITOR // TRÁFICO FRONTERIZO"
+    status: "SPOT // MONITOREO DE EXPORTACIÓN",
+    buyer: "State War Academy Disposal",
+    dayPeriod: "today",
+    dayLabel: "HOY · 17 OCT",
+    timeAgo: "HACE 2 HORAS",
+    timestamp: "2026-10-17T15:00:00Z",
+    notes: "Activos en The Forge con ruta trazada hacia corredores de contrabando en Lonetrek y Venal."
+  },
+  {
+    id: "mkt-jita-02",
+    hub: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+    system: "Jita",
+    region: "The Forge",
+    sec: "0.9",
+    item: "Pith X-Type Large Shield Booster",
+    type: "Venta (Sell Order)",
+    vol: "14 unidades",
+    price: "680,000,000 ISK",
+    total: "9.52 B ISK",
+    status: "SPOT // ARBITRAJE CON DODIXIE",
+    buyer: "Caldari Megacorp Liquidator",
+    dayPeriod: "yesterday",
+    dayLabel: "AYER · 16 OCT",
+    timeAgo: "HACE 21 HORAS",
+    timestamp: "2026-10-16T20:20:00Z",
+    notes: "Diferencial de precio de +18% comparado con la plaza de Sinq Laison; flete contratado por intermediarios."
+  },
+  {
+    id: "mkt-jita-03",
+    hub: "Jita IV - Moon 4 - Caldari Navy Assembly Plant",
+    system: "Jita",
+    region: "The Forge",
+    sec: "0.9",
+    item: "Caldari Navy Raven (Acorazados de Élite)",
+    type: "Compra (Buy Order)",
+    vol: "5 unidades",
+    price: "1,420,000,000 ISK",
+    total: "7.10 B ISK",
+    status: "SPOT // DESVÍO DE SEGURIDAD ESTATAL",
+    buyer: "Wiyrkomi Paramilitary Procurement",
+    dayPeriod: "two_days_ago",
+    dayLabel: "HACE 2 DÍAS · 15 OCT",
+    timeAgo: "HACE 44 HORAS",
+    timestamp: "2026-10-15T21:10:00Z",
+    notes: "Adquisición registrada en la ventana de 48h con destino documentado a bases fronterizas de Black Rise."
   }
 ];
 
@@ -226,6 +553,7 @@ class ConcordWidgetSuite {
     this.activeTab = 'general';   // 'general', 'telemetry', 'radar', 'wires', 'history', 'market'
     this.currentSourceFilter = 'all';
     this.currentSecurityFilter = 'all'; // 'all', 'high', 'low', 'null'
+    this.currentMarketDayFilter = 'all'; // 'all', 'today', 'yesterday', 'two_days_ago'
     this.timer = null;
     this.liveStreamTimer = null;
     this.radar = null;
@@ -875,7 +1203,13 @@ class ConcordWidgetSuite {
           <!-- Pane 5: Historical Archive -->
           <div class="pod-tab-pane" id="pane-history">
             <div class="pod-full-table-view">
-              <h3 style="color: #57C4DD; margin: 0 0 8px 0; font-size: 1.1rem;">EXPEDIENTES HISTÓRICOS DE CORRUPCIÓN EN NEW EDEN</h3>
+              <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+                <h3 style="color: #57C4DD; margin: 0; font-size: 1.1rem;">EXPEDIENTES HISTÓRICOS DE CORRUPCIÓN EN NEW EDEN</h3>
+                <span class="mkt-history-badge">
+                  <span class="mkt-clock-icon">⏱</span>
+                  <span>EVENTOS REGISTRADOS HACE 2 DÍAS [15 OCTUBRE 2026]</span>
+                </span>
+              </div>
               <div style="overflow-x: auto;">
                 <table class="pod-table">
                   <thead>
@@ -898,40 +1232,94 @@ class ConcordWidgetSuite {
 
           <!-- Pane 6: ESI Market Audit -->
           <div class="pod-tab-pane" id="pane-market">
-            <div class="pod-market-grid">
-              <div class="pod-market-box">
-                <h3>AUDITORÍA DE COMPRAS EN PLAZA FEDERAL (DODIXIE) <span style="font-size: 0.72rem; color: #EA428B;">ALTO RIESGO</span></h3>
-                <p style="font-size: 0.76rem; color: #B1E8F2;">
-                  Monitoreo de órdenes de compra anómalas en Sinq Laison por cascos militares y drones no autorizados por la Armada Federal.
-                </p>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                  ${MARKET_AUDIT_DATA.filter(m => m.hub.includes("Dodixie") || m.hub.includes("Villore")).map(m => `
-                    <div style="background: rgba(16,28,47,0.8); border: 1px solid rgba(87,196,221,0.25); border-left: 3px solid #57C4DD; padding: 10px; border-radius: 4px;">
-                      <div style="display: flex; justify-content: space-between; font-weight: 600; color: #57C4DD;">
-                        <span>${m.item}</span>
-                        <span style="color: #EA428B;">${m.total}</span>
-                      </div>
-                      <div style="font-size: 0.72rem; color: #B1E8F2; margin-top: 3px;">${m.type} · ${m.vol} @ ${m.price}</div>
-                      <div style="font-size: 0.68rem; color: #EA428B; margin-top: 4px; font-weight: 700;">${m.status}</div>
-                    </div>
-                  `).join('')}
+            <div class="pod-market-header-summary">
+              <div class="mkt-summary-top">
+                <div>
+                  <h3 style="color: #57C4DD; margin: 0; font-size: 1.05rem; display: flex; align-items: center; gap: 8px;">
+                    <span>AUDITORÍA ESI DE COMPRAS // PLAZA FEDERAL DODIXIE & MERCADOS REGIONALES</span>
+                    <span style="font-size: 0.68rem; color: #EA428B; background: rgba(234,66,139,0.15); border: 1px solid rgba(234,66,139,0.3); padding: 2px 6px; border-radius: 3px;">ALTO RIESGO</span>
+                  </h3>
+                  <p style="font-size: 0.76rem; color: #B1E8F2; margin: 4px 0 0 0;">
+                    Registro de adquisiciones, blanqueo y contratos anómalos en Sinq Laison (Dodixie) y Senado (Villore), con contraste spot en The Forge (Jita 4-4).
+                  </p>
+                </div>
+                <div class="mkt-history-badge">
+                  <span class="mkt-clock-icon">⏱</span>
+                  <span>MARGEN HISTÓRICO: 48 HORAS PREVIAS [15 OCT 2026, 17:30 UTC — 17 OCT 2026, 17:20 UTC]</span>
                 </div>
               </div>
+            </div>
 
+            <div class="pod-market-grid">
+              <!-- Col 1: Dodixie / Villore Purchase Register (48h Historical Margin) -->
               <div class="pod-market-box">
-                <h3>CONTRASTE CON MEGACORPORACIONES CALDARI (JITA 4-4) <span style="font-size: 0.72rem; color: #57C4DD;">REFERENCIA SPOT</span></h3>
-                <p style="font-size: 0.76rem; color: #B1E8F2;">
-                  Rastreo de activos de contrabando salientes de The Forge con destino probable a rutas de evasión en Black Rise y Venal.
-                </p>
-                <div style="display: flex; flex-direction: column; gap: 8px;">
-                  ${MARKET_AUDIT_DATA.map(m => `
-                    <div style="background: rgba(16,28,47,0.8); border: 1px solid rgba(87,196,221,0.25); border-left: 3px solid #E5A93C; padding: 10px; border-radius: 4px;">
-                      <div style="display: flex; justify-content: space-between; font-weight: 600; color: #E5A93C;">
-                        <span>${m.item} [${m.hub}]</span>
-                        <span style="color: #F1F1F1;">${m.total}</span>
+                <div class="pod-market-box-header">
+                  <div>
+                    <h3 style="color: #57C4DD; margin: 0;">REGISTRO DE COMPRAS EN PLAZA FEDERAL (DODIXIE)</h3>
+                    <div style="font-size: 0.72rem; color: #B1E8F2; margin-top: 2px;">
+                      Auditoría aduanera DED sobre transacciones de alto tonelaje y material militar restringido.
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Timeline Filter Bar for 48h Window -->
+                <div class="mkt-timeline-filters">
+                  <span style="font-size: 0.68rem; color: #B1E8F2; font-weight: 700; margin-right: 4px;">MARGEN:</span>
+                  <button class="mkt-timeline-btn ${this.currentMarketDayFilter === 'all' ? 'active' : ''}" id="mkt-day-btn-all" onclick="window.concordWidget.filterMarketDay('all')">
+                    TODAS (48H)
+                  </button>
+                  <button class="mkt-timeline-btn ${this.currentMarketDayFilter === 'today' ? 'active' : ''}" id="mkt-day-btn-today" onclick="window.concordWidget.filterMarketDay('today')">
+                    HOY (17 OCT)
+                  </button>
+                  <button class="mkt-timeline-btn ${this.currentMarketDayFilter === 'yesterday' ? 'active' : ''}" id="mkt-day-btn-yesterday" onclick="window.concordWidget.filterMarketDay('yesterday')">
+                    AYER (16 OCT)
+                  </button>
+                  <button class="mkt-timeline-btn ${this.currentMarketDayFilter === 'two_days_ago' ? 'active' : ''}" id="mkt-day-btn-two_days_ago" onclick="window.concordWidget.filterMarketDay('two_days_ago')">
+                    HACE 2 DÍAS (15 OCT)
+                  </button>
+                  <span id="mkt-dodixie-counter" style="margin-left: auto; font-size: 0.68rem; color: #57C4DD; font-weight: 600;">14 órdenes auditadas</span>
+                </div>
+
+                <!-- Scrollable Orders Feed -->
+                <div class="pod-market-list" id="dodixie-market-list"></div>
+              </div>
+
+              <!-- Col 2: Jita 4-4 Spot Arbitrage Contrast -->
+              <div class="pod-market-box">
+                <div class="pod-market-box-header">
+                  <div>
+                    <h3 style="color: #E5A93C; margin: 0;">CONTRASTE SPOT // MEGACORPORACIONES CALDARI (JITA 4-4)</h3>
+                    <div style="font-size: 0.72rem; color: #B1E8F2; margin-top: 2px;">
+                      Rastreo de activos de contrabando salientes de The Forge hacia rutas de evasión en Venal y Black Rise.
+                    </div>
+                  </div>
+                </div>
+
+                <div class="pod-market-list" id="jita-market-list">
+                  ${MARKET_AUDIT_DATA.filter(m => m.hub.includes("Jita")).map(m => `
+                    <div class="mkt-order-card" style="border-left-color: #E5A93C;">
+                      <div class="mkt-card-header">
+                        <div>
+                          <span class="mkt-card-period-tag" style="background: rgba(229,169,60,0.2); color: #E5A93C; border: 1px solid rgba(229,169,60,0.4);">
+                            ${m.dayLabel} // ${m.timeAgo}
+                          </span>
+                          <div style="font-weight: 700; color: #F1F1F1; font-size: 0.86rem; margin-top: 4px;">${m.item}</div>
+                        </div>
+                        <span style="font-family: 'El Messiri', serif; font-size: 1.05rem; font-weight: 700; color: #F1F1F1; white-space: nowrap;">
+                          ${m.total}
+                        </span>
                       </div>
-                      <div style="font-size: 0.72rem; color: #B1E8F2; margin-top: 3px;">${m.type} · ${m.vol} @ ${m.price}</div>
-                      <div style="font-size: 0.68rem; color: #B1E8F2; margin-top: 4px;">${m.status}</div>
+                      <div style="font-size: 0.72rem; color: #B1E8F2;">
+                        <div><strong>Hub / Estación:</strong> ${m.hub}</div>
+                        <div><strong>Orden:</strong> ${m.type} · ${m.vol} @ ${m.price}</div>
+                        <div><strong>Entidad:</strong> ${m.buyer}</div>
+                        <div style="color: #E5A93C; font-weight: 700; margin-top: 3px;">${m.status}</div>
+                        <div style="font-size: 0.68rem; opacity: 0.85; margin-top: 2px;"><em>${m.notes}</em></div>
+                      </div>
+                      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding-top: 4px; border-top: 1px dashed rgba(87,196,221,0.2);">
+                        <span style="font-size: 0.65rem; color: #57C4DD;">REG: ${m.timestamp}</span>
+                        <button class="pod-subpoena-trigger" onclick="window.concordWidget.openSubpoenaInspector('${m.id}')">[CITACIÓN DED]</button>
+                      </div>
                     </div>
                   `).join('')}
                 </div>
@@ -982,9 +1370,77 @@ class ConcordWidgetSuite {
         this.initRadar('pod-radar-canvas');
         this.radar?.resize?.();
       }, 100);
+    } else if (tabName === 'market') {
+      setTimeout(() => {
+        this.renderMarketList();
+      }, 50);
     }
 
     this.renderCurrentTab();
+  }
+
+  filterMarketDay(period) {
+    this.currentMarketDayFilter = period;
+    document.querySelectorAll('.mkt-timeline-btn').forEach(btn => btn.classList.remove('active'));
+    const btn = document.getElementById(`mkt-day-btn-${period}`);
+    if (btn) btn.classList.add('active');
+
+    this.playTone('ping');
+    this.renderMarketList();
+  }
+
+  renderMarketList() {
+    const listEl = document.getElementById('dodixie-market-list');
+    const counterEl = document.getElementById('mkt-dodixie-counter');
+    if (!listEl) return;
+
+    let items = MARKET_AUDIT_DATA.filter(m => m.hub.includes("Dodixie") || m.hub.includes("Villore"));
+    if (this.currentMarketDayFilter !== 'all') {
+      items = items.filter(m => m.dayPeriod === this.currentMarketDayFilter);
+    }
+
+    const totalIsk = items.reduce((acc, m) => acc + (m.totalNum || 0), 0);
+    const iskB = (totalIsk / 1000000000).toFixed(2);
+    if (counterEl) {
+      counterEl.innerText = `${items.length} órdenes · ${iskB} B ISK`;
+    }
+
+    if (items.length === 0) {
+      listEl.innerHTML = `<div style="padding: 24px; text-align: center; color: #B1E8F2; font-size: 0.8rem;">No hay transacciones registradas en este período del margen histórico.</div>`;
+      return;
+    }
+
+    listEl.innerHTML = items.map(m => {
+      const periodClass = m.dayPeriod === 'two_days_ago' ? 'period-two_days_ago' : (m.dayPeriod === 'yesterday' ? 'period-yesterday' : 'period-today');
+      const tagClass = m.dayPeriod === 'two_days_ago' ? 'tag-two_days_ago' : (m.dayPeriod === 'yesterday' ? 'tag-yesterday' : 'tag-today');
+
+      return `
+        <div class="mkt-order-card ${periodClass}">
+          <div class="mkt-card-header">
+            <div>
+              <span class="mkt-card-period-tag ${tagClass}">${m.dayLabel} // ${m.timeAgo}</span>
+              <div style="font-weight: 700; color: #F1F1F1; font-size: 0.86rem; margin-top: 4px;">${m.item}</div>
+            </div>
+            <span style="font-family: 'El Messiri', serif; font-size: 1.05rem; font-weight: 700; color: #EA428B; white-space: nowrap;">
+              ${m.total}
+            </span>
+          </div>
+
+          <div style="font-size: 0.72rem; color: #B1E8F2;">
+            <div><strong>Hub / Estación:</strong> ${m.hub}</div>
+            <div><strong>Orden Bursátil:</strong> ${m.type} · ${m.vol} @ ${m.price}</div>
+            <div><strong>Entidad Compradora:</strong> ${m.buyer}</div>
+            <div style="color: #EA428B; font-weight: 700; margin-top: 3px;">${m.status}</div>
+            <div style="font-size: 0.68rem; opacity: 0.85; margin-top: 2px;"><em>${m.notes}</em></div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 4px; padding-top: 4px; border-top: 1px dashed rgba(87,196,221,0.2);">
+            <span style="font-size: 0.65rem; color: #57C4DD;">REG: ${m.timestamp}</span>
+            <button class="pod-subpoena-trigger" onclick="window.concordWidget.openSubpoenaInspector('${m.id}')">[CITACIÓN DED]</button>
+          </div>
+        </div>
+      `;
+    }).join('');
   }
 
   filterSecurity(secTier) {
@@ -1108,6 +1564,9 @@ class ConcordWidgetSuite {
     if (histBody) {
       histBody.innerHTML = this.buildHistoryTableRowsHTML();
     }
+
+    // 5. Market Audit List
+    this.renderMarketList();
   }
 
   buildHistoryTableRowsHTML() {
@@ -1122,7 +1581,10 @@ class ConcordWidgetSuite {
 
       return `
         <tr>
-          <td><strong>${h.time}</strong></td>
+          <td>
+            <strong style="color: #57C4DD; font-size: 0.74rem;">${h.time}</strong>
+            <div style="font-size: 0.65rem; color: #B1E8F2; opacity: 0.85; margin-top: 2px;">${h.timestamp.replace('T', ' ').replace(':00Z', ' UTC')}</div>
+          </td>
           <td style="color: ${secColor}; font-weight: 600;">
             ${h.system} (${h.region}) [${h.sec}]
             <span style="font-size: 0.65rem; display: block; opacity: 0.85; color: ${secColor};">${secLabel}</span>
@@ -1196,33 +1658,70 @@ Portavoces de ${inc.corp} desmienten cualquier acuerdo con piratas en ${inc.syst
   // 7. Subpoena Inspector (Full Judicial Document)
   // ========================================================================
   openSubpoenaInspector(id) {
-    const inc = this.incidents.find(i => i.id === id) || HISTORICAL_ARCHIVE[0];
+    const inc = this.incidents.find(i => i.id === id) || HISTORICAL_ARCHIVE.find(h => h.id === id);
+    const mkt = MARKET_AUDIT_DATA.find(m => m.id === id);
     const inspector = document.getElementById('pod-subpoena-inspector');
     const body = document.getElementById('pod-subpoena-body');
 
-    const doc = `
+    let doc = "";
+    if (mkt) {
+      doc = `
 ================================================================================
-  CONCORD DIRECTIVE ENFORCEMENT DIVISION // SUBPOENA OF INQUIRY #SUB-${inc.id}
-  CLASSIFICATION: CLANDESTINE CROSS-FACTION COLLUSION // PRIORITY ${inc.severity}
+  CONCORD DIRECTIVE ENFORCEMENT DIVISION // SUBPOENA OF INQUIRY #MKT-${mkt.id}
+  CLASSIFICATION: PLAZA FEDERAL MARKET MANIPULATION // 48-HOUR AUDIT
 ================================================================================
 
-FECHA ESTELAR: ${inc.timestamp}
-LOCALIZACIÓN: Sistema Solar ${inc.system} (${inc.region || 'Frontera'})
-ESTATUS DE SEGURIDAD: ${inc.sec} Sec
-FUENTE DE TELEMETRÍA: ${inc.source.toUpperCase()}
+FECHA ESTELAR REGISTRADA: ${mkt.timestamp} (${mkt.timeAgo})
+CENTRO DE COMERCIO: ${mkt.hub}
+SISTEMA SOLAR: ${mkt.system} (${mkt.region}) [${mkt.sec || '0.9'} Sec]
+AUDITORÍA TEMPORAL: ${mkt.dayLabel} (Margen histórico 48 horas previas)
+
+DETALLE DE LA OPERACIÓN ANÓMALA:
+- ACTIVO TRANSACCIONADO: ${mkt.item}
+- TIPO DE ORDEN BURSÁTIL: ${mkt.type}
+- VOLUMEN REGISTRADO: ${mkt.vol}
+- PRECIO UNITARIO: ${mkt.price}
+- VALOR TOTAL ESTIMADO: ${mkt.total}
+
+ENTIDADES IMPLICADAS:
+- COMPRADOR / BENEFICIARIO: ${mkt.buyer}
+- NEXOS DE CORRUPCIÓN: ${mkt.status}
+- DICTAMEN ADUANERO: ${mkt.notes}
+
+FUNDAMENTO LEGAL DED:
+Se imputa violación del Artículo 404-C de Regulación Bursátil de New Eden 
+(Adquisición encubierta y triangulación de armamento militar con carteles no signatarios de Yulai).
+
+MEDIDA CAUTELAR EJECUTIVA:
+RETENCIÓN INMEDIATA DEL CARGAMENTO EN LOS HANGARS DE LA ASAMBLEA FEDERAL DE DODIXIE.
+EMBARGO PREVENTIVO DE CUENTAS ASOCIADAS Y APERTURA DE JUICIO EN EL SENADO.
+================================================================================
+      `.trim();
+    } else {
+      const activeInc = inc || HISTORICAL_ARCHIVE[0];
+      doc = `
+================================================================================
+  CONCORD DIRECTIVE ENFORCEMENT DIVISION // SUBPOENA OF INQUIRY #SUB-${activeInc.id}
+  CLASSIFICATION: CLANDESTINE CROSS-FACTION COLLUSION // PRIORITY ${activeInc.severity}
+================================================================================
+
+FECHA ESTELAR: ${activeInc.timestamp}
+LOCALIZACIÓN: Sistema Solar ${activeInc.system} (${activeInc.region || 'Frontera'})
+ESTATUS DE SEGURIDAD: ${activeInc.sec} Sec
+FUENTE DE TELEMETRÍA: ${(activeInc.source || 'EVE').toUpperCase()}
 
 ENTIDADES CITADAS A DECLARAR:
-- ENTIDAD IMPLICADA: ${inc.corp}
-- FACCIÓN ASOCIADA: ${inc.faction || 'Gallente Federation'}
+- ENTIDAD IMPLICADA: ${activeInc.corp}
+- FACCIÓN ASOCIADA: ${activeInc.faction || 'Gallente Federation'}
 - NEXOS CON GURISTAS SYNDICATE: Confirmados por firma IFF y balance comercial.
 
 EVIDENCIA MATERIAL INCAUTADA/DESTRUIDA:
-- Casco / Nave: ${inc.ship}
-- Valor Estimado de Daños/Soborno: ${inc.val}
-- Cargamento Clandestino: ${inc.cargo ? inc.cargo.join(', ') : 'Tecnología de Drones'}
+- Casco / Nave: ${activeInc.ship}
+- Valor Estimado de Daños/Soborno: ${activeInc.val}
+- Cargamento Clandestino: ${activeInc.cargo ? activeInc.cargo.join(', ') : 'Tecnología de Drones'}
 
 DICTAMEN TÉCNICO DED:
-${inc.text} (Índice de Colusión GGCI: ${inc.ggci}%)
+${activeInc.text} (Índice de Colusión GGCI: ${activeInc.ggci}%)
 
 FUNDAMENTO LEGAL:
 Se imputa transgresión directa del Código Penal Interestelar CONCORD, Artículo 884-B 
@@ -1232,7 +1731,8 @@ MEDIDA CAUTELAR:
 SE ORDENA EL CONGELAMIENTO INMEDIATO DE FONDOS Y LA RETENCIÓN DE ACTIVOS EN DODIXIE Y JITA.
 POR LA DIRECTIVA SUPREMA DE CONCORD.
 ================================================================================
-    `.trim();
+      `.trim();
+    }
 
     this.currentSubpoenaText = doc;
     if (body) body.innerText = doc;

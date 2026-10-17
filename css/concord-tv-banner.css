@@ -892,33 +892,216 @@
 }
 
 /* View 5: Market Order Book (ESI) View */
-.pod-market-grid {
+#pane-market {
+  display: none;
   width: 100%;
   height: 100%;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  padding: 14px;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  flex-direction: column;
+}
+
+#pane-market.active {
+  display: flex;
+}
+
+.pod-market-header-summary {
+  padding: 12px 16px;
+  background: rgba(16, 28, 47, 0.9);
+  border-bottom: 1px solid rgba(87, 196, 221, 0.25);
+  flex-shrink: 0;
+}
+
+.mkt-summary-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.mkt-history-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #57C4DD;
+  background: rgba(87, 196, 221, 0.12);
+  border: 1px solid rgba(87, 196, 221, 0.35);
+  padding: 4px 10px;
+  border-radius: 4px;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.mkt-clock-icon {
+  font-size: 0.85rem;
+}
+
+.pod-market-grid {
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 1.18fr 0.82fr;
+  gap: 16px;
+  padding: 14px 16px;
+  align-items: start;
 }
 
 .pod-market-box {
-  background: rgba(26, 40, 62, 0.6);
+  background: rgba(26, 40, 62, 0.65);
   border: 1px solid rgba(87, 196, 221, 0.3);
   border-radius: 6px;
-  padding: 12px;
+  padding: 14px;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.pod-market-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .pod-market-box h3 {
   font-family: 'El Messiri', serif;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   color: var(--theme-accent, #57C4DD);
   margin: 0;
+}
+
+.mkt-timeline-filters {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+  padding: 6px 0;
+  border-top: 1px dashed rgba(87, 196, 221, 0.15);
+  border-bottom: 1px dashed rgba(87, 196, 221, 0.15);
+}
+
+.mkt-timeline-btn {
+  background: rgba(36, 56, 113, 0.35);
+  border: 1px solid rgba(87, 196, 221, 0.3);
+  color: #B1E8F2;
+  padding: 4px 9px;
+  font-size: 0.68rem;
+  font-weight: 600;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.mkt-timeline-btn:hover,
+.mkt-timeline-btn.active {
+  background: #57C4DD;
+  color: #101C2F;
+  border-color: #57C4DD;
+  font-weight: 700;
+  box-shadow: 0 0 8px rgba(87, 196, 221, 0.35);
+}
+
+.pod-market-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
+  max-height: calc(100vh - 360px);
+  min-height: 250px;
+  padding-right: 6px;
+  box-sizing: border-box;
+  scrollbar-width: thin;
+  scrollbar-color: #57C4DD rgba(16, 28, 47, 0.8);
+}
+
+#pane-market::-webkit-scrollbar,
+.pod-market-list::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#pane-market::-webkit-scrollbar-track,
+.pod-market-list::-webkit-scrollbar-track {
+  background: rgba(16, 28, 47, 0.85);
+  border-radius: 3px;
+}
+
+#pane-market::-webkit-scrollbar-thumb,
+.pod-market-list::-webkit-scrollbar-thumb {
+  background: #57C4DD;
+  border-radius: 3px;
+}
+
+.mkt-order-card {
+  background: rgba(16, 28, 47, 0.82);
+  border: 1px solid rgba(87, 196, 221, 0.25);
+  border-left: 3px solid #57C4DD;
+  padding: 12px;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.mkt-order-card:hover {
+  background: rgba(26, 40, 62, 0.85);
+  border-color: rgba(87, 196, 221, 0.6);
+  box-shadow: 0 0 10px rgba(87, 196, 221, 0.15);
+}
+
+.mkt-order-card.period-two_days_ago {
+  border-left-color: #EA428B;
+}
+
+.mkt-order-card.period-yesterday {
+  border-left-color: #E5A93C;
+}
+
+.mkt-order-card.period-today {
+  border-left-color: #57C4DD;
+}
+
+.mkt-card-header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.mkt-card-period-tag {
+  font-size: 0.64rem;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 3px;
+  letter-spacing: 0.05em;
+  display: inline-block;
+}
+
+.mkt-card-period-tag.tag-today {
+  background: rgba(87, 196, 221, 0.2);
+  color: #57C4DD;
+  border: 1px solid rgba(87, 196, 221, 0.4);
+}
+
+.mkt-card-period-tag.tag-yesterday {
+  background: rgba(229, 169, 60, 0.2);
+  color: #E5A93C;
+  border: 1px solid rgba(229, 169, 60, 0.4);
+}
+
+.mkt-card-period-tag.tag-two_days_ago {
+  background: rgba(234, 66, 139, 0.2);
+  color: #EA428B;
+  border: 1px solid rgba(234, 66, 139, 0.4);
 }
 
 /* Subpoena Inspector Modal (Inner Layer) */
@@ -1006,6 +1189,12 @@
 
   .pod-market-grid {
     grid-template-columns: 1fr;
+    padding: 12px 10px;
+  }
+
+  .pod-market-list {
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
