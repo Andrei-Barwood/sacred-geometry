@@ -2,6 +2,7 @@
 // CONCORD DED // TV Broadcast Banner & Full Intelligence Pod Suite
 // For Sacred Geometry Portal — Comprehensive Implementation
 // ==========================================================================
+import { Aegis9SentinelDrone } from './aegis9-sentinel-drone.js';
 
 // Initial Historical Archive of Activity Monitor Updates
 // Initial Historical Archive of Activity Monitor Updates (Events from 2 days ago: 15 Octubre 2026)
@@ -579,6 +580,7 @@ class ConcordWidgetSuite {
     this.setupAudio();
     this.setupModalTrigger();
     this.startBackgroundStream();
+    this.sentinelDrone = new Aegis9SentinelDrone(this);
   }
 
   // ========================================================================
@@ -882,6 +884,13 @@ class ConcordWidgetSuite {
 
       this.incidents.unshift(newInc);
       if (this.incidents.length > 50) this.incidents.pop();
+      if (this.sentinelDrone) {
+        this.sentinelDrone.resolvePodCase(newInc).then(() => {
+          if (this.activeTab === 'sentinel') {
+            this.sentinelDrone.renderSentinelTabPane();
+          }
+        });
+      }
 
       // Update metrics
       this.metrics.totalCount++;
@@ -1066,6 +1075,9 @@ class ConcordWidgetSuite {
           </button>
           <button class="pod-tab-btn" id="tab-btn-market" onclick="window.concordWidget.switchTab('market')">
             <span class="tab-icon">⚖</span> <span class="tab-label-full">MERCADO ESI (DODIXIE)</span><span class="tab-label-short">MERCADO</span>
+          </button>
+          <button class="pod-tab-btn pod-tab-sentinel" id="tab-btn-sentinel" onclick="window.concordWidget.switchTab('sentinel')">
+            <span class="tab-icon">🛡️</span> <span class="tab-label-full">SENTINELA AEGIS-9 (EDR)</span><span class="tab-label-short">AEGIS-9</span>
           </button>
         </nav>
 
@@ -1326,6 +1338,11 @@ class ConcordWidgetSuite {
               </div>
             </div>
           </div>
+
+          <!-- Pane 7: Aegis-9 Cyberbrain EDR Autonomous Sentinel Drone -->
+          <div class="pod-tab-pane" id="pane-sentinel">
+            <div id="aegis9-sentinel-root" style="width: 100%; height: 100%; overflow-y: auto;"></div>
+          </div>
         </main>
 
         <!-- Subpoena Inspector Modal Layer -->
@@ -1374,6 +1391,10 @@ class ConcordWidgetSuite {
       setTimeout(() => {
         this.renderMarketList();
       }, 50);
+    } else if (tabName === 'sentinel') {
+      setTimeout(() => {
+        this.sentinelDrone?.renderSentinelTabPane();
+      }, 40);
     }
 
     this.renderCurrentTab();
@@ -1545,7 +1566,12 @@ class ConcordWidgetSuite {
             <td>${inc.corp}</td>
             <td style="color: #B1E8F2;">${inc.cargo ? inc.cargo.join(', ') : 'Sin carga'}</td>
             <td style="color: #EA428B; font-weight: 600;">${inc.val}</td>
-            <td><button class="pod-subpoena-trigger" onclick="window.concordWidget.openSubpoenaInspector('${inc.id}')">CITACIÓN</button></td>
+            <td>
+              <div style="display: flex; gap: 4px;">
+                <button class="pod-subpoena-trigger" onclick="window.concordWidget.openSubpoenaInspector('${inc.id}')">CITACIÓN</button>
+                <button class="pod-subpoena-trigger sentinel-action-btn" onclick="window.concordWidget.openSentinelForCase('${inc.id}')">🛡️ AEGIS-9</button>
+              </div>
+            </td>
           </tr>
         `;
       }).join('') : `<tr><td colspan="8" style="text-align: center; color: #B1E8F2; padding: 24px;">No se encontraron registros de telemetría en este rango de seguridad.</td></tr>`;
@@ -1592,7 +1618,12 @@ class ConcordWidgetSuite {
           <td><span class="pod-badge ${h.severity === 'OMEGA' ? 'pod-badge-omega' : 'pod-badge-beta'}">${h.severity} (${h.ggci}%)</span></td>
           <td>${h.text}</td>
           <td style="color: #EA428B; font-weight: 600;">${h.val}</td>
-          <td><button class="pod-subpoena-trigger" onclick="window.concordWidget.openSubpoenaInspector('${h.id}')">VER CITACIÓN</button></td>
+          <td>
+            <div style="display: flex; gap: 4px;">
+              <button class="pod-subpoena-trigger" onclick="window.concordWidget.openSubpoenaInspector('${h.id}')">VER CITACIÓN</button>
+              <button class="pod-subpoena-trigger sentinel-action-btn" onclick="window.concordWidget.openSentinelForCase('${h.id}')">🛡️ SENTINELA</button>
+            </div>
+          </td>
         </tr>
       `;
     }).join('');
@@ -1620,7 +1651,8 @@ class ConcordWidgetSuite {
           ${inc.cargo && inc.cargo.length ? `<div style="color: #57C4DD;"><strong>Carga Clandestina:</strong> ${inc.cargo.join(', ')}</div>` : ''}
           <div style="font-size: 0.72rem; color: #B1E8F2; margin-top: 3px;">${inc.text}</div>
         </div>
-        <div class="pod-card-actions">
+        <div class="pod-card-actions" style="gap: 6px;">
+          <button class="pod-subpoena-trigger sentinel-action-btn" onclick="window.concordWidget.openSentinelForCase('${inc.id}')">[🛡️ SENTINELA AEGIS-9]</button>
           <button class="pod-subpoena-trigger" onclick="window.concordWidget.openSubpoenaInspector('${inc.id}')">[CITACIÓN DED]</button>
         </div>
       </div>
@@ -1657,6 +1689,16 @@ Portavoces de ${inc.corp} desmienten cualquier acuerdo con piratas en ${inc.syst
   // ========================================================================
   // 7. Subpoena Inspector (Full Judicial Document)
   // ========================================================================
+  openSentinelForCase(id) {
+    if (this.sentinelDrone) {
+      this.sentinelDrone.selectedCaseId = id;
+    }
+    this.switchTab('sentinel');
+    if (this.sentinelDrone) {
+      this.sentinelDrone.selectCaseAndInspect(id);
+    }
+  }
+
   openSubpoenaInspector(id) {
     const inc = this.incidents.find(i => i.id === id) || HISTORICAL_ARCHIVE.find(h => h.id === id);
     const mkt = MARKET_AUDIT_DATA.find(m => m.id === id);
@@ -1730,6 +1772,13 @@ Se imputa transgresión directa del Código Penal Interestelar CONCORD, Artícul
 MEDIDA CAUTELAR:
 SE ORDENA EL CONGELAMIENTO INMEDIATO DE FONDOS Y LA RETENCIÓN DE ACTIVOS EN DODIXIE Y JITA.
 POR LA DIRECTIVA SUPREMA DE CONCORD.
+
+--------------------------------------------------------------------------------
+REPORTE DE EJECUCIÓN TÁCTICA // DRON SENTINELA AEGIS-9 (CYBERBRAIN EDR):
+- ESTRATEGIA APLICADA: ${this.sentinelDrone?.caseResolutions.get(activeInc.id)?.chosenSolution?.title || 'OPCIÓN A // INTERDICCIÓN DE PUERTA & CORTAFUEGOS NEURAL'}
+- NIVEL DE FALLBACK ACTIVO: TIER ${this.sentinelDrone?.caseResolutions.get(activeInc.id)?.activeFallbackTier || (activeInc.sec < 0.5 ? 2 : 1)} (${this.sentinelDrone?.caseResolutions.get(activeInc.id)?.activeFallbackTitle || 'Dron Sentinela Aegis-9 + Gate Guns'})
+- VECTORES MITRE CUBIERTOS: ${(this.sentinelDrone?.caseResolutions.get(activeInc.id)?.mitreMappings || []).map(m => m.code).join(', ') || 'T1210, T1565.002, T1070'}
+- SELLO BLOCKCHAIN (T1070): SHA-256 #${this.sentinelDrone?.caseResolutions.get(activeInc.id)?.ledgerBlockHash || 'VERIFIED_CURVE25519'}
 ================================================================================
       `.trim();
     }
