@@ -156,14 +156,20 @@ export class Aegis9SentinelDrone {
       badge.id = "tv-sentinel-status-pill";
       badge.className = "tv-btn tv-sentinel-btn";
       badge.title = "Ver cómo el Dron Sentinela Aegis-9 resolvió este caso y su cadena de fallbacks";
+      rightContainer.insertBefore(badge, rightContainer.firstChild);
+    }
+
+    if (!badge.dataset.boundSentinelClick) {
+      badge.dataset.boundSentinelClick = "true";
       badge.addEventListener("click", (e) => {
         e.stopPropagation();
-        this.selectedCaseId = resolution.caseId;
+        const activeCaseId = badge.dataset.currentCaseId || this.selectedCaseId || "hist-07";
+        this.selectedCaseId = activeCaseId;
         this.widget.openPodModal();
         this.widget.switchTab("sentinel");
       });
-      rightContainer.insertBefore(badge, rightContainer.firstChild);
     }
+    badge.dataset.currentCaseId = resolution.caseId;
 
     const tierLabel = `FALLBACK T${resolution.activeFallbackTier}`;
     badge.innerHTML = `
