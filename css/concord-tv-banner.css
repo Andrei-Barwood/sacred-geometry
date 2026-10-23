@@ -634,7 +634,8 @@
 
 /* Pod Main View Container */
 .pod-view-container {
-  flex: 1;
+  flex: 1 1 0%;
+  min-height: 0;
   overflow: hidden;
   position: relative;
   display: flex;
@@ -645,6 +646,7 @@
   display: none;
   width: 100%;
   height: 100%;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -1839,3 +1841,503 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ==========================================================================
+   7. GALACTIC MINI-MAP & REGIONAL SELECTOR (4 IMPERIOS, TODAS LAS FACCIONES,
+   EVE ONLINE, ECHOES, GALAXY CONQUEST & CONCORD PRESENCE)
+   ========================================================================== */
+.tv-map-btn {
+  background: rgba(243, 198, 79, 0.14) !important;
+  border: 1px solid rgba(243, 198, 79, 0.65) !important;
+  color: #F3C64F !important;
+  font-weight: 700 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tv-map-btn:hover {
+  background: rgba(243, 198, 79, 0.28) !important;
+  box-shadow: 0 0 12px rgba(243, 198, 79, 0.4);
+}
+
+.map-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #F3C64F;
+  box-shadow: 0 0 8px #F3C64F;
+  display: inline-block;
+  animation: tv-pulse 1.3s infinite alternate ease-in-out;
+}
+
+.pod-tab-map {
+  color: #F3C64F !important;
+}
+
+.pod-tab-map.active {
+  background: rgba(243, 198, 79, 0.18) !important;
+  border-bottom: 2px solid #F3C64F !important;
+}
+
+/* Pestaña de Mapa Interestelar y Dron Sentinela con Scroll Vertical Fluido */
+#pane-map,
+#pane-sentinel {
+  display: none;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  flex: 1 1 0%;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  box-sizing: border-box;
+  flex-direction: column;
+  scrollbar-width: thin;
+  scrollbar-color: #F3C64F rgba(16, 28, 47, 0.85);
+}
+
+#pane-map.active,
+#pane-sentinel.active {
+  display: flex !important;
+}
+
+#pane-map::-webkit-scrollbar,
+#pane-sentinel::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+#pane-map::-webkit-scrollbar-track,
+#pane-sentinel::-webkit-scrollbar-track {
+  background: rgba(16, 28, 47, 0.85);
+  border-radius: 3px;
+}
+
+#pane-map::-webkit-scrollbar-thumb {
+  background: #F3C64F;
+  border-radius: 3px;
+}
+
+#pane-sentinel::-webkit-scrollbar-thumb {
+  background: #00F5D4;
+  border-radius: 3px;
+}
+
+#galactic-map-pane-root {
+  width: 100%;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+/* Modal Flotante de Mini-Mapa */
+.concord-minimap-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 10005;
+  background: rgba(6, 12, 22, 0.85);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.concord-minimap-window {
+  width: 95%;
+  max-width: 1240px;
+  max-height: 94vh;
+  background: rgba(11, 19, 32, 0.96);
+  border: 1.5px solid #F3C64F;
+  border-radius: 8px;
+  box-shadow: 0 0 32px rgba(243, 198, 79, 0.25), 0 20px 48px rgba(0, 0, 0, 0.8);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.minimap-modal-header {
+  padding: 12px 18px;
+  background: rgba(18, 30, 49, 0.95);
+  border-bottom: 1px solid rgba(243, 198, 79, 0.35);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.minimap-modal-body {
+  padding: 16px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Switcher de Juegos / Clústeres */
+.galactic-game-switcher {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.galactic-mode-btn {
+  background: rgba(26, 40, 62, 0.6);
+  border: 1px solid rgba(87, 196, 221, 0.3);
+  color: #B1E8F2;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.galactic-mode-btn:hover {
+  border-color: #00F5D4;
+  color: #FFF;
+  background: rgba(0, 245, 212, 0.15);
+}
+
+.galactic-mode-btn.active {
+  background: rgba(243, 198, 79, 0.2);
+  border-color: #F3C64F;
+  color: #F3C64F;
+  box-shadow: 0 0 10px rgba(243, 198, 79, 0.3);
+}
+
+/* Barra de Filtros del Mapa (Imperio, Facción, CONCORD) */
+.galactic-filters-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 8px;
+  background: rgba(16, 28, 47, 0.75);
+  padding: 8px 12px;
+  border: 1px solid rgba(87, 196, 221, 0.2);
+  border-radius: 6px;
+  margin: 6px 0 10px 0;
+  flex-shrink: 0;
+}
+
+.galactic-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.galactic-filter-label {
+  font-size: 0.66rem;
+  font-weight: 800;
+  color: #57C4DD;
+  letter-spacing: 0.05em;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.galactic-select {
+  background: #0B1320;
+  border: 1px solid rgba(87, 196, 221, 0.4);
+  color: #F1F1F1;
+  padding: 5px 8px;
+  border-radius: 4px;
+  font-size: 0.74rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.galactic-select:focus {
+  border-color: #00F5D4;
+  box-shadow: 0 0 8px rgba(0, 245, 212, 0.3);
+}
+
+/* Contenedor del Canvas del Mini-Mapa */
+.galactic-canvas-wrap {
+  position: relative;
+  width: 100%;
+  height: clamp(230px, 36vh, 380px);
+  min-height: 220px;
+  background: radial-gradient(circle at center, #0F1D30 0%, #060B14 100%);
+  border: 1.5px solid rgba(87, 196, 221, 0.35);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+  touch-action: none;
+  flex-shrink: 0;
+}
+
+.galactic-canvas-wrap::before,
+.galactic-canvas-wrap::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.galactic-canvas-wrap::before {
+  top: 6px;
+  left: 6px;
+  border-top: 2px solid #00F5D4;
+  border-left: 2px solid #00F5D4;
+}
+
+.galactic-canvas-wrap::after {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 2px solid #F3C64F;
+  border-right: 2px solid #F3C64F;
+}
+
+.galactic-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* HUD Overlay sobre el Canvas */
+.galactic-hud-overlay {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.galactic-hud-pill {
+  background: rgba(11, 19, 32, 0.85);
+  border: 1px solid rgba(87, 196, 221, 0.3);
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 0.68rem;
+  color: #B1E8F2;
+  backdrop-filter: blur(4px);
+}
+
+.galactic-hud-bottom {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 3;
+}
+
+/* Tarjetas de Regiones en Grid */
+.galactic-regions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  padding-bottom: 28px;
+}
+
+.galactic-region-card {
+  background: rgba(26, 40, 62, 0.55);
+  border: 1px solid rgba(87, 196, 221, 0.25);
+  border-radius: 5px;
+  padding: 10px;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.galactic-region-card:hover {
+  border-color: #00F5D4;
+  background: rgba(36, 56, 113, 0.45);
+  transform: translateY(-2px);
+}
+
+.galactic-region-card.active-drone {
+  border: 1.5px solid #00F5D4;
+  background: rgba(0, 245, 212, 0.08);
+  box-shadow: 0 0 14px rgba(0, 245, 212, 0.2);
+}
+
+.sentinel-deploy-btn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 5px 8px;
+  border-radius: 3px;
+  border: 1px solid rgba(87, 196, 221, 0.4);
+  background: rgba(16, 28, 47, 0.9);
+  color: #57C4DD;
+  font-size: 0.7rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sentinel-deploy-btn:hover {
+  background: #00F5D4;
+  color: #060B14;
+  border-color: #00F5D4;
+}
+
+.sentinel-deploy-btn.active {
+  background: rgba(0, 245, 212, 0.2);
+  color: #00F5D4;
+  border-color: #00F5D4;
+  cursor: default;
+}
+
+/* Quick Chips en la Pestaña del Sentinela */
+.sentinel-empire-quick-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 6px;
+}
+
+.sentinel-quick-chip {
+  padding: 4px 6px;
+  border-radius: 3px;
+  border: 1px solid rgba(87, 196, 221, 0.3);
+  background: rgba(11, 19, 32, 0.7);
+  color: #B1E8F2;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sentinel-quick-chip:hover {
+  border-color: #00F5D4;
+  color: #FFF;
+  background: rgba(0, 245, 212, 0.15);
+}
+
+.chip-gallente { border-color: rgba(87, 196, 221, 0.4); color: #57C4DD; }
+.chip-caldari { border-color: rgba(77, 143, 172, 0.4); color: #8EC5E5; }
+.chip-amarr { border-color: rgba(243, 198, 79, 0.4); color: #F3C64F; }
+.chip-minmatar { border-color: rgba(226, 90, 56, 0.4); color: #FFA07A; }
+.chip-pirate { border-color: rgba(234, 66, 139, 0.4); color: #EA428B; }
+.chip-blood { border-color: rgba(255, 42, 109, 0.4); color: #FF2A6D; }
+.chip-angel { border-color: rgba(155, 81, 224, 0.4); color: #D1A3FF; }
+.chip-triglavian { border-color: rgba(255, 0, 85, 0.4); color: #FF557F; }
+
+.sentinel-region-status-card {
+  background: rgba(16, 28, 47, 0.85);
+  border: 1px solid rgba(0, 245, 212, 0.4);
+  border-left: 4px solid #00F5D4;
+  border-radius: 5px;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+}
+
+.sentinel-beacon-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #00F5D4;
+  box-shadow: 0 0 10px #00F5D4;
+  display: inline-block;
+  animation: tv-pulse 0.9s infinite alternate;
+}
+
+/* ==========================================================================
+   RESPONSIVE OVERHAULS: MINI-MAP & REGIONAL SELECTOR
+   ========================================================================== */
+@media (max-width: 900px) {
+  .concord-minimap-window {
+    width: 96%;
+    max-height: 96vh;
+  }
+  .galactic-filters-row {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 8px;
+    padding: 10px;
+  }
+  .galactic-canvas-wrap {
+    height: 330px;
+  }
+  .galactic-regions-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .concord-minimap-modal {
+    padding: 6px;
+  }
+  .concord-minimap-window {
+    width: 100%;
+    max-height: 98vh;
+    border-radius: 6px;
+  }
+  .minimap-modal-header {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+  .minimap-modal-body {
+    padding: 8px;
+  }
+  .galactic-game-switcher {
+    width: 100%;
+    display: flex;
+    gap: 4px;
+  }
+  .galactic-mode-btn {
+    flex: 1 1 auto;
+    padding: 5px 6px;
+    font-size: 0.62rem;
+    text-align: center;
+    justify-content: center;
+  }
+  .galactic-filters-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 8px;
+    margin: 8px 0;
+  }
+  .galactic-select {
+    font-size: 0.72rem;
+    padding: 5px 8px;
+  }
+  .galactic-canvas-wrap {
+    height: 270px;
+  }
+  .galactic-hud-overlay,
+  .galactic-hud-bottom {
+    top: 6px;
+    bottom: 6px;
+    left: 6px;
+    right: 6px;
+  }
+  .galactic-hud-pill {
+    font-size: 0.58rem;
+    padding: 2px 6px;
+  }
+  .galactic-regions-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 440px) {
+  .galactic-canvas-wrap {
+    height: 230px;
+  }
+  .galactic-hud-bottom {
+    display: none;
+  }
+}
+

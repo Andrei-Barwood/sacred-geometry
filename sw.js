@@ -5,7 +5,7 @@
 
 /* global self, clients */
 
-const SW_VERSION = 'arch-v17-aegis9-sentinel';
+const SW_VERSION = 'arch-v21-map-overflow-fix';
 const SHELL_CACHE = `sacred-arch-shell-${SW_VERSION}`;
 const ASSET_CACHE = `sacred-arch-assets-${SW_VERSION}`;
 

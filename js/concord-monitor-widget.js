@@ -2,7 +2,14 @@
 // CONCORD DED // TV Broadcast Banner & Full Intelligence Pod Suite
 // For Sacred Geometry Portal — Comprehensive Implementation
 // ==========================================================================
-import { Aegis9SentinelDrone } from './aegis9-sentinel-drone.js';
+import {
+  Aegis9SentinelDrone,
+  NEW_EDEN_REGIONS,
+  EMPIRES_METADATA,
+  FACTIONS_METADATA,
+  CONCORD_PRESENCE_METADATA,
+  GAME_LAYERS_METADATA
+} from './aegis9-sentinel-drone.js';
 
 // Initial Historical Archive of Activity Monitor Updates
 // Initial Historical Archive of Activity Monitor Updates (Events from 2 days ago: 15 Octubre 2026)
@@ -555,6 +562,13 @@ class ConcordWidgetSuite {
     this.currentSourceFilter = 'all';
     this.currentSecurityFilter = 'all'; // 'all', 'high', 'low', 'null'
     this.currentMarketDayFilter = 'all'; // 'all', 'today', 'yesterday', 'two_days_ago'
+    this.currentEmpireFilter = 'all'; // 'all', 'gallente', 'caldari', 'amarr', 'minmatar', 'nullsec'
+    this.currentFactionFilter = 'all';
+    this.currentConcordPresenceFilter = 'all'; // 'all', 'high', 'low', 'null'
+    this.currentGameMapMode = 'eve_online'; // 'eve_online', 'eve_echoes', 'eve_galaxy_conquest'
+    this.galacticMap = null;
+    this.modalGalacticMap = null;
+    this.isMiniMapModalOpen = false;
     this.timer = null;
     this.liveStreamTimer = null;
     this.radar = null;
@@ -958,6 +972,23 @@ class ConcordWidgetSuite {
   setupModalTrigger() {
     const btn = document.getElementById('tv-open-pod-btn');
     const banner = document.getElementById('concord-tv-banner');
+    const mapBtn = document.getElementById('tv-map-selector-btn');
+    const sentinelBtn = document.getElementById('tv-sentinel-status-pill');
+
+    if (mapBtn) {
+      mapBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.openMiniMapModal();
+      });
+    }
+
+    if (sentinelBtn) {
+      sentinelBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        this.openPodModal();
+        this.switchTab('sentinel');
+      });
+    }
 
     if (btn) {
       btn.addEventListener('click', (e) => {
@@ -1078,6 +1109,9 @@ class ConcordWidgetSuite {
           </button>
           <button class="pod-tab-btn pod-tab-sentinel" id="tab-btn-sentinel" onclick="window.concordWidget.switchTab('sentinel')">
             <span class="tab-icon">🛡️</span> <span class="tab-label-full">SENTINELA AEGIS-9 (EDR)</span><span class="tab-label-short">AEGIS-9</span>
+          </button>
+          <button class="pod-tab-btn pod-tab-map" id="tab-btn-map" onclick="window.concordWidget.switchTab('map')">
+            <span class="tab-icon">🗺️</span> <span class="tab-label-full">MAPA & REGIONES (EVE / ECHOES / CONQUEST)</span><span class="tab-label-short">MAPA</span>
           </button>
         </nav>
 
@@ -1341,7 +1375,12 @@ class ConcordWidgetSuite {
 
           <!-- Pane 7: Aegis-9 Cyberbrain EDR Autonomous Sentinel Drone -->
           <div class="pod-tab-pane" id="pane-sentinel">
-            <div id="aegis9-sentinel-root" style="width: 100%; height: 100%; overflow-y: auto;"></div>
+            <div id="aegis9-sentinel-root" style="width: 100%; min-height: 100%; display: flex; flex-direction: column; box-sizing: border-box;"></div>
+          </div>
+
+          <!-- Pane 8: Galactic Interactive Map & Region Selector (EVE Online, Echoes, Galaxy Conquest) -->
+          <div class="pod-tab-pane" id="pane-map">
+            <div id="galactic-map-pane-root" style="width: 100%; min-height: 100%; display: flex; flex-direction: column; box-sizing: border-box;"></div>
           </div>
         </main>
 
@@ -1394,6 +1433,10 @@ class ConcordWidgetSuite {
     } else if (tabName === 'sentinel') {
       setTimeout(() => {
         this.sentinelDrone?.renderSentinelTabPane();
+      }, 40);
+    } else if (tabName === 'map') {
+      setTimeout(() => {
+        this.renderGalacticMapPane();
       }, 40);
     }
 
@@ -1983,9 +2026,803 @@ REPORTE DE EJECUCIÓN TÁCTICA // DRON SENTINELA AEGIS-9 (CYBERBRAIN EDR):
 
     renderLoop();
   }
+
+  // ========================================================================
+  // 9. Galactic Mini-Map & Regional Selector (EVE Online, Echoes, Galaxy Conquest)
+  // ========================================================================
+  openMiniMapModal() {
+    // Si el Pod principal ya está abierto, simplemente cambiar a la pestaña de mapa
+    const podModal = document.getElementById('concord-pod-modal');
+    if (podModal && podModal.style.display === 'flex') {
+      this.switchTab('map');
+      return;
+    }
+
+    let modal = document.getElementById('concord-minimap-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'concord-minimap-modal';
+      modal.className = 'concord-minimap-modal';
+      document.body.appendChild(modal);
+
+      modal.addEventListener('click', (e) => {
+        if (e.target === modal) this.closeMiniMapModal();
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && this.isMiniMapModalOpen) {
+          this.closeMiniMapModal();
+        }
+      });
+    }
+
+    modal.innerHTML = `
+      <div class="concord-minimap-window">
+        <header class="minimap-modal-header">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span class="map-pulse-dot"></span>
+            <div>
+              <h3 style="margin: 0; color: #F3C64F; font-size: 0.95rem; letter-spacing: 0.05em;">
+                🗺️ SELECTOR DE REGIONES // MIRADA PEQUEÑA DEL MAPA DE NEW EDEN
+              </h3>
+              <p style="margin: 2px 0 0 0; font-size: 0.68rem; color: #B1E8F2;">
+                EVE Online (Tranquility) · EVE Echoes (Red Móvil) · EVE Galaxy Conquest (4X) // 4 Grandes Imperios & Facciones
+              </p>
+            </div>
+          </div>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="tv-btn tv-expand-btn" style="font-size: 0.7rem; padding: 4px 10px;" onclick="window.concordWidget.closeMiniMapModal(); window.concordWidget.openPodModal(); window.concordWidget.switchTab('map');">
+              [ABRIR EN POD COMPLETO]
+            </button>
+            <button class="pod-close-btn" style="padding: 3px 8px;" onclick="window.concordWidget.closeMiniMapModal()">✕ CERRAR</button>
+          </div>
+        </header>
+
+        <div class="minimap-modal-body">
+          <!-- Modos de Mapa: Online, Echoes, Galaxy Conquest -->
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 8px;">
+            <div class="galactic-game-switcher">
+              <span style="font-size: 0.68rem; font-weight: 800; color: #57C4DD;">MODO DE MAPA:</span>
+              <button class="galactic-mode-btn ${this.currentGameMapMode === 'eve_online' ? 'active' : ''}" onclick="window.concordWidget.setGameMapMode('eve_online')">
+                🛰️ EVE ONLINE (TRANQUILITY)
+              </button>
+              <button class="galactic-mode-btn ${this.currentGameMapMode === 'eve_echoes' ? 'active' : ''}" onclick="window.concordWidget.setGameMapMode('eve_echoes')">
+                📱 EVE ECHOES (MÓVIL)
+              </button>
+              <button class="galactic-mode-btn ${this.currentGameMapMode === 'eve_galaxy_conquest' ? 'active' : ''}" onclick="window.concordWidget.setGameMapMode('eve_galaxy_conquest')">
+                ⚔️ EVE GALAXY CONQUEST (4X)
+              </button>
+            </div>
+            <div style="font-size: 0.7rem; color: #00F5D4; font-weight: 700;">
+              🛡️ DRON SENTINELA: ACTIVO Y OBSERVANDO EL MAPA
+            </div>
+          </div>
+
+          <!-- Filtros de Imperio, Facción y Nivel CONCORD -->
+          <div class="galactic-filters-row">
+            <div class="galactic-filter-group">
+              <label class="galactic-filter-label">👑 FILTRAR POR IMPERIO:</label>
+              <select class="galactic-select" onchange="window.concordWidget.filterEmpire(this.value)">
+                <option value="all" ${this.currentEmpireFilter === 'all' ? 'selected' : ''}>Todos los Imperios (4 Imperios + Piratas)</option>
+                <option value="gallente" ${this.currentEmpireFilter === 'gallente' ? 'selected' : ''}>🏛️ Gallente Federation</option>
+                <option value="caldari" ${this.currentEmpireFilter === 'caldari' ? 'selected' : ''}>🏢 Caldari State</option>
+                <option value="amarr" ${this.currentEmpireFilter === 'amarr' ? 'selected' : ''}>👑 Amarr Empire</option>
+                <option value="minmatar" ${this.currentEmpireFilter === 'minmatar' ? 'selected' : ''}>⚙️ Minmatar Republic</option>
+                <option value="nullsec" ${this.currentEmpireFilter === 'nullsec' ? 'selected' : ''}>☠️ Espacio Pirata & Soberano (Null-Sec)</option>
+              </select>
+            </div>
+
+            <div class="galactic-filter-group">
+              <label class="galactic-filter-label">⚔️ FILTRAR POR FACCIÓN:</label>
+              <select class="galactic-select" onchange="window.concordWidget.filterFaction(this.value)">
+                <option value="all" ${this.currentFactionFilter === 'all' ? 'selected' : ''}>Todas las Facciones</option>
+                <option value="guristas" ${this.currentFactionFilter === 'guristas' ? 'selected' : ''}>☠️ Guristas Pirates (The Rabbit)</option>
+                <option value="blood_raiders" ${this.currentFactionFilter === 'blood_raiders' ? 'selected' : ''}>🩸 Blood Raiders Covenant</option>
+                <option value="angel_cartel" ${this.currentFactionFilter === 'angel_cartel' ? 'selected' : ''}>⚡ Angel Cartel / Dominations</option>
+                <option value="sansha" ${this.currentFactionFilter === 'sansha' ? 'selected' : ''}>👁️ Sansha's Nation (Master Kuvakei)</option>
+                <option value="serpentis" ${this.currentFactionFilter === 'serpentis' ? 'selected' : ''}>🧪 Serpentis Corporation</option>
+                <option value="triglavian" ${this.currentFactionFilter === 'triglavian' ? 'selected' : ''}>🔺 Triglavian Collective (Pochven)</option>
+                <option value="edencom" ${this.currentFactionFilter === 'edencom' ? 'selected' : ''}>🛡️ EDENCOM Interstellar Defense</option>
+                <option value="gallente_fed" ${this.currentFactionFilter === 'gallente_fed' ? 'selected' : ''}>🏛️ Gallente Navy / FIO</option>
+                <option value="caldari_state" ${this.currentFactionFilter === 'caldari_state' ? 'selected' : ''}>🏢 Caldari State / Lai Dai</option>
+                <option value="amarr_empire" ${this.currentFactionFilter === 'amarr_empire' ? 'selected' : ''}>👑 Amarr Imperial Navy / Sarum</option>
+                <option value="minmatar_republic" ${this.currentFactionFilter === 'minmatar_republic' ? 'selected' : ''}>⚙️ Minmatar Republic Fleet</option>
+              </select>
+            </div>
+
+            <div class="galactic-filter-group">
+              <label class="galactic-filter-label">🛡️ PRESENCIA DE CONCORD:</label>
+              <select class="galactic-select" onchange="window.concordWidget.filterConcordPresence(this.value)">
+                <option value="all" ${this.currentConcordPresenceFilter === 'all' ? 'selected' : ''}>Todos los Niveles de Presencia</option>
+                <option value="high" ${this.currentConcordPresenceFilter === 'high' ? 'selected' : ''}>● Presencia Total (1.0 - 0.5 // Despacho DED 3s-19s)</option>
+                <option value="low" ${this.currentConcordPresenceFilter === 'low' ? 'selected' : ''}>● Presencia Parcial (0.4 - 0.1 // Solo Gate Guns)</option>
+                <option value="null" ${this.currentConcordPresenceFilter === 'null' ? 'selected' : ''}>● Sin Presencia CONCORD (≤ 0.0 // Anarquía Null-Sec)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Canvas del Mini-Mapa Galáctico -->
+          <div class="galactic-canvas-wrap">
+            <canvas id="modal-galactic-canvas" class="galactic-canvas"></canvas>
+            <div class="galactic-hud-overlay">
+              <div class="galactic-hud-pill">
+                🛰️ MAPA: <strong>${GAME_LAYERS_METADATA[this.currentGameMapMode].name.toUpperCase()}</strong>
+              </div>
+              <div class="galactic-hud-pill" style="color: #00F5D4;">
+                📍 SENTINELA EN: <strong>${(this.sentinelDrone?.activeRegionId || 'PLACID').toUpperCase()}</strong>
+              </div>
+            </div>
+            <div class="galactic-hud-bottom">
+              <div class="galactic-hud-pill">
+                💡 Haz clic en cualquier nodo del mapa para reubicar al Dron Sentinela
+              </div>
+              <div class="galactic-hud-pill" id="modal-hud-filter-pill">
+                FILTRO: <strong>${this.getFilterSummaryText()}</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid de Regiones Filtradas con Despliegue Rápido -->
+          <div id="modal-map-regions-grid" class="galactic-regions-grid"></div>
+        </div>
+      </div>
+    `;
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    this.isMiniMapModalOpen = true;
+
+    setTimeout(() => {
+      this.initGalacticMiniMap('modal-galactic-canvas');
+      this.renderMapRegionsGrid('modal-map-regions-grid');
+    }, 60);
+  }
+
+  closeMiniMapModal() {
+    const modal = document.getElementById('concord-minimap-modal');
+    if (modal) modal.style.display = 'none';
+    this.isMiniMapModalOpen = false;
+    document.body.style.overflow = '';
+  }
+
+  renderGalacticMapPane() {
+    const root = document.getElementById('galactic-map-pane-root');
+    if (!root) return;
+
+    root.innerHTML = `
+      <div style="padding: 16px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px;">
+        <!-- Cabecera de la Pestaña de Mapa -->
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 6px;">
+          <div>
+            <h3 style="margin: 0; color: #F3C64F; font-size: 1.05rem; letter-spacing: 0.05em;">
+              🗺️ MAPA TÁCTICO INTERESTELAR // CLÚSTER MULTIDIMENSIONAL
+            </h3>
+            <p style="margin: 3px 0 0 0; font-size: 0.72rem; color: #B1E8F2;">
+              Vista condensada de New Eden completa: 4 Grandes Imperios, espacio pirata y soberanía en EVE Online, Echoes y Galaxy Conquest.
+            </p>
+          </div>
+          <div class="galactic-game-switcher">
+            <button class="galactic-mode-btn ${this.currentGameMapMode === 'eve_online' ? 'active' : ''}" onclick="window.concordWidget.setGameMapMode('eve_online')">
+              🛰️ EVE ONLINE
+            </button>
+            <button class="galactic-mode-btn ${this.currentGameMapMode === 'eve_echoes' ? 'active' : ''}" onclick="window.concordWidget.setGameMapMode('eve_echoes')">
+              📱 EVE ECHOES
+            </button>
+            <button class="galactic-mode-btn ${this.currentGameMapMode === 'eve_galaxy_conquest' ? 'active' : ''}" onclick="window.concordWidget.setGameMapMode('eve_galaxy_conquest')">
+              ⚔️ GALAXY CONQUEST
+            </button>
+          </div>
+        </div>
+
+        <!-- Filtros Tácticos (Imperio, Facción, CONCORD) -->
+        <div class="galactic-filters-row">
+          <div class="galactic-filter-group">
+            <label class="galactic-filter-label">👑 FILTRAR POR IMPERIO:</label>
+            <select class="galactic-select" onchange="window.concordWidget.filterEmpire(this.value)">
+              <option value="all" ${this.currentEmpireFilter === 'all' ? 'selected' : ''}>Todos los Imperios (4 Grandes Imperios + Piratas)</option>
+              <option value="gallente" ${this.currentEmpireFilter === 'gallente' ? 'selected' : ''}>🏛️ Gallente Federation</option>
+              <option value="caldari" ${this.currentEmpireFilter === 'caldari' ? 'selected' : ''}>🏢 Caldari State</option>
+              <option value="amarr" ${this.currentEmpireFilter === 'amarr' ? 'selected' : ''}>👑 Amarr Empire</option>
+              <option value="minmatar" ${this.currentEmpireFilter === 'minmatar' ? 'selected' : ''}>⚙️ Minmatar Republic</option>
+              <option value="nullsec" ${this.currentEmpireFilter === 'nullsec' ? 'selected' : ''}>☠️ Espacio Pirata & Soberano (Null-Sec)</option>
+            </select>
+          </div>
+
+          <div class="galactic-filter-group">
+            <label class="galactic-filter-label">⚔️ FILTRAR POR FACCIÓN:</label>
+            <select class="galactic-select" onchange="window.concordWidget.filterFaction(this.value)">
+              <option value="all" ${this.currentFactionFilter === 'all' ? 'selected' : ''}>Todas las Facciones</option>
+              <option value="guristas" ${this.currentFactionFilter === 'guristas' ? 'selected' : ''}>☠️ Guristas Pirates (The Rabbit)</option>
+              <option value="blood_raiders" ${this.currentFactionFilter === 'blood_raiders' ? 'selected' : ''}>🩸 Blood Raiders Covenant</option>
+              <option value="angel_cartel" ${this.currentFactionFilter === 'angel_cartel' ? 'selected' : ''}>⚡ Angel Cartel / Dominations</option>
+              <option value="sansha" ${this.currentFactionFilter === 'sansha' ? 'selected' : ''}>👁️ Sansha's Nation (Master Kuvakei)</option>
+              <option value="serpentis" ${this.currentFactionFilter === 'serpentis' ? 'selected' : ''}>🧪 Serpentis Corporation</option>
+              <option value="triglavian" ${this.currentFactionFilter === 'triglavian' ? 'selected' : ''}>🔺 Triglavian Collective (Pochven)</option>
+              <option value="edencom" ${this.currentFactionFilter === 'edencom' ? 'selected' : ''}>🛡️ EDENCOM Interstellar Defense</option>
+              <option value="gallente_fed" ${this.currentFactionFilter === 'gallente_fed' ? 'selected' : ''}>🏛️ Gallente Navy / FIO</option>
+              <option value="caldari_state" ${this.currentFactionFilter === 'caldari_state' ? 'selected' : ''}>🏢 Caldari State / Lai Dai</option>
+              <option value="amarr_empire" ${this.currentFactionFilter === 'amarr_empire' ? 'selected' : ''}>👑 Amarr Imperial Navy / Sarum</option>
+              <option value="minmatar_republic" ${this.currentFactionFilter === 'minmatar_republic' ? 'selected' : ''}>⚙️ Minmatar Republic Fleet</option>
+            </select>
+          </div>
+
+          <div class="galactic-filter-group">
+            <label class="galactic-filter-label">🛡️ PRESENCIA DE CONCORD:</label>
+            <select class="galactic-select" onchange="window.concordWidget.filterConcordPresence(this.value)">
+              <option value="all" ${this.currentConcordPresenceFilter === 'all' ? 'selected' : ''}>Todos los Niveles de Presencia</option>
+              <option value="high" ${this.currentConcordPresenceFilter === 'high' ? 'selected' : ''}>● Presencia Total (1.0 - 0.5 // Despacho DED 3s-19s)</option>
+              <option value="low" ${this.currentConcordPresenceFilter === 'low' ? 'selected' : ''}>● Presencia Parcial (0.4 - 0.1 // Solo Gate Guns)</option>
+              <option value="null" ${this.currentConcordPresenceFilter === 'null' ? 'selected' : ''}>● Sin Presencia CONCORD (≤ 0.0 // Anarquía Null-Sec)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Canvas del Mini-Mapa Galáctico -->
+        <div class="galactic-canvas-wrap">
+          <canvas id="pod-galactic-canvas" class="galactic-canvas"></canvas>
+          <div class="galactic-hud-overlay">
+            <div class="galactic-hud-pill">
+              🛰️ MAPA ACTIVO: <strong>${GAME_LAYERS_METADATA[this.currentGameMapMode].name.toUpperCase()}</strong>
+            </div>
+            <div class="galactic-hud-pill" style="color: #00F5D4;">
+              📍 DRON SENTINELA: <strong>${(this.sentinelDrone?.activeRegionId || 'PLACID').toUpperCase()}</strong>
+            </div>
+          </div>
+          <div class="galactic-hud-bottom">
+            <div class="galactic-hud-pill">
+              💡 Haz clic sobre cualquier nodo regional para desplegar el Dron Sentinela
+            </div>
+            <div class="galactic-hud-pill" id="pod-hud-filter-pill">
+              FILTRO: <strong>${this.getFilterSummaryText()}</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grid de Regiones Filtradas con Botón Desplegar -->
+        <div id="galactic-regions-grid" class="galactic-regions-grid"></div>
+      </div>
+    `;
+
+    setTimeout(() => {
+      this.initGalacticMiniMap('pod-galactic-canvas');
+      this.renderMapRegionsGrid('galactic-regions-grid');
+    }, 60);
+  }
+
+  getFilterSummaryText() {
+    const parts = [];
+    if (this.currentEmpireFilter !== 'all') {
+      const eMeta = EMPIRES_METADATA[this.currentEmpireFilter];
+      parts.push(eMeta ? eMeta.name.toUpperCase() : this.currentEmpireFilter.toUpperCase());
+    }
+    if (this.currentFactionFilter !== 'all') {
+      const fMeta = FACTIONS_METADATA[this.currentFactionFilter];
+      parts.push(fMeta ? fMeta.name.toUpperCase() : this.currentFactionFilter.toUpperCase());
+    }
+    if (this.currentConcordPresenceFilter !== 'all') {
+      parts.push(`CONCORD: ${this.currentConcordPresenceFilter.toUpperCase()}`);
+    }
+    return parts.length > 0 ? parts.join(' · ') : 'TODOS LOS SISTEMAS';
+  }
+
+  updateHudFilterBadges() {
+    const txt = this.getFilterSummaryText();
+    const podPill = document.getElementById('pod-hud-filter-pill');
+    if (podPill) podPill.innerHTML = `FILTRO: <strong>${txt}</strong>`;
+    const modalPill = document.getElementById('modal-hud-filter-pill');
+    if (modalPill) modalPill.innerHTML = `FILTRO: <strong>${txt}</strong>`;
+  }
+
+  resetGalacticFilters() {
+    this.currentEmpireFilter = 'all';
+    this.currentFactionFilter = 'all';
+    this.currentConcordPresenceFilter = 'all';
+    if (this.audioEnabled) this.playTone('ping');
+    document.querySelectorAll('.galactic-select').forEach((sel) => {
+      sel.value = 'all';
+    });
+    this.updateHudFilterBadges();
+    this.renderMapRegionsGrid('galactic-regions-grid');
+    this.renderMapRegionsGrid('modal-map-regions-grid');
+  }
+
+  isRegionActive(reg) {
+    if (this.currentGameMapMode !== 'all' && reg.games && !reg.games.includes(this.currentGameMapMode)) {
+      return false;
+    }
+    if (this.currentEmpireFilter !== 'all' && reg.empire !== this.currentEmpireFilter) {
+      return false;
+    }
+    if (this.currentFactionFilter !== 'all') {
+      const f = this.currentFactionFilter;
+      if (reg.faction !== f && reg.hostileFaction !== f) {
+        return false;
+      }
+    }
+    if (this.currentConcordPresenceFilter !== 'all') {
+      if (this.currentConcordPresenceFilter === 'high' && reg.sec < 0.5) return false;
+      if (this.currentConcordPresenceFilter === 'low' && (reg.sec < 0.1 || reg.sec >= 0.5)) return false;
+      if (this.currentConcordPresenceFilter === 'null' && reg.sec >= 0.1) return false;
+    }
+    return true;
+  }
+
+  renderMapRegionsGrid(containerId = 'galactic-regions-grid') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    const filtered = NEW_EDEN_REGIONS.filter((reg) => this.isRegionActive(reg));
+    const activeRegionId = this.sentinelDrone?.activeRegionId || 'placid';
+    const isFiltered = this.currentEmpireFilter !== 'all' || this.currentFactionFilter !== 'all' || this.currentConcordPresenceFilter !== 'all';
+
+    if (filtered.length === 0) {
+      container.innerHTML = `
+        <div style="grid-column: 1 / -1; padding: 24px; text-align: center; color: #B1E8F2; font-size: 0.82rem; background: rgba(16, 28, 47, 0.6); border: 1px dashed rgba(87,196,221,0.3); border-radius: 6px;">
+          ⚠️ No hay regiones que coincidan con los filtros seleccionados (Imperio: ${this.currentEmpireFilter}, Facción: ${this.currentFactionFilter}, Presencia CONCORD: ${this.currentConcordPresenceFilter}).
+          <br><br>
+          <button class="tv-btn" style="padding: 5px 12px; font-size: 0.72rem;" onclick="window.concordWidget.resetGalacticFilters()">✕ RESTAURAR TODOS LOS FILTROS</button>
+        </div>
+      `;
+      return;
+    }
+
+    const cardsHtml = filtered.map((reg) => {
+      const isCurrentDroneLocation = reg.id === activeRegionId;
+      const empireMeta = EMPIRES_METADATA[reg.empire] || EMPIRES_METADATA["gallente"];
+      const secColor = reg.sec >= 0.5 ? "#57C4DD" : (reg.sec >= 0.1 ? "#E5A93C" : "#EA428B");
+
+      return `
+        <div class="galactic-region-card ${isCurrentDroneLocation ? 'active-drone' : ''}">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <strong style="color: ${secColor}; font-size: 0.88rem;">
+                ${reg.name} [${reg.sec}]
+              </strong>
+              <span class="pod-badge" style="background: rgba(87,196,221,0.18); color: ${empireMeta.color}; border: 1px solid ${empireMeta.color};">
+                ${empireMeta.icon} ${empireMeta.name}
+              </span>
+            </div>
+
+            <div style="font-size: 0.72rem; color: #B1E8F2; margin-top: 5px; line-height: 1.35;">
+              ${reg.description}
+            </div>
+
+            <div style="margin-top: 6px; font-size: 0.68rem; display: flex; flex-direction: column; gap: 2px;">
+              <div><strong>Facción Soberana:</strong> <span style="color: #F1F1F1;">${reg.factionName}</span></div>
+              <div><strong>Amenaza Hostil:</strong> <span style="color: #EA428B;">${reg.hostileFactionName}</span></div>
+              <div><strong>Presencia CONCORD:</strong> <span style="color: ${secColor}; font-weight: 700;">${reg.concordPresence}</span> (${reg.concordResponse})</div>
+            </div>
+          </div>
+
+          <button 
+            class="sentinel-deploy-btn ${isCurrentDroneLocation ? 'active' : ''}" 
+            onclick="window.concordWidget.deploySentinelToRegion('${reg.id}')">
+            ${isCurrentDroneLocation ? '✓ PATRULLA SENTINELA ACTIVA' : '🚀 DESPLEGAR DRON SENTINELA AQUÍ'}
+          </button>
+        </div>
+      `;
+    }).join('');
+
+    const countHeader = `
+      <div style="grid-column: 1 / -1; display: flex; justify-content: space-between; align-items: center; padding: 4px 2px 8px 2px; border-bottom: 1px solid rgba(87, 196, 221, 0.2); margin-bottom: 6px; flex-wrap: wrap; gap: 6px;">
+        <span style="font-size: 0.74rem; font-weight: 800; color: #00F5D4; letter-spacing: 0.05em;">
+          📍 REGIONES EN PANTALLA: ${filtered.length} DE ${NEW_EDEN_REGIONS.length} ${isFiltered ? `(FILTRO ACTIVO)` : ''}
+        </span>
+        ${isFiltered ? `
+          <button class="tv-btn" style="padding: 2px 8px; font-size: 0.65rem;" onclick="window.concordWidget.resetGalacticFilters()">
+            ✕ LIMPIAR FILTROS
+          </button>
+        ` : ''}
+      </div>
+    `;
+
+    container.innerHTML = countHeader + cardsHtml;
+  }
+
+  async deploySentinelToRegion(regionId, systemName = null) {
+    if (this.sentinelDrone) {
+      await this.sentinelDrone.deploySentinelToRegion(regionId, systemName);
+    }
+    this.renderMapRegionsGrid('galactic-regions-grid');
+    this.renderMapRegionsGrid('modal-map-regions-grid');
+  }
+
+  setGameMapMode(modeKey) {
+    this.currentGameMapMode = modeKey;
+    if (this.sentinelDrone) {
+      this.sentinelDrone.setGameMode(modeKey);
+    }
+    if (this.audioEnabled) this.playTone('ping');
+    this.renderGalacticMapPane();
+    if (this.isMiniMapModalOpen) {
+      this.openMiniMapModal();
+    }
+  }
+
+  filterEmpire(empireKey) {
+    this.currentEmpireFilter = empireKey;
+    if (this.audioEnabled) this.playTone('ping');
+    this.updateHudFilterBadges();
+    this.renderMapRegionsGrid('galactic-regions-grid');
+    this.renderMapRegionsGrid('modal-map-regions-grid');
+  }
+
+  filterFaction(factionKey) {
+    this.currentFactionFilter = factionKey;
+    if (this.audioEnabled) this.playTone('ping');
+    this.updateHudFilterBadges();
+    this.renderMapRegionsGrid('galactic-regions-grid');
+    this.renderMapRegionsGrid('modal-map-regions-grid');
+  }
+
+  filterConcordPresence(presenceKey) {
+    this.currentConcordPresenceFilter = presenceKey;
+    if (this.audioEnabled) this.playTone('ping');
+    this.updateHudFilterBadges();
+    this.renderMapRegionsGrid('galactic-regions-grid');
+    this.renderMapRegionsGrid('modal-map-regions-grid');
+  }
+
+  initGalacticMiniMap(canvasId) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    let w = 0;
+    let h = 0;
+    let mouseX = -100;
+    let mouseY = -100;
+    let hoveredNode = null;
+    let dronePulseRadius = 0;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const dpr = window.devicePixelRatio || 1;
+      canvas.width = Math.floor(rect.width * dpr);
+      canvas.height = Math.floor(rect.height * dpr);
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.scale(dpr, dpr);
+      w = rect.width;
+      h = rect.height;
+    };
+
+    resize();
+
+    let resizeTimer = null;
+    const debouncedResize = () => {
+      if (resizeTimer) cancelAnimationFrame(resizeTimer);
+      resizeTimer = requestAnimationFrame(resize);
+    };
+
+    window.addEventListener('resize', debouncedResize);
+
+    if (typeof ResizeObserver !== 'undefined' && canvas.parentElement) {
+      const ro = new ResizeObserver(() => debouncedResize());
+      ro.observe(canvas.parentElement);
+    }
+
+    // Proyección de coordenadas con márgenes de seguridad para todas las resoluciones
+    const getNodeScreenCoords = (reg, currentW, currentH) => {
+      const topPad = currentH < 300 ? 32 : 42;
+      const bottomPad = currentH < 300 ? 38 : 48;
+      const leftPad = currentW < 480 ? 28 : (currentW < 768 ? 40 : 54);
+      const rightPad = currentW < 480 ? 32 : (currentW < 768 ? 44 : 58);
+
+      const usableW = Math.max(80, currentW - leftPad - rightPad);
+      const usableH = Math.max(80, currentH - topPad - bottomPad);
+
+      const minX = 0.04, maxX = 0.92;
+      const minY = 0.04, maxY = 0.92;
+
+      const normX = Math.max(0, Math.min(1, (reg.x - minX) / (maxX - minX)));
+      const normY = Math.max(0, Math.min(1, (reg.y - minY) / (maxY - minY)));
+
+      return {
+        x: leftPad + normX * usableW,
+        y: topPad + normY * usableH
+      };
+    };
+
+    // Soporte unificado de Mouse y Toque (Touch / Mobile / Tablets)
+    const handlePointerAction = (clientX, clientY, isTap = false) => {
+      const rect = canvas.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      mouseX = clientX - rect.left;
+      mouseY = clientY - rect.top;
+
+      let closest = null;
+      let minDistance = w < 500 ? 28 : 22; // Radio ampliado en móviles
+
+      for (const reg of NEW_EDEN_REGIONS) {
+        const pt = getNodeScreenCoords(reg, w, h);
+        const dist = Math.hypot(mouseX - pt.x, mouseY - pt.y);
+        if (dist < minDistance) {
+          closest = reg;
+          minDistance = dist;
+        }
+      }
+
+      hoveredNode = closest;
+      canvas.style.cursor = closest ? 'pointer' : 'default';
+
+      if (isTap && closest) {
+        this.deploySentinelToRegion(closest.id);
+        if (this.audioEnabled) {
+          this.playTone(closest.sec < 0.1 ? 'omega' : 'ping');
+        }
+      }
+    };
+
+    canvas.addEventListener('mousemove', (e) => handlePointerAction(e.clientX, e.clientY, false));
+    canvas.addEventListener('click', (e) => handlePointerAction(e.clientX, e.clientY, true));
+    canvas.addEventListener('mouseleave', () => {
+      mouseX = -100;
+      mouseY = -100;
+      hoveredNode = null;
+    });
+
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches[0]) {
+        handlePointerAction(e.touches[0].clientX, e.touches[0].clientY, true);
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches[0]) {
+        handlePointerAction(e.touches[0].clientX, e.touches[0].clientY, false);
+      }
+    }, { passive: true });
+
+    // Rutas e hipervías de New Eden
+    const CONNECTIONS = [
+      ["essence", "sinq_laison"], ["essence", "placid"], ["placid", "black_rise"],
+      ["black_rise", "the_citadel"], ["the_citadel", "the_forge"], ["the_forge", "lonetrek"],
+      ["lonetrek", "venal"], ["the_citadel", "metropolis"], ["metropolis", "heimatar"],
+      ["heimatar", "molden_heath"], ["sinq_laison", "domain"], ["domain", "bleak_lands"],
+      ["bleak_lands", "tash_murkon"], ["bleak_lands", "metropolis"], ["domain", "delve"],
+      ["tash_murkon", "stain"], ["curse", "bleak_lands"], ["curse", "stain"],
+      ["fountain", "placid"], ["venal", "the_forge"], ["pochven", "essence"],
+      ["pochven", "the_forge"], ["pochven", "domain"], ["pochven", "metropolis"]
+    ];
+
+    // Estrellas de fondo precalculadas
+    const stars = [];
+    for (let i = 0; i < 90; i++) {
+      stars.push({
+        x: Math.random(),
+        y: Math.random(),
+        size: Math.random() * 1.5 + 0.5,
+        alpha: Math.random() * 0.7 + 0.3
+      });
+    }
+
+    const renderLoop = () => {
+      if (!document.getElementById(canvasId)) return;
+      ctx.clearRect(0, 0, w, h);
+
+      const isFilterEngaged = this.currentEmpireFilter !== 'all' || this.currentFactionFilter !== 'all' || this.currentConcordPresenceFilter !== 'all';
+
+      // 1. Nebulosas galácticas para los 4 imperios y Null-Sec
+      const drawNebula = (cx, cy, radius, colorStop) => {
+        const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, radius);
+        grad.addColorStop(0, colorStop);
+        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.fill();
+      };
+
+      drawNebula(w * 0.28, h * 0.42, w * 0.22, 'rgba(87, 196, 221, 0.08)'); // Gallente
+      drawNebula(w * 0.65, h * 0.32, w * 0.22, 'rgba(77, 143, 172, 0.08)'); // Caldari
+      drawNebula(w * 0.38, h * 0.72, w * 0.24, 'rgba(243, 198, 79, 0.08)'); // Amarr
+      drawNebula(w * 0.80, h * 0.65, w * 0.22, 'rgba(226, 90, 56, 0.08)'); // Minmatar
+      drawNebula(w * 0.52, h * 0.12, w * 0.18, 'rgba(234, 66, 139, 0.09)'); // Venal / Piratas
+      drawNebula(w * 0.50, h * 0.50, w * 0.14, 'rgba(255, 0, 85, 0.12)');  // Pochven
+
+      // 2. Campo de estrellas
+      ctx.fillStyle = '#FFFFFF';
+      for (const s of stars) {
+        ctx.globalAlpha = s.alpha * 0.6;
+        ctx.beginPath();
+        ctx.arc(s.x * w, s.y * h, s.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1.0;
+
+      // 3. Cuadrículas y meridianos tácticos
+      ctx.strokeStyle = 'rgba(87, 196, 221, 0.08)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(w * 0.04, h * 0.04, w * 0.92, h * 0.92);
+
+      ctx.beginPath();
+      ctx.moveTo(w * 0.5, h * 0.04);
+      ctx.lineTo(w * 0.5, h * 0.96);
+      ctx.moveTo(w * 0.04, h * 0.5);
+      ctx.lineTo(w * 0.96, h * 0.5);
+      ctx.stroke();
+
+      // 4. Conexiones e Hipervías de Puertas Estelares (Stargates)
+      const regionMap = new Map(NEW_EDEN_REGIONS.map((r) => [r.id, r]));
+      for (const [id1, id2] of CONNECTIONS) {
+        const r1 = regionMap.get(id1);
+        const r2 = regionMap.get(id2);
+        if (!r1 || !r2) continue;
+
+        const p1 = getNodeScreenCoords(r1, w, h);
+        const p2 = getNodeScreenCoords(r2, w, h);
+
+        const a1 = this.isRegionActive(r1);
+        const a2 = this.isRegionActive(r2);
+        const isConnectedActive = a1 && a2;
+
+        if (isFilterEngaged) {
+          ctx.strokeStyle = isConnectedActive ? 'rgba(0, 245, 212, 0.5)' : 'rgba(87, 196, 221, 0.04)';
+          ctx.lineWidth = isConnectedActive ? 1.6 : 0.6;
+          ctx.setLineDash(isConnectedActive ? [5, 4] : [2, 8]);
+        } else {
+          ctx.strokeStyle = isConnectedActive ? 'rgba(87, 196, 221, 0.35)' : 'rgba(87, 196, 221, 0.08)';
+          ctx.lineWidth = 1.2;
+          ctx.setLineDash(isConnectedActive ? [4, 4] : [2, 6]);
+        }
+
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.stroke();
+      }
+      ctx.setLineDash([]);
+
+      // 5. Nodos Regionales de New Eden
+      const activeSentinelRegionId = this.sentinelDrone?.activeRegionId || 'placid';
+
+      for (const reg of NEW_EDEN_REGIONS) {
+        const pt = getNodeScreenCoords(reg, w, h);
+        const rx = pt.x;
+        const ry = pt.y;
+        const isActive = this.isRegionActive(reg);
+        const isHovered = hoveredNode === reg;
+        const isSentinelActive = reg.id === activeSentinelRegionId;
+
+        const secColor = reg.sec >= 0.5 ? '#57C4DD' : (reg.sec >= 0.1 ? '#E5A93C' : '#EA428B');
+        const empireMeta = EMPIRES_METADATA[reg.empire] || EMPIRES_METADATA['gallente'];
+
+        ctx.save();
+        if (!isActive) {
+          ctx.globalAlpha = isFilterEngaged ? 0.09 : 0.22;
+        }
+
+        // Halo para nodos activos cuando un filtro está activado
+        if (isActive && isFilterEngaged) {
+          ctx.beginPath();
+          ctx.arc(rx, ry, 12, 0, Math.PI * 2);
+          ctx.fillStyle = `${empireMeta.color}28`;
+          ctx.fill();
+          ctx.strokeStyle = empireMeta.color;
+          ctx.lineWidth = 1.2;
+          ctx.stroke();
+        }
+
+        // Si el Dron Sentinela está desplegado aquí, dibujar ondas de radar
+        if (isSentinelActive) {
+          dronePulseRadius = (dronePulseRadius + 0.35) % 24;
+          ctx.strokeStyle = '#00F5D4';
+          ctx.lineWidth = 1.8;
+          ctx.beginPath();
+          ctx.arc(rx, ry, 7 + dronePulseRadius, 0, Math.PI * 2);
+          ctx.stroke();
+
+          // Retícula exterior táctica
+          ctx.strokeStyle = 'rgba(0, 245, 212, 0.4)';
+          ctx.beginPath();
+          ctx.arc(rx, ry, 16, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        // Anillo de Seguridad CONCORD
+        const nodeRadius = isHovered ? 8 : (isActive && isFilterEngaged ? 6.5 : 5);
+        ctx.beginPath();
+        ctx.arc(rx, ry, nodeRadius, 0, Math.PI * 2);
+        ctx.fillStyle = empireMeta.color;
+        ctx.fill();
+        ctx.strokeStyle = secColor;
+        ctx.lineWidth = isHovered ? 2.4 : (isActive && isFilterEngaged ? 2.0 : 1.4);
+        ctx.stroke();
+
+        // Punto central brillante
+        ctx.beginPath();
+        ctx.arc(rx, ry, 2, 0, Math.PI * 2);
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fill();
+
+        // Etiqueta del Nodo con alineación inteligente (evita salirse de la pantalla)
+        const isRightSide = rx > w * 0.58;
+        ctx.textAlign = isRightSide ? 'right' : 'left';
+        const labelX = isRightSide ? rx - (isHovered ? 12 : 9) : rx + (isHovered ? 12 : 9);
+
+        const fontSize = w < 480 ? 8 : (w < 768 ? 9 : 10);
+        ctx.font = (isActive && isFilterEngaged) 
+          ? `bold ${fontSize}px "Inter", monospace, sans-serif`
+          : `${fontSize}px "Inter", monospace, sans-serif`;
+        
+        ctx.fillStyle = isActive 
+          ? (isFilterEngaged ? '#00F5D4' : '#F1F1F1') 
+          : 'rgba(241, 241, 241, 0.35)';
+        
+        ctx.fillText(`${reg.name} [${reg.sec}]`, labelX, ry + 3);
+
+        // Indicador del Dron Sentinela
+        if (isSentinelActive) {
+          const sentFontSize = w < 480 ? 7.5 : 8.5;
+          ctx.font = `bold ${sentFontSize}px "Inter", sans-serif`;
+          ctx.fillStyle = '#00F5D4';
+          ctx.fillText(`🛡️ SENTINELA T${this.sentinelDrone?.caseResolutions.get(this.sentinelDrone?.selectedCaseId)?.activeFallbackTier || 2}`, labelX, ry + (w < 480 ? 12 : 14));
+        }
+
+        ctx.restore();
+      }
+
+      // 6. Tooltip Táctico Interactivo en Hover / Touch
+      if (hoveredNode) {
+        const pt = getNodeScreenCoords(hoveredNode, w, h);
+        const rx = pt.x;
+        const ry = pt.y;
+        const empireMeta = EMPIRES_METADATA[hoveredNode.empire] || EMPIRES_METADATA['gallente'];
+        const secColor = hoveredNode.sec >= 0.5 ? '#57C4DD' : (hoveredNode.sec >= 0.1 ? '#E5A93C' : '#EA428B');
+
+        const boxW = Math.min(210, w - 24);
+        const boxH = h < 280 ? 76 : 88;
+        let boxX = Math.max(10, Math.min(w - boxW - 10, rx - boxW / 2));
+        let boxY = ry < h * 0.5 ? ry + 16 : ry - boxH - 16;
+        if (boxY < 8) boxY = 8;
+        if (boxY + boxH > h - 8) boxY = h - boxH - 8;
+
+        ctx.fillStyle = 'rgba(11, 19, 32, 0.94)';
+        ctx.strokeStyle = '#00F5D4';
+        ctx.lineWidth = 1.2;
+        ctx.fillRect(boxX, boxY, boxW, boxH);
+        ctx.strokeRect(boxX, boxY, boxW, boxH);
+
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#00F5D4';
+        ctx.font = 'bold 9.5px "Inter", sans-serif';
+        ctx.fillText(`REGIÓN: ${hoveredNode.name.toUpperCase()} [${hoveredNode.sec} SEC]`, boxX + 8, boxY + 14);
+
+        ctx.fillStyle = '#B1E8F2';
+        ctx.font = '8.5px "Inter", sans-serif';
+        ctx.fillText(`Imperio: ${empireMeta.name}`, boxX + 8, boxY + 28);
+        ctx.fillText(`Facción: ${hoveredNode.factionName}`, boxX + 8, boxY + 41);
+        
+        ctx.fillStyle = secColor;
+        ctx.fillText(`CONCORD: ${hoveredNode.concordPresence} (${hoveredNode.concordResponse})`, boxX + 8, boxY + 54);
+
+        ctx.fillStyle = '#EA428B';
+        ctx.fillText(`Amenaza: ${hoveredNode.hostileFactionName}`, boxX + 8, boxY + 67);
+
+        if (boxH > 80) {
+          ctx.fillStyle = '#00F5D4';
+          ctx.font = 'bold 8px "Inter", sans-serif';
+          ctx.fillText(`[TOCA O HAZ CLIC PARA DESPLEGAR]`, boxX + 8, boxY + 80);
+        }
+      }
+
+      requestAnimationFrame(renderLoop);
+    };
+
+    renderLoop();
+  }
 }
 
-// Instantiate on DOM load
-document.addEventListener('DOMContentLoaded', () => {
-  window.concordWidget = new ConcordWidgetSuite();
-});
+// Instantiate on DOM load or immediately if already loaded
+function initConcordWidgetSuite() {
+  if (!window.concordWidget) {
+    window.concordWidget = new ConcordWidgetSuite();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initConcordWidgetSuite);
+} else {
+  initConcordWidgetSuite();
+}
